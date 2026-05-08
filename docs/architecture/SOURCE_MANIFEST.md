@@ -6,7 +6,7 @@ This file records the source repository states used to initialize the Phase 4A f
 
 Repository: `info-rbp/rbp-platform`
 
-Default branch: `work` (environment-local; remote default branch not available in this environment)
+Default branch: `main`
 
 Phase 4A branch: `phase/phase-4a-foundation`
 
