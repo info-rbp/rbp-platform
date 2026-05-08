@@ -26,11 +26,11 @@ Purpose:
 
 Repository: `info-rbp/Uiuxdesignassistance`
 
-Default branch: `unknown (repository not accessible from current environment)`
+Default branch: `main`
 
 Source branch: `main`
 
-Source commit: `unknown (repository not accessible from current environment)`
+Source commit: `<FULL_UIUX_MAIN_SHA>`
 
 Status: Phase 1 complete
 
