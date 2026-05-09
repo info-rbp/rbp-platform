@@ -1,0 +1,1 @@
+"""HRMS integration service placeholders."""

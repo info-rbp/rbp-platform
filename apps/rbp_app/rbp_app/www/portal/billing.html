@@ -1,0 +1,109 @@
+{% extends "rbp_app/templates/shells/portal_base.html" %}
+
+{% block title %}Billing - RBP Portal{% endblock %}
+
+{% block portal_title %}Billing{% endblock %}
+
+{% block portal_content %}
+    <div class="rbp-billing-shell" data-testid="portal-billing-page">
+        {% if account %}
+            <div class="rbp-billing-summary">
+                <p class="rbp-section-label">Billing summary for {{ account.account_name }}</p>
+                <dl>
+                    <dt>Status</dt>
+                    <dd>{{ account.subscription_status or "No Subscription" }}</dd>
+
+                    <dt>Customer</dt>
+                    <dd>{{ account.stripe_customer_id or "Not created" }}</dd>
+
+                    <dt>Subscription</dt>
+                    <dd>{{ account.stripe_subscription_id or "Not created" }}</dd>
+
+                    <dt>Current period ends</dt>
+                    <dd>{{ account.current_period_end or "N/A" }}</dd>
+
+                    <dt>Next payment due</dt>
+                    <dd>{{ account.next_payment_due or "N/A" }}</dd>
+                </dl>
+            </div>
+
+            {% if not account.stripe_subscription_id %}
+                <div class="rbp-placeholder-notice">
+                    <p>No active subscription is linked to your account yet.</p>
+                </div>
+            {% endif %}
+
+            {% if available_plans %}
+                <div class="rbp-billing-checkout">
+                    <h2>Choose a plan</h2>
+                    <div id="rbp-billing-error" class="rbp-form-error" aria-live="polite" style="display:none;"></div>
+                    <form id="rbp-billing-checkout-form" class="rbp-form">
+                        <label for="rbp-billing-plan">Plan</label>
+                        <select id="rbp-billing-plan" name="plan" required>
+                            {% for plan in available_plans %}
+                                <option value="{{ plan.name }}">
+                                    {{ plan.plan_name or plan.name }} - {{ plan.cost }} {{ plan.currency }}
+                                    {% if plan.billing_interval %}
+                                        / {{ plan.billing_interval_count or 1 }} {{ plan.billing_interval }}
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="csrf_token" value="{{ frappe.session.data.csrf_token or '' }}" />
+                        <button type="submit" class="rbp-btn">Continue to checkout</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="rbp-placeholder-notice">
+                    <p>No Stripe subscription plans are available yet.</p>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="rbp-placeholder-notice">
+                <p>We could not find a billing profile for your account.</p>
+                <p>Please contact support to connect your Stripe billing details.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("rbp-billing-checkout-form");
+            if (!form) return;
+
+            const error = document.getElementById("rbp-billing-error");
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                error.style.display = "none";
+                error.textContent = "";
+
+                const formData = new FormData(form);
+                const payload = new URLSearchParams(formData);
+                const csrfToken = formData.get("csrf_token");
+
+                try {
+                    const response = await fetch("/api/method/rbp_app.www.portal.billing.start_subscription_checkout", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                            "X-Frappe-CSRF-Token": csrfToken,
+                            "Accept": "application/json",
+                        },
+                        body: payload,
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || "Checkout could not be started.");
+                    }
+
+                    window.location.href = result.message.redirect_to;
+                } catch (err) {
+                    error.style.display = "block";
+                    error.textContent = err.message || "Checkout could not be started.";
+                }
+            });
+        });
+    </script>
+{% endblock %}

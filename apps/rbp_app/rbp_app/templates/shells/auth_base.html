@@ -1,0 +1,48 @@
+{# RBP Auth Shell Base Template #}
+{# Extends Frappe base.html. Minimal chrome for identity flows. #}
+{# Cross-links: back to public site, forward to portal on success. #}
+{% extends "templates/base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/assets/rbp_app/css/rbp.css">
+{% endblock %}
+
+
+{% block navbar %}
+<header class="rbp-auth-header" data-testid="rbp-auth-header">
+    <a href="/" class="rbp-logo">RBP</a>
+</header>
+{% endblock %}
+
+{% block content %}
+<div class="rbp-auth-shell" data-testid="rbp-auth-shell">
+    <div class="rbp-auth-content">
+        <div class="rbp-auth-card">
+            {% block auth_content %}{% endblock %}
+
+            {# Cross-shell navigation: back to site, forward to portal #}
+            <div class="rbp-auth-flow" data-testid="auth-flow-links">
+                <a href="/">Back to site</a>
+                <span class="rbp-auth-flow-sep"></span>
+                <a href="/login?redirect-to=%2Fportal%2Fdashboard">Go to Portal</a>
+            </div>
+        </div>
+    </div>
+    <div class="rbp-auth-support">
+        <a href="/support">Need help?</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="rbp-auth-footer" data-testid="rbp-auth-footer">
+    <p>&copy; {{ frappe.utils.now_datetime().year if frappe else "2026" }} Remote Business Partner</p>
+</footer>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script src="/assets/rbp_app/js/rbp.js"></script>
+{% endblock %}
+

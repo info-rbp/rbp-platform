@@ -1,0 +1,82 @@
+{# RBP Portal Shell Base Template #}
+{# Extends Frappe base.html. Sidebar-driven layout for authenticated members. #}
+{# Cross-links: back to public website, to admin surface, logout to auth. #}
+{% extends "templates/base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/assets/rbp_app/css/rbp.css">
+{% endblock %}
+
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="rbp-portal-layout" data-testid="rbp-portal-shell">
+    {# Sidebar with portal nav and cross-shell links #}
+    <aside class="rbp-portal-sidebar" data-testid="rbp-portal-sidebar">
+        <div class="rbp-portal-sidebar-logo">
+            <a href="/">RBP</a>
+        </div>
+        <nav class="rbp-portal-nav" data-testid="rbp-portal-nav">
+            {% set app_cards = portal_available_apps or [] %}
+            <a href="/portal/dashboard">Dashboard</a>
+            {% if app_cards %}
+                {% for app in app_cards %}
+                    {% if app.enabled %}
+                        <a href="{{ app.route }}" data-app-key="{{ app.key }}">{{ app.label or app.title or app.key }}</a>
+                    {% endif %}
+                {% endfor %}
+                <a href="/portal/account">Account</a>
+                <a href="/portal/notifications">Notifications</a>
+                <a href="/portal/support">Support</a>
+            {% else %}
+                <a href="/portal/membership">Membership</a>
+                <a href="/portal/library">Library</a>
+                <a href="/portal/resources">Resources</a>
+                <a href="/portal/finance">Finance</a>
+                <a href="/portal/decision-desk">Decision Desk</a>
+                <a href="/portal/billing">Billing</a>
+                <a href="/portal/account">Account</a>
+                <a href="/portal/notifications">Notifications</a>
+                <a href="/portal/support">Support</a>
+            {% endif %}
+        </nav>
+        {# Cross-shell links at bottom of sidebar #}
+        <div class="rbp-portal-sidebar-footer">
+            <a href="/" data-testid="portal-to-public">Back to Website</a>
+            <a href="/admin" data-testid="portal-to-admin">Admin / Desk</a>
+            <a href="/api/method/logout" class="logout" data-testid="portal-logout">Logout</a>
+        </div>
+    </aside>
+
+    <div class="rbp-portal-main">
+        {# Top bar with cross-shell links #}
+        <div class="rbp-portal-header" data-testid="rbp-portal-header">
+            <span>Remote Business Partner &mdash; <strong>Member Portal</strong></span>
+            <div class="rbp-portal-header-links">
+                <a href="/" data-testid="portal-topbar-site">Website</a>
+                <a href="/admin" data-testid="portal-topbar-admin">Admin</a>
+                <a href="/portal/account" data-testid="portal-topbar-account">Account</a>
+                <a href="/api/method/logout" data-testid="portal-topbar-logout">Logout</a>
+            </div>
+        </div>
+
+        <div class="rbp-portal-page-header">
+            <h1>{% block portal_title %}Portal{% endblock %}</h1>
+        </div>
+
+        <div class="rbp-portal-content" data-testid="rbp-portal-content">
+            {% block portal_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script src="/assets/rbp_app/js/rbp.js"></script>
+{% endblock %}
+

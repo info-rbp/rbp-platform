@@ -1,0 +1,1 @@
+rbp_app.patches.set_rbp_home_page

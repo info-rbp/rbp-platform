@@ -1,0 +1,46 @@
+{# RBP Public Shell - Footer Include #}
+{# Provides: footer navigation groups with cross-shell links and app ownership #}
+
+<footer class="rbp-footer" data-testid="rbp-footer">
+    <div class="rbp-footer-inner">
+        <div class="rbp-footer-grid">
+            <div class="rbp-footer-group">
+                <h4>Company</h4>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+            </div>
+            <div class="rbp-footer-group">
+                <h4>Services</h4>
+                <a href="/services">All Services</a>
+                <a href="/membership">Membership</a>
+                <a href="/finance">Finance</a>
+                <a href="/offers">Offers</a>
+            </div>
+            <div class="rbp-footer-group">
+                <h4>Resources</h4>
+                <a href="/resources">Resource Library</a>
+                <a href="/documents">Documents</a>
+                <a href="/decision-desk">Decision Desk</a>
+            </div>
+            <div class="rbp-footer-group">
+                <h4>Support</h4>
+                <a href="/help">Help Centre</a>
+                <a href="/support">Support</a>
+                <a href="/faq">FAQ</a>
+                <a href="/support/contact">Contact Support</a>
+            </div>
+            <div class="rbp-footer-group">
+                <h4>Account</h4>
+                <a href="/login">Login</a>
+                <a href="/signup">Join / Get Started</a>
+                <a href="/portal/dashboard">Member Portal</a>
+                <a href="/admin">Admin</a>
+            </div>
+        </div>
+        <div class="rbp-footer-bottom">
+            <p>&copy; {{ frappe.utils.now_datetime().year if frappe else "2026" }} Remote Business Partner. All rights reserved. Powered by <code>rbp_app</code> on Frappe.</p>
+        </div>
+    </div>
+</footer>

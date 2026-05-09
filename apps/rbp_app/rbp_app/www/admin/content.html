@@ -1,0 +1,15 @@
+{% extends "rbp_app/templates/shells/admin_base.html" %}
+
+{% block title %}Content Management - RBP Admin{% endblock %}
+
+{% block admin_content %}
+<div class="rbp-placeholder-page" data-testid="admin-content-page">
+    <h1>Content Management</h1>
+    <p class="rbp-section-label">Admin Section: Content</p>
+    <div class="rbp-admin-notice">
+        <p><strong>Admin Scaffold:</strong> This route is served by Frappe Desk.</p>
+        <p>Target: <code>/admin/content</code></p>
+        <p>Go to <a href="/desk">Frappe Desk</a> for admin functionality.</p>
+    </div>
+</div>
+{% endblock %}

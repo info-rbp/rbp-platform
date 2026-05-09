@@ -1,0 +1,51 @@
+{# RBP Admin Shell Base Template (Scaffold) #}
+{# Extends Frappe base.html. Scaffold pointing to Frappe Desk. #}
+{# Cross-links: to portal, to public site, architecture map. #}
+{% extends "templates/base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/assets/rbp_app/css/rbp.css">
+{% endblock %}
+
+
+{% block navbar %}{% endblock %}
+
+{% block content %}
+<div class="rbp-shell" data-testid="rbp-admin-shell-scaffold">
+    {# Admin bar with cross-shell links #}
+    <div class="rbp-admin-bar">
+        <div>
+            <strong>RBP Admin</strong>
+            <span class="rbp-admin-badge">Scaffold</span>
+        </div>
+        <div class="rbp-admin-bar-links">
+            <a href="/" data-testid="admin-to-public">Public Site</a>
+            <a href="/portal/dashboard" data-testid="admin-to-portal">Member Portal</a>
+            <a href="/api/method/logout" data-testid="admin-to-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="rbp-admin-notice" data-testid="admin-desk-notice">
+        <strong>Admin Shell Scaffold</strong><br>
+        Admin functionality for RBP is delivered through <strong>Frappe Desk</strong> &mdash;
+        workspaces, list views, and form views. These placeholder pages document the target
+        admin structure. In production, <code>/desk</code> serves all admin surfaces.
+        <br><br>
+        <a href="/portal/dashboard">Go to Portal</a> |
+        <a href="/">Go to Public Site</a>
+    </div>
+
+    <div class="rbp-main-content">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script src="/assets/rbp_app/js/rbp.js"></script>
+{% endblock %}
+
