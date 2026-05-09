@@ -28,7 +28,8 @@ coverage/
 out/
 
 # Frappe / bench runtime
-sites/
+sites/*
+!sites/common_site_config.template.json
 logs/
 config/
 env/
