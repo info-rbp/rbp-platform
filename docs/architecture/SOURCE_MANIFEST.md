@@ -188,7 +188,7 @@ Status: Phase 3 in progress
 Current `rbp_app` location:
 
 ```text
-pending file verification
+rbp_app/
 ```
 
 Final import target:
@@ -205,10 +205,10 @@ Pending Phase 3 acceptance gate / Phase 4B
 
 Backend source state:
 
-- `rbp_app` exists: `pending file verification`
-- `rbp_app` location: `pending file verification`
-- `frappe/` core exists in source repo: `pending file verification`
-- `apps/frappe/` core exists in source repo: `pending file verification`
+- `rbp_app` exists: `verified`
+- `rbp_app` location: `rbp_app/`
+- `frappe/` core exists in source repo: `verified - present and must be excluded from migration`
+- `apps/frappe/` core exists in source repo: `verified - not present`
 - `rbp_app` import status: `pending for Phase 4B (not imported in Phase 4A)`
 
 Backend source metadata verified:
@@ -219,7 +219,7 @@ Backend source metadata verified:
 - Source commit: `bf8dc2c1bb14107c52a4eef9f3743d4580d0e5a1`
 - Clone target used for verification: `/tmp/rbp-phase4a/frappe-project`
 
-Backend file indicators to verify next:
+Verified backend indicators:
 
 - `rbp_app/`
 - `rbp_app/README.md`
@@ -228,19 +228,74 @@ Backend file indicators to verify next:
 - `rbp_app/HANDOFF.md`
 - `rbp_app/docs/platform-validation-report.md`
 
+Detected backend app structure:
+
+- `rbp_app/rbp_app/api/`
+- `rbp_app/rbp_app/services/`
+- `rbp_app/rbp_app/doctype/`
+- `rbp_app/rbp_app/tests/`
+- `rbp_app/rbp_app/www/`
+- `rbp_app/rbp_app/config/`
+- `rbp_app/rbp_app/patches/`
+- `rbp_app/rbp_app/templates/`
+- `rbp_app/rbp_app/utils/`
+
+Detected backend documentation and validation material:
+
+- `rbp_app/ADMIN_APPROACH.md`
+- `rbp_app/ARCHITECTURE.md`
+- `rbp_app/AUTHENTICATION.md`
+- `rbp_app/HANDOFF.md`
+- `rbp_app/docs/app-capability-register.md`
+- `rbp_app/docs/cross-app-workflow-register.md`
+- `rbp_app/docs/phase3-api-endpoint-inventory.md`
+- `rbp_app/docs/phase3-api-smoke-test-plan.md`
+- `rbp_app/docs/phase3-backend-environment-validation.md`
+- `rbp_app/docs/phase3-backend-validation-report.md`
+- `rbp_app/docs/phase3-completion-report.md`
+- `rbp_app/docs/phase3-frontend-api-handoff-checklist.md`
+- `rbp_app/docs/phase3-integration-readiness-plan.md`
+- `rbp_app/docs/phase3-launch-readiness-runbook.md`
+- `rbp_app/docs/phase3-qa-uat-readiness-plan.md`
+- `rbp_app/docs/platform-validation-report.md`
+
+Detected backend tests:
+
+- `rbp_app/rbp_app/tests/test_api_apps.py`
+- `rbp_app/rbp_app/tests/test_api_dashboard.py`
+- `rbp_app/rbp_app/tests/test_api_hrms_adapter.py`
+- `rbp_app/rbp_app/tests/test_api_integrations.py`
+- `rbp_app/rbp_app/tests/test_api_me.py`
+- `rbp_app/rbp_app/tests/test_connectivity.py`
+- `rbp_app/rbp_app/tests/test_decision_desk.py`
+- `rbp_app/rbp_app/tests/test_docushare.py`
+- `rbp_app/rbp_app/tests/test_guards.py`
+- `rbp_app/rbp_app/tests/test_marketplace.py`
+- `rbp_app/rbp_app/tests/test_membership_onboarding.py`
+- `rbp_app/rbp_app/tests/test_multi_tenant_billing.py`
+- `rbp_app/rbp_app/tests/test_phase3_partials.py`
+- `rbp_app/rbp_app/tests/test_platform_api.py`
+- `rbp_app/rbp_app/tests/test_portal_app_routes.py`
+- `rbp_app/rbp_app/tests/test_risk_advisor.py`
+- `rbp_app/rbp_app/tests/test_tenancy.py`
+- `rbp_app/rbp_app/tests/test_the_fixer.py`
+
 Important exclusions:
 
 - Do not copy the full Frappe framework into `rbp-platform`.
 - Do not copy `frappe/`.
 - Do not copy `apps/frappe/`.
 - Do not copy local bench/runtime files.
+- Do not copy generated runtime output such as `test_reports/`.
 - Do not import `rbp_app` into `main` during Phase 4A.
 - Only the custom app `rbp_app/` is eligible for final import after Phase 3 validation.
 
 Notes:
 
-- Backend repository access, default branch, and source commit have been verified.
-- Backend file-level verification is still pending.
+- Backend repository access, default branch, source commit, and file-level indicators have been verified.
+- The source repository contains a top-level `frappe/` framework directory; this must not be migrated into `rbp-platform`.
+- The source repository does not contain `apps/frappe/`.
+- The expected production backend unit remains the custom Frappe app only: `rbp_app/`.
 - Final backend import will occur during Phase 4B after Phase 3 validation passes.
 - `rbp_app` must be imported as the custom Frappe app only.
 - Frappe core must remain an external framework dependency.
@@ -261,16 +316,15 @@ Explicitly **not** performed:
 
 Step 1 status:
 
-`In progress - backend file verification pending`
+`Complete - source states verified and manifest updated`
 
 Summary:
 
 - Target repository state confirmed.
 - Phase 1 UI/UX source state confirmed.
 - Phase 2 contract source paths confirmed inside `info-rbp/Uiuxdesignassistance`.
-- Phase 3 backend repository access, default branch, and source commit confirmed.
-- Phase 3 backend file-level verification still pending.
-- Source manifest created in `docs/architecture/SOURCE_MANIFEST.md`.
+- Phase 3 backend repository access, default branch, source commit, and file-level indicators confirmed.
+- Source manifest created and updated in `docs/architecture/SOURCE_MANIFEST.md`.
 - No source code migration performed.
 - No contract migration performed.
 - No backend import performed.
