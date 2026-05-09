@@ -1,0 +1,387 @@
+# Phase 5 CI Guardrails Local Evidence
+
+Generated on: Sat May  9 19:16:57 AWST 2026
+
+## Branch
+phase5/add-ci-guardrails
+
+## Commit
+d10e816a6bc2a7ac0485394fc00c6e6520e89c8d
+
+## Repository guardrails
+Running repository guardrail checks...
+PASS: Consolidated rbp_app exists
+PASS: rbp_app hooks.py exists
+PASS: rbp_app API modules exists
+PASS: rbp_app services exists
+PASS: rbp_app DocTypes exists
+PASS: Frontend portal exists
+PASS: Frontend package.json exists
+PASS: Contracts exists
+PASS: Docs exists
+PASS: Frappe framework core directory absent
+PASS: apps/frappe framework core directory absent
+FAIL: Bench sites runtime directory exists at sites
+PASS: Logs directory absent
+PASS: Frontend dist build output absent
+PASS: Frontend build output absent
+FAIL: Frontend node_modules exists at frontend/portal/node_modules
+FAIL: Nested node_modules directories found
+./frontend/portal/node_modules
+./frontend/portal/node_modules/resolve/test/shadowed_core/node_modules
+./frontend/portal/node_modules/resolve/test/resolver/symlinked/_/node_modules
+./frontend/portal/node_modules/firebase/node_modules
+./frontend/portal/node_modules/@babel/core/node_modules
+./frontend/portal/node_modules/@firebase/auth-compat/node_modules
+./frontend/portal/node_modules/prop-types/node_modules
+./frontend/portal/node_modules/cosmiconfig/node_modules
+./frontend/portal/node_modules/hoist-non-react-statics/node_modules
+./frontend/portal/node_modules/tar/node_modules
+./frontend/portal/node_modules/recharts/node_modules
+FAIL: Nested dist directories found
+./frontend/portal/node_modules/tinyglobby/dist
+./frontend/portal/node_modules/d3-format/dist
+./frontend/portal/node_modules/use-callback-ref/dist
+./frontend/portal/node_modules/react-popper/dist
+./frontend/portal/node_modules/d3-shape/dist
+./frontend/portal/node_modules/tailwind-merge/dist
+./frontend/portal/node_modules/jiti/dist
+./frontend/portal/node_modules/react-day-picker/dist
+./frontend/portal/node_modules/@rolldown/pluginutils/dist
+./frontend/portal/node_modules/stylis/dist
+./frontend/portal/node_modules/react-transition-group/dist
+./frontend/portal/node_modules/react-remove-scroll-bar/dist
+./frontend/portal/node_modules/use-sidecar/dist
+./frontend/portal/node_modules/babel-plugin-macros/dist
+./frontend/portal/node_modules/input-otp/dist
+./frontend/portal/node_modules/web-vitals/dist
+./frontend/portal/node_modules/d3-array/dist
+./frontend/portal/node_modules/chownr/dist
+./frontend/portal/node_modules/@popperjs/core/dist
+./frontend/portal/node_modules/escalade/dist
+./frontend/portal/node_modules/resize-observer-polyfill/dist
+./frontend/portal/node_modules/dnd-core/dist
+./frontend/portal/node_modules/motion-utils/dist
+./frontend/portal/node_modules/d3-scale/dist
+./frontend/portal/node_modules/d3-color/dist
+./frontend/portal/node_modules/@tailwindcss/vite/dist
+./frontend/portal/node_modules/@tailwindcss/node/dist
+./frontend/portal/node_modules/magic-string/dist
+./frontend/portal/node_modules/d3-timer/dist
+./frontend/portal/node_modules/baseline-browser-mapping/dist
+./frontend/portal/node_modules/d3-time-format/dist
+./frontend/portal/node_modules/react-hook-form/dist
+./frontend/portal/node_modules/d3-interpolate/dist
+./frontend/portal/node_modules/lucide-react/dist
+./frontend/portal/node_modules/d3-time/dist
+./frontend/portal/node_modules/tiny-invariant/dist
+./frontend/portal/node_modules/react-resizable-panels/dist
+./frontend/portal/node_modules/motion/dist
+./frontend/portal/node_modules/@isaacs/fs-minipass/dist
+./frontend/portal/node_modules/react-dnd-html5-backend/dist
+./frontend/portal/node_modules/@vitejs/plugin-react/dist
+./frontend/portal/node_modules/aria-hidden/dist
+./frontend/portal/node_modules/fdir/dist
+./frontend/portal/node_modules/react-dnd/dist
+./frontend/portal/node_modules/motion-dom/dist
+./frontend/portal/node_modules/clsx/dist
+./frontend/portal/node_modules/react-remove-scroll/dist
+./frontend/portal/node_modules/sonner/dist
+./frontend/portal/node_modules/minizlib/dist
+./frontend/portal/node_modules/firebase/database/dist
+./frontend/portal/node_modules/firebase/compat/database/dist
+./frontend/portal/node_modules/firebase/compat/app/dist
+./frontend/portal/node_modules/firebase/compat/dist
+./frontend/portal/node_modules/firebase/compat/firestore/dist
+./frontend/portal/node_modules/firebase/compat/auth/dist
+./frontend/portal/node_modules/firebase/compat/app-check/dist
+./frontend/portal/node_modules/firebase/compat/remote-config/dist
+./frontend/portal/node_modules/firebase/compat/storage/dist
+./frontend/portal/node_modules/firebase/compat/installations/dist
+./frontend/portal/node_modules/firebase/compat/functions/dist
+./frontend/portal/node_modules/firebase/compat/performance/dist
+./frontend/portal/node_modules/firebase/compat/messaging/dist
+./frontend/portal/node_modules/firebase/compat/analytics/dist
+./frontend/portal/node_modules/firebase/app/dist
+./frontend/portal/node_modules/firebase/firestore/dist
+./frontend/portal/node_modules/firebase/firestore/lite/dist
+./frontend/portal/node_modules/firebase/firestore/lite/pipelines/dist
+./frontend/portal/node_modules/firebase/firestore/pipelines/dist
+./frontend/portal/node_modules/firebase/auth/cordova/dist
+./frontend/portal/node_modules/firebase/auth/dist
+./frontend/portal/node_modules/firebase/auth/web-extension/dist
+./frontend/portal/node_modules/firebase/node_modules/@firebase/auth/dist
+./frontend/portal/node_modules/firebase/app-check/dist
+./frontend/portal/node_modules/firebase/remote-config/dist
+./frontend/portal/node_modules/firebase/storage/dist
+./frontend/portal/node_modules/firebase/installations/dist
+./frontend/portal/node_modules/firebase/ai/dist
+./frontend/portal/node_modules/firebase/functions/dist
+./frontend/portal/node_modules/firebase/data-connect/dist
+./frontend/portal/node_modules/firebase/performance/dist
+./frontend/portal/node_modules/firebase/messaging/sw/dist
+./frontend/portal/node_modules/firebase/messaging/dist
+./frontend/portal/node_modules/firebase/analytics/dist
+./frontend/portal/node_modules/vite/dist
+./frontend/portal/node_modules/class-variance-authority/dist
+./frontend/portal/node_modules/get-nonce/dist
+./frontend/portal/node_modules/tw-animate-css/dist
+./frontend/portal/node_modules/@radix-ui/react-menubar/dist
+./frontend/portal/node_modules/@radix-ui/react-use-size/dist
+./frontend/portal/node_modules/@radix-ui/react-tabs/dist
+./frontend/portal/node_modules/@radix-ui/react-progress/dist
+./frontend/portal/node_modules/@radix-ui/react-popper/dist
+./frontend/portal/node_modules/@radix-ui/react-context/dist
+./frontend/portal/node_modules/@radix-ui/react-direction/dist
+./frontend/portal/node_modules/@radix-ui/react-focus-scope/dist
+./frontend/portal/node_modules/@radix-ui/react-use-previous/dist
+./frontend/portal/node_modules/@radix-ui/react-portal/dist
+./frontend/portal/node_modules/@radix-ui/react-tooltip/dist
+./frontend/portal/node_modules/@radix-ui/rect/dist
+./frontend/portal/node_modules/@radix-ui/react-radio-group/dist
+./frontend/portal/node_modules/@radix-ui/react-use-layout-effect/dist
+./frontend/portal/node_modules/@radix-ui/react-alert-dialog/dist
+./frontend/portal/node_modules/@radix-ui/react-collection/dist
+./frontend/portal/node_modules/@radix-ui/react-roving-focus/dist
+./frontend/portal/node_modules/@radix-ui/react-collapsible/dist
+./frontend/portal/node_modules/@radix-ui/react-checkbox/dist
+./frontend/portal/node_modules/@radix-ui/primitive/dist
+./frontend/portal/node_modules/@radix-ui/react-use-controllable-state/dist
+./frontend/portal/node_modules/@radix-ui/react-slider/dist
+./frontend/portal/node_modules/@radix-ui/react-visually-hidden/dist
+./frontend/portal/node_modules/@radix-ui/react-scroll-area/dist
+./frontend/portal/node_modules/@radix-ui/react-hover-card/dist
+./frontend/portal/node_modules/@radix-ui/react-dialog/dist
+./frontend/portal/node_modules/@radix-ui/react-toggle/dist
+./frontend/portal/node_modules/@radix-ui/react-context-menu/dist
+./frontend/portal/node_modules/@radix-ui/react-toggle-group/dist
+./frontend/portal/node_modules/@radix-ui/number/dist
+./frontend/portal/node_modules/@radix-ui/react-id/dist
+./frontend/portal/node_modules/@radix-ui/react-primitive/dist
+./frontend/portal/node_modules/@radix-ui/react-label/dist
+./frontend/portal/node_modules/@radix-ui/react-separator/dist
+./frontend/portal/node_modules/@radix-ui/react-accordion/dist
+./frontend/portal/node_modules/@radix-ui/react-presence/dist
+./frontend/portal/node_modules/@radix-ui/react-use-escape-keydown/dist
+./frontend/portal/node_modules/@radix-ui/react-menu/dist
+./frontend/portal/node_modules/@radix-ui/react-switch/dist
+./frontend/portal/node_modules/@radix-ui/react-popover/dist
+./frontend/portal/node_modules/@radix-ui/react-aspect-ratio/dist
+./frontend/portal/node_modules/@radix-ui/react-avatar/dist
+./frontend/portal/node_modules/@radix-ui/react-compose-refs/dist
+./frontend/portal/node_modules/@radix-ui/react-arrow/dist
+./frontend/portal/node_modules/@radix-ui/react-select/dist
+./frontend/portal/node_modules/@radix-ui/react-focus-guards/dist
+./frontend/portal/node_modules/@radix-ui/react-dismissable-layer/dist
+./frontend/portal/node_modules/@radix-ui/react-slot/dist
+./frontend/portal/node_modules/@radix-ui/react-use-callback-ref/dist
+./frontend/portal/node_modules/@radix-ui/react-use-rect/dist
+./frontend/portal/node_modules/@radix-ui/react-dropdown-menu/dist
+./frontend/portal/node_modules/@radix-ui/react-navigation-menu/dist
+./frontend/portal/node_modules/rollup/dist
+./frontend/portal/node_modules/protobufjs/dist
+./frontend/portal/node_modules/json5/dist
+./frontend/portal/node_modules/react-slick/dist
+./frontend/portal/node_modules/d3-path/dist
+./frontend/portal/node_modules/@firebase/remote-config-compat/dist
+./frontend/portal/node_modules/@firebase/database/dist
+./frontend/portal/node_modules/@firebase/messaging-compat/dist
+./frontend/portal/node_modules/@firebase/firestore-compat/dist
+./frontend/portal/node_modules/@firebase/logger/dist
+./frontend/portal/node_modules/@firebase/app/dist
+./frontend/portal/node_modules/@firebase/database-compat/dist
+./frontend/portal/node_modules/@firebase/util/dist
+./frontend/portal/node_modules/@firebase/firestore/dist
+./frontend/portal/node_modules/@firebase/functions-compat/dist
+./frontend/portal/node_modules/@firebase/component/dist
+./frontend/portal/node_modules/@firebase/app-check/dist
+./frontend/portal/node_modules/@firebase/remote-config/dist
+./frontend/portal/node_modules/@firebase/storage/dist
+./frontend/portal/node_modules/@firebase/installations/dist
+./frontend/portal/node_modules/@firebase/installations-compat/dist
+./frontend/portal/node_modules/@firebase/performance-compat/dist
+./frontend/portal/node_modules/@firebase/app-check-compat/dist
+./frontend/portal/node_modules/@firebase/analytics-compat/dist
+./frontend/portal/node_modules/@firebase/ai/dist
+./frontend/portal/node_modules/@firebase/functions/dist
+./frontend/portal/node_modules/@firebase/webchannel-wrapper/dist
+./frontend/portal/node_modules/@firebase/data-connect/dist
+./frontend/portal/node_modules/@firebase/performance/dist
+./frontend/portal/node_modules/@firebase/auth-compat/dist
+./frontend/portal/node_modules/@firebase/auth-compat/node_modules/@firebase/auth/dist
+./frontend/portal/node_modules/@firebase/messaging/dist
+./frontend/portal/node_modules/@firebase/app-compat/dist
+./frontend/portal/node_modules/@firebase/storage-compat/dist
+./frontend/portal/node_modules/@firebase/analytics/dist
+./frontend/portal/node_modules/@react-dnd/asap/dist
+./frontend/portal/node_modules/@react-dnd/invariant/dist
+./frontend/portal/node_modules/@react-dnd/shallowequal/dist
+./frontend/portal/node_modules/cookie/dist
+./frontend/portal/node_modules/source-map/dist
+./frontend/portal/node_modules/fast-equals/dist
+./frontend/portal/node_modules/@floating-ui/core/dist
+./frontend/portal/node_modules/@floating-ui/utils/dist
+./frontend/portal/node_modules/@floating-ui/react-dom/dist
+./frontend/portal/node_modules/@floating-ui/dom/dist
+./frontend/portal/node_modules/cosmiconfig/dist
+./frontend/portal/node_modules/cosmiconfig/node_modules/yaml/dist
+./frontend/portal/node_modules/cosmiconfig/node_modules/yaml/browser/dist
+./frontend/portal/node_modules/hoist-non-react-statics/dist
+./frontend/portal/node_modules/minipass/dist
+./frontend/portal/node_modules/@jridgewell/sourcemap-codec/dist
+./frontend/portal/node_modules/@jridgewell/trace-mapping/dist
+./frontend/portal/node_modules/@jridgewell/gen-mapping/dist
+./frontend/portal/node_modules/@jridgewell/resolve-uri/dist
+./frontend/portal/node_modules/@jridgewell/remapping/dist
+./frontend/portal/node_modules/@emotion/unitless/dist
+./frontend/portal/node_modules/@emotion/styled/dist
+./frontend/portal/node_modules/@emotion/styled/base/dist
+./frontend/portal/node_modules/@emotion/babel-plugin/dist
+./frontend/portal/node_modules/@emotion/cache/dist
+./frontend/portal/node_modules/@emotion/hash/dist
+./frontend/portal/node_modules/@emotion/weak-memoize/dist
+./frontend/portal/node_modules/@emotion/serialize/dist
+./frontend/portal/node_modules/@emotion/utils/dist
+./frontend/portal/node_modules/@emotion/use-insertion-effect-with-fallbacks/dist
+./frontend/portal/node_modules/@emotion/memoize/dist
+./frontend/portal/node_modules/@emotion/is-prop-valid/dist
+./frontend/portal/node_modules/@emotion/sheet/dist
+./frontend/portal/node_modules/@emotion/react/dist
+./frontend/portal/node_modules/@emotion/react/_isolated-hnrs/dist
+./frontend/portal/node_modules/@emotion/react/jsx-dev-runtime/dist
+./frontend/portal/node_modules/@emotion/react/jsx-runtime/dist
+./frontend/portal/node_modules/tailwindcss/dist
+./frontend/portal/node_modules/canvas-confetti/dist
+./frontend/portal/node_modules/tar/dist
+./frontend/portal/node_modules/tar/node_modules/yallist/dist
+./frontend/portal/node_modules/framer-motion/dist
+./frontend/portal/node_modules/caniuse-lite/dist
+./frontend/portal/node_modules/redux/dist
+./frontend/portal/node_modules/vaul/dist
+./frontend/portal/node_modules/d3-ease/dist
+./frontend/portal/node_modules/cmdk/dist
+./frontend/portal/node_modules/next-themes/dist
+./frontend/portal/node_modules/react-router/dist
+./frontend/portal/node_modules/internmap/dist
+./frontend/portal/node_modules/react-style-singleton/dist
+FAIL: Nested build directories found
+./frontend/portal/node_modules/idb/build
+./frontend/portal/node_modules/y18n/build
+./frontend/portal/node_modules/yargs-parser/build
+./frontend/portal/node_modules/lines-and-columns/build
+./frontend/portal/node_modules/cliui/build
+./frontend/portal/node_modules/yargs/build
+./frontend/portal/node_modules/@grpc/grpc-js/build
+./frontend/portal/node_modules/@grpc/proto-loader/build
+PASS: Nested logs directories absent
+PASS: Local .env files absent
+PASS: Local .env.local files absent
+PASS: Local .env.production files absent
+PASS: Python __pycache__ directories absent
+sites/common_site_config.template.json
+FAIL: forbidden generated/runtime paths are tracked
+PASS: no local env files are tracked
+Repository guardrail checks failed with 6 failure(s).
+
+## Static smoke tests
+Running Phase 5 static smoke tests...
+PASS file: README.md
+PASS file: docs/architecture/PHASE_5_SOURCE_FREEZE.md
+PASS file: docs/architecture/PHASE_5_HANDOFF.md
+PASS dir: apps/rbp_app
+PASS file: apps/rbp_app/pyproject.toml
+PASS file: apps/rbp_app/rbp_app/hooks.py
+PASS file: apps/rbp_app/rbp_app/api/membership.py
+PASS file: apps/rbp_app/rbp_app/api/decision_desk.py
+PASS file: apps/rbp_app/rbp_app/api/docushare.py
+PASS file: apps/rbp_app/rbp_app/api/marketplace.py
+PASS file: apps/rbp_app/rbp_app/api/connectivity.py
+PASS file: apps/rbp_app/rbp_app/api/risk_advisor.py
+PASS file: apps/rbp_app/rbp_app/api/the_fixer.py
+PASS file: apps/rbp_app/rbp_app/api/billing.py
+PASS file: apps/rbp_app/rbp_app/api/notifications.py
+PASS file: apps/rbp_app/rbp_app/services/membership.py
+PASS file: apps/rbp_app/rbp_app/services/decision_desk.py
+PASS file: apps/rbp_app/rbp_app/services/docushare.py
+PASS file: apps/rbp_app/rbp_app/services/marketplace.py
+PASS file: apps/rbp_app/rbp_app/services/connectivity.py
+PASS file: apps/rbp_app/rbp_app/services/risk_advisor.py
+PASS file: apps/rbp_app/rbp_app/services/the_fixer.py
+PASS file: apps/rbp_app/rbp_app/services/tenancy.py
+PASS file: apps/rbp_app/rbp_app/services/entitlements.py
+PASS file: apps/rbp_app/rbp_app/services/files.py
+PASS file: apps/rbp_app/rbp_app/services/audit.py
+PASS dir: frontend/portal
+PASS file: frontend/portal/package.json
+PASS file: frontend/portal/package-lock.json
+PASS file: frontend/portal/vite.config.ts
+PASS file: frontend/portal/src/main.tsx
+PASS file: frontend/portal/src/app/routes.tsx
+PASS dir: contracts/api
+PASS dir: contracts/doctypes
+PASS dir: contracts/workflows
+PASS dir: contracts/permissions
+PASS file: contracts/api/11-route-to-endpoint-map.md
+PASS file: contracts/api/16-mock-to-real-api-map.md
+PASS file: contracts/doctypes/05-core-doctype-model.md
+PASS file: contracts/workflows/08-payment-state-model.md
+PASS file: contracts/permissions/04-permission-model-draft.md
+contracts/naming-conventions.md:284:POST /api/method/rbp_app.api.fixer.create_request
+contracts/naming-conventions.md:1188:POST /api/method/rbp_app.api.fixer.create_request
+contracts/doctypes/12-form-field-specifications.md:323:Primary API Module: rbp_app.api.fixer
+contracts/doctypes/05-core-doctype-model.md:1808:POST /api/method/rbp_app.api.fixer.create_request
+contracts/doctypes/05-core-doctype-model.md:1809:POST /api/method/rbp_app.api.fixer.update_request
+contracts/doctypes/05-core-doctype-model.md:1810:POST /api/method/rbp_app.api.fixer.submit_request
+contracts/doctypes/05-core-doctype-model.md:1811:GET  /api/method/rbp_app.api.fixer.get_request
+contracts/doctypes/05-core-doctype-model.md:1812:GET  /api/method/rbp_app.api.fixer.list_my_requests
+contracts/doctypes/05-core-doctype-model.md:1813:POST /api/method/rbp_app.api.fixer.attach_file
+contracts/doctypes/05-core-doctype-model.md:1814:POST /api/method/rbp_app.api.fixer.admin_assign_request
+contracts/doctypes/05-core-doctype-model.md:1815:POST /api/method/rbp_app.api.fixer.admin_close_request
+contracts/permissions/15-admin-actions.md:83:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_request_more_information` | RBP Fixer Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:84:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_reject_request` | RBP Fixer Request | Submitted/In Review | Rejected | `fixer_rejected` |
+contracts/permissions/15-admin-actions.md:85:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_close_request` | RBP Fixer Request | Outcome Ready/In Progress | Closed | `fixer_closed` |
+contracts/permissions/15-admin-actions.md:86:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_archive_request` | RBP Fixer Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/04-permission-model-draft.md:498:rbp_app.api.fixer
+contracts/api/16-mock-to-real-api-map.md:78:| `/mock/fixer/request` | `/api/method/rbp_app.api.fixer.create_request` | POST | RBP Fixer Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:79:| mock submit for The Fixer | `/api/method/rbp_app.api.fixer.submit_request` | POST | RBP Fixer Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:80:| mock get/list for The Fixer | `/api/method/rbp_app.api.fixer.get_request` / `list_my_requests` | GET | RBP Fixer Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:81:| mock upload for The Fixer | `/api/method/rbp_app.api.fixer.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/11-route-to-endpoint-map.md:96:| `/on-demand/the-fixer` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:97:| `/portal/services/request` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:133:| The Fixer | `POST /api/method/rbp_app.api.fixer.create_request` | `POST /api/method/rbp_app.api.fixer.update_request` | `POST /api/method/rbp_app.api.fixer.submit_request` | `GET /api/method/rbp_app.api.fixer.get_request` | `GET /api/method/rbp_app.api.fixer.list_my_requests` | `POST /api/method/rbp_app.api.fixer.attach_file` | `POST /api/method/rbp_app.api.fixer.admin_<action>` |
+contracts/api/09-upload-file-rules.md:488:POST /api/method/rbp_app.api.fixer.attach_file
+contracts/api/07-error-catalogue.md:67:rbp_app.api.fixer
+WARN: legacy rbp_app.api.fixer reference found. Confirm reconciliation addendum governs this.
+docs/qa/evidence/phase5-ci-guardrails-local-output.txt:300:PASS file: apps/rbp_app/rbp_app/api/the_fixer.py
+apps/rbp_app/docs/phase3-backend-validation-report.md:131:- `rbp_app.api.the_fixer`
+apps/rbp_app/docs/phase3-backend-validation-report.md:158:- Treat `rbp_app.api.the_fixer` as canonical or add an alias module.
+apps/rbp_app/docs/phase3-integration-readiness-plan.md:48:- rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:689:- `rbp_app.api.the_fixer.create_case(payload=None)`
+PASS: canonical rbp_app.api.the_fixer reference found
+Phase 5 static smoke tests passed.
+
+## Backend syntax
+Running backend syntax checks...
+PASS: backend Python syntax check completed
+
+## Frontend package
+v24.14.1
+11.11.0
+
+> @rbp/frontend-portal@0.0.1 build
+> vite build
+
+vite v6.3.5 building for production...
+transforming...
+✓ 1781 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.52 kB │ gzip:   0.33 kB
+dist/assets/index-Dj4RYICP.css  164.19 kB │ gzip:  24.05 kB
+dist/assets/index-Dd6Axe_n.js   992.74 kB │ gzip: 238.11 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.34s
