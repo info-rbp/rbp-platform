@@ -1,105 +1,60 @@
 # RBP Platform
 
-Final source-of-truth repository for the Remote Business Partner Platform.
+Source-of-truth repository for the Remote Business Partner Platform.
 
-Status: Phase 4 consolidation complete; Phase 5 handoff ready.
+Status: Phase 5 integration is now active on top of the consolidated monorepo.
 
 ## Purpose
 
-This repository is the consolidation target for the completed Remote Business Partner Platform workstreams.
-
-It is intended to become the structured production repository for:
+This repository is the single approved source for continuing platform work across:
 
 - the custom Frappe backend app
 - the React/Vite frontend portal
-- Phase 2 API, DocType, workflow, and permission contracts
+- API, DocType, workflow, and permission contracts
 - onboarding and product-flow specifications
 - infrastructure and deployment materials
 - architecture and operational documentation
 - backend, frontend, and integration test entry points
 
+## Current Operating Strategy
+
+The repository has already completed consolidation.
+
+The active strategy is now Phase 5 integration:
+
+- validate the consolidated frontend and backend in their real runtime contexts
+- connect frontend flows to `rbp_app` APIs behind explicit integration boundaries
+- use the contract set as the baseline for backend and frontend alignment
+- expand CI from structure-only checks into Phase 5 guardrails
+- keep old repositories as reference/source-history only
+
 ## Current Phase
 
-Current phase:
-
 ```text
-Phase 4 - Consolidation complete
+Phase 5 - Integration and validation in progress
 ```
 
-Completed in this branch:
+Current priorities:
 
-- source repository states confirmed
-- `docs/architecture/ARCHITECTURE.md`
-- `docs/architecture/SOURCE_MANIFEST.md` finalized
-- base repository structure created
-- environment examples added
-- root `.gitignore` added
-- Phase 4A validation workflow added
-- placeholder targets created for future imports
+- frontend build validation from `frontend/portal/`
+- backend syntax and installability validation from `apps/rbp_app/`
+- mock-to-real API integration flow pilots
+- contract-to-implementation reconciliation
+- CI guardrails for repository safety, frontend build, and backend syntax
 
-Completed in Phase 4:
+## Source of Truth
 
-- frontend migration
-- Phase 2 contract migration
-- `rbp_app` import
-
-Not yet performed:
-
-- backend/frontend integration
-- production deployment
-- QA launch validation
-
-## Source Repositories
-
-### UI/UX and Phase 2 contract source
+All active work must begin from:
 
 ```text
-info-rbp/Uiuxdesignassistance
+info-rbp/rbp-platform
+branch: main
 ```
 
-Current known source commit:
+Previous repositories are now reference/source-history only:
 
-```text
-6165346d4fc29fba6b78ec84e32285159a182c82
-```
-
-Expected future targets:
-
-- `frontend/portal/`
-- `contracts/`
-- `specs/onboarding-flows/`
-- `docs/product-flows/`
-- `docs/api-contracts/`
-
-### Backend source
-
-```text
-info-rbp/frappe-project
-```
-
-Current known source commit:
-
-```text
-bf8dc2c1bb14107c52a4eef9f3743d4580d0e5a1
-```
-
-Expected future target:
-
-```text
-apps/rbp_app/
-```
-
-Only the custom Frappe app `rbp_app/` is eligible for import.
-
-Do not copy:
-
-- `frappe/`
-- `apps/frappe/`
-- Frappe framework core
-- local bench runtime files
-- generated reports
-- secrets
-- local environment files
+- `info-rbp/Uiuxdesignassistance`
+- `info-rbp/frappe-project`
 
 ## Repository Structure
 
@@ -128,6 +83,8 @@ rbp-platform/
 │   ├── qa/
 │   ├── launch/
 │   └── runbook/
+├── scripts/
+│   └── ci/
 ├── tests/
 │   ├── backend/
 │   ├── frontend/
@@ -139,39 +96,30 @@ rbp-platform/
 ## Key Documents
 
 - `docs/architecture/ARCHITECTURE.md`
-- `docs/architecture/SOURCE_MANIFEST.md`
 - `docs/architecture/REPOSITORY_STRATEGY.md`
-- `docs/architecture/PHASE_4A_STATUS.md`
-- `docs/architecture/CONSOLIDATION_CHECKLIST.md`
-- `docs/architecture/PHASE_4_COMPLETION_REPORT.md`
+- `docs/architecture/PHASE_5_SOURCE_FREEZE.md`
 - `docs/architecture/PHASE_5_HANDOFF.md`
-- `docs/api-contracts/API_CONTRACTS.md`
+- `docs/qa/PHASE_5_CI_GUARDRAILS.md`
+- `contracts/api/11-route-to-endpoint-map.md`
+- `contracts/api/16-mock-to-real-api-map.md`
 - `docs/product-flows/PRODUCT_FLOWS.md`
-- `docs/product-flows/ONBOARDING_FLOWS.md`
-- `docs/architecture/CONSOLIDATED_REPO_VALIDATION.md`
 - `docs/runbook/RUNBOOK.md`
 - `docs/launch/LAUNCH_PLAN.md`
 - `docs/qa/QA_PLAN.md`
 - `docs/deployment/DEPLOYMENT.md`
 
-## Phase 4A Rule
+## Guardrails
 
-This phase is structured consolidation.
+Do not:
 
-It is not integration, rewrite, QA, launch, or production deployment.
+- re-import the source repositories wholesale
+- copy Frappe framework core into this repository
+- commit local `.env` files or secrets
+- commit generated runtime output such as `node_modules/`, `dist/`, `build/`, or `logs/`
+- change contracts without documenting the contract decision first
 
-Do not turn this repository into a junk drawer.
+## Phase 5 Focus
 
+Phase 5 is integration and validation work.
 
-## Phase 5 Source Freeze
-
-As of the Phase 5 preparation gate, this repository is the only approved candidate source for Phase 5 Integration.
-
-Previous repositories are reference/source-history only:
-
-- info-rbp/Uiuxdesignassistance
-- info-rbp/frappe-project
-
-See:
-
-    docs/architecture/PHASE_5_SOURCE_FREEZE.md
+It is not a reset, a new consolidation pass, or a return to the old source repositories.

@@ -1,8 +1,8 @@
 # Repository Strategy
 
-## Recommended Strategy
+## Current Strategy
 
-The recommended structure for `info-rbp/rbp-platform` is a structured monorepo.
+The platform now operates as a structured monorepo with Phase 5 integration work in progress.
 
 ```text
 rbp-platform/
@@ -12,35 +12,55 @@ rbp-platform/
 ├── specs/
 ├── infra/
 ├── docs/
+├── scripts/
 └── tests/
 ```
 
-## Why Structured Monorepo
+## Why This Strategy Still Holds
 
-A structured monorepo is preferred because the platform has tightly related product, frontend, backend, contract, and deployment concerns.
+A structured monorepo remains the right shape because the platform has tightly related product, frontend, backend, contract, and deployment concerns.
 
-This approach gives the project:
+This approach keeps:
 
-- one final source-of-truth repository
-- clear separation between backend, frontend, contracts, docs, infra, and tests
-- simpler Phase 5 integration handoff
+- one active source-of-truth repository
+- clear separation between backend, frontend, contracts, docs, infra, scripts, and tests
 - one place to validate contracts against implementation
-- one place to document deployment assumptions
+- one place to connect frontend flows to backend APIs in a controlled way
 - reduced drift between UI, backend, and API contracts
 
-## What Must Be Migrated Later
+## Phase 5 Execution Priorities
 
-Future migration work should selectively import:
+Phase 5 work should now focus on:
 
-- `rbp_app/` from `info-rbp/frappe-project` into `apps/rbp_app/`
-- React/Vite portal source from `info-rbp/Uiuxdesignassistance` into `frontend/portal/`
-- Phase 2 contracts from `RBP_Phase_2_Backend_Contracts/` into `contracts/`
-- onboarding/product flow specs into `specs/` and `docs/product-flows/`
-- deployment and bench scripts into `infra/`
+- validating the consolidated frontend in `frontend/portal/`
+- validating the consolidated backend app in `apps/rbp_app/`
+- replacing or isolating mock services behind explicit integration adapters
+- reconciling contracts with the imported backend implementation
+- expanding CI from structure checks to integration-era guardrails
 
-## What Must Not Be Migrated
+## Source-of-Truth Rule
 
-Do not copy:
+All active implementation work must start from:
+
+```text
+info-rbp/rbp-platform
+branch: main
+```
+
+The previous repositories remain reference/source-history only:
+
+- `info-rbp/Uiuxdesignassistance`
+- `info-rbp/frappe-project`
+
+## Migration Boundary
+
+Do not copy whole repositories back into `rbp-platform`.
+
+Selective imports and follow-on implementation must continue to respect the current monorepo boundaries.
+
+## What Must Not Be Committed
+
+Do not commit:
 
 - the full Frappe framework
 - top-level `frappe/`
@@ -51,44 +71,46 @@ Do not copy:
 - logs
 - generated reports
 - cache directories
-- experimental throwaway files
+- frontend generated output such as `node_modules/`, `dist/`, and `build/`
 
 ## Backend Strategy
 
 The production backend unit is the custom Frappe app:
 
 ```text
-rbp_app/
-```
-
-The final target is:
-
-```text
 apps/rbp_app/
 ```
 
-Frappe itself must remain an external framework dependency installed by bench or deployment tooling.
+Frappe itself remains an external framework dependency installed by bench or deployment tooling.
+
+Phase 5 backend work should validate:
+
+- app installability
+- migrate behavior
+- route and permission guards
+- DocType behavior
+- API module coverage against the contracts
 
 ## Frontend Strategy
 
-The React/Vite frontend should be staged under:
+The React/Vite frontend remains staged under:
 
 ```text
 frontend/portal/
 ```
 
-The frontend should remain separate until Phase 5 integration determines whether it is:
+Phase 5 frontend work should:
 
-- separately deployed
-- Frappe-served
-- embedded alongside Frappe
-- retained as a reference implementation
+- keep mock mode available where helpful
+- introduce explicit API adapters for real backend calls
+- validate build behavior in CI
+- map routes and flows to backend endpoints deliberately
 
 ## Contracts Strategy
 
-Phase 2 contracts are authoritative for Phase 5 integration.
+Contracts remain the baseline for integration review, but they now need active reconciliation against the imported backend implementation.
 
-The expected contract targets are:
+The primary contract targets remain:
 
 ```text
 contracts/api/
@@ -97,18 +119,21 @@ contracts/workflows/
 contracts/permissions/
 ```
 
-The current known source package is:
+Contract changes should be documented before implementation starts depending on the changed contract.
 
-```text
-RBP_Phase_2_Backend_Contracts/
-```
+## CI Strategy
+
+The repository should no longer rely only on the original Phase 4A structure validation workflow.
+
+Phase 5 CI should cover:
+
+1. repository guardrails
+2. frontend install and build
+3. backend static validation
+4. static smoke checks for critical integration files
 
 ## Current Status
 
-Phase 4A foundation is being staged on:
+The repository has moved past consolidation.
 
-```text
-phase/phase-4a-foundation
-```
-
-This branch should be merged into `main` only after the foundation documents and skeleton structure are reviewed.
+Phase 5 integration and validation is the active operating strategy on `main`.
