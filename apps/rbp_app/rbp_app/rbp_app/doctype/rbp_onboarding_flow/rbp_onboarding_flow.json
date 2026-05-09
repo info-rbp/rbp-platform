@@ -1,0 +1,146 @@
+{
+ "allow_copy": 0,
+ "allow_guest_to_view": 0,
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:RBP-ONB-{####}",
+ "creation": "2026-05-07 00:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "tenant",
+  "business_profile",
+  "user",
+  "membership_plan",
+  "subscription",
+  "status",
+  "current_step_key",
+  "source_channel",
+  "started_on",
+  "submitted_on",
+  "completed_on",
+  "last_activity_on",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "business_profile",
+   "fieldtype": "Link",
+   "label": "Business Profile",
+   "options": "RBP Business Profile",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "membership_plan",
+   "fieldtype": "Link",
+   "label": "Membership Plan",
+   "options": "RBP Membership Plan",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "subscription",
+   "fieldtype": "Link",
+   "label": "Subscription",
+   "options": "RBP Subscription"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nIn Progress\nSubmitted\nCompleted\nAbandoned\nCancelled",
+   "default": "Draft",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "current_step_key",
+   "fieldtype": "Data",
+   "label": "Current Step Key",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source_channel",
+   "fieldtype": "Data",
+   "label": "Source Channel"
+  },
+  {
+   "fieldname": "started_on",
+   "fieldtype": "Datetime",
+   "label": "Started On"
+  },
+  {
+   "fieldname": "submitted_on",
+   "fieldtype": "Datetime",
+   "label": "Submitted On"
+  },
+  {
+   "fieldname": "completed_on",
+   "fieldtype": "Datetime",
+   "label": "Completed On"
+  },
+  {
+   "fieldname": "last_activity_on",
+   "fieldtype": "Datetime",
+   "label": "Last Activity On"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "has_web_view": 0,
+ "hide_heading": 0,
+ "hide_toolbar": 0,
+ "idx": 0,
+ "in_create": 1,
+ "is_submittable": 0,
+ "issingle": 0,
+ "istable": 0,
+ "modified": "2026-05-07 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RBP App",
+ "name": "RBP Onboarding Flow",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "cancel": 0,
+   "amend": 0,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  }
+ ],
+ "quick_entry": 0,
+ "read_only": 0,
+ "show_name_in_global_search": 0,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

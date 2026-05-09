@@ -1,0 +1,184 @@
+{
+ "allow_copy": 0,
+ "allow_guest_to_view": 0,
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:RBP-ENT-{####}",
+ "creation": "2026-05-07 00:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "tenant",
+  "user",
+  "app_key",
+  "app_label",
+  "source_app",
+  "app_category",
+  "module_type",
+  "entitlement_type",
+  "status",
+  "enabled",
+  "visible_in_launcher",
+  "route",
+  "roles_allowed",
+  "plan_required",
+  "source_subscription",
+  "starts_on",
+  "ends_on",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "app_key",
+   "fieldtype": "Data",
+   "label": "App Key",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "app_label",
+   "fieldtype": "Data",
+   "label": "App Label",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "source_app",
+   "fieldtype": "Data",
+   "label": "Source App",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "app_category",
+   "fieldtype": "Select",
+   "label": "App Category",
+   "options": "Platform\nPeople\nFinance\nSales\nLearning\nSupport\nAnalytics\nDocuments\nWebsite\nCommerce\nOperations\nKnowledge\nOther",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "module_type",
+   "fieldtype": "Select",
+   "label": "Module Type",
+   "options": "Frappe App\nRBP Platform Module\nExternal Integration",
+   "default": "Frappe App",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "entitlement_type",
+   "fieldtype": "Select",
+   "label": "Entitlement Type",
+   "options": "Tenant\nUser\nRole\nPlan",
+   "default": "Tenant",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nActive\nSuspended\nExpired\nCancelled",
+   "default": "Active",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1"
+  },
+  {
+   "fieldname": "visible_in_launcher",
+   "fieldtype": "Check",
+   "label": "Visible In Launcher",
+   "default": "1"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route"
+  },
+  {
+   "fieldname": "roles_allowed",
+   "fieldtype": "Small Text",
+   "label": "Roles Allowed"
+  },
+  {
+   "fieldname": "plan_required",
+   "fieldtype": "Data",
+   "label": "Plan Required"
+  },
+  {
+   "fieldname": "source_subscription",
+   "fieldtype": "Link",
+   "label": "Source Subscription",
+   "options": "RBP Subscription"
+  },
+  {
+   "fieldname": "starts_on",
+   "fieldtype": "Date",
+   "label": "Starts On"
+  },
+  {
+   "fieldname": "ends_on",
+   "fieldtype": "Date",
+   "label": "Ends On"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "has_web_view": 0,
+ "hide_heading": 0,
+ "hide_toolbar": 0,
+ "idx": 0,
+ "in_create": 1,
+ "is_submittable": 0,
+ "issingle": 0,
+ "istable": 0,
+ "modified": "2026-05-07 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RBP App",
+ "name": "RBP App Entitlement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "cancel": 0,
+   "amend": 0,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  }
+ ],
+ "quick_entry": 0,
+ "read_only": 0,
+ "show_name_in_global_search": 0,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

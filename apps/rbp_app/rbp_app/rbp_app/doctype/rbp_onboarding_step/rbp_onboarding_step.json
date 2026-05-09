@@ -1,0 +1,135 @@
+{
+ "allow_copy": 0,
+ "allow_guest_to_view": 0,
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:RBP-ONB-STEP-{####}",
+ "creation": "2026-05-07 00:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "flow",
+  "tenant",
+  "user",
+  "step_key",
+  "step_label",
+  "status",
+  "sort_order",
+  "started_on",
+  "completed_on",
+  "payload_json",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "flow",
+   "fieldtype": "Link",
+   "label": "Onboarding Flow",
+   "options": "RBP Onboarding Flow",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "step_key",
+   "fieldtype": "Data",
+   "label": "Step Key",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "step_label",
+   "fieldtype": "Data",
+   "label": "Step Label",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Not Started\nIn Progress\nCompleted\nSkipped\nBlocked",
+   "default": "Not Started",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Sort Order",
+   "default": "0"
+  },
+  {
+   "fieldname": "started_on",
+   "fieldtype": "Datetime",
+   "label": "Started On"
+  },
+  {
+   "fieldname": "completed_on",
+   "fieldtype": "Datetime",
+   "label": "Completed On"
+  },
+  {
+   "fieldname": "payload_json",
+   "fieldtype": "Code",
+   "label": "Payload JSON",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "has_web_view": 0,
+ "hide_heading": 0,
+ "hide_toolbar": 0,
+ "idx": 0,
+ "in_create": 1,
+ "is_submittable": 0,
+ "issingle": 0,
+ "istable": 0,
+ "modified": "2026-05-07 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RBP App",
+ "name": "RBP Onboarding Step",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "cancel": 0,
+   "amend": 0,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  }
+ ],
+ "quick_entry": 0,
+ "read_only": 0,
+ "show_name_in_global_search": 0,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

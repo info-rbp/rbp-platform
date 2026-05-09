@@ -1,0 +1,36 @@
+{# ===================================================================
+   RBP Public Shell Base Template
+   Extends Frappe base.html. Provides: header, nav, content, footer.
+   All public-facing RBP pages extend this shell.
+   =================================================================== #}
+{% extends "templates/base.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="/assets/rbp_app/css/rbp.css">
+{% endblock %}
+
+
+{% block navbar %}
+{% include "rbp_app/templates/includes/header.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="rbp-shell" data-testid="rbp-public-shell">
+    {% block page_intro %}{% endblock %}
+
+    <main class="rbp-main-content">
+        {% block page_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% include "rbp_app/templates/includes/footer.html" %}
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script src="/assets/rbp_app/js/rbp.js"></script>
+{% endblock %}
+

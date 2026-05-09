@@ -1,0 +1,62 @@
+{% extends "rbp_app/templates/shells/portal_base.html" %}
+
+{% block title %}Apps - RBP Portal{% endblock %}
+
+{% block portal_title %}Apps{% endblock %}
+
+{% block portal_content %}
+<div class="rbp-placeholder-page" data-testid="portal-apps-page">
+    {% set app_groups = portal_apps_by_category or {} %}
+    {% set app_cards = portal_available_apps or [] %}
+
+    <div class="rbp-portal-dashboard-intro">
+        <p class="rbp-section-label">App Launcher</p>
+        <p class="rbp-portal-dashboard-copy">Open your available Frappe apps and RBP platform modules.</p>
+    </div>
+
+    {% if app_groups %}
+        <div class="rbp-app-launcher" data-testid="rbp-app-launcher">
+            {% for category, cards in app_groups.items() %}
+                <section class="rbp-app-category" data-category="{{ category }}">
+                    <h2>{{ category }}</h2>
+                    <div class="rbp-app-card-grid">
+                        {% for app in cards %}
+                            <a
+                                class="rbp-app-card{% if not app.enabled %} is-disabled{% endif %}"
+                                href="{{ app.route if app.enabled else '#' }}"
+                                data-app-key="{{ app.key }}"
+                                data-source-app="{{ app.source_app }}"
+                                data-module-type="{{ app.module_type }}"
+                            >
+                                <div class="rbp-app-card-topline">
+                                    <span>{{ app.module_type }}</span>
+                                    <span>{{ app.source_app }}</span>
+                                </div>
+                                <h3>{{ app.label or app.title or app.key }}</h3>
+                                <p>{{ app.description }}</p>
+                                <div class="rbp-app-card-meta">
+                                    <span>{{ app.key }}</span>
+                                    <span>{{ "Enabled" if app.enabled else "Unavailable" }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% elif app_cards %}
+        <div class="rbp-app-card-grid" data-testid="rbp-app-launcher">
+            {% for app in app_cards %}
+                <a class="rbp-app-card" href="{{ app.route }}" data-app-key="{{ app.key }}">
+                    <h3>{{ app.label or app.title or app.key }}</h3>
+                    <p>{{ app.description }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="rbp-placeholder-notice">
+            <p>No apps are available for this user yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

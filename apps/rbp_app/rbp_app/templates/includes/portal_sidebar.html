@@ -1,0 +1,29 @@
+{# RBP Portal Sidebar Include #}
+{# Provides: portal sidebar navigation for authenticated members #}
+
+<aside class="rbp-portal-sidebar" data-testid="rbp-portal-sidebar">
+    <div class="rbp-portal-sidebar-logo">
+        <a href="/">RBP</a>
+    </div>
+    <nav class="rbp-portal-nav" data-testid="rbp-portal-nav">
+        {% set app_cards = portal_available_apps or [] %}
+        <a href="/portal/dashboard">Dashboard</a>
+        {% if app_cards %}
+            {% for app in app_cards %}
+                {% if app.enabled %}
+                    <a href="{{ app.route }}" data-app-key="{{ app.key }}">{{ app.label or app.title or app.key }}</a>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <a href="/portal/membership">Membership</a>
+            <a href="/portal/library">Library</a>
+            <a href="/portal/resources">Resources</a>
+            <a href="/portal/finance">Finance</a>
+            <a href="/portal/decision-desk">Decision Desk</a>
+            <a href="/portal/billing">Billing</a>
+        {% endif %}
+        <a href="/portal/account">Account</a>
+        <a href="/portal/notifications">Notifications</a>
+        <a href="/portal/support">Support</a>
+    </nav>
+</aside>

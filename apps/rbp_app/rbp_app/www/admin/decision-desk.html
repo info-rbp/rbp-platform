@@ -1,0 +1,15 @@
+{% extends "rbp_app/templates/shells/admin_base.html" %}
+
+{% block title %}Decision Desk Admin - RBP Admin{% endblock %}
+
+{% block admin_content %}
+<div class="rbp-placeholder-page" data-testid="admin-decision-desk-page">
+    <h1>Decision Desk Admin</h1>
+    <p class="rbp-section-label">Admin Section: Decision Desk</p>
+    <div class="rbp-admin-notice">
+        <p><strong>Admin Scaffold:</strong> This route is served by Frappe Desk.</p>
+        <p>Target: <code>/admin/decision-desk</code></p>
+        <p>Go to <a href="/desk">Frappe Desk</a> for admin functionality.</p>
+    </div>
+</div>
+{% endblock %}

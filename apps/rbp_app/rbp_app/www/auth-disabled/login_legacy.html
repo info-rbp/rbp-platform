@@ -1,0 +1,66 @@
+{% extends "rbp_app/templates/shells/auth_base.html" %}
+
+{% block auth_content %}
+    <h1>Login</h1>
+    <p>Access your portal and billing dashboard using your email and password.</p>
+
+    <div id="rbp-login-error" class="rbp-form-error" aria-live="polite" style="display:none;"></div>
+
+    <form id="rbp-login-form" class="rbp-form">
+        <label for="rbp-login-email">Email</label>
+        <input id="rbp-login-email" name="usr" type="email" required autocomplete="email" />
+
+        <label for="rbp-login-password">Password</label>
+        <input id="rbp-login-password" name="pwd" type="password" required autocomplete="current-password" />
+
+        <input type="hidden" name="redirect-to" value="{{ redirect_to }}" />
+        <input type="hidden" name="csrf_token" value="{{ frappe.session.data.csrf_token or '' }}" />
+
+        <button type="submit" class="rbp-btn">Sign in</button>
+    </form>
+
+    <div class="rbp-auth-links">
+        <a href="/signup">Create an account</a>
+        <a href="/forgot-password">Forgot password?</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("rbp-login-form");
+            const error = document.getElementById("rbp-login-error");
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                error.style.display = "none";
+                error.textContent = "";
+
+                const formData = new FormData(form);
+                const payload = new URLSearchParams(formData);
+                const redirectTo = formData.get("redirect-to") || "/portal/dashboard";
+                const csrfToken = formData.get("csrf_token");
+
+                try {
+                    const response = await fetch("/api/method/login", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "X-Frappe-CSRF-Token": csrfToken,
+                            "Accept": "application/json",
+                        },
+                        body: payload,
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || "Invalid login credentials.");
+                    }
+
+                    window.location.href = result.redirect_to || redirectTo;
+                } catch (err) {
+                    error.style.display = "block";
+                    error.textContent = err.message || "Login failed. Please try again.";
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,137 @@
+{
+ "allow_copy": 0,
+ "allow_guest_to_view": 0,
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:RBP-FILE-{####}",
+ "creation": "2026-05-07 00:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "tenant",
+  "owner_user",
+  "related_doctype",
+  "related_name",
+  "file",
+  "file_type",
+  "visibility",
+  "uploaded_by",
+  "uploaded_on",
+  "status",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "label": "Owner User",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "related_doctype",
+   "fieldtype": "Data",
+   "label": "Related DocType",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "related_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Related Name",
+   "options": "related_doctype",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "file",
+   "fieldtype": "Link",
+   "label": "File",
+   "options": "File",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "file_type",
+   "fieldtype": "Data",
+   "label": "File Type"
+  },
+  {
+   "fieldname": "visibility",
+   "fieldtype": "Select",
+   "label": "Visibility",
+   "options": "Private To Owner\nTenant Visible\nAdvisor Visible\nAdmin Only\nPublic",
+   "default": "Private To Owner",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "uploaded_by",
+   "fieldtype": "Link",
+   "label": "Uploaded By",
+   "options": "User"
+  },
+  {
+   "fieldname": "uploaded_on",
+   "fieldtype": "Datetime",
+   "label": "Uploaded On"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nActive\nArchived",
+   "default": "Active",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "has_web_view": 0,
+ "hide_heading": 0,
+ "hide_toolbar": 0,
+ "idx": 0,
+ "in_create": 1,
+ "is_submittable": 0,
+ "issingle": 0,
+ "istable": 0,
+ "modified": "2026-05-07 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RBP App",
+ "name": "RBP File Reference",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "cancel": 0,
+   "amend": 0,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  }
+ ],
+ "quick_entry": 0,
+ "read_only": 0,
+ "show_name_in_global_search": 0,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

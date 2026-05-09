@@ -1,0 +1,50 @@
+{% extends "rbp_app/templates/shells/public_base.html" %}
+
+{% block title %}Remote Business Partner{% endblock %}
+
+{% block page_intro %}
+<section style="background:var(--rbp-color-bg-light);padding:3rem 0;text-align:center;" data-testid="rbp-hero">
+    <div style="max-width:var(--rbp-max-width);margin:0 auto;padding:0 1.5rem;">
+        <h1 style="font-size:2.5rem;color:var(--rbp-color-primary);margin-bottom:0.75rem;">
+            Remote Business Partner
+        </h1>
+        <p style="font-size:1.15rem;color:var(--rbp-color-text-light);max-width:600px;margin:0 auto 1.5rem;">
+            Your partner for business services, resources, and growth.
+        </p>
+        <a href="/signup" class="rbp-btn-join" style="display:inline-block;background:var(--rbp-color-highlight);color:#fff;padding:0.75rem 2rem;border-radius:var(--rbp-radius);text-decoration:none;font-weight:600;" data-testid="hero-cta">
+            Get Started
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_content %}
+<div data-testid="rbp-home-page">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;padding:2rem 0;">
+        <div style="background:#fff;border:1px solid var(--rbp-color-border);border-radius:var(--rbp-radius);padding:1.5rem;">
+            <h3 style="color:var(--rbp-color-primary);">Services</h3>
+            <p style="color:var(--rbp-color-text-light);font-size:0.9rem;">Explore our range of business services.</p>
+            <a href="/services" style="color:var(--rbp-color-accent);font-size:0.875rem;">Browse Services &rarr;</a>
+        </div>
+        <div style="background:#fff;border:1px solid var(--rbp-color-border);border-radius:var(--rbp-radius);padding:1.5rem;">
+            <h3 style="color:var(--rbp-color-primary);">Membership</h3>
+            <p style="color:var(--rbp-color-text-light);font-size:0.9rem;">Join and access exclusive member benefits.</p>
+            <a href="/membership" style="color:var(--rbp-color-accent);font-size:0.875rem;">View Plans &rarr;</a>
+        </div>
+        <div style="background:#fff;border:1px solid var(--rbp-color-border);border-radius:var(--rbp-radius);padding:1.5rem;">
+            <h3 style="color:var(--rbp-color-primary);">Resources</h3>
+            <p style="color:var(--rbp-color-text-light);font-size:0.9rem;">Access guides, tools, and knowledge base.</p>
+            <a href="/resources" style="color:var(--rbp-color-accent);font-size:0.875rem;">Explore Resources &rarr;</a>
+        </div>
+        <div style="background:#fff;border:1px solid var(--rbp-color-border);border-radius:var(--rbp-radius);padding:1.5rem;">
+            <h3 style="color:var(--rbp-color-primary);">Finance</h3>
+            <p style="color:var(--rbp-color-text-light);font-size:0.9rem;">Funding, insurance, and financial tools.</p>
+            <a href="/finance" style="color:var(--rbp-color-accent);font-size:0.875rem;">Finance Hub &rarr;</a>
+        </div>
+    </div>
+
+    <div class="rbp-placeholder-notice" style="margin-top:1rem;">
+        <p>This is the RBP shell home page. Full content will be added in a future phase.</p>
+    </div>
+</div>
+{% endblock %}

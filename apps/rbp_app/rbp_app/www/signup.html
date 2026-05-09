@@ -1,0 +1,76 @@
+{% extends "rbp_app/templates/shells/auth_base.html" %}
+
+{% block auth_content %}
+    <h1>Join</h1>
+    <p>Create an account to access your portal and billing pages.</p>
+
+    <div id="rbp-signup-error" class="rbp-form-error" aria-live="polite" style="display:none;"></div>
+    <div id="rbp-signup-success" class="rbp-form-success" aria-live="polite" style="display:none;"></div>
+
+    <form id="rbp-signup-form" class="rbp-form">
+        <label for="rbp-signup-email">Email</label>
+        <input id="rbp-signup-email" name="email" type="email" required autocomplete="email" />
+
+        <label for="rbp-signup-first-name">First name</label>
+        <input id="rbp-signup-first-name" name="first_name" type="text" autocomplete="given-name" />
+
+        <label for="rbp-signup-last-name">Last name</label>
+        <input id="rbp-signup-last-name" name="last_name" type="text" autocomplete="family-name" />
+
+        <label for="rbp-signup-password">Password</label>
+        <input id="rbp-signup-password" name="password" type="password" required autocomplete="new-password" />
+
+        <input type="hidden" name="redirect_to" value="{{ redirect_to }}" />
+        <input type="hidden" name="csrf_token" value="{{ frappe.session.data.csrf_token or '' }}" />
+
+        <button type="submit" class="rbp-btn">Create account</button>
+    </form>
+
+    <div class="rbp-auth-links">
+        <a href="/login">Already have an account?</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("rbp-signup-form");
+            const error = document.getElementById("rbp-signup-error");
+            const success = document.getElementById("rbp-signup-success");
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                error.style.display = "none";
+                success.style.display = "none";
+                error.textContent = "";
+                success.textContent = "";
+
+                const formData = new FormData(form);
+                const payload = new URLSearchParams(formData);
+                const redirectTo = formData.get("redirect_to") || "/portal/dashboard";
+                const csrfToken = formData.get("csrf_token");
+
+                try {
+                    const response = await fetch("/api/method/rbp_app.utils.auth.signup", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                            "X-Frappe-CSRF-Token": csrfToken,
+                            "Accept": "application/json",
+                        },
+                        body: payload,
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || "Signup failed. Please try again.");
+                    }
+
+                    window.location.href = result.redirect_to || redirectTo;
+                } catch (err) {
+                    error.style.display = "block";
+                    error.textContent = err.message || "Signup failed. Please try again.";
+                }
+            });
+        });
+    </script>
+{% endblock %}

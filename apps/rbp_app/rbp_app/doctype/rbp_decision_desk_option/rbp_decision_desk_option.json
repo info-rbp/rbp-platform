@@ -1,0 +1,134 @@
+{
+ "allow_copy": 0,
+ "allow_guest_to_view": 0,
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "format:RBP-DDO-{####}",
+ "creation": "2026-05-08 00:00:00.000000",
+ "custom": 0,
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "decision_request",
+  "tenant",
+  "option_label",
+  "option_summary",
+  "pros",
+  "cons",
+  "estimated_cost",
+  "risk_level",
+  "recommended",
+  "sort_order",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "decision_request",
+   "fieldtype": "Link",
+   "label": "Decision Request",
+   "options": "RBP Decision Desk Request",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "option_label",
+   "fieldtype": "Data",
+   "label": "Option Label",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "option_summary",
+   "fieldtype": "Small Text",
+   "label": "Option Summary"
+  },
+  {
+   "fieldname": "pros",
+   "fieldtype": "Long Text",
+   "label": "Pros"
+  },
+  {
+   "fieldname": "cons",
+   "fieldtype": "Long Text",
+   "label": "Cons"
+  },
+  {
+   "fieldname": "estimated_cost",
+   "fieldtype": "Currency",
+   "label": "Estimated Cost"
+  },
+  {
+   "fieldname": "risk_level",
+   "fieldtype": "Select",
+   "label": "Risk Level",
+   "options": "Low\nMedium\nHigh\nCritical",
+   "default": "Medium",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "recommended",
+   "fieldtype": "Check",
+   "label": "Recommended",
+   "default": "0",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Sort Order",
+   "default": "0"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Long Text",
+   "label": "Notes"
+  }
+ ],
+ "has_web_view": 0,
+ "hide_heading": 0,
+ "hide_toolbar": 0,
+ "idx": 0,
+ "in_create": 1,
+ "is_submittable": 0,
+ "issingle": 0,
+ "istable": 0,
+ "modified": "2026-05-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RBP App",
+ "name": "RBP Decision Desk Option",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "cancel": 0,
+   "amend": 0,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  }
+ ],
+ "quick_entry": 0,
+ "read_only": 0,
+ "show_name_in_global_search": 0,
+ "sort_field": "sort_order",
+ "sort_order": "ASC",
+ "track_changes": 1
+}

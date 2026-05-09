@@ -1,0 +1,144 @@
+{
+ "allow_copy": 0,
+ "allow_guest_to_view": 0,
+ "allow_import": 0,
+ "allow_rename": 0,
+ "autoname": "field:account_name",
+ "beta": 0,
+ "creation": "2026-01-01 00:00:00.000000",
+ "custom": 0,
+ "docstatus": 0,
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "account_name",
+  "website_user",
+  "tenant",
+  "payer_email",
+  "stripe_customer_id",
+  "stripe_subscription_id",
+  "subscription_status",
+  "current_period_end",
+  "next_payment_due",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "account_name",
+   "fieldtype": "Data",
+   "label": "Account Name",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "in_global_search": 1
+  },
+  {
+   "fieldname": "website_user",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "Website User",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "options": "Tenant",
+   "label": "Tenant",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "payer_email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "stripe_customer_id",
+   "fieldtype": "Data",
+   "label": "Stripe Customer ID"
+  },
+  {
+   "fieldname": "stripe_subscription_id",
+   "fieldtype": "Data",
+   "label": "Stripe Subscription ID"
+  },
+  {
+   "fieldname": "subscription_status",
+   "fieldtype": "Data",
+   "label": "Subscription Status"
+  },
+  {
+   "fieldname": "current_period_end",
+   "fieldtype": "Date",
+   "label": "Current Period End"
+  },
+  {
+   "fieldname": "next_payment_due",
+   "fieldtype": "Date",
+   "label": "Next Payment Due"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "has_web_view": 0,
+ "hide_heading": 0,
+ "hide_toolbar": 0,
+ "idx": 0,
+ "image_view": 0,
+ "in_create": 1,
+ "is_submittable": 0,
+ "issingle": 0,
+ "istable": 0,
+ "max_attachments": 0,
+ "modified": "2026-01-01 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RBP App",
+ "name": "RBP Account",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "submit": 0,
+   "amend": 0,
+   "print": 1,
+   "email": 1,
+   "report": 1,
+   "if_owner": 0,
+   "share": 1
+  },
+  {
+   "role": "Website User",
+   "read": 1,
+   "write": 0,
+   "create": 0,
+   "delete": 0,
+   "submit": 0,
+   "amend": 0,
+   "print": 0,
+   "email": 0,
+   "report": 0,
+   "apply_user_permissions": 1,
+   "if_owner": 0,
+   "share": 0
+  }
+ ],
+ "quick_entry": 0,
+ "read_only": 0,
+ "read_only_onload": 0,
+ "show_name_in_global_search": 0,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 0,
+ "track_seen": 0
+}
