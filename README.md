@@ -29,6 +29,7 @@ Phase 4 - Consolidation complete
 Completed in this branch:
 
 - source repository states confirmed
+- `docs/architecture/ARCHITECTURE.md`
 - `docs/architecture/SOURCE_MANIFEST.md` finalized
 - base repository structure created
 - environment examples added
@@ -137,6 +138,7 @@ rbp-platform/
 
 ## Key Documents
 
+- `docs/architecture/ARCHITECTURE.md`
 - `docs/architecture/SOURCE_MANIFEST.md`
 - `docs/architecture/REPOSITORY_STRATEGY.md`
 - `docs/architecture/PHASE_4A_STATUS.md`
