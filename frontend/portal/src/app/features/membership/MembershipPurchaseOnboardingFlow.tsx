@@ -38,7 +38,7 @@ import {
   submitMockMembershipSignup,
   type MockMembershipOnboardingResult,
   type MockMembershipSignupResult,
-} from "../../services/mock/membership.mockService";
+} from "../../services/membershipService";
 
 type PaymentState = "idle" | "pending" | "simulated-success" | "simulated-failed";
 type SubmissionState = "idle" | "loading" | "success" | "error";
@@ -393,7 +393,7 @@ export function MembershipPurchaseOnboardingFlow() {
     <WizardShell
       eyebrow="Membership purchase onboarding"
       title="Remote Business Partner membership"
-      description="A Phase 1 mock journey for choosing a membership, simulating payment, completing onboarding, and handing off to the portal. No real auth, payment, or backend calls are connected."
+      description="A Phase 5 integration pilot for choosing a membership, simulating payment, completing onboarding, and handing off to the portal. In Frappe mode, membership plan and onboarding calls use rbp_app APIs."
       steps={flowSteps}
       currentStepId={currentStep.id}
       aside={
@@ -612,15 +612,15 @@ export function MembershipPurchaseOnboardingFlow() {
           <div className="space-y-4">
             <MockSubmissionState
               state={submissionState}
-              idleMessage="Ready to submit the mock membership sign-up."
-              loadingMessage="Submitting mock membership sign-up..."
-              successMessage="Mock membership sign-up submitted."
-              errorMessage="Mock sign-up failed. Review the highlighted fields."
+              idleMessage="Ready to submit the membership sign-up."
+              loadingMessage="Submitting membership sign-up..."
+              successMessage="Membership sign-up submitted."
+              errorMessage="Membership sign-up failed. Review the highlighted fields."
             />
             <ReviewSubmit
               title="Review membership sign-up"
               description="Confirm the mock membership purchase details before activating the simulated membership."
-              submitLabel="Submit mock membership sign-up"
+              submitLabel="Submit membership sign-up"
               isSubmitting={submissionState === "loading"}
               onSubmit={submitSignup}
               sections={[
@@ -650,8 +650,8 @@ export function MembershipPurchaseOnboardingFlow() {
         {currentStep.id === "success" && signupResult ? (
           <ConfirmationPanel
             title="Membership active"
-            statusLabel="Mock payment success"
-            message="Your Phase 1 mock membership is active and onboarding can begin. No real account, payment, or backend record was created."
+            statusLabel="Payment simulated"
+            message="Your membership flow is active and onboarding can begin. In Frappe mode, an rbp_app onboarding flow has been started."
             reference={signupResult.reference}
             primaryAction={
               <button
@@ -843,10 +843,10 @@ export function MembershipPurchaseOnboardingFlow() {
             />
             <MockSubmissionState
               state={onboardingState}
-              idleMessage="Ready to complete mock onboarding."
-              loadingMessage="Completing mock onboarding..."
-              successMessage="Mock onboarding completed."
-              errorMessage="Mock onboarding failed. Review required fields."
+              idleMessage="Ready to complete onboarding."
+              loadingMessage="Completing onboarding..."
+              successMessage="Onboarding completed."
+              errorMessage="Onboarding failed. Review required fields."
             />
             <StepNavigation
               canGoBack
@@ -863,7 +863,7 @@ export function MembershipPurchaseOnboardingFlow() {
           <ConfirmationPanel
             title="Onboarding complete"
             statusLabel="Portal access available"
-            message="The mock membership onboarding state is complete. The portal dashboard can now show active membership context and next-step placeholders."
+            message="The membership onboarding state is complete. In Frappe mode, the onboarding flow has been submitted to rbp_app."
             reference={onboardingResult.reference}
             primaryAction={
               <Link

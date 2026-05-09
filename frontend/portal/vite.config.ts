@@ -16,7 +16,21 @@ function figmaAssetResolver() {
   }
 }
 
+
+const frappeProxyTarget = process.env.VITE_FRAPPE_PROXY_TARGET || "http://127.0.0.1:8000";
+const frappeDevToken = process.env.RBP_DEV_FRAPPE_TOKEN;
+
 export default defineConfig({
+  server: {
+    proxy: {
+      "/api": {
+        target: frappeProxyTarget,
+        changeOrigin: true,
+        secure: false,
+        headers: frappeDevToken ? { Authorization: `token ${frappeDevToken}` } : undefined,
+      },
+    },
+  },
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
