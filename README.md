@@ -161,3 +161,18 @@ This phase is structured consolidation.
 It is not integration, rewrite, QA, launch, or production deployment.
 
 Do not turn this repository into a junk drawer.
+
+## Phase 5 Source Freeze
+
+As of the Phase 5 preparation gate, this repository is the only approved candidate source for Phase 5 Integration.
+
+Previous repositories are reference/source-history only:
+
+- `info-rbp/Uiuxdesignassistance`
+- `info-rbp/frappe-project`
+
+See:
+
+```text
+docs/architecture/PHASE_5_SOURCE_FREEZE.md
+
