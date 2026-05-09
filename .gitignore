@@ -1,0 +1,50 @@
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.local.example
+!.env.production.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+coverage/
+.vite/
+.next/
+out/
+
+# Frappe / bench runtime
+sites/
+logs/
+config/
+env/
+archived/
+private/
+backups/
+*.sql
+*.sql.gz
+
+# Generated/runtime output
+test_reports/
+tmp/
+.cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
