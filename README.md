@@ -145,6 +145,7 @@ rbp-platform/
 - `docs/architecture/CONSOLIDATION_CHECKLIST.md`
 - `docs/architecture/PHASE_4_COMPLETION_REPORT.md`
 - `docs/architecture/PHASE_5_HANDOFF.md`
+- `docs/api-contracts/API_CONTRACTS.md`
 - `docs/architecture/CONSOLIDATED_REPO_VALIDATION.md`
 - `docs/deployment/DEPLOYMENT.md`
 
