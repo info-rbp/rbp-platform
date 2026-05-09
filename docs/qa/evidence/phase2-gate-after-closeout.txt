@@ -1,0 +1,54 @@
+# Phase 2 Gate Status - After Closeout
+
+Generated on: Sat May  9 18:55:58 AWST 2026
+
+## Remaining Pending Review Items
+None
+
+## Remaining Open Items
+None
+
+## Approved Items
+11:| Status | Approved for Phase 5 preflight with documented deferrals |
+55:| 01 | `01-api-response-envelope-standard.md` | Approved |
+56:| 02 | `02-naming-conventions.md` | Approved |
+57:| 03 | `03-role-matrix.md` | Approved |
+58:| 04 | `04-permission-model-draft.md` | Approved / promoted from draft |
+59:| 05 | `05-core-doctype-model.md` | Approved |
+60:| 06 | `06-workflow-state-standards.md` | Approved |
+61:| 07 | `07-error-catalogue.md` | Approved |
+62:| 08 | `08-payment-state-model.md` | Approved |
+63:| 09 | `09-upload-file-rules.md` | Approved |
+64:| 10 | `10-contract-templates.md` | Approved |
+65:| 11 | `11-route-to-endpoint-map.md` | Approved |
+66:| 12 | `12-form-field-specifications.md` | Approved |
+67:| 13 | `13-validation-rules.md` | Approved |
+68:| 14 | `14-notification-triggers.md` | Approved |
+69:| 15 | `15-admin-actions.md` | Approved |
+70:| 16 | `16-mock-to-real-api-map.md` | Approved |
+71:| 17 | `17-phase-2-acceptance-gate.md` | Approved |
+79:| Every active route has backend mapping | `11-route-to-endpoint-map.md` | Approved |
+80:| Every major product flow has create/update/submit/get/list APIs | `11`, `16` | Approved |
+81:| Every form field maps to a backend field or DocType | `12-form-field-specifications.md` | Approved |
+82:| Every form has backend validation rules | `13-validation-rules.md` | Approved |
+84:| Every role has permission rules | `03`, `04` | Approved |
+85:| Every upload maps to `RBP File Reference` | `09`, `12`, `16` | Approved - raw upload implementation remains Phase 5 or later integration work |
+86:| Every payment touchpoint maps to `RBP Payment Event` | `08`, `12`, `16` | Approved - live payment provider integration remains deferred |
+87:| Every notification trigger is defined | `14-notification-triggers.md` | Approved |
+88:| Every admin action has an endpoint, role, state, audit, and notification rule | `15-admin-actions.md` | Approved |
+89:| Every mock service has a real Frappe endpoint target | `16-mock-to-real-api-map.md` | Approved |
+91:| Every DocType needed for Phase 3 is defined | `05-core-doctype-model.md` | Approved |
+92:| QA can write backend tests from the contracts | all documents | Approved |
+
+## Deferred Items
+83:| Every workflow has states, transitions, and role rules | `06-workflow-state-standards.md` | Deferred - strict transition hardening remains a launch-hardening item where required |
+90:| Every error path uses standard error envelope and catalogue | `01`, `07`, `13` | Deferred - Phase 3 raw dictionary responses must be reflected in Phase 5 client handling |
+124:| OI-002 | Confirm final payment provider and payment-required products | Product / Backend | Billing implementation | Deferred - payment model accepted; live provider decision remains later hardening |
+125:| OI-003 | Confirm final file type/size limits | Product / Backend / Security | Upload implementation | Deferred - final upload limits remain Phase 5/security hardening |
+126:| OI-004 | Confirm whether marketplace supports third-party seller onboarding at launch | Product | Marketplace implementation | Deferred - launch-scope decision remains product hardening |
+127:| OI-005 | Confirm final team-member access policy | Product / Backend | Permission implementation | Deferred - permission baseline accepted; final team policy remains hardening |
+128:| OI-006 | Confirm whether content/admin CMS DocTypes are in Phase 3 or later | Product / Backend | Admin implementation | Deferred - admin baseline accepted; CMS scope remains later decision |
+129:| OI-007 | Confirm final notification email vs portal-only triggers | Product / Ops | Notification implementation | Deferred - portal notification model accepted; delivery channel remains hardening |
+130:| OI-008 | Confirm connectivity provider integration requirements | Product / Backend | Connectivity implementation | Deferred - provider integration depth remains later integration scope |
+131:| OI-009 | Confirm whether Risk Advisor uses mock score, manual review, or real scoring | Product / Backend | Risk Advisor implementation | Deferred - scoring model remains product/backend hardening |
+185:    Deferred items must be carried forward and must not be treated as production-ready.

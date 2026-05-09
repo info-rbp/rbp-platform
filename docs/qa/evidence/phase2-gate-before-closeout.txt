@@ -1,0 +1,32 @@
+# Phase 2 Gate Pending Items - Before Closeout
+
+Generated on: Sat May  9 18:55:29 AWST 2026
+
+## Pending Review Items
+
+79:| Every active route has backend mapping | `11-route-to-endpoint-map.md` | Pending review |
+80:| Every major product flow has create/update/submit/get/list APIs | `11`, `16` | Pending review |
+81:| Every form field maps to a backend field or DocType | `12-form-field-specifications.md` | Pending review |
+82:| Every form has backend validation rules | `13-validation-rules.md` | Pending review |
+83:| Every workflow has states, transitions, and role rules | `06-workflow-state-standards.md` | Pending review |
+84:| Every role has permission rules | `03`, `04` | Pending review |
+85:| Every upload maps to `RBP File Reference` | `09`, `12`, `16` | Pending review |
+86:| Every payment touchpoint maps to `RBP Payment Event` | `08`, `12`, `16` | Pending review |
+87:| Every notification trigger is defined | `14-notification-triggers.md` | Pending review |
+88:| Every admin action has an endpoint, role, state, audit, and notification rule | `15-admin-actions.md` | Pending review |
+89:| Every mock service has a real Frappe endpoint target | `16-mock-to-real-api-map.md` | Pending review |
+90:| Every error path uses standard error envelope and catalogue | `01`, `07`, `13` | Pending review |
+91:| Every DocType needed for Phase 3 is defined | `05-core-doctype-model.md` | Pending review |
+92:| QA can write backend tests from the contracts | all documents | Pending review |
+
+## Open Items
+
+123:| OI-001 | Confirm whether repo placeholder pages have matching completed UI work elsewhere or are accepted as contract-required flows | Product / Frontend | Phase 3 build | Open |
+124:| OI-002 | Confirm final payment provider and payment-required products | Product / Backend | Billing implementation | Open |
+125:| OI-003 | Confirm final file type/size limits | Product / Backend / Security | Upload implementation | Open |
+126:| OI-004 | Confirm whether marketplace supports third-party seller onboarding at launch | Product | Marketplace implementation | Open |
+127:| OI-005 | Confirm final team-member access policy | Product / Backend | Permission implementation | Open |
+128:| OI-006 | Confirm whether content/admin CMS DocTypes are in Phase 3 or later | Product / Backend | Admin implementation | Open |
+129:| OI-007 | Confirm final notification email vs portal-only triggers | Product / Ops | Notification implementation | Open |
+130:| OI-008 | Confirm connectivity provider integration requirements | Product / Backend | Connectivity implementation | Open |
+131:| OI-009 | Confirm whether Risk Advisor uses mock score, manual review, or real scoring | Product / Backend | Risk Advisor implementation | Open |
