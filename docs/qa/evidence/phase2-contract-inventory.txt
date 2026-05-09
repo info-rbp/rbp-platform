@@ -1,0 +1,1294 @@
+# Phase 2 Contract Inventory
+
+Generated on: Sat May  9 18:57:58 AWST 2026
+
+## Contract files
+contracts/README.md
+contracts/api/.gitkeep
+contracts/api/01-api-response-envelope-standard.md
+contracts/api/07-error-catalogue.md
+contracts/api/09-upload-file-rules.md
+contracts/api/11-route-to-endpoint-map.md
+contracts/api/16-mock-to-real-api-map.md
+contracts/contract-templates.md
+contracts/doctypes/.gitkeep
+contracts/doctypes/05-core-doctype-model.md
+contracts/doctypes/12-form-field-specifications.md
+contracts/doctypes/13-validation-rules.md
+contracts/naming-conventions.md
+contracts/permissions/.gitkeep
+contracts/permissions/03-role-matrix.md
+contracts/permissions/04-permission-model-draft.md
+contracts/permissions/15-admin-actions.md
+contracts/phase-2-acceptance-gate.md
+contracts/phase-2-pack-index.md
+contracts/phase-2-source-index.md
+contracts/workflows/.gitkeep
+contracts/workflows/06-workflow-state-standards.md
+contracts/workflows/08-payment-state-model.md
+contracts/workflows/14-notification-triggers.md
+
+## API endpoint references
+contracts/workflows/08-payment-state-model.md:895:GET  /api/method/rbp_app.api.billing.get_my_payment_summary
+contracts/workflows/08-payment-state-model.md:896:GET  /api/method/rbp_app.api.membership.get_subscription
+contracts/workflows/08-payment-state-model.md:897:POST /api/method/rbp_app.api.membership.create_signup
+contracts/workflows/08-payment-state-model.md:898:POST /api/method/rbp_app.api.billing.create_checkout_session
+contracts/workflows/08-payment-state-model.md:899:POST /api/method/rbp_app.api.billing.cancel_checkout_session
+contracts/workflows/08-payment-state-model.md:900:POST /api/method/rbp_app.api.billing.retry_payment
+contracts/workflows/08-payment-state-model.md:906:POST /api/method/rbp_app.api.billing.handle_payment_webhook
+contracts/workflows/08-payment-state-model.md:907:POST /api/method/rbp_app.api.billing.record_payment_event
+contracts/workflows/08-payment-state-model.md:913:GET  /api/method/rbp_app.api.billing.admin_list_payment_events
+contracts/workflows/08-payment-state-model.md:914:GET  /api/method/rbp_app.api.billing.admin_get_payment_event
+contracts/workflows/08-payment-state-model.md:915:POST /api/method/rbp_app.api.billing.admin_reconcile_payment
+contracts/workflows/08-payment-state-model.md:916:POST /api/method/rbp_app.api.billing.admin_mark_payment_not_required
+contracts/workflows/08-payment-state-model.md:917:POST /api/method/rbp_app.api.billing.admin_record_refund
+contracts/workflows/08-payment-state-model.md:918:POST /api/method/rbp_app.api.billing.admin_suspend_subscription
+contracts/workflows/08-payment-state-model.md:919:POST /api/method/rbp_app.api.billing.admin_restore_subscription
+contracts/workflows/06-workflow-state-standards.md:1310:POST /api/method/rbp_app.api.<domain>.create_<resource>
+contracts/workflows/06-workflow-state-standards.md:1328:POST /api/method/rbp_app.api.<domain>.update_<resource>
+contracts/workflows/06-workflow-state-standards.md:1338:POST /api/method/rbp_app.api.<domain>.submit_<resource>
+contracts/workflows/06-workflow-state-standards.md:1346:GET /api/method/rbp_app.api.<domain>.get_<resource>
+contracts/workflows/06-workflow-state-standards.md:1372:POST /api/method/rbp_app.api.<domain>.admin_<action>
+contracts/naming-conventions.md:29:rbp_app.api.*
+contracts/naming-conventions.md:250:/api/method/rbp_app.api.<domain>.<action>_<resource>
+contracts/naming-conventions.md:268:POST /api/method/rbp_app.api.membership.create_signup
+contracts/naming-conventions.md:269:GET  /api/method/rbp_app.api.membership.get_subscription
+contracts/naming-conventions.md:270:GET  /api/method/rbp_app.api.membership.list_my_subscriptions
+contracts/naming-conventions.md:272:POST /api/method/rbp_app.api.decision_desk.create_request
+contracts/naming-conventions.md:273:POST /api/method/rbp_app.api.decision_desk.update_request
+contracts/naming-conventions.md:274:POST /api/method/rbp_app.api.decision_desk.submit_request
+contracts/naming-conventions.md:275:GET  /api/method/rbp_app.api.decision_desk.get_request
+contracts/naming-conventions.md:276:GET  /api/method/rbp_app.api.decision_desk.list_my_requests
+contracts/naming-conventions.md:277:POST /api/method/rbp_app.api.decision_desk.attach_file
+contracts/naming-conventions.md:278:POST /api/method/rbp_app.api.decision_desk.admin_assign_advisor
+contracts/naming-conventions.md:280:POST /api/method/rbp_app.api.docushare.create_brief
+contracts/naming-conventions.md:281:POST /api/method/rbp_app.api.marketplace.create_listing
+contracts/naming-conventions.md:282:POST /api/method/rbp_app.api.connectivity.create_order
+contracts/naming-conventions.md:283:POST /api/method/rbp_app.api.risk_advisor.create_assessment
+contracts/naming-conventions.md:284:POST /api/method/rbp_app.api.fixer.create_request
+contracts/naming-conventions.md:292:rbp_app.api.decision_desk.create_request
+contracts/naming-conventions.md:293:rbp_app.api.risk_advisor.create_assessment
+contracts/naming-conventions.md:294:rbp_app.api.marketplace.create_listing
+contracts/naming-conventions.md:300:rbp_app.api.DecisionDesk.createRequest
+contracts/naming-conventions.md:301:rbp_app.api.dd.make
+contracts/naming-conventions.md:302:rbp_app.api.marketplace.submitForm
+contracts/naming-conventions.md:303:rbp_app.api.risk-advisor.create-assessment
+contracts/naming-conventions.md:983:POST /api/method/rbp_app.api.<domain>.attach_file
+contracts/naming-conventions.md:1176:/api/method/rbp_app.api.<domain>.<action>_<resource>
+contracts/naming-conventions.md:1182:POST /api/method/rbp_app.api.membership.create_signup
+contracts/naming-conventions.md:1183:POST /api/method/rbp_app.api.decision_desk.create_request
+contracts/naming-conventions.md:1184:POST /api/method/rbp_app.api.docushare.create_brief
+contracts/naming-conventions.md:1185:POST /api/method/rbp_app.api.marketplace.create_listing
+contracts/naming-conventions.md:1186:POST /api/method/rbp_app.api.connectivity.create_order
+contracts/naming-conventions.md:1187:POST /api/method/rbp_app.api.risk_advisor.create_assessment
+contracts/naming-conventions.md:1188:POST /api/method/rbp_app.api.fixer.create_request
+contracts/naming-conventions.md:1189:GET  /api/method/rbp_app.api.portal.get_dashboard
+contracts/naming-conventions.md:1190:GET  /api/method/rbp_app.api.notifications.list_my_notifications
+contracts/naming-conventions.md:1670:| API endpoint | Frappe method path | `/api/method/rbp_app.api.decision_desk.create_request` |
+contracts/doctypes/12-form-field-specifications.md:110:Primary API Module: rbp_app.api.membership
+contracts/doctypes/12-form-field-specifications.md:147:Primary API Module: rbp_app.api.decision_desk
+contracts/doctypes/12-form-field-specifications.md:183:Primary API Module: rbp_app.api.docushare
+contracts/doctypes/12-form-field-specifications.md:219:Primary API Module: rbp_app.api.marketplace
+contracts/doctypes/12-form-field-specifications.md:254:Primary API Module: rbp_app.api.connectivity
+contracts/doctypes/12-form-field-specifications.md:289:Primary API Module: rbp_app.api.risk_advisor
+contracts/doctypes/12-form-field-specifications.md:323:Primary API Module: rbp_app.api.fixer
+contracts/doctypes/12-form-field-specifications.md:357:Primary API Module: rbp_app.api.portal
+contracts/doctypes/05-core-doctype-model.md:336:GET  /api/method/rbp_app.api.me.get_context
+contracts/doctypes/05-core-doctype-model.md:337:GET  /api/method/rbp_app.api.tenancy.get_tenant
+contracts/doctypes/05-core-doctype-model.md:338:POST /api/method/rbp_app.api.tenancy.update_tenant
+contracts/doctypes/05-core-doctype-model.md:410:POST /api/method/rbp_app.api.membership.create_signup
+contracts/doctypes/05-core-doctype-model.md:411:GET  /api/method/rbp_app.api.business_profile.get_profile
+contracts/doctypes/05-core-doctype-model.md:412:POST /api/method/rbp_app.api.business_profile.update_profile
+contracts/doctypes/05-core-doctype-model.md:479:GET  /api/method/rbp_app.api.membership.get_plans
+contracts/doctypes/05-core-doctype-model.md:480:POST /api/method/rbp_app.api.membership.admin_create_plan
+contracts/doctypes/05-core-doctype-model.md:481:POST /api/method/rbp_app.api.membership.admin_update_plan
+contracts/doctypes/05-core-doctype-model.md:551:POST /api/method/rbp_app.api.membership.create_signup
+contracts/doctypes/05-core-doctype-model.md:552:GET  /api/method/rbp_app.api.membership.get_subscription
+contracts/doctypes/05-core-doctype-model.md:553:POST /api/method/rbp_app.api.membership.cancel_subscription
+contracts/doctypes/05-core-doctype-model.md:554:POST /api/method/rbp_app.api.billing.admin_reconcile_subscription
+contracts/doctypes/05-core-doctype-model.md:639:GET  /api/method/rbp_app.api.me.get_context
+contracts/doctypes/05-core-doctype-model.md:640:GET  /api/method/rbp_app.api.entitlements.list_my_entitlements
+contracts/doctypes/05-core-doctype-model.md:641:POST /api/method/rbp_app.api.entitlements.admin_grant_entitlement
+contracts/doctypes/05-core-doctype-model.md:642:POST /api/method/rbp_app.api.entitlements.admin_revoke_entitlement
+contracts/doctypes/05-core-doctype-model.md:707:GET  /api/method/rbp_app.api.onboarding.get_flow
+contracts/doctypes/05-core-doctype-model.md:708:POST /api/method/rbp_app.api.onboarding.update_step
+contracts/doctypes/05-core-doctype-model.md:709:POST /api/method/rbp_app.api.onboarding.complete_flow
+contracts/doctypes/05-core-doctype-model.md:765:POST /api/method/rbp_app.api.onboarding.update_step
+contracts/doctypes/05-core-doctype-model.md:766:POST /api/method/rbp_app.api.onboarding.complete_step
+contracts/doctypes/05-core-doctype-model.md:853:GET  /api/method/rbp_app.api.notifications.list_my_notifications
+contracts/doctypes/05-core-doctype-model.md:854:POST /api/method/rbp_app.api.notifications.mark_read
+contracts/doctypes/05-core-doctype-model.md:855:POST /api/method/rbp_app.api.notifications.admin_create_notification
+contracts/doctypes/05-core-doctype-model.md:943:GET /api/method/rbp_app.api.audit.admin_list_events
+contracts/doctypes/05-core-doctype-model.md:944:GET /api/method/rbp_app.api.audit.admin_get_event
+contracts/doctypes/05-core-doctype-model.md:1048:GET  /api/method/rbp_app.api.billing.get_my_payment_summary
+contracts/doctypes/05-core-doctype-model.md:1049:GET  /api/method/rbp_app.api.billing.get_subscription_payment_events
+contracts/doctypes/05-core-doctype-model.md:1050:POST /api/method/rbp_app.api.billing.handle_payment_webhook
+contracts/doctypes/05-core-doctype-model.md:1051:POST /api/method/rbp_app.api.billing.admin_reconcile_payment
+contracts/doctypes/05-core-doctype-model.md:1141:POST /api/method/rbp_app.api.<domain>.attach_file
+contracts/doctypes/05-core-doctype-model.md:1142:GET  /api/method/rbp_app.api.files.get_file_reference
+contracts/doctypes/05-core-doctype-model.md:1143:GET  /api/method/rbp_app.api.files.list_files_for_record
+contracts/doctypes/05-core-doctype-model.md:1144:POST /api/method/rbp_app.api.files.admin_change_visibility
+contracts/doctypes/05-core-doctype-model.md:1241:POST /api/method/rbp_app.api.decision_desk.create_request
+contracts/doctypes/05-core-doctype-model.md:1242:POST /api/method/rbp_app.api.decision_desk.update_request
+contracts/doctypes/05-core-doctype-model.md:1243:POST /api/method/rbp_app.api.decision_desk.submit_request
+contracts/doctypes/05-core-doctype-model.md:1244:GET  /api/method/rbp_app.api.decision_desk.get_request
+contracts/doctypes/05-core-doctype-model.md:1245:GET  /api/method/rbp_app.api.decision_desk.list_my_requests
+contracts/doctypes/05-core-doctype-model.md:1246:POST /api/method/rbp_app.api.decision_desk.attach_file
+contracts/doctypes/05-core-doctype-model.md:1247:POST /api/method/rbp_app.api.decision_desk.admin_assign_advisor
+contracts/doctypes/05-core-doctype-model.md:1248:POST /api/method/rbp_app.api.decision_desk.admin_request_more_information
+contracts/doctypes/05-core-doctype-model.md:1249:POST /api/method/rbp_app.api.decision_desk.admin_close_request
+contracts/doctypes/05-core-doctype-model.md:1317:POST /api/method/rbp_app.api.decision_desk.add_option
+contracts/doctypes/05-core-doctype-model.md:1318:POST /api/method/rbp_app.api.decision_desk.update_option
+contracts/doctypes/05-core-doctype-model.md:1319:POST /api/method/rbp_app.api.decision_desk.remove_option
+contracts/doctypes/05-core-doctype-model.md:1386:POST /api/method/rbp_app.api.docushare.create_brief
+contracts/doctypes/05-core-doctype-model.md:1387:POST /api/method/rbp_app.api.docushare.update_brief
+contracts/doctypes/05-core-doctype-model.md:1388:POST /api/method/rbp_app.api.docushare.submit_brief
+contracts/doctypes/05-core-doctype-model.md:1389:GET  /api/method/rbp_app.api.docushare.get_brief
+contracts/doctypes/05-core-doctype-model.md:1390:GET  /api/method/rbp_app.api.docushare.list_my_briefs
+contracts/doctypes/05-core-doctype-model.md:1391:POST /api/method/rbp_app.api.docushare.attach_file
+contracts/doctypes/05-core-doctype-model.md:1392:POST /api/method/rbp_app.api.docushare.admin_assign_reviewer
+contracts/doctypes/05-core-doctype-model.md:1477:POST /api/method/rbp_app.api.marketplace.create_listing
+contracts/doctypes/05-core-doctype-model.md:1478:POST /api/method/rbp_app.api.marketplace.update_listing
+contracts/doctypes/05-core-doctype-model.md:1479:POST /api/method/rbp_app.api.marketplace.submit_listing
+contracts/doctypes/05-core-doctype-model.md:1480:GET  /api/method/rbp_app.api.marketplace.get_listing
+contracts/doctypes/05-core-doctype-model.md:1481:GET  /api/method/rbp_app.api.marketplace.list_my_listings
+contracts/doctypes/05-core-doctype-model.md:1482:GET  /api/method/rbp_app.api.marketplace.list_public_listings
+contracts/doctypes/05-core-doctype-model.md:1483:POST /api/method/rbp_app.api.marketplace.attach_file
+contracts/doctypes/05-core-doctype-model.md:1484:POST /api/method/rbp_app.api.marketplace.admin_approve_listing
+contracts/doctypes/05-core-doctype-model.md:1485:POST /api/method/rbp_app.api.marketplace.admin_reject_listing
+contracts/doctypes/05-core-doctype-model.md:1486:POST /api/method/rbp_app.api.marketplace.admin_archive_listing
+contracts/doctypes/05-core-doctype-model.md:1548:POST /api/method/rbp_app.api.marketplace.create_enquiry
+contracts/doctypes/05-core-doctype-model.md:1549:GET  /api/method/rbp_app.api.marketplace.get_enquiry
+contracts/doctypes/05-core-doctype-model.md:1550:GET  /api/method/rbp_app.api.marketplace.list_my_enquiries
+contracts/doctypes/05-core-doctype-model.md:1551:GET  /api/method/rbp_app.api.marketplace.list_listing_enquiries
+contracts/doctypes/05-core-doctype-model.md:1552:POST /api/method/rbp_app.api.marketplace.admin_mark_enquiry_spam
+contracts/doctypes/05-core-doctype-model.md:1553:POST /api/method/rbp_app.api.marketplace.admin_close_enquiry
+contracts/doctypes/05-core-doctype-model.md:1633:POST /api/method/rbp_app.api.connectivity.check_serviceability
+contracts/doctypes/05-core-doctype-model.md:1634:POST /api/method/rbp_app.api.connectivity.create_order
+contracts/doctypes/05-core-doctype-model.md:1635:POST /api/method/rbp_app.api.connectivity.update_order
+contracts/doctypes/05-core-doctype-model.md:1636:POST /api/method/rbp_app.api.connectivity.submit_order
+contracts/doctypes/05-core-doctype-model.md:1637:GET  /api/method/rbp_app.api.connectivity.get_order
+contracts/doctypes/05-core-doctype-model.md:1638:GET  /api/method/rbp_app.api.connectivity.list_my_orders
+contracts/doctypes/05-core-doctype-model.md:1639:POST /api/method/rbp_app.api.connectivity.attach_file
+contracts/doctypes/05-core-doctype-model.md:1640:POST /api/method/rbp_app.api.connectivity.admin_update_provisioning_status
+contracts/doctypes/05-core-doctype-model.md:1717:POST /api/method/rbp_app.api.risk_advisor.create_assessment
+contracts/doctypes/05-core-doctype-model.md:1718:POST /api/method/rbp_app.api.risk_advisor.update_assessment
+contracts/doctypes/05-core-doctype-model.md:1719:POST /api/method/rbp_app.api.risk_advisor.submit_assessment
+contracts/doctypes/05-core-doctype-model.md:1720:GET  /api/method/rbp_app.api.risk_advisor.get_assessment
+contracts/doctypes/05-core-doctype-model.md:1721:GET  /api/method/rbp_app.api.risk_advisor.list_my_assessments
+contracts/doctypes/05-core-doctype-model.md:1722:POST /api/method/rbp_app.api.risk_advisor.attach_file
+contracts/doctypes/05-core-doctype-model.md:1723:POST /api/method/rbp_app.api.risk_advisor.admin_assign_advisor
+contracts/doctypes/05-core-doctype-model.md:1724:POST /api/method/rbp_app.api.risk_advisor.admin_mark_assessment_complete
+contracts/doctypes/05-core-doctype-model.md:1808:POST /api/method/rbp_app.api.fixer.create_request
+contracts/doctypes/05-core-doctype-model.md:1809:POST /api/method/rbp_app.api.fixer.update_request
+contracts/doctypes/05-core-doctype-model.md:1810:POST /api/method/rbp_app.api.fixer.submit_request
+contracts/doctypes/05-core-doctype-model.md:1811:GET  /api/method/rbp_app.api.fixer.get_request
+contracts/doctypes/05-core-doctype-model.md:1812:GET  /api/method/rbp_app.api.fixer.list_my_requests
+contracts/doctypes/05-core-doctype-model.md:1813:POST /api/method/rbp_app.api.fixer.attach_file
+contracts/doctypes/05-core-doctype-model.md:1814:POST /api/method/rbp_app.api.fixer.admin_assign_request
+contracts/doctypes/05-core-doctype-model.md:1815:POST /api/method/rbp_app.api.fixer.admin_close_request
+contracts/permissions/15-admin-actions.md:55:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_activate_subscription` | RBP Subscription | Pending/Paid | Active | `subscription_active` |
+contracts/permissions/15-admin-actions.md:56:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_suspend_subscription` | RBP Subscription | Active/Past Due | Suspended | `subscription_suspended` |
+contracts/permissions/15-admin-actions.md:57:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_cancel_subscription` | RBP Subscription | Active/Past Due/Suspended | Cancelled | `subscription_cancelled` |
+contracts/permissions/15-admin-actions.md:58:| `/admin/membership` | `/api/method/rbp_app.api.entitlements.admin_grant_entitlement` | RBP App Entitlement | Any | Active | `entitlement_activated` |
+contracts/permissions/15-admin-actions.md:59:| `/admin/membership` | `/api/method/rbp_app.api.entitlements.admin_revoke_entitlement` | RBP App Entitlement | Active/Suspended | Revoked | `entitlement_revoked` |
+contracts/permissions/15-admin-actions.md:60:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_assign_advisor` | RBP Decision Desk Request | In Review/Submitted | Assigned | `advisor_assigned` |
+contracts/permissions/15-admin-actions.md:61:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_request_more_information` | RBP Decision Desk Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:62:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_reject_request` | RBP Decision Desk Request | Submitted/In Review | Rejected | `decision_desk_rejected` |
+contracts/permissions/15-admin-actions.md:63:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_close_request` | RBP Decision Desk Request | Outcome Ready/In Progress | Closed | `decision_desk_closed` |
+contracts/permissions/15-admin-actions.md:64:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_archive_request` | RBP Decision Desk Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:65:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_request_more_information` | RBP Document Brief | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:66:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_reject_brief` | RBP Document Brief | Submitted/In Review | Rejected | `docushare_rejected` |
+contracts/permissions/15-admin-actions.md:67:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_close_brief` | RBP Document Brief | Outcome Ready/In Progress | Closed | `docushare_closed` |
+contracts/permissions/15-admin-actions.md:68:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_archive_brief` | RBP Document Brief | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:69:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_approve_listing` | RBP Marketplace Listing | Pending Review | Published | `marketplace_listing_approved` |
+contracts/permissions/15-admin-actions.md:70:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_reject_listing` | RBP Marketplace Listing | Pending Review | Rejected | `marketplace_listing_rejected` |
+contracts/permissions/15-admin-actions.md:71:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_archive_listing` | RBP Marketplace Listing | Published/Rejected | Archived | `none` |
+contracts/permissions/15-admin-actions.md:72:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_mark_enquiry_spam` | RBP Marketplace Enquiry | New/In Review | Spam | `none` |
+contracts/permissions/15-admin-actions.md:73:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_close_enquiry` | RBP Marketplace Enquiry | Sent to Seller/In Review | Closed | `marketplace_enquiry_closed` |
+contracts/permissions/15-admin-actions.md:74:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_request_more_information` | RBP Connectivity Order | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:75:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_reject_order` | RBP Connectivity Order | Submitted/In Review | Rejected | `connectivity_rejected` |
+contracts/permissions/15-admin-actions.md:76:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_close_order` | RBP Connectivity Order | Outcome Ready/In Progress | Closed | `connectivity_closed` |
+contracts/permissions/15-admin-actions.md:77:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_archive_order` | RBP Connectivity Order | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:78:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_assign_advisor` | RBP Risk Assessment | In Review/Submitted | Assigned | `advisor_assigned` |
+contracts/permissions/15-admin-actions.md:79:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_request_more_information` | RBP Risk Assessment | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:80:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_reject_assessment` | RBP Risk Assessment | Submitted/In Review | Rejected | `risk_advisor_rejected` |
+contracts/permissions/15-admin-actions.md:81:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_close_assessment` | RBP Risk Assessment | Outcome Ready/In Progress | Closed | `risk_advisor_closed` |
+contracts/permissions/15-admin-actions.md:82:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_archive_assessment` | RBP Risk Assessment | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:83:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_request_more_information` | RBP Fixer Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:84:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_reject_request` | RBP Fixer Request | Submitted/In Review | Rejected | `fixer_rejected` |
+contracts/permissions/15-admin-actions.md:85:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_close_request` | RBP Fixer Request | Outcome Ready/In Progress | Closed | `fixer_closed` |
+contracts/permissions/15-admin-actions.md:86:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_archive_request` | RBP Fixer Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:111:| Site Content | list content items | `/api/method/rbp_app.api.admin_content.list_items` | Future content DocType or page registry |
+contracts/permissions/15-admin-actions.md:112:| Site Content | create content draft | `/api/method/rbp_app.api.admin_content.create_item` | Draft/publish workflow required |
+contracts/permissions/15-admin-actions.md:113:| Site Content | publish content item | `/api/method/rbp_app.api.admin_content.admin_publish_item` | Requires version/audit |
+contracts/permissions/15-admin-actions.md:114:| Resources | manage resources | `/api/method/rbp_app.api.admin_content.<action>` | Files, visibility, member/public rules |
+contracts/permissions/15-admin-actions.md:115:| Help Center | manage help content | `/api/method/rbp_app.api.admin_content.<action>` | FAQ/knowledge base workflow |
+contracts/permissions/15-admin-actions.md:116:| Legal Pages | update legal copy | `/api/method/rbp_app.api.admin_content.admin_update_legal_page` | Requires legal review/version history |
+contracts/permissions/15-admin-actions.md:117:| Settings | manage platform config | `/api/method/rbp_app.api.admin_settings.<action>` | System Manager/Administrator only for sensitive config |
+contracts/permissions/03-role-matrix.md:1119:GET /api/method/rbp_app.api.me.get_context
+contracts/permissions/04-permission-model-draft.md:492:rbp_app.api.membership
+contracts/permissions/04-permission-model-draft.md:493:rbp_app.api.decision_desk
+contracts/permissions/04-permission-model-draft.md:494:rbp_app.api.docushare
+contracts/permissions/04-permission-model-draft.md:495:rbp_app.api.marketplace
+contracts/permissions/04-permission-model-draft.md:496:rbp_app.api.connectivity
+contracts/permissions/04-permission-model-draft.md:497:rbp_app.api.risk_advisor
+contracts/permissions/04-permission-model-draft.md:498:rbp_app.api.fixer
+contracts/permissions/04-permission-model-draft.md:499:rbp_app.api.portal
+contracts/permissions/04-permission-model-draft.md:500:rbp_app.api.billing
+contracts/permissions/04-permission-model-draft.md:501:rbp_app.api.notifications
+contracts/permissions/04-permission-model-draft.md:1341:POST /api/method/rbp_app.api.decision_desk.create_request
+contracts/permissions/04-permission-model-draft.md:1398:GET /api/method/rbp_app.api.me.get_context
+contracts/contract-templates.md:194:| Python Module | `rbp_app.api.<domain_module>` |
+contracts/contract-templates.md:240:| `/example/path` | `<ComponentName>` | Guest / Member / Admin | `/api/method/rbp_app.api.<domain>.<method>` | GET/POST | Yes/No | <Notes> |
+contracts/contract-templates.md:254:| `/on-demand/decision-desk` | `DecisionDeskPage` | Guest / Member | `/api/method/rbp_app.api.decision_desk.create_request` | POST | Yes | Creates request draft or submission |
+contracts/contract-templates.md:268:| Endpoint | `/api/method/rbp_app.api.<domain>.<method_name>` |
+contracts/contract-templates.md:361:| Endpoint | `/api/method/rbp_app.api.<domain>.list_<resources>` |
+contracts/contract-templates.md:896:| API Endpoint | `/api/method/rbp_app.api.<domain>.admin_<action>` |
+contracts/contract-templates.md:989:| `/mock/example/resource` | POST | `/api/method/rbp_app.api.<domain>.create_<resource>` | POST | `<RBP DocType>` | Replace in Phase 5 |
+contracts/contract-templates.md:1137:| Endpoint | `/api/method/rbp_app.api.<domain>.create_<resource>` |
+contracts/api/16-mock-to-real-api-map.md:55:| `/mock/membership/signup` | `/api/method/rbp_app.api.membership.create_signup` | POST | RBP Subscription | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:56:| mock submit for Membership | `/api/method/rbp_app.api.membership.submit_signup` | POST | RBP Subscription | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:57:| mock get/list for Membership | `/api/method/rbp_app.api.membership.get_subscription` / `list_my_subscriptions` | GET | RBP Subscription DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:58:| `/mock/decision-desk/request` | `/api/method/rbp_app.api.decision_desk.create_request` | POST | RBP Decision Desk Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:59:| mock submit for Decision Desk | `/api/method/rbp_app.api.decision_desk.submit_request` | POST | RBP Decision Desk Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:60:| mock get/list for Decision Desk | `/api/method/rbp_app.api.decision_desk.get_request` / `list_my_requests` | GET | RBP Decision Desk Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:61:| mock upload for Decision Desk | `/api/method/rbp_app.api.decision_desk.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:62:| `/mock/docushare/brief` | `/api/method/rbp_app.api.docushare.create_brief` | POST | RBP Document Brief | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:63:| mock submit for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.submit_brief` | POST | RBP Document Brief | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:64:| mock get/list for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.get_brief` / `list_my_briefs` | GET | RBP Document Brief DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:65:| mock upload for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:66:| `/mock/marketplace/listing` | `/api/method/rbp_app.api.marketplace.create_listing` | POST | RBP Marketplace Listing | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:67:| mock submit for Marketplace | `/api/method/rbp_app.api.marketplace.submit_listing` | POST | RBP Marketplace Listing | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:68:| mock get/list for Marketplace | `/api/method/rbp_app.api.marketplace.get_listing` / `list_public_listings` | GET | RBP Marketplace Listing DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:69:| mock upload for Marketplace | `/api/method/rbp_app.api.marketplace.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:70:| `/mock/connectivity/order` | `/api/method/rbp_app.api.connectivity.create_order` | POST | RBP Connectivity Order | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:71:| mock submit for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.submit_order` | POST | RBP Connectivity Order | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:72:| mock get/list for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.get_order` / `list_my_orders` | GET | RBP Connectivity Order DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:73:| mock upload for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:74:| `/mock/risk-advisor/assessment` | `/api/method/rbp_app.api.risk_advisor.create_assessment` | POST | RBP Risk Assessment | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:75:| mock submit for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.submit_assessment` | POST | RBP Risk Assessment | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:76:| mock get/list for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.get_assessment` / `list_my_assessments` | GET | RBP Risk Assessment DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:77:| mock upload for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:78:| `/mock/fixer/request` | `/api/method/rbp_app.api.fixer.create_request` | POST | RBP Fixer Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:79:| mock submit for The Fixer | `/api/method/rbp_app.api.fixer.submit_request` | POST | RBP Fixer Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:80:| mock get/list for The Fixer | `/api/method/rbp_app.api.fixer.get_request` / `list_my_requests` | GET | RBP Fixer Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:81:| mock upload for The Fixer | `/api/method/rbp_app.api.fixer.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:82:| `/mock/portal/dashboard` | `/api/method/rbp_app.api.portal.get_dashboard` | GET | Portal dashboard DTO | Replace mock dashboard cards/activity/status. |
+contracts/api/16-mock-to-real-api-map.md:98:| mock portal dashboard stats | `rbp_app.api.portal.get_dashboard` DTO | Computed from real records. |
+contracts/api/11-route-to-endpoint-map.md:56:/api/method/rbp_app.api.<domain>.<action>_<resource>
+contracts/api/11-route-to-endpoint-map.md:62:POST /api/method/rbp_app.api.decision_desk.create_request
+contracts/api/11-route-to-endpoint-map.md:63:GET  /api/method/rbp_app.api.decision_desk.get_request
+contracts/api/11-route-to-endpoint-map.md:64:POST /api/method/rbp_app.api.decision_desk.attach_file
+contracts/api/11-route-to-endpoint-map.md:65:POST /api/method/rbp_app.api.decision_desk.admin_assign_advisor
+contracts/api/11-route-to-endpoint-map.md:76:| `/membership` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:77:| `/membership/overview` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:78:| `/membership/pricing` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:79:| `/membership/payment-terms` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:80:| `/membership/sign-up-now` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.create_signup` | POST | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:81:| `/membership/confirmation` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:82:| `/on-demand/decision-desk` | `DecisionDeskPage / PortalServiceRequest` | Decision Desk | public | `/api/method/rbp_app.api.decision_desk.get_request` | GET | RBP Decision Desk Request |
+contracts/api/11-route-to-endpoint-map.md:83:| `/portal/services/request` | `DecisionDeskPage / PortalServiceRequest` | Decision Desk | public | `/api/method/rbp_app.api.decision_desk.get_request` | GET | RBP Decision Desk Request |
+contracts/api/11-route-to-endpoint-map.md:84:| `/portal/services/:id` | `DecisionDeskPage / PortalServiceRequest` | Decision Desk | public | `/api/method/rbp_app.api.decision_desk.get_request` | GET | RBP Decision Desk Request |
+contracts/api/11-route-to-endpoint-map.md:85:| `/document-nucleus/overview` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:86:| `/document-nucleus/category/:id` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:87:| `/document-nucleus/product/:id` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:88:| `/on-demand/documents` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:89:| `/marketplace` | `MarketplacePage` | Marketplace | public | `/api/method/rbp_app.api.marketplace.get_listing` | GET | RBP Marketplace Listing |
+contracts/api/11-route-to-endpoint-map.md:90:| `/marketplace/product/:id` | `MarketplacePage` | Marketplace | public | `/api/method/rbp_app.api.marketplace.get_listing` | GET | RBP Marketplace Listing |
+contracts/api/11-route-to-endpoint-map.md:91:| `/operations/connectivity` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:92:| `/operations/connectivity/nbn-phone` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:93:| `/operations/connectivity/superloop` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:94:| `/operations/superloop` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:95:| `/on-demand/risk-advisor` | `RiskAdvisorPage` | Risk Advisor | public | `/api/method/rbp_app.api.risk_advisor.get_assessment` | GET | RBP Risk Assessment |
+contracts/api/11-route-to-endpoint-map.md:96:| `/on-demand/the-fixer` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:97:| `/portal/services/request` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:98:| `/portal/dashboard` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_dashboard` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:99:| `/portal/services` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_services` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:100:| `/portal/services/request` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.create_service_request_router` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:101:| `/portal/services/:id` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_service_record` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:102:| `/portal/sessions` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_sessions` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:103:| `/portal/documents` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.files.list_my_documents` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:104:| `/portal/offers` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_offers` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:105:| `/portal/apps` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_apps` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:106:| `/portal/resources` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_resources` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:107:| `/portal/support` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.portal.get_support` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:108:| `/portal/settings` | `Portal page` | Portal | portal | `/api/method/rbp_app.api.me.update_profile` | GET/POST | Portal DTO / related DocTypes |
+contracts/api/11-route-to-endpoint-map.md:109:| `/admin/signin` | `AdminSignInPage` | Admin Auth | admin | `/api/method/rbp_app.api.me.admin_get_context` | GET | User/Role context |
+contracts/api/11-route-to-endpoint-map.md:110:| `/admin/dashboard` | `AdminDashboard` | Admin Dashboard | admin | `/api/method/rbp_app.api.admin.get_dashboard` | GET | Admin dashboard DTO |
+contracts/api/11-route-to-endpoint-map.md:111:| `/admin/on-demand` | `AdminCrudPage` | On-Demand Admin | admin | `/api/method/rbp_app.api.admin.list_records?domain=on_demand` | GET | Product records |
+contracts/api/11-route-to-endpoint-map.md:112:| `/admin/on-demand/*` | `AdminCrudPage` | On-Demand Admin | admin | `/api/method/rbp_app.api.admin.perform_action` | POST | Product records |
+contracts/api/11-route-to-endpoint-map.md:113:| `/admin/operations/*` | `AdminCrudPage` | Operations Admin | admin | `/api/method/rbp_app.api.admin.perform_action` | POST | Connectivity/operations records |
+contracts/api/11-route-to-endpoint-map.md:114:| `/admin/marketplace/*` | `AdminCrudPage` | Marketplace Admin | admin | `/api/method/rbp_app.api.marketplace.admin_<action>` | POST | RBP Marketplace Listing |
+contracts/api/11-route-to-endpoint-map.md:115:| `/admin/membership/*` | `AdminCrudPage` | Membership Admin | admin | `/api/method/rbp_app.api.membership.admin_<action>` | POST | Subscription/Tenant/Profile |
+contracts/api/11-route-to-endpoint-map.md:116:| `/admin/resources/*` | `AdminCrudPage` | Resources Admin | admin | `/api/method/rbp_app.api.admin_content.<action>` | GET/POST | Future content DocTypes |
+contracts/api/11-route-to-endpoint-map.md:117:| `/admin/help-center/*` | `AdminCrudPage` | Help Center Admin | admin | `/api/method/rbp_app.api.admin_content.<action>` | GET/POST | Future help content DocTypes |
+contracts/api/11-route-to-endpoint-map.md:118:| `/admin/site-content/*` | `AdminCrudPage` | Site Content Admin | admin | `/api/method/rbp_app.api.admin_content.<action>` | GET/POST | Future site content DocTypes |
+contracts/api/11-route-to-endpoint-map.md:119:| `/admin/settings/*` | `AdminCrudPage` | Settings Admin | admin | `/api/method/rbp_app.api.admin_settings.<action>` | GET/POST | Config/User/Role records |
+contracts/api/11-route-to-endpoint-map.md:127:| Membership | `POST /api/method/rbp_app.api.membership.create_signup` | `POST /api/method/rbp_app.api.membership.update_signup` | `POST /api/method/rbp_app.api.membership.submit_signup` | `GET /api/method/rbp_app.api.membership.get_subscription` | `GET /api/method/rbp_app.api.membership.list_my_subscriptions` | Not applicable | `POST /api/method/rbp_app.api.membership.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:128:| Decision Desk | `POST /api/method/rbp_app.api.decision_desk.create_request` | `POST /api/method/rbp_app.api.decision_desk.update_request` | `POST /api/method/rbp_app.api.decision_desk.submit_request` | `GET /api/method/rbp_app.api.decision_desk.get_request` | `GET /api/method/rbp_app.api.decision_desk.list_my_requests` | `POST /api/method/rbp_app.api.decision_desk.attach_file` | `POST /api/method/rbp_app.api.decision_desk.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:129:| DocuShare / Document Nucleus | `POST /api/method/rbp_app.api.docushare.create_brief` | `POST /api/method/rbp_app.api.docushare.update_brief` | `POST /api/method/rbp_app.api.docushare.submit_brief` | `GET /api/method/rbp_app.api.docushare.get_brief` | `GET /api/method/rbp_app.api.docushare.list_my_briefs` | `POST /api/method/rbp_app.api.docushare.attach_file` | `POST /api/method/rbp_app.api.docushare.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:130:| Marketplace | `POST /api/method/rbp_app.api.marketplace.create_listing` | `POST /api/method/rbp_app.api.marketplace.update_listing` | `POST /api/method/rbp_app.api.marketplace.submit_listing` | `GET /api/method/rbp_app.api.marketplace.get_listing` | `GET /api/method/rbp_app.api.marketplace.list_public_listings` | `POST /api/method/rbp_app.api.marketplace.attach_file` | `POST /api/method/rbp_app.api.marketplace.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:131:| Connectivity / NBN | `POST /api/method/rbp_app.api.connectivity.create_order` | `POST /api/method/rbp_app.api.connectivity.update_order` | `POST /api/method/rbp_app.api.connectivity.submit_order` | `GET /api/method/rbp_app.api.connectivity.get_order` | `GET /api/method/rbp_app.api.connectivity.list_my_orders` | `POST /api/method/rbp_app.api.connectivity.attach_file` | `POST /api/method/rbp_app.api.connectivity.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:132:| Risk Advisor | `POST /api/method/rbp_app.api.risk_advisor.create_assessment` | `POST /api/method/rbp_app.api.risk_advisor.update_assessment` | `POST /api/method/rbp_app.api.risk_advisor.submit_assessment` | `GET /api/method/rbp_app.api.risk_advisor.get_assessment` | `GET /api/method/rbp_app.api.risk_advisor.list_my_assessments` | `POST /api/method/rbp_app.api.risk_advisor.attach_file` | `POST /api/method/rbp_app.api.risk_advisor.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:133:| The Fixer | `POST /api/method/rbp_app.api.fixer.create_request` | `POST /api/method/rbp_app.api.fixer.update_request` | `POST /api/method/rbp_app.api.fixer.submit_request` | `GET /api/method/rbp_app.api.fixer.get_request` | `GET /api/method/rbp_app.api.fixer.list_my_requests` | `POST /api/method/rbp_app.api.fixer.attach_file` | `POST /api/method/rbp_app.api.fixer.admin_<action>` |
+contracts/api/11-route-to-endpoint-map.md:141:| Dashboard | `/api/method/rbp_app.api.portal.get_dashboard` | Member dashboard cards, activity, status, notifications | user, tenant, entitlement |
+contracts/api/11-route-to-endpoint-map.md:142:| Services | `/api/method/rbp_app.api.portal.list_my_services` | Aggregated service records | user, tenant, workflow visibility |
+contracts/api/11-route-to-endpoint-map.md:143:| Service Request | `/api/method/rbp_app.api.portal.create_service_request_router` | Routes generic portal service request into specific product DocType | service id, entitlement, tenant |
+contracts/api/11-route-to-endpoint-map.md:144:| Service Detail | `/api/method/rbp_app.api.portal.get_service_record` | Fetch one product/service record safely | owner, tenant, assignment |
+contracts/api/11-route-to-endpoint-map.md:145:| Documents | `/api/method/rbp_app.api.files.list_my_documents` | Customer-visible file references | tenant, visibility, related record |
+contracts/api/11-route-to-endpoint-map.md:146:| Offers | `/api/method/rbp_app.api.portal.list_my_offers` | Member/public offers | membership, entitlement, offer visibility |
+contracts/api/11-route-to-endpoint-map.md:147:| Apps | `/api/method/rbp_app.api.portal.list_my_apps` | Entitled applications | tenant, user, entitlement |
+contracts/api/11-route-to-endpoint-map.md:148:| Resources | `/api/method/rbp_app.api.portal.list_my_resources` | Resources and downloads | role, membership visibility |
+contracts/api/11-route-to-endpoint-map.md:149:| Support | `/api/method/rbp_app.api.portal.list_my_support_items` | Support/ticket-like records | owner, tenant |
+contracts/api/11-route-to-endpoint-map.md:150:| Settings | `/api/method/rbp_app.api.me.get_context` and `/api/method/rbp_app.api.me.update_profile` | User profile and safe account settings | current user only |
+contracts/api/01-api-response-envelope-standard.md:24:This standard applies to all backend API responses returned by `rbp_app.api.*` methods, including:
+contracts/api/01-api-response-envelope-standard.md:512:All whitelisted API methods under `rbp_app.api.*` must return this response envelope.
+contracts/api/01-api-response-envelope-standard.md:546:rbp_app/rbp_app/api/response.py
+contracts/api/01-api-response-envelope-standard.md:601:from rbp_app.api.response import success, failure, error
+contracts/api/09-upload-file-rules.md:477:POST /api/method/rbp_app.api.<domain>.attach_file
+contracts/api/09-upload-file-rules.md:483:POST /api/method/rbp_app.api.decision_desk.attach_file
+contracts/api/09-upload-file-rules.md:484:POST /api/method/rbp_app.api.docushare.attach_file
+contracts/api/09-upload-file-rules.md:485:POST /api/method/rbp_app.api.marketplace.attach_file
+contracts/api/09-upload-file-rules.md:486:POST /api/method/rbp_app.api.connectivity.attach_file
+contracts/api/09-upload-file-rules.md:487:POST /api/method/rbp_app.api.risk_advisor.attach_file
+contracts/api/09-upload-file-rules.md:488:POST /api/method/rbp_app.api.fixer.attach_file
+contracts/api/09-upload-file-rules.md:494:GET  /api/method/rbp_app.api.files.get_file_reference
+contracts/api/09-upload-file-rules.md:495:GET  /api/method/rbp_app.api.files.list_files_for_record
+contracts/api/09-upload-file-rules.md:496:POST /api/method/rbp_app.api.files.remove_file_reference
+contracts/api/09-upload-file-rules.md:497:POST /api/method/rbp_app.api.files.admin_change_visibility
+contracts/api/09-upload-file-rules.md:498:POST /api/method/rbp_app.api.files.admin_quarantine_file
+contracts/api/09-upload-file-rules.md:499:POST /api/method/rbp_app.api.files.admin_restore_file
+contracts/api/09-upload-file-rules.md:560:        "download_url": "/api/method/rbp_app.api.files.download?file_reference=RBP-FILE-0001"
+contracts/api/09-upload-file-rules.md:581:GET /api/method/rbp_app.api.files.download?file_reference=<name>
+contracts/api/09-upload-file-rules.md:1384:POST /api/method/rbp_app.api.files.admin_change_visibility
+contracts/api/09-upload-file-rules.md:1385:POST /api/method/rbp_app.api.files.admin_quarantine_file
+contracts/api/09-upload-file-rules.md:1386:POST /api/method/rbp_app.api.files.admin_restore_file
+contracts/api/09-upload-file-rules.md:1387:POST /api/method/rbp_app.api.files.admin_remove_file_reference
+contracts/api/09-upload-file-rules.md:1388:POST /api/method/rbp_app.api.files.admin_approve_public_file
+contracts/api/09-upload-file-rules.md:1389:POST /api/method/rbp_app.api.files.admin_archive_file
+contracts/api/07-error-catalogue.md:54:/api/method/rbp_app.api.*
+contracts/api/07-error-catalogue.md:60:rbp_app.api.me
+contracts/api/07-error-catalogue.md:61:rbp_app.api.membership
+contracts/api/07-error-catalogue.md:62:rbp_app.api.decision_desk
+contracts/api/07-error-catalogue.md:63:rbp_app.api.docushare
+contracts/api/07-error-catalogue.md:64:rbp_app.api.marketplace
+contracts/api/07-error-catalogue.md:65:rbp_app.api.connectivity
+contracts/api/07-error-catalogue.md:66:rbp_app.api.risk_advisor
+contracts/api/07-error-catalogue.md:67:rbp_app.api.fixer
+contracts/api/07-error-catalogue.md:68:rbp_app.api.portal
+contracts/api/07-error-catalogue.md:69:rbp_app.api.billing
+contracts/api/07-error-catalogue.md:70:rbp_app.api.notifications
+contracts/api/07-error-catalogue.md:71:rbp_app.api.files
+contracts/api/07-error-catalogue.md:72:rbp_app.api.tenancy
+contracts/api/07-error-catalogue.md:73:rbp_app.api.entitlements
+contracts/api/07-error-catalogue.md:74:rbp_app.api.audit
+docs/api-contracts/API_CONTRACTS.md:104:apps/rbp_app/rbp_app/api/
+docs/api-contracts/API_CONTRACTS.md:120:3. Review backend API modules under `apps/rbp_app/rbp_app/api/`.
+docs/api-contracts/API_CONTRACTS.md:146:compare contracts/api/11-route-to-endpoint-map.md with apps/rbp_app/rbp_app/api/
+docs/product-flows/ONBOARDING_FLOWS.md:111:apps/rbp_app/rbp_app/api/
+docs/product-flows/PRODUCT_FLOWS.md:108:apps/rbp_app/rbp_app/api/
+
+## DocType references
+contracts/phase-2-source-index.md:1:# RBP Phase 2 Backend Contracts - Final UI-Dependent Pack
+contracts/workflows/08-payment-state-model.md:1:# RBP Phase 2 Backend Contracts
+contracts/workflows/08-payment-state-model.md:111:  Defines RBP Payment Event and RBP Subscription.
+contracts/workflows/08-payment-state-model.md:130:| Event-based recordkeeping | Payment changes must create `RBP Payment Event` records. |
+contracts/workflows/08-payment-state-model.md:144:## 5.1 RBP Payment Event
+contracts/workflows/08-payment-state-model.md:154:| `tenant` | Link: RBP Tenant | Conditional | Tenant context |
+contracts/workflows/08-payment-state-model.md:176:Every provider webhook should create or update an RBP Payment Event.
+contracts/workflows/08-payment-state-model.md:185:## 5.2 RBP Subscription
+contracts/workflows/08-payment-state-model.md:195:| `tenant` | Link: RBP Tenant | Yes | Subscription tenant |
+contracts/workflows/08-payment-state-model.md:197:| `plan` | Link: RBP Membership Plan | Yes | Membership plan |
+contracts/workflows/08-payment-state-model.md:206:| `last_payment_event` | Link: RBP Payment Event | Conditional | Latest payment event |
+contracts/workflows/08-payment-state-model.md:218:## 5.3 RBP App Entitlement
+contracts/workflows/08-payment-state-model.md:228:| `tenant` | Link: RBP Tenant | Conditional | Tenant entitlement |
+contracts/workflows/08-payment-state-model.md:233:| `source_subscription` | Link: RBP Subscription | Conditional | Subscription source |
+contracts/workflows/08-payment-state-model.md:754:RBP Membership Plan
+contracts/workflows/08-payment-state-model.md:755:RBP Subscription
+contracts/workflows/08-payment-state-model.md:756:RBP App Entitlement
+contracts/workflows/08-payment-state-model.md:757:RBP Payment Event
+contracts/workflows/08-payment-state-model.md:758:RBP Tenant
+contracts/workflows/08-payment-state-model.md:759:RBP Business Profile
+contracts/workflows/08-payment-state-model.md:958:    "plan_name": "RBP Member Monthly"
+contracts/workflows/08-payment-state-model.md:992:  "related_doctype": "RBP Subscription",
+contracts/workflows/08-payment-state-model.md:1026:9. Create/update RBP Payment Event.
+contracts/workflows/08-payment-state-model.md:1203:| RBP Member | Own safe payment/subscription summary |
+contracts/workflows/08-payment-state-model.md:1204:| RBP Business Owner | Tenant billing/subscription summary |
+contracts/workflows/08-payment-state-model.md:1205:| RBP Team Member | No billing access by default |
+contracts/workflows/08-payment-state-model.md:1206:| RBP Marketplace Seller | Own listing fee/payment summary if applicable |
+contracts/workflows/08-payment-state-model.md:1207:| RBP Marketplace Buyer | Own enquiry/purchase summary if applicable |
+contracts/workflows/08-payment-state-model.md:1213:| RBP Advisor | No payment access by default |
+contracts/workflows/08-payment-state-model.md:1214:| RBP Support Agent | Conditional safe billing support access |
+contracts/workflows/08-payment-state-model.md:1215:| RBP Admin | Operational payment event and reconciliation access |
+contracts/workflows/08-payment-state-model.md:1459:| `payment_simulated_success` | `RBP Payment Event` with `status = paid` in mock/test only |
+contracts/workflows/08-payment-state-model.md:1460:| `payment_simulated_failure` | `RBP Payment Event` with `status = failed` in mock/test only |
+contracts/workflows/08-payment-state-model.md:1461:| `payment_pending` | `RBP Payment Event.status = pending` |
+contracts/workflows/08-payment-state-model.md:1462:| `membership_active` | `RBP Subscription.status = active` and entitlements active |
+contracts/workflows/08-payment-state-model.md:1463:| `listing_fee_mock` | `RBP Payment Event` linked to `RBP Marketplace Listing` |
+contracts/workflows/08-payment-state-model.md:1498:RBP Payment Event:
+contracts/workflows/08-payment-state-model.md:1514:RBP Subscription:
+contracts/workflows/08-payment-state-model.md:1524:RBP App Entitlement:
+contracts/workflows/08-payment-state-model.md:1714:Every paid flow maps to RBP Payment Event.
+contracts/workflows/08-payment-state-model.md:1715:Every subscription flow maps to RBP Subscription.
+contracts/workflows/08-payment-state-model.md:1716:Every entitlement effect maps to RBP App Entitlement.
+contracts/workflows/06-workflow-state-standards.md:1:# RBP Phase 2 Backend Contracts
+contracts/workflows/06-workflow-state-standards.md:52:RBP Decision Desk Request
+contracts/workflows/06-workflow-state-standards.md:53:RBP Document Brief
+contracts/workflows/06-workflow-state-standards.md:54:RBP Marketplace Listing
+contracts/workflows/06-workflow-state-standards.md:55:RBP Marketplace Enquiry
+contracts/workflows/06-workflow-state-standards.md:56:RBP Connectivity Order
+contracts/workflows/06-workflow-state-standards.md:57:RBP Risk Assessment
+contracts/workflows/06-workflow-state-standards.md:58:RBP Fixer Request
+contracts/workflows/06-workflow-state-standards.md:59:RBP Subscription, where lifecycle state applies
+contracts/workflows/06-workflow-state-standards.md:60:RBP File Reference, where approval/visibility state applies
+contracts/workflows/06-workflow-state-standards.md:61:RBP Payment Event, where payment state applies
+contracts/workflows/06-workflow-state-standards.md:220:RBP Member
+contracts/workflows/06-workflow-state-standards.md:221:RBP Business Owner
+contracts/workflows/06-workflow-state-standards.md:222:RBP Team Member, conditional
+contracts/workflows/06-workflow-state-standards.md:223:RBP Marketplace Seller, for listing drafts
+contracts/workflows/06-workflow-state-standards.md:224:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:305:RBP Member, own/tenant record
+contracts/workflows/06-workflow-state-standards.md:306:RBP Business Owner, tenant record
+contracts/workflows/06-workflow-state-standards.md:307:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:370:RBP Member, own/tenant record
+contracts/workflows/06-workflow-state-standards.md:371:RBP Business Owner, tenant record
+contracts/workflows/06-workflow-state-standards.md:372:RBP Support Agent, conditional
+contracts/workflows/06-workflow-state-standards.md:373:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:436:RBP Support Agent can review if assigned/queue authorised
+contracts/workflows/06-workflow-state-standards.md:437:RBP Admin can review
+contracts/workflows/06-workflow-state-standards.md:491:The submission is being assessed by RBP operations, support, or admin.
+contracts/workflows/06-workflow-state-standards.md:495:RBP Admin, Support Agent, or operations team.
+contracts/workflows/06-workflow-state-standards.md:500:RBP Support Agent, conditional
+contracts/workflows/06-workflow-state-standards.md:501:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:566:RBP Member, own/tenant record
+contracts/workflows/06-workflow-state-standards.md:567:RBP Business Owner, tenant record
+contracts/workflows/06-workflow-state-standards.md:568:RBP Team Member, conditional
+contracts/workflows/06-workflow-state-standards.md:569:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:630:RBP Advisor, assigned records only
+contracts/workflows/06-workflow-state-standards.md:631:RBP Support Agent, assigned/queue records only
+contracts/workflows/06-workflow-state-standards.md:632:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:696:Assigned RBP Advisor
+contracts/workflows/06-workflow-state-standards.md:697:Assigned RBP Support Agent
+contracts/workflows/06-workflow-state-standards.md:698:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:763:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:827:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:887:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:947:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:1005:RBP Admin
+contracts/workflows/06-workflow-state-standards.md:1086:| Draft | Submitted | Website User, RBP Member, Business Owner, Team Member conditional, RBP Admin | Must pass validation. |
+contracts/workflows/06-workflow-state-standards.md:1087:| Draft | Payment Pending | Website User, RBP Member, Business Owner, System | When payment required. |
+contracts/workflows/06-workflow-state-standards.md:1088:| Draft | Cancelled | Owner, Business Owner, RBP Admin | If product permits cancellation. |
+contracts/workflows/06-workflow-state-standards.md:1089:| Payment Pending | Submitted | System, RBP Admin | After payment success/reconciliation. |
+contracts/workflows/06-workflow-state-standards.md:1091:| Payment Pending | Cancelled | Owner, Business Owner, RBP Admin | If cancellation allowed. |
+contracts/workflows/06-workflow-state-standards.md:1092:| Payment Failed | Payment Pending | Owner, Business Owner, RBP Admin | Retry payment. |
+contracts/workflows/06-workflow-state-standards.md:1093:| Payment Failed | Submitted | RBP Admin, System Manager | Admin reconciliation only. |
+contracts/workflows/06-workflow-state-standards.md:1094:| Submitted | In Review | RBP Support Agent conditional, RBP Admin | Admin/support begins review. |
+contracts/workflows/06-workflow-state-standards.md:1095:| Submitted | More Information Required | RBP Support Agent conditional, RBP Admin | Customer action needed. |
+contracts/workflows/06-workflow-state-standards.md:1096:| Submitted | Rejected | RBP Admin | Submission rejected. |
+contracts/workflows/06-workflow-state-standards.md:1097:| Submitted | Cancelled | Owner conditional, Business Owner conditional, RBP Admin | Depends on product stage. |
+contracts/workflows/06-workflow-state-standards.md:1098:| In Review | Assigned | RBP Support Agent conditional, RBP Admin | Assign advisor/operator. |
+contracts/workflows/06-workflow-state-standards.md:1099:| In Review | In Progress | RBP Support Agent conditional, RBP Admin | Used when no assignment step. |
+contracts/workflows/06-workflow-state-standards.md:1100:| In Review | More Information Required | RBP Support Agent conditional, RBP Admin | Customer action needed. |
+contracts/workflows/06-workflow-state-standards.md:1101:| In Review | Rejected | RBP Admin | Rejected after review. |
+contracts/workflows/06-workflow-state-standards.md:1102:| Assigned | In Progress | Assigned Advisor/Support Agent, RBP Admin | Work begins. |
+contracts/workflows/06-workflow-state-standards.md:1103:| Assigned | More Information Required | Assigned Advisor/Support Agent, RBP Admin | Customer action needed. |
+contracts/workflows/06-workflow-state-standards.md:1104:| Assigned | Rejected | RBP Admin | Admin-only rejection. |
+contracts/workflows/06-workflow-state-standards.md:1105:| In Progress | Outcome Ready | Assigned Advisor/Support Agent, RBP Admin | Work completed. |
+contracts/workflows/06-workflow-state-standards.md:1106:| In Progress | More Information Required | Assigned Advisor/Support Agent, RBP Admin | Customer action needed. |
+contracts/workflows/06-workflow-state-standards.md:1107:| Outcome Ready | Closed | Owner conditional, Business Owner conditional, Assigned Advisor conditional, RBP Admin | Product-specific closure. |
+contracts/workflows/06-workflow-state-standards.md:1108:| Outcome Ready | In Progress | Assigned Advisor, RBP Admin | Correction/rework. |
+contracts/workflows/06-workflow-state-standards.md:1109:| Closed | Archived | RBP Admin, System Manager | Retention/archive. |
+contracts/workflows/06-workflow-state-standards.md:1110:| Rejected | Archived | RBP Admin, System Manager | Retention/archive. |
+contracts/workflows/06-workflow-state-standards.md:1111:| Cancelled | Archived | RBP Admin, System Manager | Retention/archive. |
+contracts/workflows/06-workflow-state-standards.md:1112:| Archived | Closed/In Review | RBP Admin, System Manager | Restore only when policy permits. |
+contracts/workflows/06-workflow-state-standards.md:1122:| RBP Member | Draft → Submitted, More Information Required → Submitted, limited cancel/close |
+contracts/workflows/06-workflow-state-standards.md:1123:| RBP Business Owner | Tenant-level submit/cancel/close where product permits |
+contracts/workflows/06-workflow-state-standards.md:1124:| RBP Team Member | Conditional submit/update based on tenant policy |
+contracts/workflows/06-workflow-state-standards.md:1125:| RBP Advisor | Assigned → In Progress, In Progress → Outcome Ready, request more info if assigned |
+contracts/workflows/06-workflow-state-standards.md:1126:| RBP Marketplace Seller | Draft → Pending Review for own listings |
+contracts/workflows/06-workflow-state-standards.md:1127:| RBP Marketplace Buyer | Create/submit own enquiries only |
+contracts/workflows/06-workflow-state-standards.md:1128:| RBP Support Agent | Conditional review/assign/request-info transitions |
+contracts/workflows/06-workflow-state-standards.md:1129:| RBP Admin | Full operational workflow transitions |
+contracts/workflows/06-workflow-state-standards.md:1235:RBP Payment Event
+contracts/workflows/06-workflow-state-standards.md:1677:RBP Admin approves or rejects.
+contracts/workflows/06-workflow-state-standards.md:2110:Every workflow-enabled product record should support workflow history, either through Frappe workflow/action logs, `RBP Audit Log`, or both.
+contracts/workflows/14-notification-triggers.md:1:# RBP Phase 2 Backend Contracts
+contracts/workflows/14-notification-triggers.md:45:This document defines when the platform should create `RBP Notification` records and, where appropriate, send email or admin notifications.
+contracts/workflows/14-notification-triggers.md:56:| `membership_submitted` | Membership | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:64:| `decision_desk_submitted` | Decision Desk | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:72:| `docushare_submitted` | DocuShare / Document Nucleus | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:80:| `marketplace_submitted` | Marketplace | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:88:| `connectivity_submitted` | Connectivity / NBN | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:96:| `risk_advisor_submitted` | Risk Advisor | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:104:| `fixer_submitted` | The Fixer | Record submitted | User + RBP Admin | Portal / Email | Yes |
+contracts/workflows/14-notification-triggers.md:147:  "related_doctype": "RBP Decision Desk Request",
+contracts/workflows/14-notification-triggers.md:164:| RBP Admin | Operational queues, admin review, payment/file/security events. |
+contracts/workflows/14-notification-triggers.md:185:Create RBP Notification records server-side.
+contracts/naming-conventions.md:1:# RBP Phase 2 Backend Contracts
+contracts/naming-conventions.md:517:RBP Tenant
+contracts/naming-conventions.md:518:RBP Business Profile
+contracts/naming-conventions.md:519:RBP Membership Plan
+contracts/naming-conventions.md:520:RBP Subscription
+contracts/naming-conventions.md:521:RBP App Entitlement
+contracts/naming-conventions.md:522:RBP Onboarding Flow
+contracts/naming-conventions.md:523:RBP Onboarding Step
+contracts/naming-conventions.md:524:RBP Notification
+contracts/naming-conventions.md:525:RBP Audit Log
+contracts/naming-conventions.md:526:RBP Payment Event
+contracts/naming-conventions.md:527:RBP File Reference
+contracts/naming-conventions.md:533:RBP Decision Desk Request
+contracts/naming-conventions.md:534:RBP Decision Desk Option
+contracts/naming-conventions.md:535:RBP Document Brief
+contracts/naming-conventions.md:536:RBP Marketplace Listing
+contracts/naming-conventions.md:537:RBP Marketplace Enquiry
+contracts/naming-conventions.md:538:RBP Connectivity Order
+contracts/naming-conventions.md:539:RBP Risk Assessment
+contracts/naming-conventions.md:540:RBP Fixer Request
+contracts/naming-conventions.md:548:RBP Decision Desk Request
+contracts/naming-conventions.md:549:RBP Marketplace Listing
+contracts/naming-conventions.md:550:RBP Payment Event
+contracts/naming-conventions.md:558:RBP DecisionDesk Request
+contracts/naming-conventions.md:560:RBP DD Request
+contracts/naming-conventions.md:770:RBP Member
+contracts/naming-conventions.md:771:RBP Business Owner
+contracts/naming-conventions.md:772:RBP Team Member
+contracts/naming-conventions.md:773:RBP Advisor
+contracts/naming-conventions.md:774:RBP Marketplace Seller
+contracts/naming-conventions.md:775:RBP Marketplace Buyer
+contracts/naming-conventions.md:776:RBP Support Agent
+contracts/naming-conventions.md:777:RBP Admin
+contracts/naming-conventions.md:790:| RBP Member | `rbp_member` |
+contracts/naming-conventions.md:791:| RBP Business Owner | `rbp_business_owner` |
+contracts/naming-conventions.md:792:| RBP Team Member | `rbp_team_member` |
+contracts/naming-conventions.md:793:| RBP Advisor | `rbp_advisor` |
+contracts/naming-conventions.md:794:| RBP Marketplace Seller | `rbp_marketplace_seller` |
+contracts/naming-conventions.md:795:| RBP Marketplace Buyer | `rbp_marketplace_buyer` |
+contracts/naming-conventions.md:796:| RBP Support Agent | `rbp_support_agent` |
+contracts/naming-conventions.md:797:| RBP Admin | `rbp_admin` |
+contracts/naming-conventions.md:870:RBP Payment Event
+contracts/naming-conventions.md:947:RBP File Reference
+contracts/naming-conventions.md:1024:RBP Notification
+contracts/naming-conventions.md:1468:RBP Audit Log
+contracts/naming-conventions.md:1671:| DocType | `RBP` + Title Case | `RBP Decision Desk Request` |
+contracts/naming-conventions.md:1673:| Frappe role | Title Case | `RBP Business Owner` |
+contracts/doctypes/12-form-field-specifications.md:1:# RBP Phase 2 Backend Contracts
+contracts/doctypes/12-form-field-specifications.md:57:| `tenant` | Link | Yes | All authenticated product records | `RBP Tenant` |
+contracts/doctypes/12-form-field-specifications.md:80:| `supporting_documents` | `RBP File Reference` | Customer-supplied product documents |
+contracts/doctypes/12-form-field-specifications.md:81:| `reference_files` | `RBP File Reference` | DocuShare source/reference files |
+contracts/doctypes/12-form-field-specifications.md:82:| `media` | `RBP File Reference` | Marketplace media, public only after approval |
+contracts/doctypes/12-form-field-specifications.md:83:| `payment_evidence` | `RBP File Reference` | Admin-only unless explicitly visible |
+contracts/doctypes/12-form-field-specifications.md:91:| `selected_plan` | Selected Plan | string/link | Yes | contract-required | `RBP Membership Plan.plan_code` | required |
+contracts/doctypes/12-form-field-specifications.md:92:| `billing_cycle` | Billing Cycle | select | Yes | contract-required | `RBP Subscription.billing_cycle` | required, allowed value |
+contracts/doctypes/12-form-field-specifications.md:93:| `business_name` | Business Name | string | Yes | contract-required | `RBP Business Profile.business_name` | required, max length |
+contracts/doctypes/12-form-field-specifications.md:94:| `business_identifier` | ABN / Business Identifier | string | Conditional | contract-required | `RBP Business Profile.business_identifier` | format by jurisdiction |
+contracts/doctypes/12-form-field-specifications.md:95:| `industry` | Industry | string/select | Conditional | contract-required | `RBP Business Profile.industry` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:96:| `business_size` | Business Size | select | Conditional | contract-required | `RBP Business Profile.business_size` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:97:| `primary_contact_name` | Primary Contact Name | string | Yes | contract-required | `RBP Business Profile.primary_contact` | required |
+contracts/doctypes/12-form-field-specifications.md:98:| `email` | Email | email | Yes | contract-required | `RBP Business Profile.email` | required, email |
+contracts/doctypes/12-form-field-specifications.md:99:| `phone` | Phone | string | Conditional | contract-required | `RBP Business Profile.phone` | phone format |
+contracts/doctypes/12-form-field-specifications.md:100:| `billing_address` | Billing Address | object/text | Conditional | contract-required | `RBP Subscription.billing_address or billing account` | required if live billing |
+contracts/doctypes/12-form-field-specifications.md:101:| `payment_method` | Payment Method | provider token | Conditional | contract-required | `RBP Payment Event` | required if payment required |
+contracts/doctypes/12-form-field-specifications.md:102:| `accepted_terms` | Accepted Terms | boolean | Yes | contract-required | `RBP Subscription.accepted_terms` | must be true |
+contracts/doctypes/12-form-field-specifications.md:103:| `marketing_consent` | Marketing Consent | boolean | No | contract-required | `RBP Business Profile.marketing_consent` | boolean |
+contracts/doctypes/12-form-field-specifications.md:108:Primary DocType: RBP Subscription
+contracts/doctypes/12-form-field-specifications.md:109:Related DocTypes: RBP Tenant, RBP Business Profile, RBP Membership Plan, RBP App Entitlement, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:130:| `decision_title` | Decision Title | string | Yes | contract-required | `RBP Decision Desk Request.decision_title` | required |
+contracts/doctypes/12-form-field-specifications.md:131:| `decision_category` | Decision Category | select | Conditional | contract-required | `RBP Decision Desk Request.decision_category` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:132:| `decision_summary` | Decision Summary | textarea | Yes | contract-required | `RBP Decision Desk Request.decision_summary` | required, min length |
+contracts/doctypes/12-form-field-specifications.md:133:| `urgency` | Urgency | select | Yes | repo-observed via portal priority | `RBP Decision Desk Request.urgency` | low/normal/high/urgent |
+contracts/doctypes/12-form-field-specifications.md:134:| `deadline` | Deadline | date | Conditional | contract-required | `RBP Decision Desk Request.deadline` | valid date |
+contracts/doctypes/12-form-field-specifications.md:135:| `business_context` | Business Context | textarea | Yes | repo-observed via portal request context | `RBP Decision Desk Request.business_context` | required, min 20 chars |
+contracts/doctypes/12-form-field-specifications.md:136:| `options_considered` | Options Considered | array/table | Conditional | contract-required | `RBP Decision Desk Option` | optional until final UI decides |
+contracts/doctypes/12-form-field-specifications.md:137:| `constraints` | Constraints | textarea | Conditional | contract-required | `RBP Decision Desk Request.constraints` | max length |
+contracts/doctypes/12-form-field-specifications.md:138:| `desired_outcome` | Desired Outcome | textarea | Conditional | contract-required | `RBP Decision Desk Request.desired_outcome` | max length |
+contracts/doctypes/12-form-field-specifications.md:139:| `supporting_documents` | Supporting Documents | file[] | No | repo-observed via portal file upload | `RBP File Reference` | allowed type/size/count |
+contracts/doctypes/12-form-field-specifications.md:140:| `preferred_contact_method` | Preferred Contact Method | select | Yes | repo-observed via portal contact | `RBP Decision Desk Request.preferred_contact_method` | email/phone/video/no_pref |
+contracts/doctypes/12-form-field-specifications.md:145:Primary DocType: RBP Decision Desk Request
+contracts/doctypes/12-form-field-specifications.md:146:Related DocTypes: RBP Decision Desk Option, RBP File Reference, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:167:| `document_type` | Document Type | string/link | Yes | repo-observed via DocumentProductPage document selection | `RBP Document Brief.document_type` | required |
+contracts/doctypes/12-form-field-specifications.md:168:| `document_category` | Document Category | string/select | Yes | repo-observed via category route | `RBP Document Brief.document_category` | required |
+contracts/doctypes/12-form-field-specifications.md:169:| `selected_format` | Selected Format | select | Conditional | repo-observed | `RBP Document Brief.selected_format` | allowed document format |
+contracts/doctypes/12-form-field-specifications.md:170:| `business_context` | Business Context | textarea | Yes | contract-required | `RBP Document Brief.business_context` | required before submit |
+contracts/doctypes/12-form-field-specifications.md:171:| `jurisdiction` | Jurisdiction | select/string | Conditional | contract-required | `RBP Document Brief.jurisdiction` | required where legal/compliance doc |
+contracts/doctypes/12-form-field-specifications.md:172:| `intended_use` | Intended Use | textarea | Conditional | contract-required | `RBP Document Brief.intended_use` | max length |
+contracts/doctypes/12-form-field-specifications.md:173:| `required_sections` | Required Sections | array/text | Conditional | contract-required | `RBP Document Brief.required_sections` | section list |
+contracts/doctypes/12-form-field-specifications.md:174:| `reference_files` | Reference Files | file[] | No | definition-of-done-required | `RBP File Reference` | allowed type/size/count |
+contracts/doctypes/12-form-field-specifications.md:175:| `deadline` | Deadline | date | Conditional | contract-required | `RBP Document Brief.deadline` | valid date |
+contracts/doctypes/12-form-field-specifications.md:176:| `review_required` | Review Required | boolean | No | contract-required | `RBP Document Brief.review_required` | boolean |
+contracts/doctypes/12-form-field-specifications.md:181:Primary DocType: RBP Document Brief
+contracts/doctypes/12-form-field-specifications.md:182:Related DocTypes: RBP File Reference, RBP Notification, RBP Audit Log, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:203:| `listing_title` | Listing Title | string | Yes | repo-observed as product name | `RBP Marketplace Listing.listing_title` | required |
+contracts/doctypes/12-form-field-specifications.md:204:| `listing_category` | Listing Category | select | Yes | repo-observed categories | `RBP Marketplace Listing.listing_category` | required |
+contracts/doctypes/12-form-field-specifications.md:205:| `description` | Description | textarea | Yes | repo-observed product desc | `RBP Marketplace Listing.description` | required |
+contracts/doctypes/12-form-field-specifications.md:206:| `price` | Price | currency/string | Conditional | repo-observed | `RBP Marketplace Listing.price` | valid amount or price label |
+contracts/doctypes/12-form-field-specifications.md:207:| `currency` | Currency | string | Conditional | contract-required | `RBP Marketplace Listing.currency` | currency code |
+contracts/doctypes/12-form-field-specifications.md:208:| `location` | Location | string | No | contract-required | `RBP Marketplace Listing.location` | optional |
+contracts/doctypes/12-form-field-specifications.md:209:| `media` | Media | file[] | No | definition-of-done-required | `RBP File Reference` | public only after approval |
+contracts/doctypes/12-form-field-specifications.md:210:| `seller_contact` | Seller Contact | object | Conditional | contract-required | `RBP Marketplace Listing.seller_user/contact fields` | required for third-party listing |
+contracts/doctypes/12-form-field-specifications.md:211:| `listing_fee` | Listing Fee | payment | Conditional | contract-required | `RBP Payment Event` | if fee applies |
+contracts/doctypes/12-form-field-specifications.md:212:| `buyer_enquiry_message` | Buyer Enquiry Message | textarea | Conditional | route-audit-observed | `RBP Marketplace Enquiry.message` | required for enquiry |
+contracts/doctypes/12-form-field-specifications.md:217:Primary DocType: RBP Marketplace Listing
+contracts/doctypes/12-form-field-specifications.md:218:Related DocTypes: RBP Marketplace Enquiry, RBP File Reference, RBP Payment Event, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:239:| `service_address` | Service Address | textarea | Yes | definition-of-done-required | `RBP Connectivity Order.service_address` | required |
+contracts/doctypes/12-form-field-specifications.md:240:| `service_type` | Service Type | select | Yes | repo-observed route variants | `RBP Connectivity Order.service_type` | connectivity/nbn_phone/superloop |
+contracts/doctypes/12-form-field-specifications.md:241:| `selected_plan` | Selected Plan | string/link | Yes | repo-observed Superloop plans | `RBP Connectivity Order.selected_plan` | required |
+contracts/doctypes/12-form-field-specifications.md:242:| `hardware_option` | Hardware Option | select/string | Conditional | contract-required | `RBP Connectivity Order.hardware_option` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:243:| `installation_preference` | Installation Preference | select/string | Conditional | contract-required | `RBP Connectivity Order.installation_preference` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:244:| `contact_details` | Contact Details | object | Yes | contract-required | `RBP Connectivity Order.contact_details` | email/phone required |
+contracts/doctypes/12-form-field-specifications.md:245:| `payment_method` | Payment Method | payment | Conditional | contract-required | `RBP Payment Event` | if payment required |
+contracts/doctypes/12-form-field-specifications.md:246:| `serviceability_status` | Serviceability Status | select | Conditional | definition-of-done-required | `RBP Connectivity Order.serviceability_status` | serviceable/not_serviceable/manual_review |
+contracts/doctypes/12-form-field-specifications.md:247:| `order_status` | Order Status | select | Yes | route-audit-observed | `RBP Connectivity Order.order_status` | workflow-derived |
+contracts/doctypes/12-form-field-specifications.md:252:Primary DocType: RBP Connectivity Order
+contracts/doctypes/12-form-field-specifications.md:253:Related DocTypes: RBP File Reference, RBP Payment Event, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:274:| `business_name` | Business Name | string | Yes | contract-required | `RBP Risk Assessment.business_name` | required |
+contracts/doctypes/12-form-field-specifications.md:275:| `industry` | Industry | string/select | Conditional | contract-required | `RBP Risk Assessment.industry` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:276:| `risk_categories` | Risk Categories | array/select | Yes | route-audit-observed | `RBP Risk Assessment.risk_categories` | at least one |
+contracts/doctypes/12-form-field-specifications.md:277:| `current_controls` | Current Controls | textarea | Conditional | contract-required | `RBP Risk Assessment.current_controls` | max length |
+contracts/doctypes/12-form-field-specifications.md:278:| `known_incidents` | Known Incidents | textarea | No | contract-required | `RBP Risk Assessment.known_incidents` | max length |
+contracts/doctypes/12-form-field-specifications.md:279:| `compliance_requirements` | Compliance Requirements | textarea | Conditional | contract-required | `RBP Risk Assessment.compliance_requirements` | max length |
+contracts/doctypes/12-form-field-specifications.md:280:| `risk_appetite` | Risk Appetite | select | Conditional | contract-required | `RBP Risk Assessment.risk_appetite` | low/medium/high |
+contracts/doctypes/12-form-field-specifications.md:281:| `assessment_answers` | Assessment Answers | json/table | Yes | definition-of-done-required | `RBP Risk Assessment.assessment_answers` | required before submit |
+contracts/doctypes/12-form-field-specifications.md:282:| `mock_score` | Mock Score | number | Conditional | definition-of-done-required | `RBP Risk Assessment.mock_score/calculated_score` | 0-100 |
+contracts/doctypes/12-form-field-specifications.md:287:Primary DocType: RBP Risk Assessment
+contracts/doctypes/12-form-field-specifications.md:288:Related DocTypes: RBP File Reference, RBP Notification, RBP Audit Log, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:309:| `issue_title` | Issue Title | string | Yes | contract-required | `RBP Fixer Request.issue_title` | required |
+contracts/doctypes/12-form-field-specifications.md:310:| `issue_description` | Issue Description | textarea | Yes | contract-required | `RBP Fixer Request.issue_description` | required |
+contracts/doctypes/12-form-field-specifications.md:311:| `urgency` | Urgency | select | Yes | repo-observed via portal priority | `RBP Fixer Request.urgency` | low/normal/high/urgent |
+contracts/doctypes/12-form-field-specifications.md:312:| `business_impact` | Business Impact | textarea | Conditional | contract-required | `RBP Fixer Request.business_impact` | required if urgent |
+contracts/doctypes/12-form-field-specifications.md:313:| `desired_resolution` | Desired Resolution | textarea | Conditional | contract-required | `RBP Fixer Request.desired_resolution` | max length |
+contracts/doctypes/12-form-field-specifications.md:314:| `scope_constraints` | Scope Constraints | textarea | No | contract-required | `RBP Fixer Request.scope_constraints` | max length |
+contracts/doctypes/12-form-field-specifications.md:315:| `supporting_documents` | Supporting Documents | file[] | No | repo-observed via portal file upload | `RBP File Reference` | allowed type/size/count |
+contracts/doctypes/12-form-field-specifications.md:316:| `preferred_contact_method` | Preferred Contact Method | select | Yes | repo-observed via portal contact | `RBP Fixer Request.preferred_contact_method` | email/phone/video/no_pref |
+contracts/doctypes/12-form-field-specifications.md:321:Primary DocType: RBP Fixer Request
+contracts/doctypes/12-form-field-specifications.md:322:Related DocTypes: RBP File Reference, RBP Notification, RBP Audit Log, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:347:| `recent_activity` | Recent Activity | array | Yes | repo-observed | `RBP Audit Log / activity DTO` | safe visibility |
+contracts/doctypes/12-form-field-specifications.md:350:| `notifications` | Notifications | array | Yes | definition-of-done-required | `RBP Notification` | recipient scoped |
+contracts/doctypes/12-form-field-specifications.md:356:Related DocTypes: RBP Notification, RBP File Reference, RBP Subscription, RBP App Entitlement
+contracts/doctypes/12-form-field-specifications.md:381:Every upload field maps to RBP File Reference.
+contracts/doctypes/12-form-field-specifications.md:382:Every payment field maps to RBP Payment Event or provider checkout.
+contracts/doctypes/05-core-doctype-model.md:1:# RBP Phase 2 Backend Contracts
+contracts/doctypes/05-core-doctype-model.md:116:| RBP prefix | All custom DocTypes must start with `RBP`. |
+contracts/doctypes/05-core-doctype-model.md:117:| Tenant-first | Customer/business records must link to `RBP Tenant` where relevant. |
+contracts/doctypes/05-core-doctype-model.md:122:| File-ready | Records that accept uploads must link through `RBP File Reference`. |
+contracts/doctypes/05-core-doctype-model.md:123:| Payment-ready | Records requiring payment must link to `RBP Payment Event`. |
+contracts/doctypes/05-core-doctype-model.md:137:RBP <Clear Title Case Name>
+contracts/doctypes/05-core-doctype-model.md:143:RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:144:RBP Business Profile
+contracts/doctypes/05-core-doctype-model.md:145:RBP Decision Desk Request
+contracts/doctypes/05-core-doctype-model.md:146:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:155:RBP DD Request
+contracts/doctypes/05-core-doctype-model.md:190:RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:191:RBP Business Profile
+contracts/doctypes/05-core-doctype-model.md:192:RBP Membership Plan
+contracts/doctypes/05-core-doctype-model.md:193:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:194:RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:195:RBP Onboarding Flow
+contracts/doctypes/05-core-doctype-model.md:196:RBP Onboarding Step
+contracts/doctypes/05-core-doctype-model.md:197:RBP Notification
+contracts/doctypes/05-core-doctype-model.md:198:RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:199:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:200:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:208:RBP Decision Desk Request
+contracts/doctypes/05-core-doctype-model.md:209:RBP Decision Desk Option
+contracts/doctypes/05-core-doctype-model.md:210:RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:211:RBP Marketplace Listing
+contracts/doctypes/05-core-doctype-model.md:212:RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:213:RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:214:RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:215:RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:226:| `tenant` | Link: RBP Tenant | Yes | Customer/business tenant |
+contracts/doctypes/05-core-doctype-model.md:235:| `audit_reference` | Link: RBP Audit Log | Conditional | Key audit reference if needed |
+contracts/doctypes/05-core-doctype-model.md:262:| `tenant` | Link: RBP Tenant | Conditional | Tenant context if applicable |
+contracts/doctypes/05-core-doctype-model.md:279:## 9. RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:292:| `business_profile` | Link: RBP Business Profile | Conditional | Main business profile |
+contracts/doctypes/05-core-doctype-model.md:296:| `created_from_membership` | Link: RBP Subscription / Data | Conditional | Membership source |
+contracts/doctypes/05-core-doctype-model.md:306:RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:307:  ├── RBP Business Profile
+contracts/doctypes/05-core-doctype-model.md:308:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:309:  ├── RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:310:  ├── RBP Decision Desk Request
+contracts/doctypes/05-core-doctype-model.md:311:  ├── RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:312:  ├── RBP Marketplace Listing
+contracts/doctypes/05-core-doctype-model.md:313:  ├── RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:314:  ├── RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:315:  ├── RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:316:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:317:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:318:  ├── RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:319:  └── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:326:| RBP Business Owner | Read/update own tenant profile fields |
+contracts/doctypes/05-core-doctype-model.md:327:| RBP Team Member | Limited read if linked to tenant |
+contracts/doctypes/05-core-doctype-model.md:328:| RBP Member | Read own tenant context |
+contracts/doctypes/05-core-doctype-model.md:329:| RBP Admin | Full operational access |
+contracts/doctypes/05-core-doctype-model.md:363:## 10. RBP Business Profile
+contracts/doctypes/05-core-doctype-model.md:385:| `tenant` | Link: RBP Tenant | Conditional | Linked tenant |
+contracts/doctypes/05-core-doctype-model.md:391:RBP Business Profile
+contracts/doctypes/05-core-doctype-model.md:392:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:393:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:402:| RBP Business Owner | Read/update tenant business profile |
+contracts/doctypes/05-core-doctype-model.md:403:| RBP Team Member | Limited read |
+contracts/doctypes/05-core-doctype-model.md:404:| RBP Admin | Full operational access |
+contracts/doctypes/05-core-doctype-model.md:436:## 11. RBP Membership Plan
+contracts/doctypes/05-core-doctype-model.md:461:RBP Membership Plan
+contracts/doctypes/05-core-doctype-model.md:462:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:463:  └── RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:472:| RBP Member | Read active plan summary |
+contracts/doctypes/05-core-doctype-model.md:473:| RBP Admin | Create/update plans |
+contracts/doctypes/05-core-doctype-model.md:505:## 12. RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:515:| `tenant` | Link: RBP Tenant | Yes | Subscription tenant |
+contracts/doctypes/05-core-doctype-model.md:517:| `plan` | Link: RBP Membership Plan | Yes | Current plan |
+contracts/doctypes/05-core-doctype-model.md:526:| `last_payment_event` | Link: RBP Payment Event | Conditional | Latest payment event |
+contracts/doctypes/05-core-doctype-model.md:531:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:532:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:533:  ├── RBP Membership Plan
+contracts/doctypes/05-core-doctype-model.md:534:  ├── RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:535:  └── RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:542:| RBP Member | View own safe subscription summary |
+contracts/doctypes/05-core-doctype-model.md:543:| RBP Business Owner | View/manage tenant subscription |
+contracts/doctypes/05-core-doctype-model.md:544:| RBP Team Member | No access by default |
+contracts/doctypes/05-core-doctype-model.md:545:| RBP Admin | Full operational access |
+contracts/doctypes/05-core-doctype-model.md:582:## 13. RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:592:| `tenant` | Link: RBP Tenant | Conditional | Tenant-level entitlement |
+contracts/doctypes/05-core-doctype-model.md:597:| `source_subscription` | Link: RBP Subscription | Conditional | Source subscription |
+contracts/doctypes/05-core-doctype-model.md:621:RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:622:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:624:  └── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:631:| RBP Member | View own safe entitlement summary |
+contracts/doctypes/05-core-doctype-model.md:632:| RBP Business Owner | View tenant entitlement summary |
+contracts/doctypes/05-core-doctype-model.md:633:| RBP Admin | Full operational access |
+contracts/doctypes/05-core-doctype-model.md:668:## 14. RBP Onboarding Flow
+contracts/doctypes/05-core-doctype-model.md:680:| `tenant` | Link: RBP Tenant | Conditional | Tenant-specific flow if applicable |
+contracts/doctypes/05-core-doctype-model.md:683:| `current_step` | Link: RBP Onboarding Step | Conditional | Current active step |
+contracts/doctypes/05-core-doctype-model.md:691:RBP Onboarding Flow
+contracts/doctypes/05-core-doctype-model.md:692:  └── RBP Onboarding Step
+contracts/doctypes/05-core-doctype-model.md:700:| RBP Member | Own/tenant onboarding flow |
+contracts/doctypes/05-core-doctype-model.md:701:| RBP Business Owner | Tenant onboarding flow |
+contracts/doctypes/05-core-doctype-model.md:702:| RBP Admin | Full operational access |
+contracts/doctypes/05-core-doctype-model.md:732:## 15. RBP Onboarding Step
+contracts/doctypes/05-core-doctype-model.md:742:| `flow` | Link: RBP Onboarding Flow | Yes | Parent flow |
+contracts/doctypes/05-core-doctype-model.md:754:RBP Onboarding Step
+contracts/doctypes/05-core-doctype-model.md:755:  └── RBP Onboarding Flow
+contracts/doctypes/05-core-doctype-model.md:791:## 16. RBP Notification
+contracts/doctypes/05-core-doctype-model.md:801:| `tenant` | Link: RBP Tenant | Conditional | Tenant context |
+contracts/doctypes/05-core-doctype-model.md:833:RBP Notification
+contracts/doctypes/05-core-doctype-model.md:834:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:844:| RBP Member | Own/tenant notifications according to visibility |
+contracts/doctypes/05-core-doctype-model.md:845:| RBP Business Owner | Tenant notifications |
+contracts/doctypes/05-core-doctype-model.md:848:| RBP Admin | All operational notifications |
+contracts/doctypes/05-core-doctype-model.md:884:## 17. RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:894:| `tenant` | Link: RBP Tenant | Conditional | Tenant context |
+contracts/doctypes/05-core-doctype-model.md:924:RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:925:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:936:| RBP Admin | Operational audit access |
+contracts/doctypes/05-core-doctype-model.md:970:## 18. RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:982:| `tenant` | Link: RBP Tenant | Conditional | Tenant context |
+contracts/doctypes/05-core-doctype-model.md:1027:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1028:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:1029:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:1031:  └── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1038:| RBP Member | Safe own payment summary only |
+contracts/doctypes/05-core-doctype-model.md:1039:| RBP Business Owner | Safe tenant payment/subscription summary |
+contracts/doctypes/05-core-doctype-model.md:1041:| RBP Admin | Operational payment access |
+contracts/doctypes/05-core-doctype-model.md:1086:## 19. RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1096:| `tenant` | Link: RBP Tenant | Conditional | Tenant context |
+contracts/doctypes/05-core-doctype-model.md:1121:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1122:  ├── RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:1135:| `admin_only` | RBP Admin/System Manager/Administrator |
+contracts/doctypes/05-core-doctype-model.md:1181:## 20. RBP Decision Desk Request
+contracts/doctypes/05-core-doctype-model.md:1191:| `tenant` | Link: RBP Tenant | Yes | Customer tenant |
+contracts/doctypes/05-core-doctype-model.md:1212:RBP Decision Desk Option
+contracts/doctypes/05-core-doctype-model.md:1213:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1214:RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1215:RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1216:RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1279:## 21. RBP Decision Desk Option
+contracts/doctypes/05-core-doctype-model.md:1289:| `decision_request` | Link: RBP Decision Desk Request | Yes | Parent request |
+contracts/doctypes/05-core-doctype-model.md:1302:RBP Decision Desk Option
+contracts/doctypes/05-core-doctype-model.md:1303:  └── RBP Decision Desk Request
+contracts/doctypes/05-core-doctype-model.md:1341:## 22. RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:1351:| `tenant` | Link: RBP Tenant | Yes | Customer tenant |
+contracts/doctypes/05-core-doctype-model.md:1370:RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:1371:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1372:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1373:  ├── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1374:  └── RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1421:## 23. RBP Marketplace Listing
+contracts/doctypes/05-core-doctype-model.md:1431:| `tenant` | Link: RBP Tenant | Conditional | Seller tenant, if applicable |
+contracts/doctypes/05-core-doctype-model.md:1450:RBP Marketplace Listing
+contracts/doctypes/05-core-doctype-model.md:1451:  ├── RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:1452:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1453:  ├── RBP Payment Event, if listing fee applies
+contracts/doctypes/05-core-doctype-model.md:1454:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1455:  └── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1515:## 24. RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:1525:| `listing` | Link: RBP Marketplace Listing | Yes | Related listing |
+contracts/doctypes/05-core-doctype-model.md:1539:RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:1540:  ├── RBP Marketplace Listing
+contracts/doctypes/05-core-doctype-model.md:1541:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1542:  └── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1578:## 25. RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:1588:| `tenant` | Link: RBP Tenant | Yes | Customer tenant |
+contracts/doctypes/05-core-doctype-model.md:1607:RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:1608:  ├── RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1609:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1610:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1611:  └── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1670:## 26. RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:1680:| `tenant` | Link: RBP Tenant | Yes | Customer tenant |
+contracts/doctypes/05-core-doctype-model.md:1701:RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:1702:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1703:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1704:  ├── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1705:  └── RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1754:## 27. RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1764:| `tenant` | Link: RBP Tenant | Yes | Customer tenant |
+contracts/doctypes/05-core-doctype-model.md:1783:RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1784:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1785:  ├── RBP Notification
+contracts/doctypes/05-core-doctype-model.md:1786:  ├── RBP Audit Log
+contracts/doctypes/05-core-doctype-model.md:1787:  └── RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1891:Any DocType that may require payment must support linkage to `RBP Payment Event`.
+contracts/doctypes/05-core-doctype-model.md:1906:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:1907:RBP Marketplace Listing, if listing fee applies
+contracts/doctypes/05-core-doctype-model.md:1908:RBP Connectivity Order, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1921:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1927:RBP Decision Desk Request
+contracts/doctypes/05-core-doctype-model.md:1928:RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:1929:RBP Marketplace Listing
+contracts/doctypes/05-core-doctype-model.md:1930:RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:1931:RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:1932:RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1947:| Membership purchased | RBP Subscription | `membership_purchased` |
+contracts/doctypes/05-core-doctype-model.md:1948:| Decision Desk submitted | RBP Decision Desk Request | `decision_desk_request_submitted` |
+contracts/doctypes/05-core-doctype-model.md:1949:| Advisor assigned | RBP Decision Desk Request / RBP Risk Assessment | `advisor_assigned` |
+contracts/doctypes/05-core-doctype-model.md:1951:| Document brief submitted | RBP Document Brief | `document_brief_submitted` |
+contracts/doctypes/05-core-doctype-model.md:1952:| Marketplace listing approved | RBP Marketplace Listing | `marketplace_listing_approved` |
+contracts/doctypes/05-core-doctype-model.md:1953:| Connectivity order received | RBP Connectivity Order | `connectivity_order_received` |
+contracts/doctypes/05-core-doctype-model.md:1954:| Risk assessment completed | RBP Risk Assessment | `risk_assessment_completed` |
+contracts/doctypes/05-core-doctype-model.md:1955:| Fixer request accepted | RBP Fixer Request | `fixer_request_accepted` |
+contracts/doctypes/05-core-doctype-model.md:1956:| Payment failed | RBP Payment Event | `payment_failed` |
+contracts/doctypes/05-core-doctype-model.md:1957:| Subscription renewed | RBP Subscription | `subscription_renewed` |
+contracts/doctypes/05-core-doctype-model.md:1981:RBP Tenant
+contracts/doctypes/05-core-doctype-model.md:1982:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:1983:RBP App Entitlement
+contracts/doctypes/05-core-doctype-model.md:1984:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1985:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:2224:| `supporting_documents_mock` | `RBP File Reference` linked to product record |
+contracts/doctypes/05-core-doctype-model.md:2225:| `reference_files_mock` | `RBP File Reference` linked to `RBP Document Brief` |
+contracts/doctypes/05-core-doctype-model.md:2226:| `media_mock` | `RBP File Reference` linked to `RBP Marketplace Listing` |
+contracts/doctypes/05-core-doctype-model.md:2227:| `payment_method_mock` | Payment provider flow and `RBP Payment Event` |
+contracts/doctypes/05-core-doctype-model.md:2228:| `serviceability_status_mock` | `serviceability_status` on `RBP Connectivity Order` |
+contracts/doctypes/05-core-doctype-model.md:2290:Every uploaded file maps to RBP File Reference.
+contracts/doctypes/05-core-doctype-model.md:2291:Every payment touchpoint maps to RBP Payment Event or deliberate no-payment decision.
+contracts/doctypes/13-validation-rules.md:1:# RBP Phase 2 Backend Contracts
+contracts/permissions/15-admin-actions.md:1:# RBP Phase 2 Backend Contracts
+contracts/permissions/15-admin-actions.md:55:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_activate_subscription` | RBP Subscription | Pending/Paid | Active | `subscription_active` |
+contracts/permissions/15-admin-actions.md:56:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_suspend_subscription` | RBP Subscription | Active/Past Due | Suspended | `subscription_suspended` |
+contracts/permissions/15-admin-actions.md:57:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_cancel_subscription` | RBP Subscription | Active/Past Due/Suspended | Cancelled | `subscription_cancelled` |
+contracts/permissions/15-admin-actions.md:58:| `/admin/membership` | `/api/method/rbp_app.api.entitlements.admin_grant_entitlement` | RBP App Entitlement | Any | Active | `entitlement_activated` |
+contracts/permissions/15-admin-actions.md:59:| `/admin/membership` | `/api/method/rbp_app.api.entitlements.admin_revoke_entitlement` | RBP App Entitlement | Active/Suspended | Revoked | `entitlement_revoked` |
+contracts/permissions/15-admin-actions.md:60:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_assign_advisor` | RBP Decision Desk Request | In Review/Submitted | Assigned | `advisor_assigned` |
+contracts/permissions/15-admin-actions.md:61:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_request_more_information` | RBP Decision Desk Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:62:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_reject_request` | RBP Decision Desk Request | Submitted/In Review | Rejected | `decision_desk_rejected` |
+contracts/permissions/15-admin-actions.md:63:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_close_request` | RBP Decision Desk Request | Outcome Ready/In Progress | Closed | `decision_desk_closed` |
+contracts/permissions/15-admin-actions.md:64:| `/admin/on-demand/decision-desk` | `/api/method/rbp_app.api.decision_desk.admin_archive_request` | RBP Decision Desk Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:65:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_request_more_information` | RBP Document Brief | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:66:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_reject_brief` | RBP Document Brief | Submitted/In Review | Rejected | `docushare_rejected` |
+contracts/permissions/15-admin-actions.md:67:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_close_brief` | RBP Document Brief | Outcome Ready/In Progress | Closed | `docushare_closed` |
+contracts/permissions/15-admin-actions.md:68:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_archive_brief` | RBP Document Brief | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:69:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_approve_listing` | RBP Marketplace Listing | Pending Review | Published | `marketplace_listing_approved` |
+contracts/permissions/15-admin-actions.md:70:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_reject_listing` | RBP Marketplace Listing | Pending Review | Rejected | `marketplace_listing_rejected` |
+contracts/permissions/15-admin-actions.md:71:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_archive_listing` | RBP Marketplace Listing | Published/Rejected | Archived | `none` |
+contracts/permissions/15-admin-actions.md:72:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_mark_enquiry_spam` | RBP Marketplace Enquiry | New/In Review | Spam | `none` |
+contracts/permissions/15-admin-actions.md:73:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_close_enquiry` | RBP Marketplace Enquiry | Sent to Seller/In Review | Closed | `marketplace_enquiry_closed` |
+contracts/permissions/15-admin-actions.md:74:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_request_more_information` | RBP Connectivity Order | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:75:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_reject_order` | RBP Connectivity Order | Submitted/In Review | Rejected | `connectivity_rejected` |
+contracts/permissions/15-admin-actions.md:76:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_close_order` | RBP Connectivity Order | Outcome Ready/In Progress | Closed | `connectivity_closed` |
+contracts/permissions/15-admin-actions.md:77:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_archive_order` | RBP Connectivity Order | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:78:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_assign_advisor` | RBP Risk Assessment | In Review/Submitted | Assigned | `advisor_assigned` |
+contracts/permissions/15-admin-actions.md:79:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_request_more_information` | RBP Risk Assessment | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:80:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_reject_assessment` | RBP Risk Assessment | Submitted/In Review | Rejected | `risk_advisor_rejected` |
+contracts/permissions/15-admin-actions.md:81:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_close_assessment` | RBP Risk Assessment | Outcome Ready/In Progress | Closed | `risk_advisor_closed` |
+contracts/permissions/15-admin-actions.md:82:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_archive_assessment` | RBP Risk Assessment | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:83:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_request_more_information` | RBP Fixer Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:84:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_reject_request` | RBP Fixer Request | Submitted/In Review | Rejected | `fixer_rejected` |
+contracts/permissions/15-admin-actions.md:85:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_close_request` | RBP Fixer Request | Outcome Ready/In Progress | Closed | `fixer_closed` |
+contracts/permissions/15-admin-actions.md:86:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_archive_request` | RBP Fixer Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:96:- current user has RBP Admin, System Manager, or Administrator role
+contracts/permissions/15-admin-actions.md:158:Record RBP Audit Log for every admin action.
+contracts/permissions/15-admin-actions.md:159:Trigger RBP Notification where required.
+contracts/permissions/03-role-matrix.md:1:# RBP Phase 2 Backend Contracts
+contracts/permissions/03-role-matrix.md:84:RBP Member
+contracts/permissions/03-role-matrix.md:85:RBP Business Owner
+contracts/permissions/03-role-matrix.md:86:RBP Team Member
+contracts/permissions/03-role-matrix.md:87:RBP Advisor
+contracts/permissions/03-role-matrix.md:88:RBP Marketplace Seller
+contracts/permissions/03-role-matrix.md:89:RBP Marketplace Buyer
+contracts/permissions/03-role-matrix.md:90:RBP Support Agent
+contracts/permissions/03-role-matrix.md:91:RBP Admin
+contracts/permissions/03-role-matrix.md:102:| RBP Member | member-only requests | own/team records | own drafts | own records | no |
+contracts/permissions/03-role-matrix.md:103:| RBP Advisor | assigned advisory records | assigned records | advisor fields | recommendations | no |
+contracts/permissions/03-role-matrix.md:104:| RBP Admin | all RBP records | all RBP records | all | all | yes |
+contracts/permissions/03-role-matrix.md:120:RBP Member
+contracts/permissions/03-role-matrix.md:121:RBP Business Owner
+contracts/permissions/03-role-matrix.md:122:RBP Team Member
+contracts/permissions/03-role-matrix.md:123:RBP Advisor
+contracts/permissions/03-role-matrix.md:124:RBP Marketplace Seller
+contracts/permissions/03-role-matrix.md:125:RBP Marketplace Buyer
+contracts/permissions/03-role-matrix.md:126:RBP Support Agent
+contracts/permissions/03-role-matrix.md:127:RBP Admin
+contracts/permissions/03-role-matrix.md:140:| RBP Member | `rbp_member` |
+contracts/permissions/03-role-matrix.md:141:| RBP Business Owner | `rbp_business_owner` |
+contracts/permissions/03-role-matrix.md:142:| RBP Team Member | `rbp_team_member` |
+contracts/permissions/03-role-matrix.md:143:| RBP Advisor | `rbp_advisor` |
+contracts/permissions/03-role-matrix.md:144:| RBP Marketplace Seller | `rbp_marketplace_seller` |
+contracts/permissions/03-role-matrix.md:145:| RBP Marketplace Buyer | `rbp_marketplace_buyer` |
+contracts/permissions/03-role-matrix.md:146:| RBP Support Agent | `rbp_support_agent` |
+contracts/permissions/03-role-matrix.md:147:| RBP Admin | `rbp_admin` |
+contracts/permissions/03-role-matrix.md:177:| Member roles | RBP Member, RBP Business Owner, RBP Team Member | Customer-side business users |
+contracts/permissions/03-role-matrix.md:178:| Product-specific roles | RBP Marketplace Seller, RBP Marketplace Buyer | Marketplace participation |
+contracts/permissions/03-role-matrix.md:179:| Service delivery roles | RBP Advisor, RBP Support Agent | Internal or assigned operators |
+contracts/permissions/03-role-matrix.md:180:| Admin roles | RBP Admin, System Manager, Administrator | Platform administration and system control |
+contracts/permissions/03-role-matrix.md:253:## 6.3 RBP Member
+contracts/permissions/03-role-matrix.md:290:## 6.4 RBP Business Owner
+contracts/permissions/03-role-matrix.md:321:`RBP Business Owner` should usually be the `primary_owner` of `RBP Tenant`.
+contracts/permissions/03-role-matrix.md:325:## 6.5 RBP Team Member
+contracts/permissions/03-role-matrix.md:359:## 6.6 RBP Advisor
+contracts/permissions/03-role-matrix.md:375:- Cannot perform full platform admin actions unless also assigned RBP Admin
+contracts/permissions/03-role-matrix.md:393:## 6.7 RBP Marketplace Seller
+contracts/permissions/03-role-matrix.md:422:Seller role may be combined with `RBP Member` or `Website User` depending on marketplace access rules.
+contracts/permissions/03-role-matrix.md:426:## 6.8 RBP Marketplace Buyer
+contracts/permissions/03-role-matrix.md:454:## 6.9 RBP Support Agent
+contracts/permissions/03-role-matrix.md:485:Support Agent permissions should be carefully separated from `RBP Admin`.
+contracts/permissions/03-role-matrix.md:489:## 6.10 RBP Admin
+contracts/permissions/03-role-matrix.md:493:Platform admin role for RBP operational staff.
+contracts/permissions/03-role-matrix.md:498:- View all RBP operational records
+contracts/permissions/03-role-matrix.md:513:RBP operations manager
+contracts/permissions/03-role-matrix.md:520:`RBP Admin` is powerful, but still custom-platform scoped. It should not automatically equal Frappe `Administrator`.
+contracts/permissions/03-role-matrix.md:578:RBP Admin
+contracts/permissions/03-role-matrix.md:580:RBP Support Agent / RBP Advisor
+contracts/permissions/03-role-matrix.md:582:RBP Business Owner
+contracts/permissions/03-role-matrix.md:584:RBP Member
+contracts/permissions/03-role-matrix.md:586:RBP Team Member
+contracts/permissions/03-role-matrix.md:588:RBP Marketplace Seller / RBP Marketplace Buyer
+contracts/permissions/03-role-matrix.md:598:RBP Advisor may have more access than RBP Business Owner for assigned advisory fields.
+contracts/permissions/03-role-matrix.md:599:RBP Business Owner may have more tenant authority than RBP Advisor.
+contracts/permissions/03-role-matrix.md:600:RBP Marketplace Seller may manage listings but not Decision Desk records.
+contracts/permissions/03-role-matrix.md:601:RBP Marketplace Buyer may submit enquiries but not create listings.
+contracts/permissions/03-role-matrix.md:614:| Tenant | Business/customer workspace, represented by `RBP Tenant` |
+contracts/permissions/03-role-matrix.md:630:RBP Member:
+contracts/permissions/03-role-matrix.md:633:RBP Business Owner:
+contracts/permissions/03-role-matrix.md:636:RBP Team Member:
+contracts/permissions/03-role-matrix.md:639:RBP Advisor:
+contracts/permissions/03-role-matrix.md:642:RBP Support Agent:
+contracts/permissions/03-role-matrix.md:645:RBP Admin:
+contracts/permissions/03-role-matrix.md:646:  All RBP records for operations.
+contracts/permissions/03-role-matrix.md:657:- they are RBP Admin, System Manager, or Administrator
+contracts/permissions/03-role-matrix.md:658:- they are RBP Advisor assigned to that record
+contracts/permissions/03-role-matrix.md:659:- they are RBP Support Agent assigned or permitted to that support context
+contracts/permissions/03-role-matrix.md:669:| Capability | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Seller | Buyer | Support Agent | RBP Admin | System Manager | Administrator |
+contracts/permissions/03-role-matrix.md:707:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Support Agent | RBP Admin | System Manager |
+contracts/permissions/03-role-matrix.md:720:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:735:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor/Reviewer | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:748:| Action | Guest | Website User | RBP Member | Seller | Buyer | Business Owner | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:764:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:777:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:789:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:806:| Route Group | Guest | Website User | RBP Member | Admin Roles |
+contracts/permissions/03-role-matrix.md:817:| Route Group | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:828:| Route Group | Guest | Website User | RBP Member | Advisor | Support Agent | RBP Admin | System Manager | Administrator |
+contracts/permissions/03-role-matrix.md:872:| Transition | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin | System Manager |
+contracts/permissions/03-role-matrix.md:903:| File Visibility | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin | System Manager |
+contracts/permissions/03-role-matrix.md:928:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Support Agent | RBP Admin | System Manager |
+contracts/permissions/03-role-matrix.md:945:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin |
+contracts/permissions/03-role-matrix.md:960:| Action | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin | System Manager |
+contracts/permissions/03-role-matrix.md:965:| View all RBP audit logs | No | No | No | No | No | No | No | Yes | Yes |
+contracts/permissions/03-role-matrix.md:979:| RBP Member | RBP Admin, System Manager, membership activation process |
+contracts/permissions/03-role-matrix.md:980:| RBP Business Owner | RBP Admin, System Manager, membership/tenant creation process |
+contracts/permissions/03-role-matrix.md:981:| RBP Team Member | RBP Business Owner if enabled, RBP Admin, System Manager |
+contracts/permissions/03-role-matrix.md:982:| RBP Advisor | RBP Admin, System Manager |
+contracts/permissions/03-role-matrix.md:983:| RBP Marketplace Seller | RBP Admin, System Manager, approved seller onboarding process |
+contracts/permissions/03-role-matrix.md:984:| RBP Marketplace Buyer | System/auth process, RBP Admin |
+contracts/permissions/03-role-matrix.md:985:| RBP Support Agent | RBP Admin, System Manager |
+contracts/permissions/03-role-matrix.md:986:| RBP Admin | System Manager, Administrator |
+contracts/permissions/03-role-matrix.md:995:| Membership payment completes | RBP Member |
+contracts/permissions/03-role-matrix.md:996:| Business profile/tenant is created from membership | RBP Business Owner for primary user |
+contracts/permissions/03-role-matrix.md:997:| Business owner invites team member | RBP Team Member |
+contracts/permissions/03-role-matrix.md:998:| Marketplace seller onboarding approved | RBP Marketplace Seller |
+contracts/permissions/03-role-matrix.md:999:| Buyer account/enquiry created | RBP Marketplace Buyer where needed |
+contracts/permissions/03-role-matrix.md:1000:| Advisor is onboarded internally | RBP Advisor |
+contracts/permissions/03-role-matrix.md:1001:| Support operator is onboarded internally | RBP Support Agent |
+contracts/permissions/03-role-matrix.md:1007:| Subscription cancelled | Remove or suspend RBP Member entitlements according to business rules |
+contracts/permissions/03-role-matrix.md:1011:| Admin user offboarded | Remove RBP Admin/System Manager role immediately |
+contracts/permissions/03-role-matrix.md:1032:A user may have RBP Member role but not have entitlement to a premium service.
+contracts/permissions/03-role-matrix.md:1033:A user may have RBP Marketplace Seller role but cannot publish listings without admin approval.
+contracts/permissions/03-role-matrix.md:1034:A user may be RBP Advisor but only access records assigned to them.
+contracts/permissions/03-role-matrix.md:1244:RBP Advisor cannot browse all tenant records.
+contracts/permissions/03-role-matrix.md:1245:RBP Support Agent cannot silently become RBP Admin.
+contracts/permissions/03-role-matrix.md:1246:RBP Business Owner cannot override admin review workflows.
+contracts/permissions/03-role-matrix.md:1247:RBP Marketplace Seller cannot approve their own listings.
+contracts/permissions/03-role-matrix.md:1248:RBP Team Member cannot manage subscription billing by default.
+contracts/permissions/04-permission-model-draft.md:1:# RBP Phase 2 Backend Contracts
+contracts/permissions/04-permission-model-draft.md:144:| Admin is scoped | `RBP Admin` manages RBP platform operations but should not be treated as the same as Frappe `Administrator`. |
+contracts/permissions/04-permission-model-draft.md:199:RBP Member
+contracts/permissions/04-permission-model-draft.md:200:RBP Business Owner
+contracts/permissions/04-permission-model-draft.md:201:RBP Team Member
+contracts/permissions/04-permission-model-draft.md:202:RBP Advisor
+contracts/permissions/04-permission-model-draft.md:203:RBP Marketplace Seller
+contracts/permissions/04-permission-model-draft.md:204:RBP Marketplace Buyer
+contracts/permissions/04-permission-model-draft.md:205:RBP Support Agent
+contracts/permissions/04-permission-model-draft.md:206:RBP Admin
+contracts/permissions/04-permission-model-draft.md:310:RBP Member can create a Decision Desk request only if:
+contracts/permissions/04-permission-model-draft.md:331:- they are RBP Admin, System Manager, or Administrator
+contracts/permissions/04-permission-model-draft.md:359:RBP Advisor
+contracts/permissions/04-permission-model-draft.md:360:RBP Support Agent
+contracts/permissions/04-permission-model-draft.md:369:- an RBP Admin grants explicit operational access
+contracts/permissions/04-permission-model-draft.md:397:A user with RBP Member role may be blocked from premium Decision Desk requests if their plan does not include that entitlement.
+contracts/permissions/04-permission-model-draft.md:600:| RBP Member | Member records | Own/team records | Own drafts | Own/member records | No | Entitlement required |
+contracts/permissions/04-permission-model-draft.md:601:| RBP Business Owner | Tenant/member records | Tenant records | Tenant drafts/profile | Tenant/member records | No | Tenant authority |
+contracts/permissions/04-permission-model-draft.md:602:| RBP Team Member | Conditional | Shared/assigned tenant records | Conditional | Conditional | No | Tenant policy required |
+contracts/permissions/04-permission-model-draft.md:603:| RBP Advisor | No customer creation | Assigned records | Advisor fields | Recommendations/outcomes | No | Assignment required |
+contracts/permissions/04-permission-model-draft.md:604:| RBP Marketplace Seller | Listing drafts | Own listings/enquiries | Own draft/rejected listings | Listings for review | No | Cannot approve own listings |
+contracts/permissions/04-permission-model-draft.md:605:| RBP Marketplace Buyer | Enquiries | Own enquiries | Own draft enquiries | Enquiries | No | Buyer-only marketplace access |
+contracts/permissions/04-permission-model-draft.md:606:| RBP Support Agent | Conditional | Assigned/queue records | Support fields | Conditional | Conditional | Operationally constrained |
+contracts/permissions/04-permission-model-draft.md:607:| RBP Admin | Yes | All RBP records | All operational records | Yes | Yes | Platform admin |
+contracts/permissions/04-permission-model-draft.md:620:RBP Tenant
+contracts/permissions/04-permission-model-draft.md:621:RBP Business Profile
+contracts/permissions/04-permission-model-draft.md:622:RBP Membership Plan
+contracts/permissions/04-permission-model-draft.md:623:RBP Subscription
+contracts/permissions/04-permission-model-draft.md:624:RBP App Entitlement
+contracts/permissions/04-permission-model-draft.md:625:RBP Onboarding Flow
+contracts/permissions/04-permission-model-draft.md:626:RBP Onboarding Step
+contracts/permissions/04-permission-model-draft.md:627:RBP Notification
+contracts/permissions/04-permission-model-draft.md:628:RBP Audit Log
+contracts/permissions/04-permission-model-draft.md:629:RBP Payment Event
+contracts/permissions/04-permission-model-draft.md:630:RBP File Reference
+contracts/permissions/04-permission-model-draft.md:633:| DocType | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin | System Manager |
+contracts/permissions/04-permission-model-draft.md:635:| RBP Tenant | None | None/own pending | Tenant read | Tenant read/update limited | Read limited | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:636:| RBP Business Profile | None | Own draft | Own/tenant read | Tenant read/update | Read limited | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:637:| RBP Membership Plan | Public read | Read | Read | Read | Read | Read | Read | Full | Full |
+contracts/permissions/04-permission-model-draft.md:638:| RBP Subscription | None | Own limited | Own limited | Tenant read/manage | None | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:639:| RBP App Entitlement | None | Own limited | Own/tenant read | Tenant read | Limited | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:640:| RBP Onboarding Flow | Public/conditional | Own | Own | Tenant | Conditional | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:641:| RBP Onboarding Step | Public/conditional | Own | Own | Tenant | Conditional | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:642:| RBP Notification | None | Own | Own/tenant | Tenant | Conditional | Assigned | Assigned/queue | Full | Full |
+contracts/permissions/04-permission-model-draft.md:643:| RBP Audit Log | None | None | Limited/own if exposed | Limited/tenant if exposed | None | None | Conditional | Read/full operational | Full |
+contracts/permissions/04-permission-model-draft.md:644:| RBP Payment Event | None | None | Own summary only | Tenant summary/manage limited | None | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:645:| RBP File Reference | None | Own visible | Own/tenant visible | Tenant visible | Conditional | Assigned visible | Assigned/queue visible | Full | Full |
+contracts/permissions/04-permission-model-draft.md:663:RBP Decision Desk Request
+contracts/permissions/04-permission-model-draft.md:664:RBP Decision Desk Option
+contracts/permissions/04-permission-model-draft.md:665:RBP Document Brief
+contracts/permissions/04-permission-model-draft.md:666:RBP Marketplace Listing
+contracts/permissions/04-permission-model-draft.md:667:RBP Marketplace Enquiry
+contracts/permissions/04-permission-model-draft.md:668:RBP Connectivity Order
+contracts/permissions/04-permission-model-draft.md:669:RBP Risk Assessment
+contracts/permissions/04-permission-model-draft.md:670:RBP Fixer Request
+contracts/permissions/04-permission-model-draft.md:673:| DocType | Website User | RBP Member | Business Owner | Team Member | Advisor | Seller | Buyer | Support Agent | RBP Admin |
+contracts/permissions/04-permission-model-draft.md:675:| RBP Decision Desk Request | Own draft/conditional | Own/tenant | Tenant | Conditional | Assigned | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:676:| RBP Decision Desk Option | Own/conditional | Own/tenant | Tenant | Conditional | Assigned read | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:677:| RBP Document Brief | Own draft/conditional | Own/tenant | Tenant | Conditional | Assigned/reviewer | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:678:| RBP Marketplace Listing | Own draft if seller | Conditional | Tenant if owner/seller | Conditional | None | Own | None | Conditional | Full |
+contracts/permissions/04-permission-model-draft.md:679:| RBP Marketplace Enquiry | Own | Own | Tenant if related | Conditional | None | Own listing enquiries | Own | Conditional | Full |
+contracts/permissions/04-permission-model-draft.md:680:| RBP Connectivity Order | Own draft/conditional | Own/tenant | Tenant | Conditional | None | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:681:| RBP Risk Assessment | Own draft/conditional | Own/tenant | Tenant | Conditional | Assigned | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:682:| RBP Fixer Request | Own draft/conditional | Own/tenant | Tenant | Conditional | None/assigned if relevant | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:697:RBP Business Owner may manage tenant membership.
+contracts/permissions/04-permission-model-draft.md:698:RBP Admin/System Manager may create or correct membership records.
+contracts/permissions/04-permission-model-draft.md:712:RBP Member may read own membership status.
+contracts/permissions/04-permission-model-draft.md:714:RBP Admin may read all membership operational records.
+contracts/permissions/04-permission-model-draft.md:721:RBP Admin may update operational fields.
+contracts/permissions/04-permission-model-draft.md:732:RBP Member and Business Owner may create and submit Decision Desk requests if entitled.
+contracts/permissions/04-permission-model-draft.md:745:RBP Admin may read all.
+contracts/permissions/04-permission-model-draft.md:754:RBP Admin may update operational fields and workflow state.
+contracts/permissions/04-permission-model-draft.md:760:Only RBP Admin, System Manager, or explicitly permitted Support Agent may perform admin review.
+contracts/permissions/04-permission-model-draft.md:770:RBP Member and Business Owner may create and submit document briefs if entitled.
+contracts/permissions/04-permission-model-draft.md:781:RBP Admin may access all.
+contracts/permissions/04-permission-model-draft.md:787:Reference files must follow RBP File Reference visibility rules.
+contracts/permissions/04-permission-model-draft.md:799:Website User/RBP Member may view published listings.
+contracts/permissions/04-permission-model-draft.md:805:RBP Marketplace Seller may create listing drafts.
+contracts/permissions/04-permission-model-draft.md:814:RBP Marketplace Buyer or authenticated users may create enquiries where allowed.
+contracts/permissions/04-permission-model-draft.md:822:RBP Admin may approve, reject, publish, archive, or moderate listings.
+contracts/permissions/04-permission-model-draft.md:833:RBP Member and Business Owner may create/submit orders.
+contracts/permissions/04-permission-model-draft.md:843:RBP Admin may view all.
+contracts/permissions/04-permission-model-draft.md:861:RBP Member and Business Owner may create and submit risk assessments if entitled.
+contracts/permissions/04-permission-model-draft.md:871:RBP Admin may update all operational fields.
+contracts/permissions/04-permission-model-draft.md:881:RBP Member and Business Owner may create and submit Fixer requests if entitled.
+contracts/permissions/04-permission-model-draft.md:1022:RBP Admin may generally perform:
+contracts/permissions/04-permission-model-draft.md:1146:RBP Admin may view and reconcile operational payment information.
+contracts/permissions/04-permission-model-draft.md:1172:- they are RBP Admin/System Manager
+contracts/permissions/04-permission-model-draft.md:1220:| RBP Member | None or very limited safe history |
+contracts/permissions/04-permission-model-draft.md:1224:| RBP Admin | Operational audit access |
+contracts/permissions/04-permission-model-draft.md:1271:| RBP Admin | Full RBP operational admin actions |
+contracts/permissions/04-permission-model-draft.md:1272:| System Manager | Full RBP and system actions |
+contracts/permissions/04-permission-model-draft.md:1274:| RBP Support Agent | Limited product-specific actions only |
+contracts/permissions/04-permission-model-draft.md:1275:| RBP Advisor | Assigned advisory actions only |
+contracts/permissions/04-permission-model-draft.md:1611:RBP Decision Desk Request
+contracts/permissions/04-permission-model-draft.md:1612:RBP Document Brief
+contracts/permissions/04-permission-model-draft.md:1613:RBP Connectivity Order
+contracts/permissions/04-permission-model-draft.md:1614:RBP Risk Assessment
+contracts/permissions/04-permission-model-draft.md:1615:RBP Fixer Request
+contracts/permissions/04-permission-model-draft.md:1622:| RBP Member | Own/Tenant | Draft only | Yes | Yes | No |
+contracts/permissions/04-permission-model-draft.md:1623:| RBP Business Owner | Tenant | Draft only | Yes | Yes | No |
+contracts/permissions/04-permission-model-draft.md:1624:| RBP Team Member | Conditional | Conditional | Conditional | Conditional | No |
+contracts/permissions/04-permission-model-draft.md:1625:| RBP Advisor | Assigned | Advisor fields | No | Conditional | No |
+contracts/permissions/04-permission-model-draft.md:1626:| RBP Support Agent | Assigned/Queue | Support fields | Conditional | Conditional | No |
+contracts/permissions/04-permission-model-draft.md:1627:| RBP Admin | All | All | Yes | Yes | Conditional |
+contracts/permissions/04-permission-model-draft.md:1635:RBP Payment Event
+contracts/permissions/04-permission-model-draft.md:1636:RBP Audit Log
+contracts/permissions/04-permission-model-draft.md:1637:RBP File Reference
+contracts/permissions/04-permission-model-draft.md:1638:RBP Notification
+contracts/permissions/04-permission-model-draft.md:1648:| RBP Admin | Yes | Yes | Yes | Conditional |
+contracts/permissions/04-permission-model-draft.md:1657:RBP Membership Plan
+contracts/permissions/04-permission-model-draft.md:1658:RBP App Entitlement
+contracts/permissions/04-permission-model-draft.md:1659:RBP Onboarding Flow
+contracts/permissions/04-permission-model-draft.md:1660:RBP Onboarding Step
+contracts/permissions/04-permission-model-draft.md:1669:| RBP Admin | Yes | Yes | Yes | Conditional |
+contracts/permissions/04-permission-model-draft.md:1728:Return RBP records according to admin role and operational filters.
+contracts/phase-2-pack-index.md:1:# RBP Phase 2 Backend Contracts - Final UI-Dependent Pack
+contracts/contract-templates.md:1:# RBP Phase 2 Backend Contracts
+contracts/contract-templates.md:142:# RBP Phase 2 Backend Contracts
+contracts/contract-templates.md:165:# RBP Phase 2 Backend Contracts
+contracts/contract-templates.md:467:## DocType Contract: <RBP DocType Name>
+contracts/contract-templates.md:471:| DocType | `<RBP DocType Name>` |
+contracts/contract-templates.md:490:| `tenant` | Tenant | Link: RBP Tenant | Yes | None | Customer tenant |
+contracts/contract-templates.md:495:<RBP DocType Name>
+contracts/contract-templates.md:513:| RBP Member | Yes | Own/Tenant | Draft only | Yes | No |
+contracts/contract-templates.md:514:| RBP Admin | Yes | All | All | Yes | Yes |
+contracts/contract-templates.md:570:| Field | Guest | Website User | RBP Member | Business Owner | Advisor | RBP Admin |
+contracts/contract-templates.md:647:| Draft | Submitted | RBP Member, Business Owner | `submit_<resource>` | `<domain>_submitted` | `record_submitted` |
+contracts/contract-templates.md:691:| RBP Member | Yes | Own/Tenant | Draft only | Yes | No | Entitlement required |
+contracts/contract-templates.md:692:| RBP Business Owner | Yes | Tenant | Draft/tenant | Yes | No | Tenant authority |
+contracts/contract-templates.md:693:| RBP Advisor | No | Assigned | Advisor fields | Conditional | No | Assignment required |
+contracts/contract-templates.md:694:| RBP Admin | Yes | All | All | Yes | Yes | Operational admin |
+contracts/contract-templates.md:727:| RBP Member | Own/member service records | Requires entitlement |
+contracts/contract-templates.md:728:| RBP Business Owner | Tenant records | Tenant authority |
+contracts/contract-templates.md:729:| RBP Team Member | Shared/assigned tenant records | Conditional |
+contracts/contract-templates.md:730:| RBP Advisor | Assigned records | No global tenant browsing |
+contracts/contract-templates.md:731:| RBP Support Agent | Assigned/queue records | Conditional |
+contracts/contract-templates.md:732:| RBP Admin | All operational records | Admin review |
+contracts/contract-templates.md:750:| Payment DocType | `RBP Payment Event` |
+contracts/contract-templates.md:751:| Subscription DocType | `RBP Subscription`, if applicable |
+contracts/contract-templates.md:752:| Entitlement DocType | `RBP App Entitlement`, if applicable |
+contracts/contract-templates.md:800:| File DocType | `RBP File Reference` |
+contracts/contract-templates.md:810:| `supporting_documents_mock` | `RBP File Reference` | `supporting_document` | No | 10 | 25 MB |
+contracts/contract-templates.md:871:| Creates RBP Notification | Yes / No |
+contracts/contract-templates.md:881:  "related_doctype": "RBP Example",
+contracts/contract-templates.md:898:| Allowed Roles | RBP Admin, System Manager |
+contracts/contract-templates.md:989:| `/mock/example/resource` | POST | `/api/method/rbp_app.api.<domain>.create_<resource>` | POST | `<RBP DocType>` | Replace in Phase 5 |
+contracts/contract-templates.md:995:| `supporting_documents_mock` | `RBP File Reference` | Replace mock array with upload references |
+contracts/contract-templates.md:996:| `payment_method_mock` | `RBP Payment Event` / provider checkout | Replace simulated payment |
+contracts/contract-templates.md:1066:# RBP Phase 2 Backend Contracts
+contracts/contract-templates.md:1227:| RBP Member |  |  |  |  |  |
+contracts/contract-templates.md:1228:| RBP Business Owner |  |  |  |  |  |
+contracts/contract-templates.md:1229:| RBP Team Member |  |  |  |  |  |
+contracts/contract-templates.md:1230:| RBP Advisor |  |  |  |  |  |
+contracts/contract-templates.md:1231:| RBP Support Agent |  |  |  |  |  |
+contracts/contract-templates.md:1232:| RBP Admin |  |  |  |  |  |
+contracts/phase-2-acceptance-gate.md:1:# RBP Phase 2 Backend Contracts
+contracts/phase-2-acceptance-gate.md:85:| Every upload maps to `RBP File Reference` | `09`, `12`, `16` | Pending review |
+contracts/phase-2-acceptance-gate.md:86:| Every payment touchpoint maps to `RBP Payment Event` | `08`, `12`, `16` | Pending review |
+contracts/api/16-mock-to-real-api-map.md:1:# RBP Phase 2 Backend Contracts
+contracts/api/16-mock-to-real-api-map.md:55:| `/mock/membership/signup` | `/api/method/rbp_app.api.membership.create_signup` | POST | RBP Subscription | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:56:| mock submit for Membership | `/api/method/rbp_app.api.membership.submit_signup` | POST | RBP Subscription | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:57:| mock get/list for Membership | `/api/method/rbp_app.api.membership.get_subscription` / `list_my_subscriptions` | GET | RBP Subscription DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:58:| `/mock/decision-desk/request` | `/api/method/rbp_app.api.decision_desk.create_request` | POST | RBP Decision Desk Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:59:| mock submit for Decision Desk | `/api/method/rbp_app.api.decision_desk.submit_request` | POST | RBP Decision Desk Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:60:| mock get/list for Decision Desk | `/api/method/rbp_app.api.decision_desk.get_request` / `list_my_requests` | GET | RBP Decision Desk Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:61:| mock upload for Decision Desk | `/api/method/rbp_app.api.decision_desk.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:62:| `/mock/docushare/brief` | `/api/method/rbp_app.api.docushare.create_brief` | POST | RBP Document Brief | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:63:| mock submit for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.submit_brief` | POST | RBP Document Brief | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:64:| mock get/list for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.get_brief` / `list_my_briefs` | GET | RBP Document Brief DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:65:| mock upload for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:66:| `/mock/marketplace/listing` | `/api/method/rbp_app.api.marketplace.create_listing` | POST | RBP Marketplace Listing | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:67:| mock submit for Marketplace | `/api/method/rbp_app.api.marketplace.submit_listing` | POST | RBP Marketplace Listing | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:68:| mock get/list for Marketplace | `/api/method/rbp_app.api.marketplace.get_listing` / `list_public_listings` | GET | RBP Marketplace Listing DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:69:| mock upload for Marketplace | `/api/method/rbp_app.api.marketplace.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:70:| `/mock/connectivity/order` | `/api/method/rbp_app.api.connectivity.create_order` | POST | RBP Connectivity Order | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:71:| mock submit for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.submit_order` | POST | RBP Connectivity Order | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:72:| mock get/list for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.get_order` / `list_my_orders` | GET | RBP Connectivity Order DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:73:| mock upload for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:74:| `/mock/risk-advisor/assessment` | `/api/method/rbp_app.api.risk_advisor.create_assessment` | POST | RBP Risk Assessment | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:75:| mock submit for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.submit_assessment` | POST | RBP Risk Assessment | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:76:| mock get/list for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.get_assessment` / `list_my_assessments` | GET | RBP Risk Assessment DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:77:| mock upload for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:78:| `/mock/fixer/request` | `/api/method/rbp_app.api.fixer.create_request` | POST | RBP Fixer Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:79:| mock submit for The Fixer | `/api/method/rbp_app.api.fixer.submit_request` | POST | RBP Fixer Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:80:| mock get/list for The Fixer | `/api/method/rbp_app.api.fixer.get_request` / `list_my_requests` | GET | RBP Fixer Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:81:| mock upload for The Fixer | `/api/method/rbp_app.api.fixer.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:90:| `payment_method_mock` | provider checkout/session + `RBP Payment Event` | Frontend never marks payment paid. |
+contracts/api/16-mock-to-real-api-map.md:91:| `payment_simulated_success` | `RBP Payment Event.status = paid` in dev/test only | Production comes from provider/backend event. |
+contracts/api/16-mock-to-real-api-map.md:92:| `payment_simulated_failure` | `RBP Payment Event.status = failed` in dev/test only | Must trigger `payment_failed`. |
+contracts/api/16-mock-to-real-api-map.md:93:| `supporting_documents_mock` | `RBP File Reference` | Linked to related product record. |
+contracts/api/16-mock-to-real-api-map.md:94:| `reference_files_mock` | `RBP File Reference` | Linked to `RBP Document Brief`. |
+contracts/api/16-mock-to-real-api-map.md:95:| `media_mock` | `RBP File Reference` | Public only after marketplace approval. |
+contracts/api/16-mock-to-real-api-map.md:96:| `serviceability_status_mock` | `RBP Connectivity Order.serviceability_status` | Backend/provider/admin controlled. |
+contracts/api/16-mock-to-real-api-map.md:97:| `mock_score` | `RBP Risk Assessment.mock_score` then `calculated_score` if real scoring exists | Mock score must be labelled if retained. |
+contracts/api/16-mock-to-real-api-map.md:99:| mock notifications | `RBP Notification` | Recipient and tenant scoped. |
+contracts/api/16-mock-to-real-api-map.md:136:- Replace mock files with upload API and RBP File Reference DTOs.
+contracts/api/16-mock-to-real-api-map.md:154:Mock notifications replaced with RBP Notification APIs.
+contracts/api/16-mock-to-real-api-map.md:155:Mock uploads replaced with RBP File Reference APIs.
+contracts/api/16-mock-to-real-api-map.md:156:Mock payment states replaced with RBP Payment Event and provider flow.
+contracts/api/11-route-to-endpoint-map.md:1:# RBP Phase 2 Backend Contracts
+contracts/api/11-route-to-endpoint-map.md:76:| `/membership` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:77:| `/membership/overview` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:78:| `/membership/pricing` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:79:| `/membership/payment-terms` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:80:| `/membership/sign-up-now` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.create_signup` | POST | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:81:| `/membership/confirmation` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:82:| `/on-demand/decision-desk` | `DecisionDeskPage / PortalServiceRequest` | Decision Desk | public | `/api/method/rbp_app.api.decision_desk.get_request` | GET | RBP Decision Desk Request |
+contracts/api/11-route-to-endpoint-map.md:83:| `/portal/services/request` | `DecisionDeskPage / PortalServiceRequest` | Decision Desk | public | `/api/method/rbp_app.api.decision_desk.get_request` | GET | RBP Decision Desk Request |
+contracts/api/11-route-to-endpoint-map.md:84:| `/portal/services/:id` | `DecisionDeskPage / PortalServiceRequest` | Decision Desk | public | `/api/method/rbp_app.api.decision_desk.get_request` | GET | RBP Decision Desk Request |
+contracts/api/11-route-to-endpoint-map.md:85:| `/document-nucleus/overview` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:86:| `/document-nucleus/category/:id` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:87:| `/document-nucleus/product/:id` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:88:| `/on-demand/documents` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:89:| `/marketplace` | `MarketplacePage` | Marketplace | public | `/api/method/rbp_app.api.marketplace.get_listing` | GET | RBP Marketplace Listing |
+contracts/api/11-route-to-endpoint-map.md:90:| `/marketplace/product/:id` | `MarketplacePage` | Marketplace | public | `/api/method/rbp_app.api.marketplace.get_listing` | GET | RBP Marketplace Listing |
+contracts/api/11-route-to-endpoint-map.md:91:| `/operations/connectivity` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:92:| `/operations/connectivity/nbn-phone` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:93:| `/operations/connectivity/superloop` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:94:| `/operations/superloop` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:95:| `/on-demand/risk-advisor` | `RiskAdvisorPage` | Risk Advisor | public | `/api/method/rbp_app.api.risk_advisor.get_assessment` | GET | RBP Risk Assessment |
+contracts/api/11-route-to-endpoint-map.md:96:| `/on-demand/the-fixer` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:97:| `/portal/services/request` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:114:| `/admin/marketplace/*` | `AdminCrudPage` | Marketplace Admin | admin | `/api/method/rbp_app.api.marketplace.admin_<action>` | POST | RBP Marketplace Listing |
+contracts/api/11-route-to-endpoint-map.md:173:- Admin routes must require RBP Admin/System Manager/Administrator roles.
+contracts/api/01-api-response-envelope-standard.md:190:    "required_role": "RBP Admin"
+contracts/api/09-upload-file-rules.md:1:# RBP Phase 2 Backend Contracts
+contracts/api/09-upload-file-rules.md:76:RBP File Reference
+contracts/api/09-upload-file-rules.md:93:This document does not define final storage infrastructure. It assumes Frappe File is the base file object and `RBP File Reference` wraps it with platform-specific ownership, tenant, visibility, and related-record rules.
+contracts/api/09-upload-file-rules.md:124:  Defines RBP File Reference.
+contracts/api/09-upload-file-rules.md:144:| Frappe File is not enough | Every business-relevant file must have an `RBP File Reference`. |
+contracts/api/09-upload-file-rules.md:158:## 5. Core DocType: RBP File Reference
+contracts/api/09-upload-file-rules.md:162:`RBP File Reference` links a Frappe `File` to an RBP business record with platform-specific rules for:
+contracts/api/09-upload-file-rules.md:177:The Frappe `File` object stores the file. `RBP File Reference` defines how the platform is allowed to use it.
+contracts/api/09-upload-file-rules.md:183:| `tenant` | Link: RBP Tenant | Conditional | Required for tenant/customer records |
+contracts/api/09-upload-file-rules.md:447:Phase 1 mock upload fields must map into `RBP File Reference`.
+contracts/api/09-upload-file-rules.md:451:| `supporting_documents_mock` | `RBP File Reference` linked to product record |
+contracts/api/09-upload-file-rules.md:452:| `reference_files_mock` | `RBP File Reference` linked to `RBP Document Brief` |
+contracts/api/09-upload-file-rules.md:453:| `media_mock` | `RBP File Reference` linked to `RBP Marketplace Listing` |
+contracts/api/09-upload-file-rules.md:454:| `payment_evidence_mock` | `RBP File Reference` linked to payment/billing record |
+contracts/api/09-upload-file-rules.md:455:| `serviceability_documents_mock` | `RBP File Reference` linked to `RBP Connectivity Order` |
+contracts/api/09-upload-file-rules.md:456:| `assessment_evidence_mock` | `RBP File Reference` linked to `RBP Risk Assessment` |
+contracts/api/09-upload-file-rules.md:457:| `fixer_supporting_documents_mock` | `RBP File Reference` linked to `RBP Fixer Request` |
+contracts/api/09-upload-file-rules.md:464:Each real uploaded file must create both a Frappe File and an RBP File Reference.
+contracts/api/09-upload-file-rules.md:524:      "related_doctype": "RBP Decision Desk Request",
+contracts/api/09-upload-file-rules.md:621:| RBP Member | Own or tenant-authorised records |
+contracts/api/09-upload-file-rules.md:622:| RBP Business Owner | Tenant-authorised records |
+contracts/api/09-upload-file-rules.md:623:| RBP Team Member | Conditional tenant-authorised records |
+contracts/api/09-upload-file-rules.md:624:| RBP Advisor | Assigned records only, usually advisor/internal/outcome files |
+contracts/api/09-upload-file-rules.md:625:| RBP Marketplace Seller | Own listings |
+contracts/api/09-upload-file-rules.md:626:| RBP Marketplace Buyer | Own enquiries if buyer uploads are enabled |
+contracts/api/09-upload-file-rules.md:627:| RBP Support Agent | Assigned/queue records where permitted |
+contracts/api/09-upload-file-rules.md:628:| RBP Admin | Full operational upload access |
+contracts/api/09-upload-file-rules.md:668:| Visibility | Guest | Website User | RBP Member | Business Owner | Team Member | Advisor | Support Agent | RBP Admin | System Manager |
+contracts/api/09-upload-file-rules.md:937:RBP File Reference created as private_to_owner or admin_only
+contracts/api/09-upload-file-rules.md:961:RBP Admin
+contracts/api/09-upload-file-rules.md:981:RBP Admin
+contracts/api/09-upload-file-rules.md:1005:RBP Admin
+contracts/api/09-upload-file-rules.md:1488:Use RBP File Reference for platform business rules.
+contracts/api/09-upload-file-rules.md:1536:Recommended indexes for `RBP File Reference`:
+contracts/api/09-upload-file-rules.md:1730:RBP File Reference is defined.
+contracts/api/09-upload-file-rules.md:1769:Every uploaded file maps to Frappe File and RBP File Reference.
+contracts/api/07-error-catalogue.md:1:# RBP Phase 2 Backend Contracts

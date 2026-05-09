@@ -824,3 +824,25 @@ This standard should be referenced by:
 Every API should return the same envelope shape, every frontend API client should expect that shape, and every backend test should enforce it.
 
 That is the entire point: one response standard, everywhere, so nobody has to inspect twelve incompatible return formats while muttering at their monitor like a Victorian ghost.
+
+---
+
+## Phase 5 Contract Reconciliation Addendum
+
+This contract has been reconciled against the Phase 3 rbp_app implementation for Phase 5 preflight.
+
+Authoritative reconciliation record:
+
+    docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md
+
+If this document conflicts with the Phase 3 implementation in endpoint names, response shapes, DocType names, role behavior, file handling, or payment behavior, the reconciliation record governs Phase 5 integration until a later contract-change PR updates the underlying contract.
+
+Key Phase 5 decisions:
+
+- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+- Phase 5 frontend integration will use the Phase 3 raw dictionary / serialized DocType response shape unless a later contract-change PR introduces a shared envelope.
+- Phase 3 canonical DocType names may differ from early Phase 2 planning names.
+- RBP File Reference is the canonical file wrapper.
+- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+- Live payment provider integration and raw upload implementation remain deferred unless explicitly opened in Phase 5.
+

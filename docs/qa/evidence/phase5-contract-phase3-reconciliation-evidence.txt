@@ -1,0 +1,64 @@
+Phase 5 contract-to-Phase-3 reconciliation evidence
+
+API modules: ['apps', 'billing', 'capabilities', 'connectivity', 'dashboard', 'decision_desk', 'documents', 'docushare', 'entitlements', 'hr', 'integrations', 'marketplace', 'me', 'membership', 'notifications', 'risk_advisor', 'the_fixer', 'workflows']
+Service modules: ['apps', 'audit', 'billing', 'capabilities', 'connectivity', 'dashboard', 'decision_desk', 'documents', 'docushare', 'entitlements', 'files', 'hr', 'integrations', 'marketplace', 'membership', 'notifications', 'risk_advisor', 'tenancy', 'the_fixer']
+DocTypes: ['RBP Connectivity Provider', 'RBP Connectivity Quote', 'RBP Connectivity Request', 'RBP Decision Desk Option', 'RBP Decision Desk Request', 'RBP DocuShare Document', 'RBP DocuShare Folder', 'RBP DocuShare Share', 'RBP Fixer Case', 'RBP Fixer Task', 'RBP Fixer Update', 'RBP Marketplace Listing', 'RBP Marketplace Order', 'RBP Marketplace Vendor', 'RBP Risk Advisor Action', 'RBP Risk Advisor Assessment', 'RBP Risk Advisor Risk']
+Missing API modules: []
+Missing service modules: []
+Raw response decision found: True
+The Fixer decision found: True
+
+Legacy API findings:
+contracts/naming-conventions.md: rbp_app.api.fixer
+contracts/doctypes/12-form-field-specifications.md: rbp_app.api.fixer
+contracts/doctypes/05-core-doctype-model.md: rbp_app.api.fixer
+contracts/permissions/15-admin-actions.md: rbp_app.api.fixer
+contracts/permissions/04-permission-model-draft.md: rbp_app.api.fixer
+contracts/api/16-mock-to-real-api-map.md: rbp_app.api.fixer
+contracts/api/11-route-to-endpoint-map.md: rbp_app.api.fixer
+contracts/api/09-upload-file-rules.md: rbp_app.api.fixer
+contracts/api/07-error-catalogue.md: rbp_app.api.fixer
+
+Legacy DocType findings:
+contracts/naming-conventions.md: RBP Document Brief
+contracts/naming-conventions.md: RBP Marketplace Enquiry
+contracts/naming-conventions.md: RBP Connectivity Order
+contracts/naming-conventions.md: RBP Risk Assessment
+contracts/naming-conventions.md: RBP Fixer Request
+contracts/workflows/06-workflow-state-standards.md: RBP Document Brief
+contracts/workflows/06-workflow-state-standards.md: RBP Marketplace Enquiry
+contracts/workflows/06-workflow-state-standards.md: RBP Connectivity Order
+contracts/workflows/06-workflow-state-standards.md: RBP Risk Assessment
+contracts/workflows/06-workflow-state-standards.md: RBP Fixer Request
+contracts/doctypes/12-form-field-specifications.md: RBP Document Brief
+contracts/doctypes/12-form-field-specifications.md: RBP Marketplace Enquiry
+contracts/doctypes/12-form-field-specifications.md: RBP Connectivity Order
+contracts/doctypes/12-form-field-specifications.md: RBP Risk Assessment
+contracts/doctypes/12-form-field-specifications.md: RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md: RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md: RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md: RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md: RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md: RBP Fixer Request
+contracts/permissions/15-admin-actions.md: RBP Document Brief
+contracts/permissions/15-admin-actions.md: RBP Marketplace Enquiry
+contracts/permissions/15-admin-actions.md: RBP Connectivity Order
+contracts/permissions/15-admin-actions.md: RBP Risk Assessment
+contracts/permissions/15-admin-actions.md: RBP Fixer Request
+contracts/permissions/04-permission-model-draft.md: RBP Document Brief
+contracts/permissions/04-permission-model-draft.md: RBP Marketplace Enquiry
+contracts/permissions/04-permission-model-draft.md: RBP Connectivity Order
+contracts/permissions/04-permission-model-draft.md: RBP Risk Assessment
+contracts/permissions/04-permission-model-draft.md: RBP Fixer Request
+contracts/api/16-mock-to-real-api-map.md: RBP Document Brief
+contracts/api/16-mock-to-real-api-map.md: RBP Connectivity Order
+contracts/api/16-mock-to-real-api-map.md: RBP Risk Assessment
+contracts/api/16-mock-to-real-api-map.md: RBP Fixer Request
+contracts/api/11-route-to-endpoint-map.md: RBP Document Brief
+contracts/api/11-route-to-endpoint-map.md: RBP Connectivity Order
+contracts/api/11-route-to-endpoint-map.md: RBP Risk Assessment
+contracts/api/11-route-to-endpoint-map.md: RBP Fixer Request
+contracts/api/09-upload-file-rules.md: RBP Document Brief
+contracts/api/09-upload-file-rules.md: RBP Connectivity Order
+contracts/api/09-upload-file-rules.md: RBP Risk Assessment
+contracts/api/09-upload-file-rules.md: RBP Fixer Request

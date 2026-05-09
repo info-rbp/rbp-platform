@@ -1,0 +1,433 @@
+# Contract Legacy Reference Scan
+
+Generated on: Sat May  9 18:58:35 AWST 2026
+
+## Legacy API name references
+contracts/naming-conventions.md:284:POST /api/method/rbp_app.api.fixer.create_request
+contracts/naming-conventions.md:1188:POST /api/method/rbp_app.api.fixer.create_request
+contracts/doctypes/12-form-field-specifications.md:323:Primary API Module: rbp_app.api.fixer
+contracts/doctypes/05-core-doctype-model.md:1808:POST /api/method/rbp_app.api.fixer.create_request
+contracts/doctypes/05-core-doctype-model.md:1809:POST /api/method/rbp_app.api.fixer.update_request
+contracts/doctypes/05-core-doctype-model.md:1810:POST /api/method/rbp_app.api.fixer.submit_request
+contracts/doctypes/05-core-doctype-model.md:1811:GET  /api/method/rbp_app.api.fixer.get_request
+contracts/doctypes/05-core-doctype-model.md:1812:GET  /api/method/rbp_app.api.fixer.list_my_requests
+contracts/doctypes/05-core-doctype-model.md:1813:POST /api/method/rbp_app.api.fixer.attach_file
+contracts/doctypes/05-core-doctype-model.md:1814:POST /api/method/rbp_app.api.fixer.admin_assign_request
+contracts/doctypes/05-core-doctype-model.md:1815:POST /api/method/rbp_app.api.fixer.admin_close_request
+contracts/permissions/15-admin-actions.md:83:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_request_more_information` | RBP Fixer Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:84:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_reject_request` | RBP Fixer Request | Submitted/In Review | Rejected | `fixer_rejected` |
+contracts/permissions/15-admin-actions.md:85:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_close_request` | RBP Fixer Request | Outcome Ready/In Progress | Closed | `fixer_closed` |
+contracts/permissions/15-admin-actions.md:86:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_archive_request` | RBP Fixer Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/04-permission-model-draft.md:498:rbp_app.api.fixer
+contracts/api/16-mock-to-real-api-map.md:78:| `/mock/fixer/request` | `/api/method/rbp_app.api.fixer.create_request` | POST | RBP Fixer Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:79:| mock submit for The Fixer | `/api/method/rbp_app.api.fixer.submit_request` | POST | RBP Fixer Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:80:| mock get/list for The Fixer | `/api/method/rbp_app.api.fixer.get_request` / `list_my_requests` | GET | RBP Fixer Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:81:| mock upload for The Fixer | `/api/method/rbp_app.api.fixer.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/11-route-to-endpoint-map.md:96:| `/on-demand/the-fixer` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:97:| `/portal/services/request` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:133:| The Fixer | `POST /api/method/rbp_app.api.fixer.create_request` | `POST /api/method/rbp_app.api.fixer.update_request` | `POST /api/method/rbp_app.api.fixer.submit_request` | `GET /api/method/rbp_app.api.fixer.get_request` | `GET /api/method/rbp_app.api.fixer.list_my_requests` | `POST /api/method/rbp_app.api.fixer.attach_file` | `POST /api/method/rbp_app.api.fixer.admin_<action>` |
+contracts/api/09-upload-file-rules.md:488:POST /api/method/rbp_app.api.fixer.attach_file
+contracts/api/07-error-catalogue.md:67:rbp_app.api.fixer
+
+## Legacy DocType planning references
+contracts/workflows/06-workflow-state-standards.md:53:RBP Document Brief
+contracts/workflows/06-workflow-state-standards.md:55:RBP Marketplace Enquiry
+contracts/workflows/06-workflow-state-standards.md:56:RBP Connectivity Order
+contracts/workflows/06-workflow-state-standards.md:57:RBP Risk Assessment
+contracts/workflows/06-workflow-state-standards.md:58:RBP Fixer Request
+contracts/naming-conventions.md:535:RBP Document Brief
+contracts/naming-conventions.md:537:RBP Marketplace Enquiry
+contracts/naming-conventions.md:538:RBP Connectivity Order
+contracts/naming-conventions.md:539:RBP Risk Assessment
+contracts/naming-conventions.md:540:RBP Fixer Request
+contracts/doctypes/12-form-field-specifications.md:167:| `document_type` | Document Type | string/link | Yes | repo-observed via DocumentProductPage document selection | `RBP Document Brief.document_type` | required |
+contracts/doctypes/12-form-field-specifications.md:168:| `document_category` | Document Category | string/select | Yes | repo-observed via category route | `RBP Document Brief.document_category` | required |
+contracts/doctypes/12-form-field-specifications.md:169:| `selected_format` | Selected Format | select | Conditional | repo-observed | `RBP Document Brief.selected_format` | allowed document format |
+contracts/doctypes/12-form-field-specifications.md:170:| `business_context` | Business Context | textarea | Yes | contract-required | `RBP Document Brief.business_context` | required before submit |
+contracts/doctypes/12-form-field-specifications.md:171:| `jurisdiction` | Jurisdiction | select/string | Conditional | contract-required | `RBP Document Brief.jurisdiction` | required where legal/compliance doc |
+contracts/doctypes/12-form-field-specifications.md:172:| `intended_use` | Intended Use | textarea | Conditional | contract-required | `RBP Document Brief.intended_use` | max length |
+contracts/doctypes/12-form-field-specifications.md:173:| `required_sections` | Required Sections | array/text | Conditional | contract-required | `RBP Document Brief.required_sections` | section list |
+contracts/doctypes/12-form-field-specifications.md:175:| `deadline` | Deadline | date | Conditional | contract-required | `RBP Document Brief.deadline` | valid date |
+contracts/doctypes/12-form-field-specifications.md:176:| `review_required` | Review Required | boolean | No | contract-required | `RBP Document Brief.review_required` | boolean |
+contracts/doctypes/12-form-field-specifications.md:181:Primary DocType: RBP Document Brief
+contracts/doctypes/12-form-field-specifications.md:212:| `buyer_enquiry_message` | Buyer Enquiry Message | textarea | Conditional | route-audit-observed | `RBP Marketplace Enquiry.message` | required for enquiry |
+contracts/doctypes/12-form-field-specifications.md:218:Related DocTypes: RBP Marketplace Enquiry, RBP File Reference, RBP Payment Event, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:239:| `service_address` | Service Address | textarea | Yes | definition-of-done-required | `RBP Connectivity Order.service_address` | required |
+contracts/doctypes/12-form-field-specifications.md:240:| `service_type` | Service Type | select | Yes | repo-observed route variants | `RBP Connectivity Order.service_type` | connectivity/nbn_phone/superloop |
+contracts/doctypes/12-form-field-specifications.md:241:| `selected_plan` | Selected Plan | string/link | Yes | repo-observed Superloop plans | `RBP Connectivity Order.selected_plan` | required |
+contracts/doctypes/12-form-field-specifications.md:242:| `hardware_option` | Hardware Option | select/string | Conditional | contract-required | `RBP Connectivity Order.hardware_option` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:243:| `installation_preference` | Installation Preference | select/string | Conditional | contract-required | `RBP Connectivity Order.installation_preference` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:244:| `contact_details` | Contact Details | object | Yes | contract-required | `RBP Connectivity Order.contact_details` | email/phone required |
+contracts/doctypes/12-form-field-specifications.md:246:| `serviceability_status` | Serviceability Status | select | Conditional | definition-of-done-required | `RBP Connectivity Order.serviceability_status` | serviceable/not_serviceable/manual_review |
+contracts/doctypes/12-form-field-specifications.md:247:| `order_status` | Order Status | select | Yes | route-audit-observed | `RBP Connectivity Order.order_status` | workflow-derived |
+contracts/doctypes/12-form-field-specifications.md:252:Primary DocType: RBP Connectivity Order
+contracts/doctypes/12-form-field-specifications.md:274:| `business_name` | Business Name | string | Yes | contract-required | `RBP Risk Assessment.business_name` | required |
+contracts/doctypes/12-form-field-specifications.md:275:| `industry` | Industry | string/select | Conditional | contract-required | `RBP Risk Assessment.industry` | allowed value |
+contracts/doctypes/12-form-field-specifications.md:276:| `risk_categories` | Risk Categories | array/select | Yes | route-audit-observed | `RBP Risk Assessment.risk_categories` | at least one |
+contracts/doctypes/12-form-field-specifications.md:277:| `current_controls` | Current Controls | textarea | Conditional | contract-required | `RBP Risk Assessment.current_controls` | max length |
+contracts/doctypes/12-form-field-specifications.md:278:| `known_incidents` | Known Incidents | textarea | No | contract-required | `RBP Risk Assessment.known_incidents` | max length |
+contracts/doctypes/12-form-field-specifications.md:279:| `compliance_requirements` | Compliance Requirements | textarea | Conditional | contract-required | `RBP Risk Assessment.compliance_requirements` | max length |
+contracts/doctypes/12-form-field-specifications.md:280:| `risk_appetite` | Risk Appetite | select | Conditional | contract-required | `RBP Risk Assessment.risk_appetite` | low/medium/high |
+contracts/doctypes/12-form-field-specifications.md:281:| `assessment_answers` | Assessment Answers | json/table | Yes | definition-of-done-required | `RBP Risk Assessment.assessment_answers` | required before submit |
+contracts/doctypes/12-form-field-specifications.md:282:| `mock_score` | Mock Score | number | Conditional | definition-of-done-required | `RBP Risk Assessment.mock_score/calculated_score` | 0-100 |
+contracts/doctypes/12-form-field-specifications.md:287:Primary DocType: RBP Risk Assessment
+contracts/doctypes/12-form-field-specifications.md:309:| `issue_title` | Issue Title | string | Yes | contract-required | `RBP Fixer Request.issue_title` | required |
+contracts/doctypes/12-form-field-specifications.md:310:| `issue_description` | Issue Description | textarea | Yes | contract-required | `RBP Fixer Request.issue_description` | required |
+contracts/doctypes/12-form-field-specifications.md:311:| `urgency` | Urgency | select | Yes | repo-observed via portal priority | `RBP Fixer Request.urgency` | low/normal/high/urgent |
+contracts/doctypes/12-form-field-specifications.md:312:| `business_impact` | Business Impact | textarea | Conditional | contract-required | `RBP Fixer Request.business_impact` | required if urgent |
+contracts/doctypes/12-form-field-specifications.md:313:| `desired_resolution` | Desired Resolution | textarea | Conditional | contract-required | `RBP Fixer Request.desired_resolution` | max length |
+contracts/doctypes/12-form-field-specifications.md:314:| `scope_constraints` | Scope Constraints | textarea | No | contract-required | `RBP Fixer Request.scope_constraints` | max length |
+contracts/doctypes/12-form-field-specifications.md:316:| `preferred_contact_method` | Preferred Contact Method | select | Yes | repo-observed via portal contact | `RBP Fixer Request.preferred_contact_method` | email/phone/video/no_pref |
+contracts/doctypes/12-form-field-specifications.md:321:Primary DocType: RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:210:RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:212:RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:213:RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:214:RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:215:RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:311:  ├── RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:313:  ├── RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:314:  ├── RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:315:  ├── RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1341:## 22. RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:1370:RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:1451:  ├── RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:1515:## 24. RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:1539:RBP Marketplace Enquiry
+contracts/doctypes/05-core-doctype-model.md:1578:## 25. RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:1607:RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:1670:## 26. RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:1701:RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:1754:## 27. RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1783:RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1908:RBP Connectivity Order, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1928:RBP Document Brief
+contracts/doctypes/05-core-doctype-model.md:1930:RBP Connectivity Order
+contracts/doctypes/05-core-doctype-model.md:1931:RBP Risk Assessment
+contracts/doctypes/05-core-doctype-model.md:1932:RBP Fixer Request
+contracts/doctypes/05-core-doctype-model.md:1949:| Advisor assigned | RBP Decision Desk Request / RBP Risk Assessment | `advisor_assigned` |
+contracts/doctypes/05-core-doctype-model.md:1951:| Document brief submitted | RBP Document Brief | `document_brief_submitted` |
+contracts/doctypes/05-core-doctype-model.md:1953:| Connectivity order received | RBP Connectivity Order | `connectivity_order_received` |
+contracts/doctypes/05-core-doctype-model.md:1954:| Risk assessment completed | RBP Risk Assessment | `risk_assessment_completed` |
+contracts/doctypes/05-core-doctype-model.md:1955:| Fixer request accepted | RBP Fixer Request | `fixer_request_accepted` |
+contracts/doctypes/05-core-doctype-model.md:2225:| `reference_files_mock` | `RBP File Reference` linked to `RBP Document Brief` |
+contracts/doctypes/05-core-doctype-model.md:2228:| `serviceability_status_mock` | `serviceability_status` on `RBP Connectivity Order` |
+contracts/permissions/15-admin-actions.md:65:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_request_more_information` | RBP Document Brief | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:66:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_reject_brief` | RBP Document Brief | Submitted/In Review | Rejected | `docushare_rejected` |
+contracts/permissions/15-admin-actions.md:67:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_close_brief` | RBP Document Brief | Outcome Ready/In Progress | Closed | `docushare_closed` |
+contracts/permissions/15-admin-actions.md:68:| `/admin/on-demand/document-nucleus` | `/api/method/rbp_app.api.docushare.admin_archive_brief` | RBP Document Brief | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:72:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_mark_enquiry_spam` | RBP Marketplace Enquiry | New/In Review | Spam | `none` |
+contracts/permissions/15-admin-actions.md:73:| `/admin/marketplace` | `/api/method/rbp_app.api.marketplace.admin_close_enquiry` | RBP Marketplace Enquiry | Sent to Seller/In Review | Closed | `marketplace_enquiry_closed` |
+contracts/permissions/15-admin-actions.md:74:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_request_more_information` | RBP Connectivity Order | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:75:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_reject_order` | RBP Connectivity Order | Submitted/In Review | Rejected | `connectivity_rejected` |
+contracts/permissions/15-admin-actions.md:76:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_close_order` | RBP Connectivity Order | Outcome Ready/In Progress | Closed | `connectivity_closed` |
+contracts/permissions/15-admin-actions.md:77:| `/admin/operations/connectivity` | `/api/method/rbp_app.api.connectivity.admin_archive_order` | RBP Connectivity Order | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:78:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_assign_advisor` | RBP Risk Assessment | In Review/Submitted | Assigned | `advisor_assigned` |
+contracts/permissions/15-admin-actions.md:79:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_request_more_information` | RBP Risk Assessment | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:80:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_reject_assessment` | RBP Risk Assessment | Submitted/In Review | Rejected | `risk_advisor_rejected` |
+contracts/permissions/15-admin-actions.md:81:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_close_assessment` | RBP Risk Assessment | Outcome Ready/In Progress | Closed | `risk_advisor_closed` |
+contracts/permissions/15-admin-actions.md:82:| `/admin/on-demand/risk-advisor` | `/api/method/rbp_app.api.risk_advisor.admin_archive_assessment` | RBP Risk Assessment | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/15-admin-actions.md:83:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_request_more_information` | RBP Fixer Request | Submitted/In Review/Assigned/In Progress | More Information Required | `more_information_requested` |
+contracts/permissions/15-admin-actions.md:84:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_reject_request` | RBP Fixer Request | Submitted/In Review | Rejected | `fixer_rejected` |
+contracts/permissions/15-admin-actions.md:85:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_close_request` | RBP Fixer Request | Outcome Ready/In Progress | Closed | `fixer_closed` |
+contracts/permissions/15-admin-actions.md:86:| `/admin/the-fixer` | `/api/method/rbp_app.api.fixer.admin_archive_request` | RBP Fixer Request | Closed/Rejected/Cancelled | Archived | `none` |
+contracts/permissions/04-permission-model-draft.md:665:RBP Document Brief
+contracts/permissions/04-permission-model-draft.md:667:RBP Marketplace Enquiry
+contracts/permissions/04-permission-model-draft.md:668:RBP Connectivity Order
+contracts/permissions/04-permission-model-draft.md:669:RBP Risk Assessment
+contracts/permissions/04-permission-model-draft.md:670:RBP Fixer Request
+contracts/permissions/04-permission-model-draft.md:677:| RBP Document Brief | Own draft/conditional | Own/tenant | Tenant | Conditional | Assigned/reviewer | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:679:| RBP Marketplace Enquiry | Own | Own | Tenant if related | Conditional | None | Own listing enquiries | Own | Conditional | Full |
+contracts/permissions/04-permission-model-draft.md:680:| RBP Connectivity Order | Own draft/conditional | Own/tenant | Tenant | Conditional | None | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:681:| RBP Risk Assessment | Own draft/conditional | Own/tenant | Tenant | Conditional | Assigned | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:682:| RBP Fixer Request | Own draft/conditional | Own/tenant | Tenant | Conditional | None/assigned if relevant | None | None | Assigned/queue | Full |
+contracts/permissions/04-permission-model-draft.md:1612:RBP Document Brief
+contracts/permissions/04-permission-model-draft.md:1613:RBP Connectivity Order
+contracts/permissions/04-permission-model-draft.md:1614:RBP Risk Assessment
+contracts/permissions/04-permission-model-draft.md:1615:RBP Fixer Request
+contracts/api/16-mock-to-real-api-map.md:62:| `/mock/docushare/brief` | `/api/method/rbp_app.api.docushare.create_brief` | POST | RBP Document Brief | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:63:| mock submit for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.submit_brief` | POST | RBP Document Brief | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:64:| mock get/list for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.get_brief` / `list_my_briefs` | GET | RBP Document Brief DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:70:| `/mock/connectivity/order` | `/api/method/rbp_app.api.connectivity.create_order` | POST | RBP Connectivity Order | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:71:| mock submit for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.submit_order` | POST | RBP Connectivity Order | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:72:| mock get/list for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.get_order` / `list_my_orders` | GET | RBP Connectivity Order DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:74:| `/mock/risk-advisor/assessment` | `/api/method/rbp_app.api.risk_advisor.create_assessment` | POST | RBP Risk Assessment | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:75:| mock submit for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.submit_assessment` | POST | RBP Risk Assessment | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:76:| mock get/list for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.get_assessment` / `list_my_assessments` | GET | RBP Risk Assessment DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:78:| `/mock/fixer/request` | `/api/method/rbp_app.api.fixer.create_request` | POST | RBP Fixer Request | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:79:| mock submit for The Fixer | `/api/method/rbp_app.api.fixer.submit_request` | POST | RBP Fixer Request | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:80:| mock get/list for The Fixer | `/api/method/rbp_app.api.fixer.get_request` / `list_my_requests` | GET | RBP Fixer Request DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:94:| `reference_files_mock` | `RBP File Reference` | Linked to `RBP Document Brief`. |
+contracts/api/16-mock-to-real-api-map.md:96:| `serviceability_status_mock` | `RBP Connectivity Order.serviceability_status` | Backend/provider/admin controlled. |
+contracts/api/16-mock-to-real-api-map.md:97:| `mock_score` | `RBP Risk Assessment.mock_score` then `calculated_score` if real scoring exists | Mock score must be labelled if retained. |
+contracts/api/11-route-to-endpoint-map.md:85:| `/document-nucleus/overview` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:86:| `/document-nucleus/category/:id` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:87:| `/document-nucleus/product/:id` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:88:| `/on-demand/documents` | `DocumentProductPage / DocumentOverviewPage / DocumentCategoryPage` | DocuShare / Document Nucleus | public | `/api/method/rbp_app.api.docushare.get_brief` | GET | RBP Document Brief |
+contracts/api/11-route-to-endpoint-map.md:91:| `/operations/connectivity` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:92:| `/operations/connectivity/nbn-phone` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:93:| `/operations/connectivity/superloop` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:94:| `/operations/superloop` | `ConnectivityPage / NbnPhonePage / SuperloopPage` | Connectivity / NBN | public | `/api/method/rbp_app.api.connectivity.get_order` | GET | RBP Connectivity Order |
+contracts/api/11-route-to-endpoint-map.md:95:| `/on-demand/risk-advisor` | `RiskAdvisorPage` | Risk Advisor | public | `/api/method/rbp_app.api.risk_advisor.get_assessment` | GET | RBP Risk Assessment |
+contracts/api/11-route-to-endpoint-map.md:96:| `/on-demand/the-fixer` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/11-route-to-endpoint-map.md:97:| `/portal/services/request` | `TheFixerPage / PortalServiceRequest` | The Fixer | public | `/api/method/rbp_app.api.fixer.get_request` | GET | RBP Fixer Request |
+contracts/api/09-upload-file-rules.md:452:| `reference_files_mock` | `RBP File Reference` linked to `RBP Document Brief` |
+contracts/api/09-upload-file-rules.md:455:| `serviceability_documents_mock` | `RBP File Reference` linked to `RBP Connectivity Order` |
+contracts/api/09-upload-file-rules.md:456:| `assessment_evidence_mock` | `RBP File Reference` linked to `RBP Risk Assessment` |
+contracts/api/09-upload-file-rules.md:457:| `fixer_supporting_documents_mock` | `RBP File Reference` linked to `RBP Fixer Request` |
+
+## Canonical Phase 3 references
+contracts/workflows/08-payment-state-model.md:111:  Defines RBP Payment Event and RBP Subscription.
+contracts/workflows/08-payment-state-model.md:130:| Event-based recordkeeping | Payment changes must create `RBP Payment Event` records. |
+contracts/workflows/08-payment-state-model.md:144:## 5.1 RBP Payment Event
+contracts/workflows/08-payment-state-model.md:176:Every provider webhook should create or update an RBP Payment Event.
+contracts/workflows/08-payment-state-model.md:185:## 5.2 RBP Subscription
+contracts/workflows/08-payment-state-model.md:206:| `last_payment_event` | Link: RBP Payment Event | Conditional | Latest payment event |
+contracts/workflows/08-payment-state-model.md:233:| `source_subscription` | Link: RBP Subscription | Conditional | Subscription source |
+contracts/workflows/08-payment-state-model.md:755:RBP Subscription
+contracts/workflows/08-payment-state-model.md:757:RBP Payment Event
+contracts/workflows/08-payment-state-model.md:992:  "related_doctype": "RBP Subscription",
+contracts/workflows/08-payment-state-model.md:1026:9. Create/update RBP Payment Event.
+contracts/workflows/08-payment-state-model.md:1459:| `payment_simulated_success` | `RBP Payment Event` with `status = paid` in mock/test only |
+contracts/workflows/08-payment-state-model.md:1460:| `payment_simulated_failure` | `RBP Payment Event` with `status = failed` in mock/test only |
+contracts/workflows/08-payment-state-model.md:1461:| `payment_pending` | `RBP Payment Event.status = pending` |
+contracts/workflows/08-payment-state-model.md:1462:| `membership_active` | `RBP Subscription.status = active` and entitlements active |
+contracts/workflows/08-payment-state-model.md:1463:| `listing_fee_mock` | `RBP Payment Event` linked to `RBP Marketplace Listing` |
+contracts/workflows/08-payment-state-model.md:1498:RBP Payment Event:
+contracts/workflows/08-payment-state-model.md:1514:RBP Subscription:
+contracts/workflows/08-payment-state-model.md:1714:Every paid flow maps to RBP Payment Event.
+contracts/workflows/08-payment-state-model.md:1715:Every subscription flow maps to RBP Subscription.
+contracts/workflows/08-payment-state-model.md:1766:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/workflows/08-payment-state-model.md:1769:- RBP File Reference is the canonical file wrapper.
+contracts/workflows/08-payment-state-model.md:1770:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+contracts/workflows/06-workflow-state-standards.md:59:RBP Subscription, where lifecycle state applies
+contracts/workflows/06-workflow-state-standards.md:60:RBP File Reference, where approval/visibility state applies
+contracts/workflows/06-workflow-state-standards.md:61:RBP Payment Event, where payment state applies
+contracts/workflows/06-workflow-state-standards.md:1235:RBP Payment Event
+contracts/naming-conventions.md:520:RBP Subscription
+contracts/naming-conventions.md:526:RBP Payment Event
+contracts/naming-conventions.md:527:RBP File Reference
+contracts/naming-conventions.md:550:RBP Payment Event
+contracts/naming-conventions.md:870:RBP Payment Event
+contracts/naming-conventions.md:947:RBP File Reference
+contracts/doctypes/12-form-field-specifications.md:80:| `supporting_documents` | `RBP File Reference` | Customer-supplied product documents |
+contracts/doctypes/12-form-field-specifications.md:81:| `reference_files` | `RBP File Reference` | DocuShare source/reference files |
+contracts/doctypes/12-form-field-specifications.md:82:| `media` | `RBP File Reference` | Marketplace media, public only after approval |
+contracts/doctypes/12-form-field-specifications.md:83:| `payment_evidence` | `RBP File Reference` | Admin-only unless explicitly visible |
+contracts/doctypes/12-form-field-specifications.md:92:| `billing_cycle` | Billing Cycle | select | Yes | contract-required | `RBP Subscription.billing_cycle` | required, allowed value |
+contracts/doctypes/12-form-field-specifications.md:100:| `billing_address` | Billing Address | object/text | Conditional | contract-required | `RBP Subscription.billing_address or billing account` | required if live billing |
+contracts/doctypes/12-form-field-specifications.md:101:| `payment_method` | Payment Method | provider token | Conditional | contract-required | `RBP Payment Event` | required if payment required |
+contracts/doctypes/12-form-field-specifications.md:102:| `accepted_terms` | Accepted Terms | boolean | Yes | contract-required | `RBP Subscription.accepted_terms` | must be true |
+contracts/doctypes/12-form-field-specifications.md:108:Primary DocType: RBP Subscription
+contracts/doctypes/12-form-field-specifications.md:109:Related DocTypes: RBP Tenant, RBP Business Profile, RBP Membership Plan, RBP App Entitlement, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:139:| `supporting_documents` | Supporting Documents | file[] | No | repo-observed via portal file upload | `RBP File Reference` | allowed type/size/count |
+contracts/doctypes/12-form-field-specifications.md:146:Related DocTypes: RBP Decision Desk Option, RBP File Reference, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:174:| `reference_files` | Reference Files | file[] | No | definition-of-done-required | `RBP File Reference` | allowed type/size/count |
+contracts/doctypes/12-form-field-specifications.md:182:Related DocTypes: RBP File Reference, RBP Notification, RBP Audit Log, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:209:| `media` | Media | file[] | No | definition-of-done-required | `RBP File Reference` | public only after approval |
+contracts/doctypes/12-form-field-specifications.md:211:| `listing_fee` | Listing Fee | payment | Conditional | contract-required | `RBP Payment Event` | if fee applies |
+contracts/doctypes/12-form-field-specifications.md:218:Related DocTypes: RBP Marketplace Enquiry, RBP File Reference, RBP Payment Event, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:245:| `payment_method` | Payment Method | payment | Conditional | contract-required | `RBP Payment Event` | if payment required |
+contracts/doctypes/12-form-field-specifications.md:253:Related DocTypes: RBP File Reference, RBP Payment Event, RBP Notification, RBP Audit Log
+contracts/doctypes/12-form-field-specifications.md:288:Related DocTypes: RBP File Reference, RBP Notification, RBP Audit Log, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:315:| `supporting_documents` | Supporting Documents | file[] | No | repo-observed via portal file upload | `RBP File Reference` | allowed type/size/count |
+contracts/doctypes/12-form-field-specifications.md:322:Related DocTypes: RBP File Reference, RBP Notification, RBP Audit Log, RBP Payment Event
+contracts/doctypes/12-form-field-specifications.md:356:Related DocTypes: RBP Notification, RBP File Reference, RBP Subscription, RBP App Entitlement
+contracts/doctypes/12-form-field-specifications.md:381:Every upload field maps to RBP File Reference.
+contracts/doctypes/12-form-field-specifications.md:382:Every payment field maps to RBP Payment Event or provider checkout.
+contracts/doctypes/05-core-doctype-model.md:122:| File-ready | Records that accept uploads must link through `RBP File Reference`. |
+contracts/doctypes/05-core-doctype-model.md:123:| Payment-ready | Records requiring payment must link to `RBP Payment Event`. |
+contracts/doctypes/05-core-doctype-model.md:146:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:193:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:199:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:200:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:296:| `created_from_membership` | Link: RBP Subscription / Data | Conditional | Membership source |
+contracts/doctypes/05-core-doctype-model.md:308:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:316:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:318:  ├── RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:393:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:462:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:505:## 12. RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:526:| `last_payment_event` | Link: RBP Payment Event | Conditional | Latest payment event |
+contracts/doctypes/05-core-doctype-model.md:531:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:535:  └── RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:597:| `source_subscription` | Link: RBP Subscription | Conditional | Source subscription |
+contracts/doctypes/05-core-doctype-model.md:624:  └── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:970:## 18. RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1027:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1029:  ├── RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:1086:## 19. RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1121:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1213:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1216:RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1371:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1374:  └── RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1452:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1453:  ├── RBP Payment Event, if listing fee applies
+contracts/doctypes/05-core-doctype-model.md:1608:  ├── RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1609:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1702:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1705:  └── RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1784:  ├── RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1787:  └── RBP Payment Event, if payment applies
+contracts/doctypes/05-core-doctype-model.md:1891:Any DocType that may require payment must support linkage to `RBP Payment Event`.
+contracts/doctypes/05-core-doctype-model.md:1906:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:1921:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:1947:| Membership purchased | RBP Subscription | `membership_purchased` |
+contracts/doctypes/05-core-doctype-model.md:1956:| Payment failed | RBP Payment Event | `payment_failed` |
+contracts/doctypes/05-core-doctype-model.md:1957:| Subscription renewed | RBP Subscription | `subscription_renewed` |
+contracts/doctypes/05-core-doctype-model.md:1982:RBP Subscription
+contracts/doctypes/05-core-doctype-model.md:1984:RBP Payment Event
+contracts/doctypes/05-core-doctype-model.md:1985:RBP File Reference
+contracts/doctypes/05-core-doctype-model.md:2224:| `supporting_documents_mock` | `RBP File Reference` linked to product record |
+contracts/doctypes/05-core-doctype-model.md:2225:| `reference_files_mock` | `RBP File Reference` linked to `RBP Document Brief` |
+contracts/doctypes/05-core-doctype-model.md:2226:| `media_mock` | `RBP File Reference` linked to `RBP Marketplace Listing` |
+contracts/doctypes/05-core-doctype-model.md:2227:| `payment_method_mock` | Payment provider flow and `RBP Payment Event` |
+contracts/doctypes/05-core-doctype-model.md:2290:Every uploaded file maps to RBP File Reference.
+contracts/doctypes/05-core-doctype-model.md:2291:Every payment touchpoint maps to RBP Payment Event or deliberate no-payment decision.
+contracts/doctypes/05-core-doctype-model.md:2330:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/doctypes/05-core-doctype-model.md:2333:- RBP File Reference is the canonical file wrapper.
+contracts/doctypes/05-core-doctype-model.md:2334:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+contracts/permissions/15-admin-actions.md:55:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_activate_subscription` | RBP Subscription | Pending/Paid | Active | `subscription_active` |
+contracts/permissions/15-admin-actions.md:56:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_suspend_subscription` | RBP Subscription | Active/Past Due | Suspended | `subscription_suspended` |
+contracts/permissions/15-admin-actions.md:57:| `/admin/membership` | `/api/method/rbp_app.api.membership.admin_cancel_subscription` | RBP Subscription | Active/Past Due/Suspended | Cancelled | `subscription_cancelled` |
+contracts/permissions/04-permission-model-draft.md:623:RBP Subscription
+contracts/permissions/04-permission-model-draft.md:629:RBP Payment Event
+contracts/permissions/04-permission-model-draft.md:630:RBP File Reference
+contracts/permissions/04-permission-model-draft.md:638:| RBP Subscription | None | Own limited | Own limited | Tenant read/manage | None | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:644:| RBP Payment Event | None | None | Own summary only | Tenant summary/manage limited | None | None | Conditional | Full | Full |
+contracts/permissions/04-permission-model-draft.md:645:| RBP File Reference | None | Own visible | Own/tenant visible | Tenant visible | Conditional | Assigned visible | Assigned/queue visible | Full | Full |
+contracts/permissions/04-permission-model-draft.md:787:Reference files must follow RBP File Reference visibility rules.
+contracts/permissions/04-permission-model-draft.md:1635:RBP Payment Event
+contracts/permissions/04-permission-model-draft.md:1637:RBP File Reference
+contracts/permissions/04-permission-model-draft.md:1927:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/permissions/04-permission-model-draft.md:1930:- RBP File Reference is the canonical file wrapper.
+contracts/permissions/04-permission-model-draft.md:1931:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+contracts/contract-templates.md:750:| Payment DocType | `RBP Payment Event` |
+contracts/contract-templates.md:751:| Subscription DocType | `RBP Subscription`, if applicable |
+contracts/contract-templates.md:800:| File DocType | `RBP File Reference` |
+contracts/contract-templates.md:810:| `supporting_documents_mock` | `RBP File Reference` | `supporting_document` | No | 10 | 25 MB |
+contracts/contract-templates.md:995:| `supporting_documents_mock` | `RBP File Reference` | Replace mock array with upload references |
+contracts/contract-templates.md:996:| `payment_method_mock` | `RBP Payment Event` / provider checkout | Replace simulated payment |
+contracts/phase-2-acceptance-gate.md:85:| Every upload maps to `RBP File Reference` | `09`, `12`, `16` | Pending review |
+contracts/phase-2-acceptance-gate.md:86:| Every payment touchpoint maps to `RBP Payment Event` | `08`, `12`, `16` | Pending review |
+contracts/api/16-mock-to-real-api-map.md:55:| `/mock/membership/signup` | `/api/method/rbp_app.api.membership.create_signup` | POST | RBP Subscription | Create draft or initial record. |
+contracts/api/16-mock-to-real-api-map.md:56:| mock submit for Membership | `/api/method/rbp_app.api.membership.submit_signup` | POST | RBP Subscription | Validate and transition workflow. |
+contracts/api/16-mock-to-real-api-map.md:57:| mock get/list for Membership | `/api/method/rbp_app.api.membership.get_subscription` / `list_my_subscriptions` | GET | RBP Subscription DTO | Replace local status/timeline. |
+contracts/api/16-mock-to-real-api-map.md:61:| mock upload for Decision Desk | `/api/method/rbp_app.api.decision_desk.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:65:| mock upload for DocuShare / Document Nucleus | `/api/method/rbp_app.api.docushare.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:69:| mock upload for Marketplace | `/api/method/rbp_app.api.marketplace.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:73:| mock upload for Connectivity / NBN | `/api/method/rbp_app.api.connectivity.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:77:| mock upload for Risk Advisor | `/api/method/rbp_app.api.risk_advisor.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:81:| mock upload for The Fixer | `/api/method/rbp_app.api.fixer.attach_file` | POST | RBP File Reference | Replace mock file placeholder. |
+contracts/api/16-mock-to-real-api-map.md:90:| `payment_method_mock` | provider checkout/session + `RBP Payment Event` | Frontend never marks payment paid. |
+contracts/api/16-mock-to-real-api-map.md:91:| `payment_simulated_success` | `RBP Payment Event.status = paid` in dev/test only | Production comes from provider/backend event. |
+contracts/api/16-mock-to-real-api-map.md:92:| `payment_simulated_failure` | `RBP Payment Event.status = failed` in dev/test only | Must trigger `payment_failed`. |
+contracts/api/16-mock-to-real-api-map.md:93:| `supporting_documents_mock` | `RBP File Reference` | Linked to related product record. |
+contracts/api/16-mock-to-real-api-map.md:94:| `reference_files_mock` | `RBP File Reference` | Linked to `RBP Document Brief`. |
+contracts/api/16-mock-to-real-api-map.md:95:| `media_mock` | `RBP File Reference` | Public only after marketplace approval. |
+contracts/api/16-mock-to-real-api-map.md:136:- Replace mock files with upload API and RBP File Reference DTOs.
+contracts/api/16-mock-to-real-api-map.md:155:Mock uploads replaced with RBP File Reference APIs.
+contracts/api/16-mock-to-real-api-map.md:156:Mock payment states replaced with RBP Payment Event and provider flow.
+contracts/api/16-mock-to-real-api-map.md:173:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/api/16-mock-to-real-api-map.md:176:- RBP File Reference is the canonical file wrapper.
+contracts/api/16-mock-to-real-api-map.md:177:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+contracts/api/11-route-to-endpoint-map.md:76:| `/membership` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:77:| `/membership/overview` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:78:| `/membership/pricing` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:79:| `/membership/payment-terms` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:80:| `/membership/sign-up-now` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.create_signup` | POST | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:81:| `/membership/confirmation` | `MembershipSignUpPage` | Membership | public | `/api/method/rbp_app.api.membership.get_subscription` | GET | RBP Subscription |
+contracts/api/11-route-to-endpoint-map.md:213:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/api/11-route-to-endpoint-map.md:216:- RBP File Reference is the canonical file wrapper.
+contracts/api/11-route-to-endpoint-map.md:217:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+contracts/api/01-api-response-envelope-standard.md:842:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/api/01-api-response-envelope-standard.md:845:- RBP File Reference is the canonical file wrapper.
+contracts/api/01-api-response-envelope-standard.md:846:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+contracts/api/09-upload-file-rules.md:76:RBP File Reference
+contracts/api/09-upload-file-rules.md:93:This document does not define final storage infrastructure. It assumes Frappe File is the base file object and `RBP File Reference` wraps it with platform-specific ownership, tenant, visibility, and related-record rules.
+contracts/api/09-upload-file-rules.md:124:  Defines RBP File Reference.
+contracts/api/09-upload-file-rules.md:144:| Frappe File is not enough | Every business-relevant file must have an `RBP File Reference`. |
+contracts/api/09-upload-file-rules.md:158:## 5. Core DocType: RBP File Reference
+contracts/api/09-upload-file-rules.md:162:`RBP File Reference` links a Frappe `File` to an RBP business record with platform-specific rules for:
+contracts/api/09-upload-file-rules.md:177:The Frappe `File` object stores the file. `RBP File Reference` defines how the platform is allowed to use it.
+contracts/api/09-upload-file-rules.md:447:Phase 1 mock upload fields must map into `RBP File Reference`.
+contracts/api/09-upload-file-rules.md:451:| `supporting_documents_mock` | `RBP File Reference` linked to product record |
+contracts/api/09-upload-file-rules.md:452:| `reference_files_mock` | `RBP File Reference` linked to `RBP Document Brief` |
+contracts/api/09-upload-file-rules.md:453:| `media_mock` | `RBP File Reference` linked to `RBP Marketplace Listing` |
+contracts/api/09-upload-file-rules.md:454:| `payment_evidence_mock` | `RBP File Reference` linked to payment/billing record |
+contracts/api/09-upload-file-rules.md:455:| `serviceability_documents_mock` | `RBP File Reference` linked to `RBP Connectivity Order` |
+contracts/api/09-upload-file-rules.md:456:| `assessment_evidence_mock` | `RBP File Reference` linked to `RBP Risk Assessment` |
+contracts/api/09-upload-file-rules.md:457:| `fixer_supporting_documents_mock` | `RBP File Reference` linked to `RBP Fixer Request` |
+contracts/api/09-upload-file-rules.md:464:Each real uploaded file must create both a Frappe File and an RBP File Reference.
+contracts/api/09-upload-file-rules.md:937:RBP File Reference created as private_to_owner or admin_only
+contracts/api/09-upload-file-rules.md:1488:Use RBP File Reference for platform business rules.
+contracts/api/09-upload-file-rules.md:1536:Recommended indexes for `RBP File Reference`:
+contracts/api/09-upload-file-rules.md:1730:RBP File Reference is defined.
+contracts/api/09-upload-file-rules.md:1769:Every uploaded file maps to Frappe File and RBP File Reference.
+contracts/api/09-upload-file-rules.md:1824:- rbp_app.api.the_fixer is the canonical backend API module for The Fixer.
+contracts/api/09-upload-file-rules.md:1827:- RBP File Reference is the canonical file wrapper.
+contracts/api/09-upload-file-rules.md:1828:- RBP Subscription and RBP Payment Event are the canonical payment/subscription models.
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:42:| rbp_app.api.the_fixer | Present | Canonical for Phase 5. |
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:56:    rbp_app.api.the_fixer
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:134:| File model | RBP File Reference is the canonical file wrapper. |
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:136:| Visibility | Phase 5 must preserve tenant, owner, and related-record visibility rules from RBP File Reference. |
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:143:| Subscription model | RBP Subscription is canonical. |
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:144:| Payment event model | RBP Payment Event is canonical. |
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:165:| Fixer naming | Use rbp_app.api.the_fixer | Phase 5 integration |
+docs/architecture/phase5-reconciliation/CONTRACT_PHASE3_RECONCILIATION.md:190:- rbp_app.api.the_fixer is confirmed as the canonical Fixer API module.
+apps/rbp_app/docs/phase3-backend-validation-report.md:131:- `rbp_app.api.the_fixer`
+apps/rbp_app/docs/phase3-backend-validation-report.md:158:- Treat `rbp_app.api.the_fixer` as canonical or add an alias module.
+apps/rbp_app/docs/phase3-backend-validation-report.md:213:- RBP Subscription
+apps/rbp_app/docs/phase3-backend-validation-report.md:214:- RBP Payment Event
+apps/rbp_app/docs/phase3-backend-validation-report.md:220:- RBP File Reference
+apps/rbp_app/docs/phase3-backend-validation-report.md:365:- `RBP Subscription` models tenant, member, status, plan, billing cycle, provider IDs, payment status, amount, currency, and billing period.
+apps/rbp_app/docs/phase3-backend-validation-report.md:366:- `RBP Payment Event` records provider payment events.
+apps/rbp_app/docs/phase3-backend-validation-report.md:389:- `RBP File Reference` models tenant-aware file links.
+apps/rbp_app/docs/phase3-integration-readiness-plan.md:48:- rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:689:- `rbp_app.api.the_fixer.create_case(payload=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:690:- `rbp_app.api.the_fixer.update_draft_case(case_name, payload=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:691:- `rbp_app.api.the_fixer.submit_case(case_name)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:692:- `rbp_app.api.the_fixer.list_my_cases(filters=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:693:- `rbp_app.api.the_fixer.get_case(case_name)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:694:- `rbp_app.api.the_fixer.admin_assign_case(case_name, assigned_to)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:695:- `rbp_app.api.the_fixer.admin_update_case_status(case_name, status, payload=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:696:- `rbp_app.api.the_fixer.create_task(case_name, payload=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:697:- `rbp_app.api.the_fixer.update_task(task_name, payload=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:698:- `rbp_app.api.the_fixer.complete_task(task_name)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:699:- `rbp_app.api.the_fixer.add_case_update(case_name, payload=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:700:- `rbp_app.api.the_fixer.list_case_updates(case_name, filters=None)`
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:1097:`rbp_app.api.the_fixer` is the canonical Phase 3 backend API module for The Fixer.
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:1106:rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:1113:- The implemented API module is already `rbp_app.api.the_fixer`.
+apps/rbp_app/docs/phase3-frontend-api-handoff-checklist.md:1121:Phase 5 frontend/backend integration should treat `rbp_app.api.the_fixer` as canonical.
+apps/rbp_app/docs/phase3-api-endpoint-inventory.md:55:- rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-api-endpoint-inventory.md:302:Module: `rbp_app.api.the_fixer`
+apps/rbp_app/docs/phase3-api-endpoint-inventory.md:504:`rbp_app.api.the_fixer` is the canonical Phase 3 backend API module for The Fixer.
+apps/rbp_app/docs/phase3-api-endpoint-inventory.md:513:rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-api-endpoint-inventory.md:520:- The implemented API module is already `rbp_app.api.the_fixer`.
+apps/rbp_app/docs/phase3-api-endpoint-inventory.md:528:Phase 5 frontend/backend integration should treat `rbp_app.api.the_fixer` as canonical.
+apps/rbp_app/docs/platform-validation-report.md:113:- Moved `RBP App Entitlement`, `RBP Tenant`, `RBP Subscription`, `RBP Audit Log`, and `RBP Notification` DocType source folders into the synced `rbp_app/rbp_app/rbp_app/doctype` module path.
+apps/rbp_app/docs/phase3-api-smoke-test-plan.md:228:rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-api-smoke-test-plan.md:429:`rbp_app.api.the_fixer` is the canonical Phase 3 backend API module for The Fixer.
+apps/rbp_app/docs/phase3-api-smoke-test-plan.md:438:rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-api-smoke-test-plan.md:445:- The implemented API module is already `rbp_app.api.the_fixer`.
+apps/rbp_app/docs/phase3-api-smoke-test-plan.md:453:Phase 5 frontend/backend integration should treat `rbp_app.api.the_fixer` as canonical.
+apps/rbp_app/docs/cross-app-workflow-register.md:1136:Update RBP Subscription
+apps/rbp_app/docs/phase3-the-fixer-backend-task.md:146:rbp_app/rbp_app/api/the_fixer.py
+apps/rbp_app/docs/phase3-qa-uat-readiness-plan.md:397:- Should `rbp_app.api.the_fixer` receive a compatibility alias as `rbp_app.api.fixer`?
+apps/rbp_app/docs/phase3-completion-report.md:28:- RBP Subscription model
+apps/rbp_app/docs/phase3-completion-report.md:29:- RBP Payment Event model
+apps/rbp_app/docs/phase3-completion-report.md:33:- RBP File Reference model
+apps/rbp_app/docs/phase3-completion-report.md:78:- `rbp_app.api.the_fixer`
+apps/rbp_app/docs/phase3-completion-report.md:93:- The implemented Fixer API module is `rbp_app.api.the_fixer`.
+apps/rbp_app/docs/phase3-completion-report.md:128:- RBP Subscription
+apps/rbp_app/docs/phase3-completion-report.md:129:- RBP Payment Event
+apps/rbp_app/docs/phase3-completion-report.md:135:- RBP File Reference
+apps/rbp_app/docs/phase3-completion-report.md:267:- `rbp_app.api.the_fixer` naming must be coordinated with frontend expectations.
+apps/rbp_app/docs/phase3-completion-report.md:346:`rbp_app.api.the_fixer` is the canonical Phase 3 backend API module for The Fixer.
+apps/rbp_app/docs/phase3-completion-report.md:355:rbp_app.api.the_fixer
+apps/rbp_app/docs/phase3-completion-report.md:362:- The implemented API module is already `rbp_app.api.the_fixer`.
+apps/rbp_app/docs/phase3-completion-report.md:370:Phase 5 frontend/backend integration should treat `rbp_app.api.the_fixer` as canonical.
+apps/rbp_app/docs/phase3-completion-report.md:467:`rbp_app.api.the_fixer` is the canonical backend API module for The Fixer.
+apps/rbp_app/docs/phase3-launch-readiness-runbook.md:247:- RBP Subscription
+apps/rbp_app/docs/phase3-launch-readiness-runbook.md:248:- RBP Payment Event
