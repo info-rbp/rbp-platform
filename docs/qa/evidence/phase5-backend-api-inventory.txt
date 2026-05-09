@@ -1,0 +1,240 @@
+# Backend API Inventory
+
+Generated on: Sat May  9 19:00:16 AWST 2026
+
+## API modules
+apps/rbp_app/rbp_app/api/__init__.py
+apps/rbp_app/rbp_app/api/apps.py
+apps/rbp_app/rbp_app/api/billing.py
+apps/rbp_app/rbp_app/api/capabilities.py
+apps/rbp_app/rbp_app/api/connectivity.py
+apps/rbp_app/rbp_app/api/dashboard.py
+apps/rbp_app/rbp_app/api/decision_desk.py
+apps/rbp_app/rbp_app/api/documents.py
+apps/rbp_app/rbp_app/api/docushare.py
+apps/rbp_app/rbp_app/api/entitlements.py
+apps/rbp_app/rbp_app/api/hr.py
+apps/rbp_app/rbp_app/api/integrations.py
+apps/rbp_app/rbp_app/api/marketplace.py
+apps/rbp_app/rbp_app/api/me.py
+apps/rbp_app/rbp_app/api/membership.py
+apps/rbp_app/rbp_app/api/notifications.py
+apps/rbp_app/rbp_app/api/risk_advisor.py
+apps/rbp_app/rbp_app/api/the_fixer.py
+apps/rbp_app/rbp_app/api/workflows.py
+
+## Whitelisted methods
+apps/rbp_app/rbp_app/api/connectivity.py:19:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:31:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:37:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:43:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:49:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:55:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:61:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:73:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:79:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:85:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/connectivity.py:91:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/me.py:8:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/billing.py:12:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/billing.py:20:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:19:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:31:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:37:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:43:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:49:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:55:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:61:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:73:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/docushare.py:79:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:19:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:31:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:37:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:43:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:49:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:55:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:61:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:73:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:79:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/risk_advisor.py:85:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/documents.py:22:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/documents.py:30:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/apps.py:9:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/hr.py:9:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/hr.py:17:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/hr.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/entitlements.py:9:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/entitlements.py:15:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/dashboard.py:9:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/capabilities.py:71:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/capabilities.py:87:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/capabilities.py:97:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/capabilities.py:107:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:19:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:31:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:37:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:43:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:49:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:55:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:61:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:73:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:79:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/marketplace.py:85:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:19:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:31:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:37:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:43:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:49:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:55:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:61:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/decision_desk.py:73:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/workflows.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/workflows.py:98:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/notifications.py:13:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/notifications.py:21:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/notifications.py:29:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:19:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:25:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:31:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:37:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:43:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:49:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:55:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:61:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:67:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:73:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:79:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/the_fixer.py:85:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/membership.py:26:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/membership.py:34:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/membership.py:48:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/membership.py:56:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/membership.py:75:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/membership.py:88:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/integrations.py:34:@frappe.whitelist()
+apps/rbp_app/rbp_app/api/integrations.py:42:@frappe.whitelist()
+
+## Function definitions
+apps/rbp_app/rbp_app/api/connectivity.py:11:def _payload(payload):
+apps/rbp_app/rbp_app/api/connectivity.py:20:def create_request(payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:26:def update_draft_request(request_name, payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:32:def submit_request(request_name):
+apps/rbp_app/rbp_app/api/connectivity.py:38:def list_my_requests(filters=None):
+apps/rbp_app/rbp_app/api/connectivity.py:44:def get_request(request_name):
+apps/rbp_app/rbp_app/api/connectivity.py:50:def admin_assign_request(request_name, assigned_to):
+apps/rbp_app/rbp_app/api/connectivity.py:56:def admin_update_status(request_name, status, payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:62:def create_provider(payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:68:def update_provider(provider_name, payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:74:def list_providers(filters=None):
+apps/rbp_app/rbp_app/api/connectivity.py:80:def create_quote(request_name, payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:86:def update_quote(quote_name, payload=None):
+apps/rbp_app/rbp_app/api/connectivity.py:92:def accept_quote(quote_name):
+apps/rbp_app/rbp_app/api/me.py:9:def get_current_user():
+apps/rbp_app/rbp_app/api/billing.py:13:def get_subscription_status():
+apps/rbp_app/rbp_app/api/billing.py:21:def record_payment_event(payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:11:def _payload(payload):
+apps/rbp_app/rbp_app/api/docushare.py:20:def create_folder(payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:26:def update_folder(folder_name, payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:32:def list_folders(filters=None):
+apps/rbp_app/rbp_app/api/docushare.py:38:def get_folder(folder_name):
+apps/rbp_app/rbp_app/api/docushare.py:44:def create_document(payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:50:def update_document(document_name, payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:56:def list_documents(filters=None):
+apps/rbp_app/rbp_app/api/docushare.py:62:def get_document(document_name):
+apps/rbp_app/rbp_app/api/docushare.py:68:def share_folder(folder_name, payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:74:def share_document(document_name, payload=None):
+apps/rbp_app/rbp_app/api/docushare.py:80:def revoke_share(share_name):
+apps/rbp_app/rbp_app/api/risk_advisor.py:11:def _payload(payload):
+apps/rbp_app/rbp_app/api/risk_advisor.py:20:def create_assessment(payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:26:def update_draft_assessment(assessment_name, payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:32:def submit_assessment(assessment_name):
+apps/rbp_app/rbp_app/api/risk_advisor.py:38:def list_my_assessments(filters=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:44:def get_assessment(assessment_name):
+apps/rbp_app/rbp_app/api/risk_advisor.py:50:def admin_assign_assessment(assessment_name, assigned_to):
+apps/rbp_app/rbp_app/api/risk_advisor.py:56:def admin_update_assessment_status(assessment_name, status, payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:62:def create_risk(assessment_name, payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:68:def update_risk(risk_name, payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:74:def create_action(risk_name, payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:80:def update_action(action_name, payload=None):
+apps/rbp_app/rbp_app/api/risk_advisor.py:86:def complete_action(action_name):
+apps/rbp_app/rbp_app/api/documents.py:14:def _coerce_payload(payload):
+apps/rbp_app/rbp_app/api/documents.py:23:def get_documents():
+apps/rbp_app/rbp_app/api/documents.py:31:def attach_file_reference(payload=None):
+apps/rbp_app/rbp_app/api/apps.py:10:def get_available_apps():
+apps/rbp_app/rbp_app/api/hr.py:10:def get_employee_summary():
+apps/rbp_app/rbp_app/api/hr.py:18:def get_leave_summary():
+apps/rbp_app/rbp_app/api/hr.py:26:def get_summary():
+apps/rbp_app/rbp_app/api/entitlements.py:10:def get_my_entitlements():
+apps/rbp_app/rbp_app/api/entitlements.py:16:def can_access_app(app_key):
+apps/rbp_app/rbp_app/api/dashboard.py:10:def get_home():
+apps/rbp_app/rbp_app/api/capabilities.py:27:def _success(data: Any, message: str | None = None) -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/capabilities.py:41:def _failure(message: str, data: Any | None = None) -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/capabilities.py:51:def _safe_service_call(service_function, failure_message: str) -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/capabilities.py:72:def get_capability_registry() -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/capabilities.py:88:def get_primary_modules() -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/capabilities.py:98:def get_supporting_capabilities() -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/capabilities.py:108:def get_cross_app_workflows() -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/marketplace.py:11:def _payload(payload):
+apps/rbp_app/rbp_app/api/marketplace.py:20:def create_vendor(payload=None):
+apps/rbp_app/rbp_app/api/marketplace.py:26:def update_vendor(vendor_name, payload=None):
+apps/rbp_app/rbp_app/api/marketplace.py:32:def list_vendors(filters=None):
+apps/rbp_app/rbp_app/api/marketplace.py:38:def get_vendor(vendor_name):
+apps/rbp_app/rbp_app/api/marketplace.py:44:def create_listing(payload=None):
+apps/rbp_app/rbp_app/api/marketplace.py:50:def update_listing(listing_name, payload=None):
+apps/rbp_app/rbp_app/api/marketplace.py:56:def list_listings(filters=None):
+apps/rbp_app/rbp_app/api/marketplace.py:62:def get_listing(listing_name):
+apps/rbp_app/rbp_app/api/marketplace.py:68:def create_order(listing_name, payload=None):
+apps/rbp_app/rbp_app/api/marketplace.py:74:def update_order_status(order_name, status, payload=None):
+apps/rbp_app/rbp_app/api/marketplace.py:80:def list_my_orders(filters=None):
+apps/rbp_app/rbp_app/api/marketplace.py:86:def get_order(order_name):
+apps/rbp_app/rbp_app/api/decision_desk.py:11:def _payload(payload):
+apps/rbp_app/rbp_app/api/decision_desk.py:20:def create_request(payload=None):
+apps/rbp_app/rbp_app/api/decision_desk.py:26:def update_draft_request(request_name, payload=None):
+apps/rbp_app/rbp_app/api/decision_desk.py:32:def submit_request(request_name):
+apps/rbp_app/rbp_app/api/decision_desk.py:38:def list_my_requests(filters=None):
+apps/rbp_app/rbp_app/api/decision_desk.py:44:def get_request(request_name):
+apps/rbp_app/rbp_app/api/decision_desk.py:50:def admin_assign_request(request_name, assigned_to):
+apps/rbp_app/rbp_app/api/decision_desk.py:56:def admin_update_status(request_name, status, payload=None):
+apps/rbp_app/rbp_app/api/decision_desk.py:62:def create_option(request_name, payload=None):
+apps/rbp_app/rbp_app/api/decision_desk.py:68:def update_option(option_name, payload=None):
+apps/rbp_app/rbp_app/api/decision_desk.py:74:def delete_option(option_name):
+apps/rbp_app/rbp_app/api/workflows.py:36:def _success(data: Any, message: str | None = None) -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/workflows.py:50:def _failure(message: str, data: Any | None = None, status: str = "error") -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/workflows.py:61:def _normalise_key(value: str | None) -> str:
+apps/rbp_app/rbp_app/api/workflows.py:68:def get_available_workflows() -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/workflows.py:99:def get_workflow_status(workflow_key: str | None = None) -> dict[str, Any]:
+apps/rbp_app/rbp_app/api/notifications.py:14:def get_notifications():
+apps/rbp_app/rbp_app/api/notifications.py:22:def mark_notification_read(name):
+apps/rbp_app/rbp_app/api/notifications.py:30:def mark_all_notifications_read():
+apps/rbp_app/rbp_app/api/the_fixer.py:11:def _payload(payload):
+apps/rbp_app/rbp_app/api/the_fixer.py:20:def create_case(payload=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:26:def update_draft_case(case_name, payload=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:32:def submit_case(case_name):
+apps/rbp_app/rbp_app/api/the_fixer.py:38:def list_my_cases(filters=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:44:def get_case(case_name):
+apps/rbp_app/rbp_app/api/the_fixer.py:50:def admin_assign_case(case_name, assigned_to):
+apps/rbp_app/rbp_app/api/the_fixer.py:56:def admin_update_case_status(case_name, status, payload=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:62:def create_task(case_name, payload=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:68:def update_task(task_name, payload=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:74:def complete_task(task_name):
+apps/rbp_app/rbp_app/api/the_fixer.py:80:def add_case_update(case_name, payload=None):
+apps/rbp_app/rbp_app/api/the_fixer.py:86:def list_case_updates(case_name, filters=None):
+apps/rbp_app/rbp_app/api/membership.py:18:def _coerce_payload(payload):
+apps/rbp_app/rbp_app/api/membership.py:27:def list_membership_plans():
+apps/rbp_app/rbp_app/api/membership.py:35:def start_onboarding(plan_code=None, source_channel="portal"):
+apps/rbp_app/rbp_app/api/membership.py:49:def get_my_onboarding():
+apps/rbp_app/rbp_app/api/membership.py:57:def update_onboarding_step(flow_name, step_key, payload=None, status="Completed"):
+apps/rbp_app/rbp_app/api/membership.py:76:def submit_onboarding(flow_name):
+apps/rbp_app/rbp_app/api/membership.py:89:def admin_complete_onboarding(flow_name):
+apps/rbp_app/rbp_app/api/integrations.py:35:def get_integrations_status():
+apps/rbp_app/rbp_app/api/integrations.py:43:def get_app_summary(app_key):

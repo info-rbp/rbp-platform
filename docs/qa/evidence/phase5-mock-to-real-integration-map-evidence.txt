@@ -1,0 +1,37 @@
+Phase 5 mock-to-real integration map evidence
+
+Mock exports detected: 33
+Backend API modules detected: 18
+Rows mapped automatically: 24
+Rows needing review: 9
+
+Detected backend modules:
+- apps: get_available_apps
+- billing: get_subscription_status, record_payment_event
+- capabilities: get_capability_registry, get_primary_modules, get_supporting_capabilities, get_cross_app_workflows
+- connectivity: create_request, update_draft_request, submit_request, list_my_requests, get_request, admin_assign_request, admin_update_status, create_provider, update_provider, list_providers, create_quote, update_quote, accept_quote
+- dashboard: get_home
+- decision_desk: create_request, update_draft_request, submit_request, list_my_requests, get_request, admin_assign_request, admin_update_status, create_option, update_option, delete_option
+- documents: get_documents, attach_file_reference
+- docushare: create_folder, update_folder, list_folders, get_folder, create_document, update_document, list_documents, get_document, share_folder, share_document, revoke_share
+- entitlements: get_my_entitlements, can_access_app
+- hr: get_employee_summary, get_leave_summary, get_summary
+- integrations: get_integrations_status, get_app_summary
+- marketplace: create_vendor, update_vendor, list_vendors, get_vendor, create_listing, update_listing, list_listings, get_listing, create_order, update_order_status, list_my_orders, get_order
+- me: get_current_user
+- membership: list_membership_plans, start_onboarding, get_my_onboarding, update_onboarding_step, submit_onboarding, admin_complete_onboarding
+- notifications: get_notifications, mark_notification_read, mark_all_notifications_read
+- risk_advisor: create_assessment, update_draft_assessment, submit_assessment, list_my_assessments, get_assessment, admin_assign_assessment, admin_update_assessment_status, create_risk, update_risk, create_action, update_action, complete_action
+- the_fixer: create_case, update_draft_case, submit_case, list_my_cases, get_case, admin_assign_case, admin_update_case_status, create_task, update_task, complete_task, add_case_update, list_case_updates
+- workflows: get_available_workflows, get_workflow_status
+
+Unmapped mock exports:
+- frontend/portal/src/app/services/mock/admin.mockService.ts :: getMockAdminReviewQueues
+- frontend/portal/src/app/services/mock/admin.mockService.ts :: submitMockAdminReviewAction
+- frontend/portal/src/app/services/mock/connectivity.mockService.ts :: checkMockServiceability
+- frontend/portal/src/app/services/mock/docushare.mockService.ts :: submitMockDocuShareBrief
+- frontend/portal/src/app/services/mock/marketplace.mockService.ts :: submitMockMarketplaceEnquiry
+- frontend/portal/src/app/services/mock/mockClient.ts :: createMockReference
+- frontend/portal/src/app/services/mock/mockClient.ts :: createMockTimeline
+- frontend/portal/src/app/services/mock/mockClient.ts :: requireFields
+- frontend/portal/src/app/services/mock/mockClient.ts :: waitForMockDelay

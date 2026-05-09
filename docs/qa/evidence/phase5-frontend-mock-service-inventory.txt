@@ -1,0 +1,55 @@
+# Frontend Mock Service Inventory
+
+Generated on: Sat May  9 19:00:13 AWST 2026
+
+## Mock service files
+frontend/portal/src/app/services/mock/admin.mockService.ts
+frontend/portal/src/app/services/mock/connectivity.mockService.ts
+frontend/portal/src/app/services/mock/decisionDesk.mockService.ts
+frontend/portal/src/app/services/mock/docushare.mockService.ts
+frontend/portal/src/app/services/mock/fixer.mockService.ts
+frontend/portal/src/app/services/mock/index.ts
+frontend/portal/src/app/services/mock/marketplace.mockService.ts
+frontend/portal/src/app/services/mock/membership.mockService.ts
+frontend/portal/src/app/services/mock/mockClient.ts
+frontend/portal/src/app/services/mock/portal.mockService.ts
+frontend/portal/src/app/services/mock/riskAdvisor.mockService.ts
+
+## Mock service exported functions
+frontend/portal/src/app/services/mock/fixer.mockService.ts:41:export function getMockFixerSetup() {
+frontend/portal/src/app/services/mock/fixer.mockService.ts:58:export function submitMockFixerRequest(payload: MockFixerRequestPayload) {
+frontend/portal/src/app/services/mock/connectivity.mockService.ts:46:export function getMockConnectivityPlans() {
+frontend/portal/src/app/services/mock/connectivity.mockService.ts:60:export function checkMockServiceability(payload: MockServiceabilityPayload) {
+frontend/portal/src/app/services/mock/connectivity.mockService.ts:85:export function submitMockConnectivityOrder(payload: MockConnectivityOrderPayload) {
+frontend/portal/src/app/services/mock/riskAdvisor.mockService.ts:62:export function getMockRiskAdvisorSetup() {
+frontend/portal/src/app/services/mock/riskAdvisor.mockService.ts:78:export function submitMockRiskAssessment(payload: MockRiskAssessmentPayload) {
+frontend/portal/src/app/services/mock/docushare.mockService.ts:49:export function getMockDocumentProducts() {
+frontend/portal/src/app/services/mock/docushare.mockService.ts:68:export function submitMockDocuShareBrief(payload: MockDocuShareBriefPayload) {
+frontend/portal/src/app/services/mock/admin.mockService.ts:32:export function getMockAdminReviewQueues() {
+frontend/portal/src/app/services/mock/admin.mockService.ts:49:export function submitMockAdminReviewAction(payload: MockAdminReviewActionPayload) {
+frontend/portal/src/app/services/mock/marketplace.mockService.ts:44:export function getMockMarketplaceItems() {
+frontend/portal/src/app/services/mock/marketplace.mockService.ts:58:export function submitMockMarketplaceEnquiry(payload: MockMarketplaceEnquiryPayload) {
+frontend/portal/src/app/services/mock/marketplace.mockService.ts:85:export function submitMockMarketplaceListing(payload: MockMarketplaceListingPayload) {
+frontend/portal/src/app/services/mock/membership.mockService.ts:48:export function getMockMembershipPlans() {
+frontend/portal/src/app/services/mock/membership.mockService.ts:56:export function submitMockMembershipSignup(payload: MockMembershipSignupPayload) {
+frontend/portal/src/app/services/mock/membership.mockService.ts:97:export function submitMockMembershipOnboarding(payload: MockMembershipOnboardingPayload) {
+frontend/portal/src/app/services/mock/portal.mockService.ts:15:export function getMockMe() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:19:export function getMockPortalDashboard() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:27:export function getMockPortalNotifications() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:35:export function getMockPortalServices() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:43:export function getMockPortalDocuments() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:51:export function getMockPortalOffers() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:59:export function getMockPortalApplications() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:67:export function getMockPortalResources() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:75:export function getMockPortalSupport() {
+frontend/portal/src/app/services/mock/portal.mockService.ts:83:export function getMockPortalSettings() {
+frontend/portal/src/app/services/mock/mockClient.ts:45:export function waitForMockDelay(delayMs = DEFAULT_MOCK_DELAY_MS): Promise<void> {
+frontend/portal/src/app/services/mock/mockClient.ts:51:export function createMockReference(prefix: string): string {
+frontend/portal/src/app/services/mock/mockClient.ts:56:export function createMockTimeline(
+frontend/portal/src/app/services/mock/mockClient.ts:72:export function requireFields(
+frontend/portal/src/app/services/mock/mockClient.ts:88:export function mockSuccess<T>(
+frontend/portal/src/app/services/mock/mockClient.ts:102:export function mockFailure<T>(
+frontend/portal/src/app/services/mock/mockClient.ts:116:export async function mockGet<T>(
+frontend/portal/src/app/services/mock/mockClient.ts:141:export async function mockPost<TPayload extends Record<string, unknown>, TData>(
+frontend/portal/src/app/services/mock/decisionDesk.mockService.ts:33:export function getMockDecisionDeskSetup() {
+frontend/portal/src/app/services/mock/decisionDesk.mockService.ts:51:export function submitMockDecisionDeskRequest(payload: MockDecisionDeskPayload) {

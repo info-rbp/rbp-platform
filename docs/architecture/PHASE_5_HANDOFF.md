@@ -54,3 +54,16 @@ This document defines what Phase 5 Integration receives from Phase 4 Consolidati
 ## Handoff Status
 
 Phase 5 can begin after this wrap-up document is merged into `main`.
+
+## Phase 5 Integration Map
+
+The mock-to-real API integration map is recorded at:
+
+    docs/architecture/phase5-integration-map/PHASE_5_MOCK_TO_REAL_API_INTEGRATION_MAP.md
+
+This map must be used before replacing frontend mock services with real backend API calls.
+
+Acceptance rule:
+
+    Every frontend mock service must map to one backend endpoint or an explicit documented deferral.
+
