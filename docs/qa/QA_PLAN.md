@@ -2,87 +2,86 @@
 
 ## Purpose
 
-This document is the placeholder QA plan for the Remote Business Partner Platform after Phase 4 Consolidation.
+This document is now the active Phase 5 QA execution plan for the consolidated Remote Business Partner Platform repository.
 
-Phase 4 was responsible for structured consolidation only. It did not perform production QA, user acceptance testing, security testing, load testing, or launch validation.
+It replaces the earlier placeholder-only posture with a checklist that makes clear what is already covered, what is currently in review, and what must still be proven before the platform can be considered launch-ready.
 
-This document defines the QA areas that Phase 5 and later phases must expand before production readiness.
-
-## Current Status
+## Current QA State
 
 ```text
-Phase 4 status: QA placeholder present
-Phase 5 status: QA planning and validation required
+Phase 4: consolidation complete
+Phase 5: QA execution in progress
+Launch readiness: not yet achieved
 ```
 
-## QA Scope for Phase 5+
+## QA Execution Matrix
 
-Phase 5 and later QA should cover:
+| Area | Current status | Evidence source | Action to close |
+|---|---|---|---|
+| Repository structure validation | Complete | Existing structure validation docs and workflow history | Keep as baseline guard |
+| Frontend install/build validation | In review | Open Phase 5 frontend validation workstream | Merge evidence and keep in CI |
+| Backend syntax validation | In review | Open Phase 5 CI guardrails workstream | Merge and keep in CI |
+| Frappe install smoke | In review | Open backend bench validation workstream | Merge evidence and automate later |
+| Frappe migrate smoke | In review | Open backend bench validation workstream | Merge evidence and automate later |
+| Contract alignment review | In review | Open contract reconciliation workstream | Merge and treat as integration baseline |
+| Frontend mock-to-real mapping | In review | Open integration map workstream | Merge and keep updated as real APIs replace mocks |
+| First integrated user flow | In review | Open membership integration workstream | Merge and extend to additional flows |
+| API smoke testing | Outstanding | Not yet automated in `main` | Add route/API smoke checks |
+| Frontend route smoke testing | Outstanding | Not yet automated in `main` | Add route smoke coverage |
+| Permission and role validation | Outstanding | Contracts exist, execution evidence missing | Add targeted validation evidence |
+| Workflow state validation | Outstanding | Contracts exist, execution evidence missing | Add targeted validation evidence |
+| Upload/file validation | Outstanding | Contract baseline exists | Add smoke coverage against backend APIs |
+| Regression testing | Outstanding | Not yet formalized | Define a Phase 5 regression sweep |
+| UAT | Outstanding | No execution evidence yet | Run after integration stabilizes |
+| Load/performance testing | Outstanding | Later-stage work | Plan before production |
+| Security review | Outstanding | Later-stage work | Plan before production |
 
-- frontend build validation
-- frontend route smoke testing
-- backend syntax and lint validation
-- Frappe app install smoke testing
-- Frappe migrate smoke testing
-- backend API smoke testing
-- DocType validation
-- permission and role validation
-- workflow state validation
-- frontend mock-to-real API replacement validation
-- onboarding flow validation
-- admin action validation
-- upload/file handling validation
-- regression testing
-- deployment smoke testing
+## Required QA Inputs
 
-## Required Inputs
-
-QA planning should use:
+The Phase 5 QA execution track should work from:
 
 ```text
-docs/architecture/ARCHITECTURE.md
+docs/architecture/PHASE_IMPLEMENTATION_REVIEW.md
 docs/architecture/PHASE_5_HANDOFF.md
 docs/architecture/PHASE_5_CI_PLAN.md
-docs/api-contracts/API_CONTRACTS.md
-docs/product-flows/PRODUCT_FLOWS.md
-docs/product-flows/ONBOARDING_FLOWS.md
 contracts/
 frontend/portal/
 apps/rbp_app/
+docs/qa/evidence/
 ```
 
-## Initial QA Checklist
+## Phase 5 Exit Criteria For QA
 
-| Area | Required Later? | Notes |
-|---|---:|---|
-| Repository structure validation | Yes | Already started in Phase 4 CI guard |
-| Frontend install/build | Yes | Add to Phase 5 CI |
-| Backend static validation | Yes | Add compile/lint checks |
-| Frappe install smoke | Yes | Requires bench environment |
-| Frappe migrate smoke | Yes | Required before deployment readiness |
-| API smoke tests | Yes | Validate backend endpoint behavior |
-| Route smoke tests | Yes | Validate frontend route behavior |
-| Contract alignment testing | Yes | Compare implementation against `contracts/` |
-| Permission testing | Yes | Validate role and admin boundaries |
-| Workflow testing | Yes | Validate workflow and state transitions |
-| UAT | Yes | Later phase, after integration stabilizes |
-| Load/performance testing | Yes | Later phase, before production launch |
-| Security review | Yes | Later phase, before production launch |
+Phase 5 QA should not be considered complete until all of the following are true:
 
-## Non-Goals for Phase 4
+- frontend build validation is merged and repeatable
+- backend syntax validation is merged and repeatable
+- Frappe install and migrate evidence is merged
+- contract reconciliation is merged
+- at least one integrated frontend-to-backend flow is merged
+- API and route smoke checks exist or equivalent evidence is attached
+- critical permission, workflow, and upload scenarios have explicit validation evidence
 
-Phase 4 did not complete:
+## Evidence Rules
 
-- full QA execution
-- production QA signoff
-- UAT
-- performance testing
-- security testing
-- accessibility certification
-- launch validation
+QA evidence should live under:
 
-## Status
+```text
+docs/qa/evidence/
+```
 
-This placeholder completes the Phase 4 documentation surface for QA planning.
+Evidence should be attached for:
 
-Detailed QA planning and execution belong to Phase 5 and later phases.
+- frontend build output
+- backend bench validation
+- integrated flow validation
+- smoke test output
+- any deferred item that blocks launch readiness
+
+## Remaining Phase 5 QA Actions
+
+1. Merge the open validation and integration workstreams already prepared.
+2. Add API and route smoke coverage.
+3. Record permission, workflow, and file-handling validation evidence.
+4. Run a regression pass after the next integrated flows land.
+5. Promote the final Phase 5 evidence set into launch-readiness gating.

@@ -41,6 +41,7 @@ Current priorities:
 - mock-to-real API integration flow pilots
 - contract-to-implementation reconciliation
 - CI guardrails for repository safety, frontend build, and backend syntax
+- closing the remaining Phase 5 QA, runbook, and launch-readiness gaps
 
 ## Source of Truth
 
@@ -97,16 +98,17 @@ rbp-platform/
 
 - `docs/architecture/ARCHITECTURE.md`
 - `docs/architecture/REPOSITORY_STRATEGY.md`
+- `docs/architecture/PHASE_IMPLEMENTATION_REVIEW.md`
 - `docs/architecture/PHASE_5_SOURCE_FREEZE.md`
 - `docs/architecture/PHASE_5_HANDOFF.md`
+- `docs/qa/QA_PLAN.md`
 - `docs/qa/PHASE_5_CI_GUARDRAILS.md`
+- `docs/runbook/RUNBOOK.md`
+- `docs/launch/LAUNCH_PLAN.md`
+- `docs/deployment/DEPLOYMENT.md`
 - `contracts/api/11-route-to-endpoint-map.md`
 - `contracts/api/16-mock-to-real-api-map.md`
 - `docs/product-flows/PRODUCT_FLOWS.md`
-- `docs/runbook/RUNBOOK.md`
-- `docs/launch/LAUNCH_PLAN.md`
-- `docs/qa/QA_PLAN.md`
-- `docs/deployment/DEPLOYMENT.md`
 
 ## Guardrails
 

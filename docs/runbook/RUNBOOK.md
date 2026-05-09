@@ -2,80 +2,109 @@
 
 ## Purpose
 
-This document is the placeholder operational runbook for the Remote Business Partner Platform after Phase 4 Consolidation.
+This document is now the Phase 5 operational baseline for the Remote Business Partner Platform repository.
 
-Phase 4 created the consolidated repository and deployment skeleton. It did not create a production operations runbook, because operating a system that is not yet integrated would be performance art with logs.
+It does not pretend production operations are complete, but it does define the minimum working commands, safety rules, and expected validation path for the current integration phase.
 
-## Current Status
-
-```text
-Phase 4 status: runbook placeholder present
-Phase 5+ status: operational runbook required
-```
-
-## Runbook Scope for Later Phases
-
-The production runbook should eventually cover:
-
-- local development startup
-- Frappe bench startup
-- frontend startup
-- app install process
-- migration process
-- deployment process
-- rollback process
-- backup and restore process
-- environment variable management
-- secret management
-- monitoring checks
-- common failure modes
-- incident response process
-- support escalation process
-
-## Required Inputs
-
-The runbook should be built from:
+## Current Operational State
 
 ```text
-docs/architecture/ARCHITECTURE.md
-docs/deployment/DEPLOYMENT.md
-docs/qa/QA_PLAN.md
-docs/launch/LAUNCH_PLAN.md
-docs/architecture/PHASE_5_CI_PLAN.md
-infra/bench/Procfile.template
-sites/common_site_config.template.json
-apps/rbp_app/
-frontend/portal/
+Repository consolidation: complete
+Integration work: active
+Production operations: not yet ready
 ```
 
-## Initial Operational Sections to Complete Later
+## Safety Rules
 
-| Section | Required Before Production? | Notes |
-|---|---:|---|
-| Local development setup | Yes | Include backend and frontend setup |
-| Frappe bench setup | Yes | Include app install and migrate |
-| Frontend build/run | Yes | Include `npm ci`, `npm run build`, and dev server notes |
-| Environment configuration | Yes | Link env examples and secret rules |
-| Deployment steps | Yes | Must be concrete before launch |
-| Rollback steps | Yes | Required before launch |
-| Backup/restore steps | Yes | Required before launch |
-| Monitoring checks | Yes | Required before launch |
-| Incident response | Yes | Required before launch |
-| Troubleshooting | Yes | Add known failure modes during Phase 5/QA |
+Never commit:
 
-## Non-Goals for Phase 4
+- local `.env` files
+- secrets
+- `frontend/portal/node_modules/`
+- `frontend/portal/dist/`
+- `frontend/portal/build/`
+- bench runtime files
+- `sites/common_site_config.json`
+- logs
 
-Phase 4 did not complete:
+Use the committed examples and templates instead:
 
-- production operations runbook
+- `.env.example`
+- `.env.local.example`
+- `.env.production.example`
+- `frontend/portal/.env.example`
+- `sites/common_site_config.template.json`
+- `infra/bench/Procfile.template`
+
+## Current Working Validation Path
+
+### Frontend build check
+
+```text
+cd frontend/portal
+npm ci
+npm run build
+```
+
+Remove generated output after local validation if needed:
+
+```text
+rm -rf frontend/portal/dist
+```
+
+### Backend syntax check
+
+```text
+python3 -m compileall apps/rbp_app/rbp_app
+```
+
+### Frappe bench validation path
+
+Use a bench-capable environment and validate:
+
+```text
+bench get-app rbp_app /path/to/rbp-platform/apps/rbp_app
+bench new-site rbp.localhost
+bench --site rbp.localhost install-app rbp_app
+bench --site rbp.localhost migrate
+bench --site rbp.localhost list-apps
+```
+
+### Current integration references
+
+During Phase 5, operators and developers should cross-check:
+
+- `contracts/api/11-route-to-endpoint-map.md`
+- `contracts/api/16-mock-to-real-api-map.md`
+- `docs/architecture/PHASE_IMPLEMENTATION_REVIEW.md`
+- `docs/qa/QA_PLAN.md`
+
+## Common Current Failure Modes
+
+| Failure mode | Likely cause | First response |
+|---|---|---|
+| Frontend build fails | missing dependencies or broken app import | run `npm ci`, then rerun `npm run build` |
+| Backend syntax check fails | imported backend module error | run `python3 -m compileall apps/rbp_app/rbp_app` and inspect the failing module |
+| Frappe app will not install | bench/site dependency mismatch | confirm bench environment, app path, and required services |
+| Frappe migrate fails | DocType, patch, or dependency issue | inspect migrate output and compare against contract and backend changes |
+| Integrated frontend flow fails against backend | wrong API endpoint, auth issue, or payload mismatch | compare frontend adapter with `contracts/api/16-mock-to-real-api-map.md` and backend API module |
+| Repository guardrails fail | runtime files or forbidden paths are present | remove generated/runtime files and rerun checks |
+
+## Still Missing Before Production Use
+
+The following are still not complete enough for a production runbook:
+
 - deployment execution procedure
-- incident response process
-- backup/restore validation
-- monitoring configuration
-- support escalation process
+- rollback procedure
+- backup and restore procedure
+- monitoring and alerting setup
+- incident response path
+- support escalation path
+- environment-specific host and secret setup
 
-## Status
+## Next Runbook Actions
 
-This placeholder completes the Phase 4 documentation surface for operational runbook planning.
-
-Detailed runbook content belongs to Phase 5 and later phases after integration and deployment validation.
+1. Keep this baseline aligned with the merged Phase 5 validation work.
+2. Add bench install and migrate evidence references once the validation PR is merged.
+3. Add troubleshooting notes for the first integrated flows after they are merged.
+4. Expand this into a production-grade runbook only after deployment and QA paths stabilize.

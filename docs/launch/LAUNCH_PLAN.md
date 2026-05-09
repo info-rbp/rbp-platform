@@ -2,85 +2,61 @@
 
 ## Purpose
 
-This document is the placeholder launch plan for the Remote Business Partner Platform after Phase 4 Consolidation.
+This document is now the Phase 5 launch-readiness tracker for the Remote Business Partner Platform repository.
 
-Phase 4 did not perform launch preparation or production release. It created the consolidated source-of-truth repository so later launch planning can happen from a clean structure instead of a digital junk drawer wearing a README.
+It replaces the older placeholder-only stance with explicit launch gates so the repository can show what still blocks go-live work.
 
-## Current Status
+## Launch Status
 
 ```text
-Phase 4 status: launch placeholder present
-Phase 5+ status: launch planning required
+Current state: not launch-ready
+Reason: Phase 5 integration and validation are still in progress
 ```
 
-## Launch Scope for Later Phases
+## Launch Gates
 
-Launch planning should eventually cover:
+| Gate | Current status | Close condition |
+|---|---|---|
+| Repository source-of-truth alignment | In review | Merge the repository strategy and CI alignment work |
+| Frontend build validation | In review | Merge repeatable frontend build evidence and CI |
+| Backend bench install validation | In review | Merge install and migrate evidence |
+| Contract reconciliation | In review | Merge the contract reconciliation workstream |
+| Mock-to-real API mapping | In review | Merge the integration map workstream |
+| First integrated user flow | In review | Merge at least one frontend-to-backend pilot flow |
+| API and route smoke coverage | Outstanding | Add automated or clearly recorded smoke coverage |
+| QA execution evidence | Outstanding | Close the QA execution matrix in `docs/qa/QA_PLAN.md` |
+| Operational runbook baseline | Complete | This baseline now exists and must be kept current |
+| Frontend serving strategy decision | Outstanding | Choose and document the serving model |
+| Rollback and recovery plan | Outstanding | Add rollback, restore, and incident recovery steps |
+| Monitoring and alerting plan | Outstanding | Define pre-launch monitoring checks |
+| Secrets externalization | Outstanding | Confirm runtime secret handling outside the repo |
 
-- target environments
-- release ownership
-- deployment process
-- rollback process
-- production configuration
-- secret management
-- database readiness
-- Redis/cache readiness
-- frontend hosting model
-- Frappe bench deployment model
-- domain and DNS setup
-- SSL/TLS setup
-- monitoring and alerting
-- incident response
-- user acceptance testing
-- go/no-go criteria
-- post-launch support process
+## Immediate Launch Blockers
 
-## Required Inputs Before Launch Planning Can Be Finalized
+The repository should not be treated as launch-ready until the following are closed:
 
-Launch planning depends on:
+- Phase 5 validation PRs are merged
+- bench install and migrate validation is accepted
+- at least one integrated flow is merged
+- API and route smoke coverage exists
+- QA evidence is attached for critical user and admin paths
+- serving strategy and rollback plan are documented
+
+## Recommended Launch Sequence
+
+1. Merge the current Phase 5 validation and integration workstreams.
+2. Decide the frontend serving strategy.
+3. Add smoke automation for backend APIs and frontend routes.
+4. Execute the QA plan and collect evidence.
+5. Finalize rollback, monitoring, and support procedures.
+6. Run a go/no-go review only after the above are complete.
+
+## Related Working Documents
 
 ```text
-docs/architecture/ARCHITECTURE.md
-docs/deployment/DEPLOYMENT.md
+docs/architecture/PHASE_IMPLEMENTATION_REVIEW.md
+docs/architecture/PHASE_5_HANDOFF.md
 docs/qa/QA_PLAN.md
 docs/runbook/RUNBOOK.md
-docs/architecture/PHASE_5_HANDOFF.md
-docs/architecture/PHASE_5_CI_PLAN.md
-infra/
-apps/rbp_app/
-frontend/portal/
+docs/deployment/DEPLOYMENT.md
 ```
-
-## Initial Launch Readiness Checklist
-
-| Area | Required Before Launch? | Notes |
-|---|---:|---|
-| Phase 5 integration complete | Yes | Frontend/backend integration must be validated |
-| Frappe app install validated | Yes | Bench install must pass |
-| Frappe migrate validated | Yes | Migration smoke must pass |
-| Frontend build validated | Yes | CI build must pass |
-| API smoke tests passing | Yes | Backend API behavior must be proven |
-| Route smoke tests passing | Yes | Major frontend routes must be proven |
-| QA plan executed | Yes | QA cannot remain a placeholder at launch |
-| Deployment runbook complete | Yes | Operators need actual steps, not vibes |
-| Rollback plan complete | Yes | Required before production release |
-| Secrets externalized | Yes | No secrets in repository |
-| Monitoring defined | Yes | Required before production launch |
-
-## Non-Goals for Phase 4
-
-Phase 4 did not complete:
-
-- production launch planning
-- release calendar
-- go-live decision
-- deployment execution
-- rollback validation
-- production monitoring setup
-- incident response process
-
-## Status
-
-This placeholder completes the Phase 4 documentation surface for launch planning.
-
-Detailed launch planning belongs to Phase 5 and later phases after integration, QA, and deployment validation.
