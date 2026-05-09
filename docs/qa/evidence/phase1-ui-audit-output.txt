@@ -1,0 +1,40 @@
+
+> @rbp/frontend-portal@0.0.1 audit:phase1
+> node scripts/phase1-audit.mjs
+
+Phase 1 Audit
+=============
+
+Passed: 66
+Warnings: 1
+Failed: 23
+
+Failures:
+- src/app/config/routes.registry.ts missing: src/app/config/routes.registry.ts
+- src/app/config/navigation.ts missing: src/app/config/navigation.ts
+- src/app/config/redirects.ts missing: src/app/config/redirects.ts
+- src/app/config/phase1FlowStates.ts missing: src/app/config/phase1FlowStates.ts
+- route missing from route config/registry/navigation: /membership/sign-up-now
+- route missing from route config/registry/navigation: /on-demand/decision-desk
+- route missing from route config/registry/navigation: /document-nucleus/overview
+- route missing from route config/registry/navigation: /marketplace
+- route missing from route config/registry/navigation: /operations/connectivity
+- route missing from route config/registry/navigation: /on-demand/risk-advisor
+- route missing from route config/registry/navigation: /on-demand/the-fixer
+- route missing from route config/registry/navigation: /portal/services
+- route missing from route config/registry/navigation: /portal/documents
+- route missing from route config/registry/navigation: /portal/offers
+- route missing from route config/registry/navigation: /portal/apps
+- route missing from route config/registry/navigation: /portal/resources
+- route missing from route config/registry/navigation: /portal/support
+- route missing from route config/registry/navigation: /portal/settings
+- route missing from route config/registry/navigation: /admin/dashboard
+- route missing from route config/registry/navigation: /admin/requests
+- route missing from route config/registry/navigation: /admin/marketplace
+- route missing from route config/registry/navigation: /admin/membership
+- route missing from route config/registry/navigation: /admin/audit-review
+
+Warnings:
+- Package present: firebase. Confirm it is not used for real Phase 1 backend/payment/auth work.
+
+Phase 1 audit failed. Fix the failures above.
