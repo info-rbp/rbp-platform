@@ -1,0 +1,52 @@
+name: Phase 4A Foundation Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - phase/phase-4a-foundation
+
+jobs:
+  structure:
+    name: Validate repository structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required Phase 4A paths
+        run: |
+          test -d apps/rbp_app
+          test -d frontend/portal
+          test -d contracts/api
+          test -d contracts/doctypes
+          test -d contracts/workflows
+          test -d contracts/permissions
+          test -d specs/onboarding-flows
+          test -d infra/bench
+          test -d infra/docker
+          test -d infra/deployment
+          test -d docs/architecture
+          test -d docs/api-contracts
+          test -d docs/product-flows
+          test -d tests/backend
+          test -d tests/frontend
+          test -d tests/integration
+          test -f README.md
+          test -f .gitignore
+          test -f .env.example
+          test -f docs/architecture/SOURCE_MANIFEST.md
+
+      - name: Guard against accidental Frappe core import
+        run: |
+          if [ -d "frappe" ]; then
+            echo "Do not copy Frappe core into rbp-platform."
+            exit 1
+          fi
+          if [ -d "apps/frappe" ]; then
+            echo "Do not copy apps/frappe into rbp-platform."
+            exit 1
+          fi
