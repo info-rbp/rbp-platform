@@ -146,6 +146,7 @@ rbp-platform/
 - `docs/architecture/PHASE_4_COMPLETION_REPORT.md`
 - `docs/architecture/PHASE_5_HANDOFF.md`
 - `docs/api-contracts/API_CONTRACTS.md`
+- `docs/product-flows/PRODUCT_FLOWS.md`
 - `docs/architecture/CONSOLIDATED_REPO_VALIDATION.md`
 - `docs/deployment/DEPLOYMENT.md`
 
