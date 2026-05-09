@@ -1,0 +1,14 @@
+node_modules/
+.env
+
+# Local Firebase/Vite secrets
+.env.local
+.env.*.local
+
+# Local Stitch source exports
+/docs/stitch/_source-zips/
+/docs/stitch/_extracted/
+
+# Local external source material staging
+/docs/source-material/_incoming/
+/docs/source-material/_raw/

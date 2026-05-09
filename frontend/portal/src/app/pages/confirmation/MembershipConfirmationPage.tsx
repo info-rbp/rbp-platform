@@ -1,0 +1,119 @@
+import { Link } from "react-router";
+import { Navbar } from "../../components/Navbar";
+import { Footer } from "../../components/Footer";
+import { ConfirmationPanel } from "../../components/flow";
+import { StatusBadge } from "../../components/status";
+import { membershipFlowStorageKey } from "../../features/membership/MembershipPurchaseOnboardingFlow";
+
+interface StoredMembershipConfirmation {
+  signupReference?: string;
+  onboardingReference?: string;
+  membershipStatus?: string;
+  paymentStatus?: string;
+  onboardingStatus?: string;
+  portalHref?: string;
+  businessName?: string;
+  primaryContactName?: string;
+  selectedPlan?: string;
+}
+
+function readStoredConfirmation(): StoredMembershipConfirmation | null {
+  const rawValue = window.sessionStorage.getItem(membershipFlowStorageKey);
+
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawValue) as StoredMembershipConfirmation;
+  } catch {
+    return null;
+  }
+}
+
+export function MembershipConfirmationPage() {
+  const confirmation = readStoredConfirmation();
+  const primaryReference =
+    confirmation?.onboardingReference ?? confirmation?.signupReference ?? "MEM-MOCK-PREVIEW";
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Navbar />
+      <main className="py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+          <ConfirmationPanel
+            title={
+              confirmation?.onboardingStatus === "complete"
+                ? "Membership onboarding complete"
+                : "Membership confirmation"
+            }
+            statusLabel={
+              confirmation ? "Mock membership state saved" : "Mock confirmation preview"
+            }
+            message={
+              confirmation
+                ? "This confirmation reflects the latest frontend-only membership flow state saved in this browser session. No real backend record, authentication account, or payment exists."
+                : "This fallback confirmation is shown when the sign-up flow has not been completed in the current browser session."
+            }
+            reference={primaryReference}
+            primaryAction={
+              <Link
+                to={confirmation?.portalHref ?? "/portal/dashboard"}
+                className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white"
+              >
+                Go to portal dashboard
+              </Link>
+            }
+            secondaryAction={
+              <Link
+                to="/membership/sign-up-now"
+                className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
+              >
+                Return to mock flow
+              </Link>
+            }
+          />
+
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-950">Mock status summary</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <StatusBadge
+                status={confirmation?.membershipStatus ?? "placeholder"}
+                label={`Membership: ${confirmation?.membershipStatus ?? "preview"}`}
+              />
+              <StatusBadge
+                status={confirmation?.paymentStatus ?? "placeholder"}
+                label={`Payment: ${confirmation?.paymentStatus ?? "not simulated"}`}
+              />
+              <StatusBadge
+                status={confirmation?.onboardingStatus ?? "placeholder"}
+                label={`Onboarding: ${confirmation?.onboardingStatus ?? "not started"}`}
+              />
+            </div>
+            <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="font-semibold text-slate-500">Business</dt>
+                <dd className="mt-1 text-slate-900">
+                  {confirmation?.businessName ?? "Not captured"}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-500">Contact</dt>
+                <dd className="mt-1 text-slate-900">
+                  {confirmation?.primaryContactName ?? "Not captured"}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-500">Plan</dt>
+                <dd className="mt-1 text-slate-900">
+                  {confirmation?.selectedPlan ?? "Remote Business Partner Membership"}
+                </dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
