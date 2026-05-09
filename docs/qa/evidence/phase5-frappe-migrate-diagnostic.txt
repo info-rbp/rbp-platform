@@ -1,0 +1,61 @@
+# Frappe migrate diagnostic
+
+Generated on: Sat May  9 19:12:19 AWST 2026
+
+## Bench directory
+/Users/gianpaulocoletti/frappe-1/start
+
+## Site
+rbp-phase5-validation.localhost
+
+## Bench version
+5.29.1
+
+## Installed apps
+
+frappe  17.x.x-develop (0e1d2ca) develop
+rbp_app 0.1.0                    main
+
+
+## Site config
++------------------------------+-------------------------+
+| Config                       | Value                   |
++------------------------------+-------------------------+
+| background_workers           | 1                       |
+| default_site                 | frappe.localhost        |
+| file_watcher_port            | 6787                    |
+| frappe_user                  | gianpaulocoletti        |
+| gunicorn_workers             | 17                      |
+| live_reload                  | True                    |
+| rebase_on_pull               | False                   |
+| redis_cache                  | redis://127.0.0.1:13000 |
+| redis_queue                  | redis://127.0.0.1:11000 |
+| redis_socketio               | redis://127.0.0.1:13000 |
+| restart_supervisor_on_update | False                   |
+| restart_systemd_on_update    | False                   |
+| serve_default_site           | True                    |
+| shallow_clone                | True                    |
+| socketio_port                | 9000                    |
+| use_redis_auth               | False                   |
+| webserver_port               | 8000                    |
+| db_name                      | _0b286e4f3bf8b930       |
+| db_password                  | XHwFIy0nCFLsRZNz        |
+| db_type                      | mariadb                 |
+| db_user                      | _0b286e4f3bf8b930       |
+| db_socket                    | None                    |
+| db_host                      | 127.0.0.1               |
+| db_port                      | 3306                    |
++------------------------------+-------------------------+
+
+## Last migrate output
+Migrating rbp-phase5-validation.localhost
+Service redis_cache is not running.
+
+Cannot run bench migrate without the services running.
+If you are running bench in development mode, make sure that bench is running:
+
+$ bench start
+
+Otherwise, check the server logs and ensure that all the required services are running.
+
+

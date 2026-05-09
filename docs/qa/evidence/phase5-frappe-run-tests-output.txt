@@ -1,0 +1,265 @@
+Starting test run with parameters: site=rbp-phase5-validation.localhost, app=rbp_app, verbose=False, tests=(), force=False, profile=False, failfast=False, skip_before_tests=False, debug=False, selected_categories=[]
+View detailed logs (using --verbose): /Users/gianpaulocoletti/frappe-1/start/logs/frappe.testing.log
+
+Running 173 unspecified-category tests for rbp_app
+
+rbp_app.tests.test_phase3_partials.TestPhase3PartialDoctypeContracts
+   [32m ✔ [0m test_audit_fields_are_expanded
+   [32m ✔ [0m test_entitlement_fields_are_expanded
+   [32m ✔ [0m test_new_supporting_doctypes_exist
+   [32m ✔ [0m test_notification_fields_are_expanded
+   [32m ✔ [0m test_subscription_fields_are_expanded
+   [32m ✔ [0m test_tenant_fields_are_expanded
+
+rbp_app.tests.test_phase3_partials.TestPhase3PartialServiceContracts
+   [32m ✔ [0m test_new_services_export_required_functions
+
+rbp_app.tests.test_api_hrms_adapter.TestApiHrmsAdapter
+   [32m ✔ [0m test_guest_is_rejected
+   [32m ✔ [0m test_hrms_absent_returns_safe_payload
+   [32m ✔ [0m test_hrms_query_failure_gets_unavailable_payload
+   [32m ✔ [0m test_hrms_summary_exposes_counts_not_employee_records
+   [32m ✔ [0m test_missing_hrms_doctypes_fail_safely
+   [32m ✔ [0m test_user_without_hrms_access_gets_unavailable_payload
+
+rbp_app.tests.test_api_me.TestApiMe
+   [32m ✔ [0m test_guest_is_rejected
+   [32m ✔ [0m test_logged_in_user_receives_roles_and_admin_flags
+
+rbp_app.tests.test_membership_onboarding.TestMembershipOnboardingContracts
+   [32m ✔ [0m test_membership_api_exports_required_methods
+   [32m ✔ [0m test_membership_plan_doctype_exists_with_required_fields
+   [32m ✔ [0m test_membership_service_exports_required_functions
+   [32m ✔ [0m test_onboarding_flow_doctype_exists_with_required_fields
+   [32m ✔ [0m test_onboarding_step_doctype_exists_with_required_fields
+
+rbp_app.tests.test_the_fixer.TestTheFixerApi
+   [32m ✔ [0m test_admin_api_requires_system_manager
+   [32m ✔ [0m test_api_methods_are_thin_and_coerce_payloads
+
+rbp_app.tests.test_the_fixer.TestTheFixerDoctypes
+   [32m ✔ [0m test_case_task_and_update_doctypes_have_required_fields
+
+rbp_app.tests.test_the_fixer.TestTheFixerService
+   [32m ✔ [0m test_add_case_update_and_visibility_rules
+   [32m ✔ [0m test_admin_assign_case_sets_assignee_and_notifies
+   [32m ✔ [0m test_admin_update_case_status_sets_dates_and_resolution_notifications
+   [32m ✔ [0m test_audit_and_notification_events_cover_required_lifecycle
+   [32m ✔ [0m test_cannot_update_case_after_submit
+   [32m ✔ [0m test_create_case_sets_owner_tenant_defaults_and_audit
+   [32m ✔ [0m test_create_update_and_complete_task_lifecycle
+   [32m ✔ [0m test_get_case_includes_tasks_and_visible_updates
+   [32m ✔ [0m test_invalid_status_transition_is_rejected
+   [32m ✔ [0m test_list_my_cases_returns_owned_and_assigned_cases
+   [32m ✔ [0m test_owner_assigned_admin_access_and_cross_tenant_denial
+   [32m ✔ [0m test_related_reference_cross_tenant_denial
+   [32m ✔ [0m test_submit_case_changes_status_and_notifies_owner_and_admin
+   [32m ✔ [0m test_update_draft_case_updates_allowed_fields_only
+
+rbp_app.tests.test_api_integrations.TestApiIntegrations
+   [32m ✔ [0m test_guest_is_rejected
+   [32m ✔ [0m test_known_app_adapter_returns_safe_response
+   [32m ✔ [0m test_missing_optional_app_is_safe
+   [32m ✔ [0m test_unknown_app_uses_generic_adapter
+
+rbp_app.tests.test_docushare.TestDocuShareApi
+   [32m ✔ [0m test_api_methods_are_thin_and_coerce_payloads
+
+rbp_app.tests.test_docushare.TestDocuShareDoctypes
+   [32m ✔ [0m test_document_doctype_fields
+   [32m ✔ [0m test_folder_doctype_fields
+   [32m ✔ [0m test_share_doctype_fields
+
+rbp_app.tests.test_docushare.TestDocuShareService
+   [32m ✔ [0m test_admin_can_access_and_manage_all_records
+   [32m ✔ [0m test_audit_events_cover_required_lifecycle
+   [32m ✔ [0m test_create_document_validates_folder_and_file_reference_tenant
+   [32m ✔ [0m test_create_folder_sets_owner_tenant_defaults_and_audit
+   [32m ✔ [0m test_cross_tenant_access_and_linking_are_denied
+   [32m ✔ [0m test_list_and_get_folder_respect_owner_access
+   [32m ✔ [0m test_list_documents_returns_visible_documents
+   [32m ✔ [0m test_notification_creation_for_share_and_revoke
+   [32m ✔ [0m test_revoke_share_removes_shared_access_and_notifies
+   [32m ✔ [0m test_share_document_grants_shared_user_access_and_notifies
+   [32m ✔ [0m test_share_folder_grants_shared_user_access_and_notifies
+   [32m ✔ [0m test_update_document_and_get_document
+   [32m ✔ [0m test_update_folder_validates_parent_tenant
+
+rbp_app.tests.test_decision_desk.TestDecisionDeskApi
+   [32m ✔ [0m test_admin_api_requires_system_manager
+   [32m ✔ [0m test_api_methods_are_thin_and_coerce_payloads
+
+rbp_app.tests.test_decision_desk.TestDecisionDeskDoctypes
+   [32m ✔ [0m test_option_doctype_has_required_fields
+   [32m ✔ [0m test_request_doctype_has_required_fields
+
+rbp_app.tests.test_decision_desk.TestDecisionDeskService
+   [32m ✔ [0m test_admin_assign_request_sets_assignee_and_notifies_advisor
+   [32m ✔ [0m test_admin_update_status_sets_status_and_outcome_notifications
+   [32m ✔ [0m test_audit_events_cover_required_lifecycle
+   [32m ✔ [0m test_cannot_get_another_user_or_tenant_request
+   [32m ✔ [0m test_cannot_update_after_submit
+   [32m ✔ [0m test_create_option_inherits_parent_tenant
+   [32m ✔ [0m test_create_request_sets_owner_tenant_and_audit
+   [32m ✔ [0m test_delete_option_removes_record
+   [32m ✔ [0m test_get_own_request_includes_options
+   [32m ✔ [0m test_list_my_requests_returns_own_and_assigned_requests_only
+   [32m ✔ [0m test_notification_creation_for_submit_assign_and_status
+   [32m ✔ [0m test_permission_failures_for_guest_non_admin_and_tenant_mismatch
+   [32m ✔ [0m test_submit_request_changes_status_and_notifies_user_and_admin
+   [32m ✔ [0m test_update_draft_request_updates_allowed_fields
+   [32m ✔ [0m test_update_option_uses_parent_access
+
+rbp_app.tests.test_portal_app_routes.TestPortalAppRoutes
+   [32m ✔ [0m test_hrms_detail_context_builds_count_cards_only
+   [32m ✔ [0m test_hrms_detail_route_uses_dedicated_context_when_absent
+   [32m ✔ [0m test_portal_app_routes_use_dedicated_pages
+
+rbp_app.tests.test_risk_advisor.TestRiskAdvisorApi
+   [32m ✔ [0m test_admin_api_requires_system_manager
+   [32m ✔ [0m test_api_methods_are_thin_and_coerce_payloads
+
+rbp_app.tests.test_risk_advisor.TestRiskAdvisorDoctypes
+   [32m ✔ [0m test_action_doctype_has_required_fields
+   [32m ✔ [0m test_assessment_doctype_has_required_fields
+   [32m ✔ [0m test_risk_doctype_has_required_fields
+
+rbp_app.tests.test_risk_advisor.TestRiskAdvisorService
+   [32m ✔ [0m test_admin_assign_assessment_sets_assignee_and_notifies_advisor
+   [32m ✔ [0m test_admin_update_assessment_status_sets_status_and_notifies_owner
+   [32m ✔ [0m test_audit_events_cover_required_lifecycle
+   [32m ✔ [0m test_cannot_update_assessment_after_submit
+   [32m ✔ [0m test_complete_action_sets_status_audit_and_notification
+   [32m ✔ [0m test_create_action_inherits_parent_tenant_and_notifies_assignee
+   [32m ✔ [0m test_create_assessment_sets_owner_tenant_and_audit
+   [32m ✔ [0m test_create_risk_inherits_parent_tenant_and_scores
+   [32m ✔ [0m test_cross_tenant_risk_and_action_links_are_denied
+   [32m ✔ [0m test_get_assessment_includes_risks_and_actions
+   [32m ✔ [0m test_invalid_assessment_status_transition_is_rejected
+   [32m ✔ [0m test_list_my_assessments_returns_own_and_assigned_records_only
+   [32m ✔ [0m test_notification_creation_for_required_events
+   [32m ✔ [0m test_owner_assigned_user_admin_access_and_cross_tenant_denial
+   [32m ✔ [0m test_risk_score_and_level_calculation_boundaries
+   [32m ✔ [0m test_submit_assessment_changes_status_and_notifies_user_and_admin
+   [32m ✔ [0m test_update_action_changes_status_and_completed_timestamp
+   [32m ✔ [0m test_update_draft_assessment_updates_allowed_fields
+   [32m ✔ [0m test_update_risk_recalculates_score_and_validates_status
+
+rbp_app.tests.test_api_dashboard.TestApiDashboard
+   [32m ✔ [0m test_guest_is_rejected
+   [32m ✔ [0m test_logged_in_user_receives_dashboard_payload
+
+rbp_app.tests.test_api_apps.TestApiApps
+   [32m ✔ [0m test_billing_is_admin_only
+   [32m ✔ [0m test_guest_is_rejected
+   [32m ✔ [0m test_known_unknown_and_platform_modules_are_returned
+
+rbp_app.tests.test_guards.TestGuards
+   [32m ✔ [0m test_admin_allows_administrator_or_system_manager
+   [32m ✔ [0m test_admin_redirects_guest
+   [32m ✔ [0m test_admin_rejects_normal_user
+   [32m ✔ [0m test_app_redirects_guest
+   [32m ✔ [0m test_portal_allows_logged_in_user
+   [32m ✔ [0m test_portal_apps_redirects_guest
+   [32m ✔ [0m test_portal_redirects_guest
+   [32m ✔ [0m test_root_redirects_to_rbp_index_before_mail_redirect
+
+rbp_app.tests.test_multi_tenant_billing.TestBillingCheckout
+   [32m ✔ [0m test_start_subscription_checkout_creates_payment_request_for_account
+
+rbp_app.tests.test_multi_tenant_billing.TestSharedBenchAuthAllowlist
+   [32m ✔ [0m test_mail_auth_allows_rbp_portal_api_methods
+   [32m ✔ [0m test_mail_does_not_claim_global_auth_routes
+
+rbp_app.tests.test_multi_tenant_billing.TestSignupOnboarding
+   [32m ✔ [0m test_signup_commits_only_after_tenant_and_account_are_created
+   [32m ✔ [0m test_signup_rolls_back_when_account_creation_fails
+
+rbp_app.tests.test_multi_tenant_billing.TestTenantAccess
+   [32m ✔ [0m test_portal_tenant_loader_sets_setup_state_when_user_has_no_tenant
+   [32m ✔ [0m test_rbp_account_permission_allows_current_tenant_only
+   [32m ✔ [0m test_tenant_permission_rejects_unrelated_website_user
+
+rbp_app.tests.test_tenancy.TestTenancyCompatibility
+   [32m ✔ [0m test_get_current_tenant_falls_back_to_legacy_tenant
+   [32m ✔ [0m test_get_current_tenant_prefers_rbp_tenant
+   [32m ✔ [0m test_load_portal_tenant_sets_current_tenant
+   [32m ✔ [0m test_load_portal_tenant_sets_setup_required_when_missing
+
+rbp_app.tests.test_connectivity.TestConnectivityApi
+   [32m ✔ [0m test_api_methods_are_thin_and_coerce_payloads
+
+rbp_app.tests.test_connectivity.TestConnectivityDoctypes
+   [32m ✔ [0m test_request_provider_and_quote_doctype_fields
+
+rbp_app.tests.test_connectivity.TestConnectivityService
+   [32m ✔ [0m test_admin_assign_and_update_status
+   [32m ✔ [0m test_audit_and_notification_events_cover_required_lifecycle
+   [32m ✔ [0m test_create_and_update_draft_request
+   [32m ✔ [0m test_create_update_and_accept_quote
+   [32m ✔ [0m test_create_update_and_list_provider_are_admin_managed
+   [32m ✔ [0m test_cross_tenant_provider_linking_is_denied
+   [32m ✔ [0m test_list_and_get_request_for_owner_and_assigned_user
+   [32m ✔ [0m test_owner_assigned_admin_access_and_cross_tenant_denial
+   [32m ✔ [0m test_submit_request_and_cannot_update_after_submit
+
+rbp_app.tests.test_platform_api.TestAvailableAppsApi
+   [32m ✔ [0m test_entitlement_records_can_drive_app_cards
+   [32m ✔ [0m test_get_available_apps_returns_billing_for_system_manager
+   [32m ✔ [0m test_get_available_apps_returns_known_unknown_and_platform_cards
+   [32m ✔ [0m test_group_app_cards_by_category
+   [32m ✔ [0m test_missing_hrms_does_not_crash_app_discovery
+
+rbp_app.tests.test_platform_api.TestCurrentUserApi
+   [32m ✔ [0m test_get_current_user_returns_session_payload
+
+rbp_app.tests.test_platform_api.TestDashboardApi
+   [32m ✔ [0m test_get_home_returns_expected_payload
+       ▸  /Users/gianpaulocoletti/frappe-1/start/apps/frappe/frappe/model/qb_query.py:153: V17FrappeDeprecationWarning: This codepath was marked (DATE: 2024-01-01) deprecated for removal (from v17 onwards); note:
+       ▸   The 'limit_page_length' parameter is deprecated. Use 'limit' instead.
+       ▸  
+       ▸    deprecation_warning(
+
+rbp_app.tests.test_platform_api.TestPlaceholderApis
+   [32m ✔ [0m test_billing_documents_and_notifications_return_dicts
+   [32m ✔ [0m test_billing_service_uses_subscription_when_available
+   [32m ✔ [0m test_erpnext_placeholder_adapter_checks_installation
+   [32m ✔ [0m test_generic_app_summary_endpoint_returns_placeholder
+   [32m ✔ [0m test_hrms_app_summary_returns_aggregate_counts_only
+   [32m ✔ [0m test_hrms_summary_fails_safely_when_doctypes_missing
+   [32m ✔ [0m test_hrms_summary_fails_safely_when_hrms_missing
+   [32m ✔ [0m test_integrations_status_returns_counts
+   [32m ✔ [0m test_notifications_service_reads_current_user_notifications
+
+rbp_app.tests.test_platform_api.TestPlatformPermissions
+   [32m ✔ [0m test_administrator_is_admin_user
+   [32m ✔ [0m test_is_system_manager_uses_roles
+   [32m ✔ [0m test_require_login_rejects_guest
+
+rbp_app.tests.test_platform_api.TestPlatformRouteGuards
+   [32m ✔ [0m test_admin_routes_redirect_guests_to_login
+   [32m ✔ [0m test_admin_routes_require_admin_user
+   [32m ✔ [0m test_customer_routes_add_dynamic_app_context_for_logged_in_users
+   [32m ✔ [0m test_customer_routes_redirect_guests_to_login
+   [32m ✔ [0m test_public_routes_remain_public
+
+rbp_app.tests.test_marketplace.TestMarketplaceApi
+   [32m ✔ [0m test_api_methods_are_thin_and_coerce_payloads
+
+rbp_app.tests.test_marketplace.TestMarketplaceDoctypes
+   [32m ✔ [0m test_vendor_listing_and_order_doctype_fields
+
+rbp_app.tests.test_marketplace.TestMarketplaceService
+   [32m ✔ [0m test_audit_and_notification_events_cover_required_lifecycle
+   [32m ✔ [0m test_create_order_update_status_list_and_get_order
+   [32m ✔ [0m test_create_update_list_and_get_listing_through_vendor_owner
+   [32m ✔ [0m test_create_update_list_and_get_vendor
+   [32m ✔ [0m test_cross_tenant_access_is_denied
+   [32m ✔ [0m test_owner_vendor_buyer_and_admin_access_paths
+   [32m ✔ [0m test_permission_and_transition_failures
+
+
+----------------------------------------------------------------------
+Ran 173 tests in 0.204s
+
+OK

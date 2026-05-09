@@ -1,0 +1,14 @@
+# Installed App Confirmation
+
+Generated on: Sat May  9 19:14:20 AWST 2026
+
+Site: rbp-phase5-validation.localhost
+
+## Installed apps
+
+frappe  17.x.x-develop (0e1d2ca) develop
+rbp_app 0.1.0                    main
+
+
+## Site config allow_tests
+| allow_tests                  | True                    |

@@ -1,0 +1,52 @@
+# Phase 5 Frappe App Validation Environment
+
+Generated on: Sat May  9 19:06:57 AWST 2026
+
+Repository: info-rbp/rbp-platform
+Branch: phase5/validate-consolidated-frappe-app
+Frappe app path: apps/rbp_app
+Bench directory: /Users/gianpaulocoletti/frappe-1/start
+Site name: rbp-phase5-validation.localhost
+
+## Git
+phase5/validate-consolidated-frappe-app
+d10e816a6bc2a7ac0485394fc00c6e6520e89c8d
+
+## Python
+Python 3.14.3
+
+## Bench
+5.29.1
+
+## Bench apps
+Traceback (most recent call last):
+  File "/Users/gianpaulocoletti/frappe-1/start/apps/frappe/frappe/utils/bench_helper.py", line 48, in invoke
+    return super().invoke(ctx)
+           ~~~~~~~~~~~~~~^^^^^
+  File "/Users/gianpaulocoletti/frappe-1/start/env/lib/python3.14/site-packages/click/core.py", line 1873, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/gianpaulocoletti/frappe-1/start/env/lib/python3.14/site-packages/click/core.py", line 1269, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gianpaulocoletti/frappe-1/start/env/lib/python3.14/site-packages/click/core.py", line 824, in invoke
+    return callback(*args, **kwargs)
+  File "/Users/gianpaulocoletti/frappe-1/start/apps/frappe/frappe/commands/utils.py", line 895, in get_version
+    app_hooks = frappe.get_module(app + ".hooks")
+  File "/Users/gianpaulocoletti/frappe-1/start/apps/frappe/frappe/__init__.py", line 821, in get_module
+    return importlib.import_module(modulename)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/gianpaulocoletti/.local/share/uv/python/cpython-3.14.3-macos-aarch64-none/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/Users/gianpaulocoletti/frappe-1/start/apps/assets/assets/hooks.py", line 1, in <module>
+    from . import __version__ as app_version
+ImportError: cannot import name '__version__' from 'assets' (unknown location)
+
+cannot import name '__version__' from 'assets' (unknown location)
