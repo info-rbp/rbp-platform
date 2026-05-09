@@ -149,6 +149,9 @@ rbp-platform/
 - `docs/product-flows/PRODUCT_FLOWS.md`
 - `docs/product-flows/ONBOARDING_FLOWS.md`
 - `docs/architecture/CONSOLIDATED_REPO_VALIDATION.md`
+- `docs/runbook/RUNBOOK.md`
+- `docs/launch/LAUNCH_PLAN.md`
+- `docs/qa/QA_PLAN.md`
 - `docs/deployment/DEPLOYMENT.md`
 
 ## Phase 4A Rule
