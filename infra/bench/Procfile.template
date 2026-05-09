@@ -1,0 +1,20 @@
+# Procfile.template
+#
+# Template process file for a local or deployment-oriented Frappe bench running rbp_app.
+# Copy this to the appropriate bench Procfile location and adjust paths, ports, and worker counts per environment.
+#
+# This file is intentionally a template. Do not put secrets here.
+
+web: bench serve --port ${FRAPPE_PORT:-8000}
+socketio: /usr/bin/node apps/frappe/socketio.js
+watch: bench watch
+schedule: bench schedule
+worker_short: bench worker --queue short,default
+worker_long: bench worker --queue long,default,short
+worker_default: bench worker --queue default
+
+# Optional production-style process examples:
+# gunicorn: bench serve --port ${FRAPPE_PORT:-8000} --noreload
+# redis_cache: redis-server config/redis_cache.conf
+# redis_queue: redis-server config/redis_queue.conf
+# redis_socketio: redis-server config/redis_socketio.conf
