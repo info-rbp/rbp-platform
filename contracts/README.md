@@ -1,15 +1,16 @@
-# Contracts Placeholder
+# Phase 2 Contracts
 
-This directory is reserved for Phase 2 contract material.
+This directory contains the migrated Phase 2 contract baseline for the Remote Business Partner Platform.
 
-Expected future source:
+Source repository:
 
-- `info-rbp/Uiuxdesignassistance`
-- source path: `RBP_Phase_2_Backend_Contracts/`
+```text
+info-rbp/Uiuxdesignassistance
 
-Contracts will be organized into:
+Source commit:
 
-- `contracts/api/`
-- `contracts/doctypes/`
-- `contracts/workflows/`
-- `contracts/permissions/`
+6165346d4fc29fba6b78ec84e32285159a182c82
+
+Original source package:
+
+RBP_Phase_2_Backend_Contracts/
