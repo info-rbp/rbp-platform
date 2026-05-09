@@ -1,0 +1,18 @@
+# Frontend Build Environment
+
+Generated on: Sat May  9 19:03:05 AWST 2026
+
+Repository: info-rbp/rbp-platform
+Branch: phase5/validate-consolidated-frontend-build
+
+## Node
+v24.14.1
+
+## npm
+11.11.0
+
+## Working directory
+/Users/gianpaulocoletti/rbp-work/rbp-platform
+
+## Frontend package
+@rbp/frontend-portal@0.0.1
