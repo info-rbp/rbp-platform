@@ -1,10 +1,11 @@
-# Frontend Portal Placeholder
 
-This directory is reserved for the React/Vite frontend import target.
+  # Remote Business Partner
 
-Expected future source:
+  This is a code bundle for Remote Business Partner. The original project is available at https://www.figma.com/design/kD7hXNGAibAxGybLGVss3c/Remote-Business-Partner.
 
-- `info-rbp/Uiuxdesignassistance`
-- target path: `frontend/portal/`
+  ## Running the code
 
-No frontend files have been migrated yet.
+  Run `npm i` to install the dependencies.
+
+  Run `npm run dev` to start the development server.
+  
