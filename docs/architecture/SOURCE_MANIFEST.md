@@ -83,11 +83,68 @@ Source commit: `6165346d4fc29fba6b78ec84e32285159a182c82`
 
 Status: Phase 2 complete
 
-Detected source path or paths:
+Detected source paths:
 
-```text
-Pending detailed Phase 2 source path audit.
-```
+- `RBP_Phase_2_Backend_Contracts/`
+- `docs/phase-2-handoff/`
+- `docs/backend-collection-contracts.md`
+- `docs/backend-collection-contracts-audit.md`
+- `docs/backend-resources-help-center.md`
+- `docs/backend-resources-help-center-audit.md`
+- `docs/admin-permissions-model.md`
+- `docs/ui/mock-api-simulation-layer.md`
+- `src/app/config/routes.registry.ts`
+- `src/app/config/phase1FlowStates.ts`
+- `src/app/services/mock/`
+- `src/app/mock/`
+- `scripts/audit-backend-collection-contracts.mjs`
+- `scripts/audit-backend-resources-help-center.mjs`
+- `scripts/audit-admin-content-model.mjs`
+- `scripts/audit-admin-crud-schema.mjs`
+
+Primary Phase 2 contract package:
+
+- `RBP_Phase_2_Backend_Contracts/00-final-ui-dependent-pack-index.md`
+- `RBP_Phase_2_Backend_Contracts/01-api-response-envelope-standard.md`
+- `RBP_Phase_2_Backend_Contracts/02-naming-conventions.md`
+- `RBP_Phase_2_Backend_Contracts/03-role-matrix.md`
+- `RBP_Phase_2_Backend_Contracts/04-permission-model-draft.md`
+- `RBP_Phase_2_Backend_Contracts/05-core-doctype-model.md`
+- `RBP_Phase_2_Backend_Contracts/06-workflow-state-standards.md`
+- `RBP_Phase_2_Backend_Contracts/07-error-catalogue.md`
+- `RBP_Phase_2_Backend_Contracts/08-payment-state-model.md`
+- `RBP_Phase_2_Backend_Contracts/09-upload-file-rules.md`
+- `RBP_Phase_2_Backend_Contracts/10-contract-templates.md`
+- `RBP_Phase_2_Backend_Contracts/11-route-to-endpoint-map.md`
+- `RBP_Phase_2_Backend_Contracts/12-form-field-specifications.md`
+- `RBP_Phase_2_Backend_Contracts/13-validation-rules.md`
+- `RBP_Phase_2_Backend_Contracts/14-notification-triggers.md`
+- `RBP_Phase_2_Backend_Contracts/15-admin-actions.md`
+- `RBP_Phase_2_Backend_Contracts/16-mock-to-real-api-map.md`
+- `RBP_Phase_2_Backend_Contracts/17-phase-2-acceptance-gate.md`
+- `RBP_Phase_2_Backend_Contracts/index.md`
+
+Relevant supporting paths:
+
+- `docs/implementation/step-24-phase-2-handoff-docs.codex.md`
+- `docs/phase-2-handoff/admin-action-map.md`
+- `docs/phase-2-handoff/backend-assumptions.md`
+- `docs/phase-2-handoff/flow-field-inventory.md`
+- `docs/phase-2-handoff/mock-api-inventory.md`
+- `docs/phase-2-handoff/phase-2-starting-brief.md`
+- `docs/phase-2-handoff/portal-status-map.md`
+- `docs/phase-2-handoff/route-to-contract-map.md`
+- `docs/phase-2-handoff/workflow-state-map.md`
+
+Searched but not found:
+
+- `contracts/`
+- `docs/contracts/`
+- `docs/api-contracts/`
+- `docs/backend/`
+- `docs/phase-2/`
+- `docs/product-flows/`
+- `specs/`
 
 Planned import targets:
 
@@ -110,10 +167,11 @@ Expected imported content:
 
 Notes:
 
-- Phase 2 contract material is expected to live inside `info-rbp/Uiuxdesignassistance`.
+- Phase 2 contract material lives inside `info-rbp/Uiuxdesignassistance`.
+- The primary Phase 2 source package is `RBP_Phase_2_Backend_Contracts/`.
+- The supporting handoff package is `docs/phase-2-handoff/`.
 - Phase 2 contracts are to be treated as the authoritative baseline for Phase 3 backend completion and Phase 5 integration.
 - No contract files were migrated during Step 1.
-- Detailed Phase 2 source path detection will be completed in the Phase 2 contract source path audit step.
 
 ## Phase 3 Backend Source
 
@@ -190,15 +248,16 @@ Explicitly **not** performed:
 
 Step 1 status:
 
-`In progress - source manifest correction underway`
+`In progress - backend source verification pending`
 
 Summary:
 
 - Target repository state confirmed.
 - Phase 1 UI/UX source state confirmed.
-- Phase 2 contract source is expected inside `info-rbp/Uiuxdesignassistance`.
+- Phase 2 contract source paths confirmed inside `info-rbp/Uiuxdesignassistance`.
 - Phase 3 backend reference state still requires detailed verification.
 - Source manifest created in `docs/architecture/SOURCE_MANIFEST.md`.
 - No source code migration performed.
+- No contract migration performed.
 - No backend import performed.
 - No destructive changes performed.
