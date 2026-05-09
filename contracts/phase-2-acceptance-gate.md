@@ -8,7 +8,7 @@
 | Document | Phase 2 Acceptance Gate |
 | Phase | Phase 2: Backend Contract Planning |
 | Project | Remote Business Partner Platform |
-| Status | Ready for review |
+| Status | Approved for Phase 5 preflight with documented deferrals |
 | Generated | 2026-05-07 |
 | Source Repository | `info-rbp/Uiuxdesignassistance` |
 | Intended Location Now | `RBP_Phase_2_Backend_Contracts/17-phase-2-acceptance-gate.md` |
@@ -76,20 +76,20 @@ It determines when backend contract planning is complete enough for Phase 3 Frap
 
 | Gate Item | Required Evidence | Status |
 |---|---|---|
-| Every active route has backend mapping | `11-route-to-endpoint-map.md` | Pending review |
-| Every major product flow has create/update/submit/get/list APIs | `11`, `16` | Pending review |
-| Every form field maps to a backend field or DocType | `12-form-field-specifications.md` | Pending review |
-| Every form has backend validation rules | `13-validation-rules.md` | Pending review |
-| Every workflow has states, transitions, and role rules | `06-workflow-state-standards.md` | Pending review |
-| Every role has permission rules | `03`, `04` | Pending review |
-| Every upload maps to `RBP File Reference` | `09`, `12`, `16` | Pending review |
-| Every payment touchpoint maps to `RBP Payment Event` | `08`, `12`, `16` | Pending review |
-| Every notification trigger is defined | `14-notification-triggers.md` | Pending review |
-| Every admin action has an endpoint, role, state, audit, and notification rule | `15-admin-actions.md` | Pending review |
-| Every mock service has a real Frappe endpoint target | `16-mock-to-real-api-map.md` | Pending review |
-| Every error path uses standard error envelope and catalogue | `01`, `07`, `13` | Pending review |
-| Every DocType needed for Phase 3 is defined | `05-core-doctype-model.md` | Pending review |
-| QA can write backend tests from the contracts | all documents | Pending review |
+| Every active route has backend mapping | `11-route-to-endpoint-map.md` | Approved |
+| Every major product flow has create/update/submit/get/list APIs | `11`, `16` | Approved |
+| Every form field maps to a backend field or DocType | `12-form-field-specifications.md` | Approved |
+| Every form has backend validation rules | `13-validation-rules.md` | Approved |
+| Every workflow has states, transitions, and role rules | `06-workflow-state-standards.md` | Deferred - strict transition hardening remains a launch-hardening item where required |
+| Every role has permission rules | `03`, `04` | Approved |
+| Every upload maps to `RBP File Reference` | `09`, `12`, `16` | Approved - raw upload implementation remains Phase 5 or later integration work |
+| Every payment touchpoint maps to `RBP Payment Event` | `08`, `12`, `16` | Approved - live payment provider integration remains deferred |
+| Every notification trigger is defined | `14-notification-triggers.md` | Approved |
+| Every admin action has an endpoint, role, state, audit, and notification rule | `15-admin-actions.md` | Approved |
+| Every mock service has a real Frappe endpoint target | `16-mock-to-real-api-map.md` | Approved |
+| Every error path uses standard error envelope and catalogue | `01`, `07`, `13` | Deferred - Phase 3 raw dictionary responses must be reflected in Phase 5 client handling |
+| Every DocType needed for Phase 3 is defined | `05-core-doctype-model.md` | Approved |
+| QA can write backend tests from the contracts | all documents | Approved |
 
 ---
 
@@ -120,15 +120,15 @@ Phase 3 may begin when all of the following are true:
 
 | ID | Item | Owner | Required Before | Status |
 |---|---|---|---|---|
-| OI-001 | Confirm whether repo placeholder pages have matching completed UI work elsewhere or are accepted as contract-required flows | Product / Frontend | Phase 3 build | Open |
-| OI-002 | Confirm final payment provider and payment-required products | Product / Backend | Billing implementation | Open |
-| OI-003 | Confirm final file type/size limits | Product / Backend / Security | Upload implementation | Open |
-| OI-004 | Confirm whether marketplace supports third-party seller onboarding at launch | Product | Marketplace implementation | Open |
-| OI-005 | Confirm final team-member access policy | Product / Backend | Permission implementation | Open |
-| OI-006 | Confirm whether content/admin CMS DocTypes are in Phase 3 or later | Product / Backend | Admin implementation | Open |
-| OI-007 | Confirm final notification email vs portal-only triggers | Product / Ops | Notification implementation | Open |
-| OI-008 | Confirm connectivity provider integration requirements | Product / Backend | Connectivity implementation | Open |
-| OI-009 | Confirm whether Risk Advisor uses mock score, manual review, or real scoring | Product / Backend | Risk Advisor implementation | Open |
+| OI-001 | Confirm whether repo placeholder pages have matching completed UI work elsewhere or are accepted as contract-required flows | Product / Frontend | Phase 3 build | Closed - accepted by Phase 1 QA evidence or documented deferrals |
+| OI-002 | Confirm final payment provider and payment-required products | Product / Backend | Billing implementation | Deferred - payment model accepted; live provider decision remains later hardening |
+| OI-003 | Confirm final file type/size limits | Product / Backend / Security | Upload implementation | Deferred - final upload limits remain Phase 5/security hardening |
+| OI-004 | Confirm whether marketplace supports third-party seller onboarding at launch | Product | Marketplace implementation | Deferred - launch-scope decision remains product hardening |
+| OI-005 | Confirm final team-member access policy | Product / Backend | Permission implementation | Deferred - permission baseline accepted; final team policy remains hardening |
+| OI-006 | Confirm whether content/admin CMS DocTypes are in Phase 3 or later | Product / Backend | Admin implementation | Deferred - admin baseline accepted; CMS scope remains later decision |
+| OI-007 | Confirm final notification email vs portal-only triggers | Product / Ops | Notification implementation | Deferred - portal notification model accepted; delivery channel remains hardening |
+| OI-008 | Confirm connectivity provider integration requirements | Product / Backend | Connectivity implementation | Deferred - provider integration depth remains later integration scope |
+| OI-009 | Confirm whether Risk Advisor uses mock score, manual review, or real scoring | Product / Backend | Risk Advisor implementation | Deferred - scoring model remains product/backend hardening |
 
 ---
 
@@ -163,3 +163,23 @@ Phase 2 is accepted only when Phase 3 can build from the contracts without inven
 ```
 
 If Phase 3 still has to guess, Phase 2 is not done. It is merely wearing a tie.
+
+
+---
+
+## 8. Phase 2 Closeout Addendum
+
+Phase 2 acceptance has been closed for Phase 5 preflight with documented deferrals.
+
+Closeout evidence:
+
+    docs/architecture/phase-2-closeout/PHASE_2_ACCEPTANCE_GATE_CLOSEOUT.md
+
+Dependency evidence:
+
+    docs/qa/PHASE_1_UI_AUDIT_RESPONSIVE_QA.md
+
+Decision:
+
+    Phase 2 is accepted for Phase 5 mock-to-real API mapping and integration planning.
+    Deferred items must be carried forward and must not be treated as production-ready.
