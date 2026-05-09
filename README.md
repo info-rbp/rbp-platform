@@ -2,7 +2,7 @@
 
 Final source-of-truth repository for the Remote Business Partner Platform.
 
-Status: Phase 4A Foundation Consolidation.
+Status: Phase 4 consolidation complete; Phase 5 handoff ready.
 
 ## Purpose
 
@@ -23,7 +23,7 @@ It is intended to become the structured production repository for:
 Current phase:
 
 ```text
-Phase 4A - Foundation Consolidation
+Phase 4 - Consolidation complete
 ```
 
 Completed in this branch:
@@ -36,11 +36,14 @@ Completed in this branch:
 - Phase 4A validation workflow added
 - placeholder targets created for future imports
 
-Not yet performed:
+Completed in Phase 4:
 
 - frontend migration
 - Phase 2 contract migration
 - `rbp_app` import
+
+Not yet performed:
+
 - backend/frontend integration
 - production deployment
 - QA launch validation
@@ -138,6 +141,9 @@ rbp-platform/
 - `docs/architecture/REPOSITORY_STRATEGY.md`
 - `docs/architecture/PHASE_4A_STATUS.md`
 - `docs/architecture/CONSOLIDATION_CHECKLIST.md`
+- `docs/architecture/PHASE_4_COMPLETION_REPORT.md`
+- `docs/architecture/PHASE_5_HANDOFF.md`
+- `docs/architecture/CONSOLIDATED_REPO_VALIDATION.md`
 - `docs/deployment/DEPLOYMENT.md`
 
 ## Phase 4A Rule
