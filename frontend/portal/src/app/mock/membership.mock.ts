@@ -15,23 +15,24 @@ export interface MockMembershipPlan {
 export const mockMembershipPlans: MockMembershipPlan[] = [
   {
     id: "membership-rbp-weekly",
-    name: "Remote Business Partner Membership",
+    name: "Lifetime RBP Membership",
     slug: "remote-business-partner-membership",
-    description: "A frontend-only mock membership plan used for Phase 1 journey testing.",
+    description:
+      "Grab the early bird offer with a discounted membership fee and all the inclusions you need to run your business",
     price: {
-      amount: 100,
+      amount: 25,
       currency: "AUD",
       gstIncluded: false,
-      label: "$100 + GST per week",
+      label: "$25 + GST per week",
     },
     billingCycle: "weekly",
     inclusions: [
-      "Mock access to On-Demand Services",
-      "Mock access to selected applications",
-      "Mock access to offers and resources",
-      "Mock portal dashboard experience",
+      "Unlimited Use of Core Services",
+      "Unlimited Access to Nucleus",
+      "25% Discount on On-Demand Services",
+      "Plus Much More",
     ],
-    ctaHref: "/membership/sign-up-now",
+    ctaHref: "/membership/remote-business-partner-membership",
     status: "placeholder",
   },
 ];
