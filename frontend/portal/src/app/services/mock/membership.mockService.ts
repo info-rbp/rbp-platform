@@ -49,7 +49,7 @@ export function getMockMembershipPlans() {
   return mockGet(
     "/mock/membership/plans",
     mockMembershipPlans,
-    "Mock membership plans returned."
+    "Membership plans returned."
   );
 }
 
@@ -66,7 +66,7 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
     errors.push({
       field: "acceptedTerms",
       code: "required",
-      message: "Terms must be accepted for this mock membership submission.",
+      message: "Membership terms must be accepted before continuing.",
     });
   }
 
@@ -74,7 +74,7 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
     return Promise.resolve(
       mockFailure<MockMembershipSignupResult>(
         "/mock/membership/signup",
-        "Mock membership validation failed.",
+        "Membership validation failed.",
         errors
       )
     );
@@ -90,7 +90,7 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
       portalHref: "/portal/dashboard",
       timeline: mockMembershipTimeline,
     }),
-    "Mock membership sign-up submitted."
+    "Membership preview confirmed."
   );
 }
 
@@ -101,7 +101,7 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
     errors.push({
       field: "goals",
       code: "required",
-      message: "At least one mock business priority is required.",
+      message: "At least one business priority is required.",
     });
   }
 
@@ -109,7 +109,7 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
     return Promise.resolve(
       mockFailure<MockMembershipOnboardingResult>(
         "/mock/membership/onboarding",
-        "Mock onboarding validation failed.",
+        "Onboarding validation failed.",
         errors
       )
     );
@@ -125,10 +125,10 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
       portalHref: "/portal/dashboard",
       nextSteps: [
         "Portal access available",
-        "Mock adviser assignment queued",
-        "First strategy session placeholder ready",
+        "Adviser allocation preview ready",
+        "First strategy session preview ready",
       ],
     }),
-    "Mock membership onboarding completed."
+    "Membership onboarding completed."
   );
 }
