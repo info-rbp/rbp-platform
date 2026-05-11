@@ -12,8 +12,8 @@ export interface MockBillingRecord {
 export const mockBillingRecords: MockBillingRecord[] = [
   {
     id: "billing-001",
-    reference: "BILL-MOCK-001",
-    description: "Mock membership payment simulation",
+    reference: "BILL-PREVIEW-001",
+    description: "RBP Premium Membership payment preview",
     amount: {
       amount: 100,
       currency: "AUD",
@@ -28,12 +28,12 @@ export const mockBillingRecords: MockBillingRecord[] = [
 export const mockPaymentMethods = [
   {
     id: "mock-card",
-    label: "Mock credit card",
-    description: "Frontend-only payment simulation. No real payment is processed.",
+    label: "Card preview",
+    description: "Payment preview only. No real payment is processed.",
   },
   {
     id: "mock-invoice",
-    label: "Mock invoice",
-    description: "Frontend-only invoice simulation.",
+    label: "Invoice preview",
+    description: "Invoice preview only. No real invoice is created.",
   },
 ];
