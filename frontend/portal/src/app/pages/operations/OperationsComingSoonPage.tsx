@@ -1,42 +1,87 @@
 import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
+import { ArrowRight, Sparkles } from "lucide-react";
+
 import { Footer } from "../../components/Footer";
+import { Navbar } from "../../components/Navbar";
+import { OperationsHero, OperationsProductCard, OperationsProductGrid, SectionHeader } from "../../components/operations/OperationsComponents";
+
+const currentLinks = [
+  {
+    title: "Business Insurance",
+    description: "Explore common business insurance products and get a quote through the RBP BizCover referral pathway.",
+    href: "/operations/insurance",
+  },
+  {
+    title: "Business Finance",
+    description: "Review finance product pathways, use calculators, and submit an internal referral enquiry.",
+    href: "/operations/finance",
+  },
+  {
+    title: "Business NBN",
+    description: "Start with coverage, compare plan tiers, review modem and phone needs, then connect now.",
+    href: "/operations/connectivity/nbn-phone",
+  },
+  {
+    title: "Contact",
+    description: "Tell RBP about an operational need that is not yet listed in the Operations section.",
+    href: "/contact",
+  },
+];
 
 export function OperationsComingSoonPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Operations</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Operations Update Coming Soon</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder for upcoming operations content and services that are being prepared for public release.</p>
+      <OperationsHero
+        eyebrow="Operations · Coming Soon"
+        title="More Operational Resources Are Coming Soon"
+        subtitle="We are continually adding new operational tools, referral pathways, business support resources, and partner services to help businesses run better."
+        primaryCta={{ label: "Explore Current Operations Support", href: "/operations" }}
+        secondaryCta={{ label: "Contact Us About an Operational Need", href: "/contact" }}
+        bullets={[
+          "New operational resources, partner pathways, tools, and guides will be announced soon",
+          "The Operations section will keep expanding as RBP adds practical business support",
+          "Current support is available across insurance, finance, and Business NBN",
+        ]}
+      />
 
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
+      <main>
+        <section className="py-14 lg:py-20">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:px-8">
+            <div className="rounded-xl border border-blue-100 bg-blue-50 p-6">
+              <Sparkles className="h-8 w-8 text-blue-700" />
+              <h2 className="mt-4 text-2xl font-black tracking-tight text-slate-950">Always adding more</h2>
+              <p className="mt-4 text-sm leading-7 text-slate-700">
+                RBP is always adding more ways to support business operations. New operational resources, partner pathways, tools, and guides will be announced soon.
               </p>
-            </section>
+            </div>
 
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/operations" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Operations Center</Link>
-              <Link to="/operations/finance" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Finance</Link>
-              <Link to="/resources" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Resources</Link>
-              </div>
-            </section>
-            <Link
-              to="/operations"
-              className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition-colors"
-            >
-              Browse Current Services
+            <div>
+              <SectionHeader
+                eyebrow="Current Sections"
+                title="Explore what is available now"
+                description="While new operational resources are being prepared, these sections are ready to help businesses review core operational needs."
+              />
+              <OperationsProductGrid columns="lg:grid-cols-2">
+                {currentLinks.map((item) => (
+                  <OperationsProductCard key={item.href} {...item} cta="Open section" />
+                ))}
+              </OperationsProductGrid>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-50 py-14 text-center">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-black tracking-tight text-slate-950">Have an operational need now?</h2>
+            <p className="mt-4 text-sm leading-7 text-slate-600">
+              Contact RBP and describe the resource, referral pathway, or partner service your business is looking for.
+            </p>
+            <Link to="/contact" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white hover:bg-blue-800">
+              Contact RBP <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-        </div>
+        </section>
       </main>
       <Footer />
     </div>
