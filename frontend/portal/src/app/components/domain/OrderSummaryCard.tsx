@@ -8,7 +8,7 @@ export interface OrderSummaryCardProps {
   lines: OrderSummaryLine[];
 }
 
-export function OrderSummaryCard({ title = "Mock order summary", lines }: OrderSummaryCardProps) {
+export function OrderSummaryCard({ title = "Order summary", lines }: OrderSummaryCardProps) {
   return (
     <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <h3 className="font-semibold text-slate-950">{title}</h3>
