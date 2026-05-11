@@ -1,8 +1,10 @@
 import {
+  freeMembershipTimeline,
   mockMembershipPlans,
-  mockMembershipTimeline,
+  premiumMembershipTimeline,
   type MockPaymentStatus,
 } from "../../mock";
+import type { MembershipTierCode } from "../../data/membershipTiers";
 import {
   createMockReference,
   mockFailure,
@@ -13,19 +15,22 @@ import {
 
 export interface MockMembershipSignupPayload extends Record<string, unknown> {
   selectedPlanId?: string;
+  membershipTier?: MembershipTierCode;
   businessName?: string;
   primaryContactName?: string;
   email?: string;
   acceptedTerms?: boolean;
   paymentMethodMock?: string;
+  paymentState?: string;
 }
 
 export interface MockMembershipSignupResult {
   reference: string;
   membershipStatus: "active" | "pending";
+  membershipTier: MembershipTierCode;
   paymentStatus: MockPaymentStatus;
   portalHref: string;
-  timeline: typeof mockMembershipTimeline;
+  timeline: typeof freeMembershipTimeline;
 }
 
 export interface MockMembershipOnboardingPayload extends Record<string, unknown> {
@@ -53,13 +58,22 @@ export function getMockMembershipPlans() {
   );
 }
 
+function resolveMembershipTier(payload: MockMembershipSignupPayload): MembershipTierCode {
+  if (payload.membershipTier === "free" || payload.selectedPlanId?.includes("free")) {
+    return "free";
+  }
+
+  return "premium";
+}
+
 export function submitMockMembershipSignup(payload: MockMembershipSignupPayload) {
+  const membershipTier = resolveMembershipTier(payload);
   const errors = requireFields(payload, [
     "selectedPlanId",
+    "membershipTier",
     "businessName",
     "primaryContactName",
     "email",
-    "paymentMethodMock",
   ]);
 
   if (!payload.acceptedTerms) {
@@ -68,6 +82,24 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
       code: "required",
       message: "Membership terms must be accepted before continuing.",
     });
+  }
+
+  if (membershipTier === "premium") {
+    if (!payload.paymentMethodMock) {
+      errors.push({
+        field: "paymentMethodMock",
+        code: "required",
+        message: "Payment preview method is required for Premium Membership.",
+      });
+    }
+
+    if (payload.paymentState !== "simulated-success") {
+      errors.push({
+        field: "paymentState",
+        code: "required",
+        message: "Payment preview must be completed before continuing.",
+      });
+    }
   }
 
   if (errors.length > 0) {
@@ -84,13 +116,16 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
     "/mock/membership/signup",
     payload,
     () => ({
-      reference: createMockReference("MEM"),
+      reference: createMockReference(membershipTier === "free" ? "FREE" : "MEM"),
       membershipStatus: "active" as const,
-      paymentStatus: "simulated-success" as const,
+      membershipTier,
+      paymentStatus: membershipTier === "free" ? "not-required" as const : "simulated-success" as const,
       portalHref: "/portal/dashboard",
-      timeline: mockMembershipTimeline,
+      timeline: membershipTier === "free" ? freeMembershipTimeline : premiumMembershipTimeline,
     }),
-    "Membership preview submitted."
+    membershipTier === "free"
+      ? "Free Membership activated."
+      : "Premium Membership preview submitted."
   );
 }
 
