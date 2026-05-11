@@ -1,5 +1,4 @@
 import {
-  premiumMembershipInclusions,
   premiumMembershipPlan,
   premiumMembershipRoutes,
 } from "../data/premiumMembership";
@@ -19,11 +18,10 @@ export interface MockMembershipPlan {
 
 export const mockMembershipPlans: MockMembershipPlan[] = [
   {
-    id: "membership-rbp-weekly",
+    id: "membership-rbp-premium-weekly",
     name: premiumMembershipPlan.name,
     slug: "rbp-premium-membership",
-    description:
-      "Access Core Services, Nucleus resources, service discounts, marketplace savings, member offers, and operations benefits through a premium weekly membership.",
+    description: premiumMembershipPlan.heroBody,
     price: {
       amount: 25,
       currency: "AUD",
@@ -31,15 +29,19 @@ export const mockMembershipPlans: MockMembershipPlan[] = [
       label: premiumMembershipPlan.earlyBirdPrice,
     },
     billingCycle: "weekly",
-    inclusions: premiumMembershipInclusions.flatMap((group) =>
-      group.items.slice(0, group.category === "Core" ? 4 : 1).map((item) => {
-        if (group.category === "Core") {
-          return `${item.name}: ${item.value} usage`;
-        }
-        return `${item.name}: ${item.value}`;
-      })
-    ),
-    ctaHref: premiumMembershipRoutes.signup,
+    inclusions: [
+      "Unlimited Business Advisor",
+      "Unlimited Decision Desk",
+      "Unlimited The Fixer",
+      "Unlimited Risk Advisor",
+      "Unlimited Nucleus access",
+      "25% off On-Demand, Managed, and Custom Services",
+      "$1,000 annual service credit per category",
+      "10% marketplace discount",
+      "Access to all member offers",
+      "Operations benefits and referral rewards",
+    ],
+    ctaHref: premiumMembershipRoutes.inclusions,
     status: "available",
   },
 ];
@@ -61,8 +63,8 @@ export const mockMembershipTimeline: MockTimelineItem[] = [
   },
   {
     id: "membership-active",
-    label: "Membership preview confirmed",
-    description: "Premium membership preview is active for portal demonstration.",
+    label: "Membership preview active",
+    description: "The membership preview is active for portal demonstration.",
     status: "active",
     timestamp: "2026-05-07T09:10:00Z",
   },
@@ -86,22 +88,22 @@ export const mockMembershipSignupFields = [
 
 export const mockMembershipExtras = [
   {
-    id: "extra-advisory-session",
-    title: "Priority advisory session",
-    description: "Preview an added strategy session during the onboarding experience.",
-    priceLabel: "$220 + GST once-off",
+    id: "extra-bid-management-onboarding",
+    title: "Bid Management Discounted Onboarding",
+    description: "Discounted Bid Management onboarding available to premium members.",
+    priceLabel: "$250 + GST once-off",
   },
   {
-    id: "extra-docushare-setup",
-    title: "Nucleus setup session",
-    description: "Preview a document workspace setup and starter template mapping session.",
-    priceLabel: "$180 + GST once-off",
+    id: "extra-additional-user",
+    title: "Additional Premium Member User",
+    description: "Add another user to the membership account.",
+    priceLabel: "$5 per user",
   },
   {
-    id: "extra-reporting-pack",
-    title: "Reporting pack",
-    description: "Preview a dashboard briefing for cash flow and decision visibility.",
-    priceLabel: "$150 + GST once-off",
+    id: "extra-service-credit-review",
+    title: "Service Credit Review",
+    description: "Review eligible service credit categories and how they may apply.",
+    priceLabel: "Included",
   },
 ];
 
@@ -129,16 +131,16 @@ export const mockMembershipManagedServiceOptions = [
   {
     id: "managed-finance",
     title: "Finance and insurance",
-    description: "Finance, lending, insurance, and planning interest capture.",
+    description: "Finance, lending, insurance, and planning support.",
   },
   {
     id: "managed-documents",
     title: "Documents and systems",
-    description: "Nucleus, process documentation, and app setup interest.",
+    description: "Nucleus, process documentation, and app setup support.",
   },
   {
     id: "managed-growth",
     title: "Growth advisory",
-    description: "Sales, reporting, strategy, and adviser support interest.",
+    description: "Sales, reporting, strategy, and adviser support.",
   },
 ];
