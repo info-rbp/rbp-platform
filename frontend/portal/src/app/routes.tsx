@@ -38,6 +38,8 @@ import { DocumentOverviewPage } from "./pages/DocumentOverviewPage";
 import { DocumentCategoryPage } from "./pages/DocumentCategoryPage";
 import { DocumentProductPage } from "./pages/DocumentProductPage";
 import { DocuShareOnboardingPage } from "./pages/DocuShareOnboardingPage";
+import { DocumentProcessPage } from "./pages/document-nucleus/DocumentProcessPage";
+import { DocumentCustomisationPage } from "./pages/document-nucleus/DocumentCustomisationPage";
 
 // ── Managed Services pages ────────────────────────────────────────────────────
 
@@ -181,6 +183,10 @@ export const router = createBrowserRouter([
 
       { path: "document-nucleus/overview", Component: DocumentOverviewPage },
       { path: "document-nucleus/brief", Component: DocuShareOnboardingPage },
+      { path: "document-nucleus/process", Component: DocumentProcessPage },
+      { path: "document-nucleus/customisation", Component: DocumentCustomisationPage },
+      { path: "document-nucleus/category/process", element: <Navigate to="/document-nucleus/process" replace /> },
+      { path: "document-nucleus/category/customisation", element: <Navigate to="/document-nucleus/customisation" replace /> },
       { path: "document-nucleus/category/:id", Component: DocumentCategoryPage },
       { path: "document-nucleus/product/:id", Component: DocumentProductPage },
 
