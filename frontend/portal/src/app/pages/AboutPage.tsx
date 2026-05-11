@@ -78,7 +78,7 @@ export function AboutPage() {
         breadcrumb="About Us"
         image={teamImage}
         bullets={["Experienced senior consultants", "Committed to your growth", "Transparent & accountable"]}
-        ctaPrimary={{ label: "Work With Us", href: "/contact?reason=discovery-call" }}
+        ctaPrimary={{ label: "Book Discovery Call", href: "/about/discovery-call" }}
         ctaSecondary={{ label: "Our Services", href: "/on-demand/services" }}
         stat={{ value: "10+", label: "Years Combined Experience", sublabel: "Across advisory verticals" }}
       />
@@ -101,7 +101,7 @@ export function AboutPage() {
                 We work with founders, directors, and operators who are ambitious about growth but recognize they need a trusted, knowledgeable partner to help them structure, optimize, and scale their businesses smartly.
               </p>
               <Link
-                to="/contact?reason=discovery-call"
+                to="/about/discovery-call"
                 className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-xl transition-all"
               >
                 Work With Us <ArrowRight className="w-4 h-4" />
