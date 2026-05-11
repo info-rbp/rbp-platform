@@ -73,11 +73,9 @@ import { MarketplacePage } from "./pages/MarketplacePage";
 import { MembershipOverviewPage } from "./pages/membership/MembershipOverviewPage";
 import { RemoteBusinessPartnerMembershipPage } from "./pages/membership/RemoteBusinessPartnerMembershipPage";
 import { MembershipInclusionsPage } from "./pages/membership/MembershipInclusionsPage";
-import { MembershipPricingPage } from "./pages/membership/MembershipPricingPage";
-import { MembershipUsagePage } from "./pages/membership/MembershipUsagePage";
-import { MembershipPaymentTermsPage } from "./pages/membership/MembershipPaymentTermsPage";
 import { MembershipSignUpPage } from "./pages/membership/MembershipSignUpPage";
 import { MembershipFaqPage } from "./pages/membership/MembershipFaqPage";
+import { MembershipTermsPage } from "./pages/membership/MembershipTermsPage";
 import { MembershipConfirmationPage } from "./pages/confirmation/MembershipConfirmationPage";
 
 // ── Offers and Resources pages ────────────────────────────────────────────────
@@ -294,11 +292,16 @@ export const router = createBrowserRouter([
             Component: RemoteBusinessPartnerMembershipPage,
           },
           { path: "inclusions", Component: MembershipInclusionsPage },
-          { path: "pricing", Component: MembershipPricingPage },
-          { path: "usage", Component: MembershipUsagePage },
-          { path: "payment-terms", Component: MembershipPaymentTermsPage },
+          { path: "pricing", element: <Navigate to="/membership/overview" replace /> },
+          { path: "usage", element: <Navigate to="/membership/terms" replace /> },
+          { path: "payment-terms", element: <Navigate to="/membership/terms" replace /> },
           { path: "sign-up-now", Component: MembershipSignUpPage },
-          { path: "frequently-asked-questions", Component: MembershipFaqPage },
+          { path: "faq", Component: MembershipFaqPage },
+          {
+            path: "frequently-asked-questions",
+            element: <Navigate to="/membership/faq" replace />,
+          },
+          { path: "terms", Component: MembershipTermsPage },
           { path: "confirmation", Component: MembershipConfirmationPage },
         ],
       },
