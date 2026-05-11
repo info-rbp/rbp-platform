@@ -26,6 +26,11 @@ export interface CurrentUser {
   is_admin: boolean;
 }
 
+export interface FrappeNotificationPayload {
+  notifications: NotificationSummary[];
+  unread_count: number;
+}
+
 export interface AppCard {
   id?: string;
   name?: string;
@@ -64,8 +69,11 @@ export interface BillingSummary {
   plan?: string;
   plan_name?: string;
   membership_plan?: string;
+  membership_tier?: "free" | "premium" | "none" | string;
   subscription_status?: string;
   current_period_end?: string;
+  billing_enabled?: boolean;
+  message?: string;
   [key: string]: unknown;
 }
 
@@ -83,7 +91,7 @@ export interface PortalDashboardPayload {
   apps_by_category: Record<string, AppCard[]>;
   quick_links: QuickLink[];
   platform_modules: AppCard[];
-  notifications: NotificationSummary[];
+  notifications: NotificationSummary[] | FrappeNotificationPayload;
   billing: BillingSummary;
   integrations: IntegrationStatus[] | Record<string, IntegrationStatus>;
 }
