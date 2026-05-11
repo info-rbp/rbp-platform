@@ -105,3 +105,14 @@ export const aboutFormBackendTargets: AboutFormBackendTarget[] = [
     currentMode: "frontend-local",
   },
 ];
+
+export const aboutFormStandards = [
+  "Required fields must be clearly marked.",
+  "Email fields must use type=email.",
+  "Phone fields must use type=tel.",
+  "URL fields must use type=url.",
+  "Forms must show professional success states.",
+  "Forms must not expose mock, Phase 1, shell, or backend limitation wording to public users.",
+  "Each form must include a consent checkbox where follow-up contact is expected.",
+  "Future backend integration should use the mapped Frappe API method for each form.",
+];
