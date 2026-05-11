@@ -46,6 +46,18 @@ export const publicNavigation: MegaConfig[] = [
     ],
   },
   {
+    key: "operations",
+    label: "Operations",
+    description: "Access business finance, insurance, connectivity, operations resources, and upcoming operational support.",
+    links: [
+      { label: "Business Finance", href: "/operations/finance" },
+      { label: "Business Insurance", href: "/operations/insurance" },
+      { label: "Business NBN", href: "/operations/connectivity/nbn-phone" },
+      { label: "Operations Resources", href: "/resources?category=operations" },
+      { label: "Coming Soon", href: "/operations/coming-soon" },
+    ],
+  },
+  {
     key: "membership",
     label: "Membership",
     description:
