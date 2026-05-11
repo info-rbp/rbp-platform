@@ -127,12 +127,12 @@ export const publicNavigation: MegaConfig[] = [
   {
     key: "membership",
     label: "Membership",
-    description: "Membership offers, inclusions, sign-up pathways, and frequently asked questions for joining RBP.",
+    description: "Explore the RBP Premium Membership offer, full inclusions, sign-up preview, and frequently asked questions.",
     links: [
-      { label: "Early Bird Offer", href: "/membership/overview#early-bird-offer" },
-      { label: "What’s Included", href: "/membership/inclusions" },
+      { label: "Overview", href: "/membership/overview" },
+      { label: "Inclusions", href: "/membership/inclusions" },
       { label: "Sign Up Now", href: "/membership/sign-up-now" },
-      { label: "Frequently Asked Questions", href: "/membership/frequently-asked-questions" },
+      { label: "FAQ", href: "/membership/faq" },
     ],
   },
   {
