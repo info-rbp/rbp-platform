@@ -74,7 +74,7 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
     return Promise.resolve(
       mockFailure<MockMembershipSignupResult>(
         "/mock/membership/signup",
-        "Membership validation failed.",
+        "Membership details need review.",
         errors
       )
     );
@@ -90,7 +90,7 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
       portalHref: "/portal/dashboard",
       timeline: mockMembershipTimeline,
     }),
-    "Membership preview confirmed."
+    "Membership preview submitted."
   );
 }
 
@@ -109,7 +109,7 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
     return Promise.resolve(
       mockFailure<MockMembershipOnboardingResult>(
         "/mock/membership/onboarding",
-        "Onboarding validation failed.",
+        "Onboarding details need review.",
         errors
       )
     );
@@ -125,10 +125,10 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
       portalHref: "/portal/dashboard",
       nextSteps: [
         "Portal access available",
-        "Adviser allocation preview ready",
-        "First strategy session preview ready",
+        "Adviser assignment ready for review",
+        "First strategy session pathway ready",
       ],
     }),
-    "Membership onboarding completed."
+    "Membership onboarding preview completed."
   );
 }
