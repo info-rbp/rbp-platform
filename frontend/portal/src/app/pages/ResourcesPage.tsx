@@ -105,7 +105,7 @@ export function ResourcesPage() {
         image={heroImage}
         bullets={["Industry reports & guides", "Downloadable templates", "Webinar & training library"]}
         ctaPrimary={{ label: "Browse Resources", href: "#categories" }}
-        ctaSecondary={{ label: "Talk to an Advisor", href: "/contact?reason=discovery-call" }}
+        ctaSecondary={{ label: "Talk to an Advisor", href: "/about/discovery-call" }}
         stat={{ value: "150+", label: "Resources Available", sublabel: "Updated regularly" }}
       />
 

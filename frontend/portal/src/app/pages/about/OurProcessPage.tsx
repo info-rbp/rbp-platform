@@ -30,7 +30,7 @@ export function OurProcessPage() {
               </div>
             </section>
             <Link
-              to="/contact?reason=discovery-call"
+              to="/about/discovery-call"
               className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition-colors"
             >
               Book a Discovery Call

@@ -2,11 +2,13 @@ import { Link } from "react-router";
 import { Briefcase } from "lucide-react";
 
 const footerSections = {
-  Public: [
-    { label: "Home", href: "/" },
-    { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "Help", href: "/help" },
+  Company: [
+    { label: "About Us", href: "/about" },
+    { label: "Our Platform", href: "/about/our-platform" },
+    { label: "Discovery Call", href: "/about/discovery-call" },
+    { label: "Work With Us", href: "/about/work-with-us" },
+    { label: "Work For Us", href: "/about/work-for-us" },
+    { label: "Contact Us", href: "/contact" },
   ],
   Services: [
     { label: "On-Demand", href: "/on-demand" },
