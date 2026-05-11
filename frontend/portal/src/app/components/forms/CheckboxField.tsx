@@ -2,7 +2,7 @@ import type { InputHTMLAttributes, ReactNode } from "react";
 
 export interface CheckboxFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: ReactNode;
-  description?: string;
+  description?: ReactNode;
 }
 
 export function CheckboxField({ label, description, id, ...props }: CheckboxFieldProps) {
