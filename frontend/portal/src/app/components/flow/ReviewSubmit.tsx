@@ -22,9 +22,9 @@ export interface ReviewSubmitProps {
 
 export function ReviewSubmit({
   title = "Review and submit",
-  description = "Confirm the details below before completing this mock submission.",
+  description = "Confirm the details below before completing this submission.",
   sections,
-  submitLabel = "Submit mock request",
+  submitLabel = "Submit",
   isSubmitting = false,
   onSubmit,
 }: ReviewSubmitProps) {
