@@ -24,7 +24,7 @@ import {
 
 import { WhatWeDoPage } from "./pages/about/WhatWeDoPage";
 import { OurProcessPage } from "./pages/about/OurProcessPage";
-import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";
+import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";\nimport { OurPlatformPage } from "./pages/about/OurPlatformPage";
 
 // ── On-Demand pages ───────────────────────────────────────────────────────────
 
@@ -169,7 +169,7 @@ export const router = createBrowserRouter([
 
       { path: "about/what-we-do", Component: WhatWeDoPage },
       { path: "about/our-process", Component: OurProcessPage },
-      { path: "about/process", Component: OurProcessPage },
+      { path: "about/process", Component: OurProcessPage },\n      { path: "about/our-platform", Component: OurPlatformPage },
       { path: "about/work-with-us", Component: WorkWithUsPage },
 
       // ── Legacy / direct public routes ──────────────────────────────────────
