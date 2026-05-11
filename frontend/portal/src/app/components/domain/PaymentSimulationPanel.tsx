@@ -4,7 +4,7 @@ export interface PaymentSimulationPanelProps {
 }
 
 export function PaymentSimulationPanel({
-  title = "Mock payment simulation",
+  title = "Payment Preview",
   amountLabel = "No real payment will be processed.",
 }: PaymentSimulationPanelProps) {
   return (
@@ -12,7 +12,7 @@ export function PaymentSimulationPanel({
       <h3 className="font-semibold text-slate-950">{title}</h3>
       <p className="mt-2 text-sm text-slate-700">{amountLabel}</p>
       <p className="mt-3 text-xs font-medium text-blue-700">
-        Phase 1 only simulates payment states. No payment provider is connected.
+        This frontend preview does not process a real payment or create a live account.
       </p>
     </section>
   );
