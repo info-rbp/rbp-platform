@@ -9,6 +9,7 @@ import { membershipFlowStorageKey } from "../../features/membership/MembershipPu
 interface StoredMembershipConfirmation {
   signupReference?: string;
   onboardingReference?: string;
+  membershipTier?: "free" | "premium";
   membershipStatus?: string;
   paymentStatus?: string;
   onboardingStatus?: string;
@@ -16,6 +17,7 @@ interface StoredMembershipConfirmation {
   businessName?: string;
   primaryContactName?: string;
   selectedPlan?: string;
+  returnTo?: string;
 }
 
 function readStoredConfirmation(): StoredMembershipConfirmation | null {
@@ -36,17 +38,21 @@ function formatLifecycleStatus(status: string | undefined, fallback: string) {
   return status ? status.replace(/-/g, " ") : fallback;
 }
 
-function formatPaymentStatus(status: string | undefined) {
-  if (status === "simulated-success") {
-    return "payment preview complete";
+function formatPaymentStatus(status: string | undefined, membershipTier?: "free" | "premium") {
+  if (membershipTier === "free" || status === "not-required") {
+    return "No payment required";
+  }
+
+  if (status === "preview-complete" || status === "simulated-success") {
+    return "Payment preview complete";
   }
 
   if (status === "simulated-failed") {
-    return "payment preview failed";
+    return "Payment preview failed";
   }
 
   if (status === "pending") {
-    return "payment preview pending";
+    return "Payment preview pending";
   }
 
   return status ? status.replace(/-/g, " ") : "not started";
@@ -54,8 +60,21 @@ function formatPaymentStatus(status: string | undefined) {
 
 export function MembershipConfirmationPage() {
   const confirmation = readStoredConfirmation();
+  const isFree = confirmation?.membershipTier === "free";
   const primaryReference =
     confirmation?.onboardingReference ?? confirmation?.signupReference ?? "MEM-PREVIEW-001";
+
+  const title = !confirmation
+    ? "Membership Preview"
+    : isFree
+      ? "RBP Free Membership Activated"
+      : "RBP Premium Membership Preview Confirmed";
+
+  const message = !confirmation
+    ? "No membership preview has been completed in this browser session."
+    : isFree
+      ? "Your Free Membership preview has been activated. You can now continue to onboarding, purchase products and services online, and manage your basic member profile."
+      : "Your Premium Membership preview has been completed. Continue to the portal dashboard or review your premium membership inclusions.";
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -63,32 +82,36 @@ export function MembershipConfirmationPage() {
       <main className="py-16 sm:py-20">
         <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
           <ConfirmationPanel
-            title={
-              confirmation?.onboardingStatus === "complete"
-                ? "Membership onboarding preview complete"
-                : "RBP Premium Membership Preview Confirmed"
-            }
-            statusLabel="Membership preview saved"
-            message={
-              confirmation
-                ? "This confirmation reflects the latest membership preview state saved in this browser session. This frontend preview does not process a real payment or create a live account."
-                : "This confirmation preview is shown when the sign-up flow has not been completed in the current browser session."
-            }
+            title={title}
+            statusLabel={formatPaymentStatus(confirmation?.paymentStatus, confirmation?.membershipTier)}
+            message={message}
             reference={primaryReference}
             primaryAction={
               <Link
-                to={confirmation?.portalHref ?? "/portal/dashboard"}
+                to={confirmation?.portalHref ?? "/membership/sign-up-now?tier=free"}
                 className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white"
               >
-                Go to portal dashboard
+                {confirmation ? "Go to portal dashboard" : "Create Free Membership"}
               </Link>
             }
             secondaryAction={
               <Link
-                to="/membership/sign-up-now"
+                to={
+                  !confirmation
+                    ? "/membership/overview"
+                    : isFree
+                      ? confirmation.returnTo || "/marketplace"
+                      : "/membership/inclusions"
+                }
                 className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
               >
-                Return to sign-up
+                {!confirmation
+                  ? "View Membership Options"
+                  : isFree
+                    ? confirmation.returnTo
+                      ? "Continue Purchase"
+                      : "Browse Marketplace"
+                    : "View Premium Inclusions"}
               </Link>
             }
           />
@@ -102,7 +125,7 @@ export function MembershipConfirmationPage() {
               />
               <StatusBadge
                 status={confirmation?.paymentStatus ?? "placeholder"}
-                label={`Payment: ${formatPaymentStatus(confirmation?.paymentStatus)}`}
+                label={`Payment: ${formatPaymentStatus(confirmation?.paymentStatus, confirmation?.membershipTier)}`}
               />
               <StatusBadge
                 status={confirmation?.onboardingStatus ?? "placeholder"}
@@ -112,20 +135,16 @@ export function MembershipConfirmationPage() {
             <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
               <div>
                 <dt className="font-semibold text-slate-500">Business</dt>
-                <dd className="mt-1 text-slate-900">
-                  {confirmation?.businessName ?? "Not captured"}
-                </dd>
+                <dd className="mt-1 text-slate-900">{confirmation?.businessName ?? "Not captured"}</dd>
               </div>
               <div>
                 <dt className="font-semibold text-slate-500">Contact</dt>
-                <dd className="mt-1 text-slate-900">
-                  {confirmation?.primaryContactName ?? "Not captured"}
-                </dd>
+                <dd className="mt-1 text-slate-900">{confirmation?.primaryContactName ?? "Not captured"}</dd>
               </div>
               <div>
                 <dt className="font-semibold text-slate-500">Plan</dt>
                 <dd className="mt-1 text-slate-900">
-                  {confirmation?.selectedPlan ?? "RBP Premium Membership"}
+                  {confirmation?.selectedPlan ?? (isFree ? "RBP Free Membership" : "RBP Premium Membership")}
                 </dd>
               </div>
             </dl>
