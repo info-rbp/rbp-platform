@@ -32,6 +32,26 @@ function readStoredConfirmation(): StoredMembershipConfirmation | null {
   }
 }
 
+function formatLifecycleStatus(status: string | undefined, fallback: string) {
+  return status ? status.replace(/-/g, " ") : fallback;
+}
+
+function formatPaymentStatus(status: string | undefined) {
+  if (status === "simulated-success") {
+    return "payment preview complete";
+  }
+
+  if (status === "simulated-failed") {
+    return "payment preview failed";
+  }
+
+  if (status === "pending") {
+    return "payment preview pending";
+  }
+
+  return status ? status.replace(/-/g, " ") : "not started";
+}
+
 export function MembershipConfirmationPage() {
   const confirmation = readStoredConfirmation();
   const primaryReference =
@@ -78,15 +98,15 @@ export function MembershipConfirmationPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <StatusBadge
                 status={confirmation?.membershipStatus ?? "placeholder"}
-                label={`Membership: ${confirmation?.membershipStatus ?? "preview"}`}
+                label={`Membership: ${formatLifecycleStatus(confirmation?.membershipStatus, "preview")}`}
               />
               <StatusBadge
                 status={confirmation?.paymentStatus ?? "placeholder"}
-                label={`Payment: ${confirmation?.paymentStatus ?? "not started"}`}
+                label={`Payment: ${formatPaymentStatus(confirmation?.paymentStatus)}`}
               />
               <StatusBadge
                 status={confirmation?.onboardingStatus ?? "placeholder"}
-                label={`Onboarding: ${confirmation?.onboardingStatus ?? "not started"}`}
+                label={`Onboarding: ${formatLifecycleStatus(confirmation?.onboardingStatus, "not started")}`}
               />
             </div>
             <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
