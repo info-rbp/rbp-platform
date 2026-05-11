@@ -36,6 +36,12 @@ import {
 } from "../../components/domain";
 import { StatusBadge } from "../../components/status";
 import {
+  canPurchaseOnline,
+  getMarketplaceDiscount,
+  type MembershipTierCode,
+} from "../../data/membershipTiers";
+import { membershipFlowStorageKey } from "../membership/MembershipPurchaseOnboardingFlow";
+import {
   mockMarketplaceItems,
   mockMarketplaceListingTypes,
   mockMarketplaceMediaPlaceholders,
@@ -77,28 +83,28 @@ const marketplaceAnchorSections = [
     id: "buying-process",
     title: "Buying Process",
     description:
-      "A clear mock pathway covering enquiry, confirmation, simulated review, delivery planning, and follow-up.",
+      "A clear preview pathway covering enquiry, confirmation, simulated review, delivery planning, and follow-up.",
   },
   {
     id: "list-with-us",
     title: "List With Us",
     description:
-      "A seller pathway for suppliers, partners, and businesses to list products, services, or assets in mock review.",
+      "A seller pathway for suppliers, partners, and businesses to list products, services, or assets for review.",
   },
 ];
 
 const sellerSteps = [
   { id: "type", label: "Listing type", description: "Choose the listing category." },
   { id: "details", label: "Details", description: "Add seller and listing details." },
-  { id: "media", label: "Media", description: "Add mock media placeholders." },
-  { id: "fees", label: "Fees", description: "Review mock fee/payment state." },
-  { id: "review", label: "Review", description: "Submit for mock admin review." },
+  { id: "media", label: "Media", description: "Add media placeholders." },
+  { id: "fees", label: "Fees", description: "Review fee/payment state." },
+  { id: "review", label: "Review", description: "Submit for admin review." },
 ];
 
 const enquirySteps = [
   { id: "details", label: "Your details", description: "Tell us who is enquiring." },
   { id: "message", label: "Message", description: "Describe what you need." },
-  { id: "review", label: "Review", description: "Submit the mock enquiry." },
+  { id: "review", label: "Review", description: "Submit the enquiry preview." },
 ];
 
 type SubmissionState = "idle" | "loading" | "success" | "error";
@@ -121,6 +127,27 @@ interface EnquiryFormState {
   message: string;
 }
 
+interface StoredMarketplaceMembershipState {
+  membershipTier?: MembershipTierCode;
+}
+
+function readMarketplaceMembershipTier(): MembershipTierCode | "none" {
+  const rawValue = window.sessionStorage.getItem(membershipFlowStorageKey);
+
+  if (!rawValue) {
+    return "none";
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue) as StoredMarketplaceMembershipState;
+    return parsed.membershipTier === "free" || parsed.membershipTier === "premium"
+      ? parsed.membershipTier
+      : "none";
+  } catch {
+    return "none";
+  }
+}
+
 function moneyLabel(item: MockMarketplaceItem) {
   return item.price.label;
 }
@@ -140,10 +167,10 @@ function MarketplaceHero() {
             Business Marketplace
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-            Browse, enquire, or list with mock marketplace flows.
+            Browse, enquire, or list with marketplace preview flows.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            Phase 1 simulates marketplace buying, seller listing, admin review, and confirmation states without real checkout, uploads, or publishing.
+            Preview marketplace buying, seller listing, admin review, and confirmation states without real checkout, uploads, or publishing.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -162,12 +189,12 @@ function MarketplaceHero() {
         </div>
         <div className="rounded-3xl border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur">
           <p className="text-sm font-semibold uppercase tracking-wide text-amber-300">
-            Mock review queue
+            Review queue
           </p>
           <div className="mt-5 grid gap-4">
             {[
               ["Active listings", String(mockMarketplaceItems.length)],
-              ["Mock enquiries", "1 submitted"],
+              ["Preview enquiries", "1 submitted"],
               ["Seller listings", "1 in review"],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl bg-white p-4 text-slate-950">
@@ -233,7 +260,7 @@ function MarketplaceLanding() {
               Marketplace categories and actions
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-              These sections support public navigation, buyer enquiries, seller listings, and mock review states.
+              These sections support public navigation, buyer enquiries, seller listings, and preview review states.
             </p>
           </div>
 
@@ -250,7 +277,7 @@ function MarketplaceLanding() {
                   to={item.id === "list-with-us" ? "/marketplace/listing/new" : "/marketplace"}
                   className="inline-flex items-center gap-2 text-sm font-bold text-amber-700 hover:text-amber-800"
                 >
-                  {item.id === "list-with-us" ? "Start a mock listing" : "Explore marketplace"}
+                  {item.id === "list-with-us" ? "Start a listing preview" : "Explore marketplace"}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -365,13 +392,13 @@ function MarketplaceLanding() {
           <ShoppingBag className="mx-auto mb-5 h-12 w-12 text-amber-400" />
           <h2 className="mb-4 text-3xl font-extrabold">Want to list something?</h2>
           <p className="mb-8 text-slate-300">
-            Start a frontend-only seller listing flow. No real listing is published and no real payment is processed.
+            Start a seller listing preview. No real listing is published and no real payment is processed.
           </p>
           <Link
             to="/marketplace/listing/new"
             className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-8 py-4 font-bold text-slate-900 shadow-lg transition hover:-translate-y-0.5 hover:bg-amber-400"
           >
-            Start mock seller listing <ArrowRight className="h-4 w-4" />
+            Start listing preview <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -381,7 +408,12 @@ function MarketplaceLanding() {
 
 function MarketplaceDetail() {
   const { id } = useParams();
+  const location = useLocation();
   const item = getListingById(id);
+  const membershipTier = readMarketplaceMembershipTier();
+  const canBuyOnline = canPurchaseOnline(membershipTier);
+  const marketplaceDiscount = getMarketplaceDiscount(membershipTier);
+  const returnTo = encodeURIComponent(`${location.pathname}${location.search}`);
 
   return (
     <>
@@ -403,6 +435,9 @@ function MarketplaceDetail() {
               <div className="rounded-2xl bg-white p-4 text-slate-950">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Price</p>
                 <p className="mt-1 text-xl font-black">{moneyLabel(item)}</p>
+                {marketplaceDiscount > 0 ? (
+                  <p className="mt-1 text-xs font-bold text-emerald-700">{marketplaceDiscount}% member discount may apply</p>
+                ) : null}
               </div>
               <div className="rounded-2xl bg-white p-4 text-slate-950">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Delivery</p>
@@ -414,12 +449,21 @@ function MarketplaceDetail() {
               </div>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to={`/marketplace/enquiry/${item.id}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-amber-400"
-              >
-                Enquire about listing <ArrowRight className="h-4 w-4" />
-              </Link>
+              {canBuyOnline ? (
+                <Link
+                  to={`/marketplace/enquiry/${item.id}`}
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-amber-400"
+                >
+                  Enquire about listing <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <Link
+                  to={`/membership/sign-up-now?tier=free&returnTo=${returnTo}`}
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-amber-400"
+                >
+                  Create a free RBP account to purchase online. <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
               <Link
                 to="/marketplace/listing/new"
                 className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
@@ -445,7 +489,7 @@ function MarketplaceDetail() {
             </div>
           </div>
           <aside className="rounded-3xl border border-amber-200 bg-amber-50 p-6">
-            <h3 className="font-bold text-slate-950">Phase 1 mock listing</h3>
+            <h3 className="font-bold text-slate-950">Marketplace preview listing</h3>
             <p className="mt-2 text-sm leading-6 text-slate-700">
               This detail screen supports buyer enquiry and seller listing simulation only. No checkout, escrow, payment, or publishing backend is connected.
             </p>
@@ -458,7 +502,10 @@ function MarketplaceDetail() {
 
 function BuyerEnquiryFlow() {
   const { id } = useParams();
+  const location = useLocation();
   const item = getListingById(id);
+  const membershipTier = readMarketplaceMembershipTier();
+  const canBuyOnline = canPurchaseOnline(membershipTier);
   const [step, setStep] = useState("details");
   const [state, setState] = useState<SubmissionState>("idle");
   const [reference, setReference] = useState("");
@@ -472,6 +519,7 @@ function BuyerEnquiryFlow() {
   const stepIndex = enquirySteps.findIndex((item) => item.id === step);
   const canBack = stepIndex > 0;
   const canForward = stepIndex < enquirySteps.length - 1;
+  const returnTo = encodeURIComponent(`${location.pathname}${location.search}`);
 
   async function handleSubmit() {
     setState("loading");
@@ -497,7 +545,7 @@ function BuyerEnquiryFlow() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <ConfirmationPanel
             title="Marketplace enquiry submitted"
-            message="Your mock marketplace enquiry has been submitted. No seller has been contacted and no real backend action has occurred."
+            message="Your marketplace enquiry preview has been submitted. No seller has been contacted and no real backend action has occurred."
             reference={reference}
             primaryAction={
               <Link className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white" to="/marketplace">
@@ -506,10 +554,31 @@ function BuyerEnquiryFlow() {
             }
             secondaryAction={
               <Link className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700" to="/portal/services">
-                View mock status
+                View status
               </Link>
             }
           />
+        </div>
+      </section>
+    );
+  }
+
+  if (!canBuyOnline) {
+    return (
+      <section className="bg-slate-50 py-12">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-amber-200 bg-amber-50 p-8 shadow-sm">
+            <h1 className="text-3xl font-black text-slate-950">Create a free RBP account to purchase online.</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Marketplace enquiries and purchases require an RBP member account. Free Membership is available at $0 and does not require a payment method.
+            </p>
+            <Link
+              to={`/membership/sign-up-now?tier=free&returnTo=${returnTo}`}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-amber-400"
+            >
+              Create Free Membership <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     );
@@ -519,7 +588,7 @@ function BuyerEnquiryFlow() {
     <WizardShell
       eyebrow="Marketplace enquiry"
       title={`Enquire about ${item.title}`}
-      description="Submit a frontend-only enquiry. No seller message, CRM record, or backend ticket is created."
+      description="Submit an enquiry preview. No seller message, CRM record, or backend ticket is created."
       steps={enquirySteps}
       currentStepId={step}
       aside={
@@ -534,7 +603,7 @@ function BuyerEnquiryFlow() {
         <MockSubmissionState state={state} />
 
         {step === "details" ? (
-          <FormSection title="Your details" description="These details are used for the mock enquiry only.">
+          <FormSection title="Your details" description="These details are used for the enquiry preview only.">
             <TextField
               label="Your name"
               value={form.buyerName}
@@ -584,7 +653,7 @@ function BuyerEnquiryFlow() {
                 ],
               },
             ]}
-            submitLabel="Submit mock enquiry"
+            submitLabel="Submit enquiry preview"
             isSubmitting={state === "loading"}
             onSubmit={handleSubmit}
           />
@@ -655,10 +724,10 @@ function SellerListingFlow() {
       <section className="bg-slate-50 py-12">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <ConfirmationPanel
-            title="Listing submitted for mock review"
+            title="Listing submitted for review"
             message="Your seller listing has entered the simulated admin review queue. No real listing was published and no real payment was processed."
             reference={reference}
-            statusLabel="Mock admin review started"
+            statusLabel="Admin review started"
             primaryAction={
               <Link className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white" to="/marketplace">
                 Back to marketplace
@@ -678,14 +747,14 @@ function SellerListingFlow() {
   return (
     <WizardShell
       eyebrow="Seller listing"
-      title="Create a mock marketplace listing"
-      description="This frontend-only flow simulates seller intake, media placeholders, fee acknowledgement, review, and admin status."
+      title="Create a marketplace listing preview"
+      description="This preview flow simulates seller intake, media placeholders, fee acknowledgement, review, and admin status."
       steps={sellerSteps}
       currentStepId={step}
       aside={
         <div className="space-y-4">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="font-bold text-slate-950">Mock listing status</h3>
+            <h3 className="font-bold text-slate-950">Listing status</h3>
             <p className="mt-2 text-sm text-slate-600">
               New listings are submitted to a simulated review queue only.
             </p>
@@ -705,7 +774,7 @@ function SellerListingFlow() {
         <MockSubmissionState state={state} />
 
         {step === "type" ? (
-          <FormSection title="Listing type" description="Choose how this mock listing should be categorised.">
+          <FormSection title="Listing type" description="Choose how this listing should be categorised.">
             <RadioCardGroup
               name="listingType"
               label="Listing type"
@@ -731,7 +800,7 @@ function SellerListingFlow() {
         ) : null}
 
         {step === "details" ? (
-          <FormSection title="Listing details" description="Add mock seller and listing details.">
+          <FormSection title="Listing details" description="Add seller and listing details.">
             <TextField
               label="Listing title"
               value={form.listingTitle}
@@ -752,7 +821,7 @@ function SellerListingFlow() {
               label="Price"
               value={form.price}
               onChange={(event) => setForm({ ...form, price: event.currentTarget.value })}
-              helpText="Use mock price text such as $750 + GST or enquiry required."
+              helpText="Use price text such as $750 + GST or enquiry required."
             />
             <TextAreaField
               label="Description"
@@ -763,7 +832,7 @@ function SellerListingFlow() {
         ) : null}
 
         {step === "media" ? (
-          <FormSection title="Mock media and documents" description="These are placeholders only. No files are uploaded.">
+          <FormSection title="Media and documents" description="These are placeholders only. No files are uploaded.">
             <SelectableCardGrid
               options={mockMarketplaceMediaPlaceholders.map((item) => ({
                 id: item.id,
@@ -771,15 +840,15 @@ function SellerListingFlow() {
                 description: item.description,
               }))}
             />
-            <FileUploadMock title="Mock marketplace media upload" />
+            <FileUploadMock title="Marketplace media upload preview" />
           </FormSection>
         ) : null}
 
         {step === "fees" ? (
           <FormSection title="Fees and terms" description="Acknowledge simulated listing fee/payment states.">
             <PaymentSimulationPanel
-              title="Mock listing fee simulation"
-              amountLabel="No real listing fee, success fee, checkout, escrow, or payment is processed in Phase 1."
+              title="Listing fee simulation"
+              amountLabel="No real listing fee, success fee, checkout, escrow, or payment is processed in this preview."
             />
             <TermsAcceptance
               checked={form.acceptedTerms}
@@ -789,7 +858,7 @@ function SellerListingFlow() {
               checked
               readOnly
               label="I understand this is not a published listing"
-              description="The listing remains a frontend mock record only."
+              description="The listing remains a preview record only."
             />
           </FormSection>
         ) : null}
@@ -816,7 +885,7 @@ function SellerListingFlow() {
                 ],
               },
             ]}
-            submitLabel="Submit mock listing"
+            submitLabel="Submit listing preview"
             isSubmitting={state === "loading"}
             onSubmit={handleSubmit}
           />

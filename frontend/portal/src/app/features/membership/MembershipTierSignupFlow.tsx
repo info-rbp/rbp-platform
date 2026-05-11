@@ -225,7 +225,7 @@ export function MembershipTierSignupFlow() {
       selectedPlanId: form.selectedPlanId,
       selectedPlan: selectedPlan?.name ?? selectedTier.name,
       membershipStatus: response.data.membershipStatus,
-      paymentStatus: isFree ? "not-required" : "preview-complete",
+      paymentStatus: response.data.paymentStatus,
       onboardingStatus: "in-progress",
       portalHref: response.data.portalHref,
       businessName: form.businessName,
@@ -262,7 +262,7 @@ export function MembershipTierSignupFlow() {
       selectedPlanId: form.selectedPlanId,
       selectedPlan: selectedPlan?.name ?? selectedTier.name,
       membershipStatus: response.data.membershipStatus,
-      paymentStatus: isFree ? "not-required" : "preview-complete",
+      paymentStatus: signupResult?.paymentStatus ?? (isFree ? "not-required" : "simulated-success"),
       onboardingStatus: response.data.onboardingStatus,
       portalHref: response.data.portalHref,
       businessName: form.businessName,
@@ -398,7 +398,7 @@ export function MembershipTierSignupFlow() {
         )}
 
         {currentStep.id === "success" && signupResult && (
-          <ConfirmationPanel title={isFree ? "RBP Free Membership Activated" : "RBP Premium Membership Preview Confirmed"} statusLabel={isFree ? "No payment required" : "Payment preview complete"} message={isFree ? "Your Free Membership preview has been activated. You can now continue onboarding, purchase products and services online, and manage your basic member profile." : "Your Premium Membership preview has been completed. Continue to onboarding or review your confirmation details."} reference={signupResult.reference} primaryAction={<button type="button" onClick={goNext} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">Continue to onboarding</button>} secondaryAction={<Link to="/membership/confirmation" className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700">View confirmation</Link>} />
+          <ConfirmationPanel title={isFree ? "RBP Free Membership Activated" : "RBP Premium Membership Preview Confirmed"} statusLabel={isFree ? "No payment required" : "Payment preview complete"} message={isFree ? "Your Free Membership has been activated. You can now continue onboarding, purchase products and services online, and manage your basic member profile." : "Your Premium Membership preview has been completed. Continue to onboarding or review your confirmation details."} reference={signupResult.reference} primaryAction={<button type="button" onClick={goNext} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">Continue to onboarding</button>} secondaryAction={<Link to="/membership/confirmation" className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700">View confirmation</Link>} />
         )}
 
         {currentStep.id === "business" && (
@@ -418,7 +418,7 @@ export function MembershipTierSignupFlow() {
         )}
 
         {currentStep.id === "complete" && onboardingResult && (
-          <ConfirmationPanel title="Membership onboarding complete" statusLabel="Portal handoff ready" message={returnTo ? "Your membership is active. Continue your purchase or open the portal dashboard." : "Your membership onboarding preview is complete. Your portal dashboard is ready."} reference={onboardingResult.reference} primaryAction={<Link to={returnTo || "/portal/dashboard"} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">{returnTo ? "Continue Purchase" : "Go to portal dashboard"}</Link>} secondaryAction={<Link to="/marketplace" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">Browse Marketplace</Link>} />
+          <ConfirmationPanel title="Membership onboarding complete" statusLabel="Portal handoff ready" message={returnTo ? "Your membership is active. Continue your purchase or open the portal dashboard." : "Your membership onboarding is complete. Your portal dashboard is ready."} reference={onboardingResult.reference} primaryAction={<Link to={returnTo || "/portal/dashboard"} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">{returnTo ? "Continue Purchase" : "Go to portal dashboard"}</Link>} secondaryAction={<Link to="/marketplace" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">Browse Marketplace</Link>} />
         )}
 
         {!['review','success','team','complete'].includes(currentStep.id) && <StepNavigation canGoBack={stepIndex > 0} canContinue onBack={goBack} onContinue={goNext} continueLabel="Continue" />}

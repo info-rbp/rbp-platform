@@ -1,5 +1,7 @@
 import type { ApiResult, FrappeMethodResponse } from "./types";
 
+const frappeApiBaseUrl = (import.meta.env.VITE_FRAPPE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ?? "";
+
 function normaliseError(payload: FrappeMethodResponse<unknown>, fallback: string) {
   if (payload.exception) return payload.exception;
   if (payload.exc) return payload.exc;
@@ -8,8 +10,18 @@ function normaliseError(payload: FrappeMethodResponse<unknown>, fallback: string
   return fallback;
 }
 
+function buildMethodUrl(methodPath: string) {
+  const path = methodPath.startsWith("/api/method/") ? methodPath : `/api/method/${methodPath}`;
+  return `${frappeApiBaseUrl}${path}`;
+}
+
+function isUnauthenticatedPayload(payload: FrappeMethodResponse<unknown>) {
+  const text = JSON.stringify(payload).toLowerCase();
+  return text.includes("login required") || text.includes("not permitted") || text.includes("guest");
+}
+
 export async function callFrappeMethod<T>(methodPath: string, init?: RequestInit): Promise<ApiResult<T>> {
-  const url = methodPath.startsWith("/api/method/") ? methodPath : `/api/method/${methodPath}`;
+  const url = buildMethodUrl(methodPath);
 
   try {
     const response = await fetch(url, {
@@ -22,9 +34,9 @@ export async function callFrappeMethod<T>(methodPath: string, init?: RequestInit
     });
 
     const payload = (await response.json().catch(() => ({}))) as FrappeMethodResponse<T>;
+    const unauthenticated = response.status === 401 || response.status === 403 || isUnauthenticatedPayload(payload);
 
-    if (!response.ok) {
-      const unauthenticated = response.status === 401 || response.status === 403;
+    if (!response.ok || unauthenticated) {
       return {
         ok: false,
         status: response.status,
@@ -36,7 +48,7 @@ export async function callFrappeMethod<T>(methodPath: string, init?: RequestInit
     return {
       ok: true,
       status: response.status,
-      data: payload.message as T,
+      data: (payload.message ?? payload) as T,
     };
   } catch (error) {
     return {

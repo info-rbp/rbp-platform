@@ -161,7 +161,7 @@ export function PortalServices() {
           title: "Decision Desk",
           category: decisionDeskState.category,
           status: statusLabel(decisionDeskState.status),
-          description: `${decisionDeskState.reference}: ${decisionDeskState.title}. This is a Phase 1 mock submission with no real advisor assigned.`,
+          description: `${decisionDeskState.reference}: ${decisionDeskState.title}. This is a preview submission with no real advisor assigned.`,
           lastUpdated: "Just now",
           nextAction: "View mock status timeline",
           buttonLabel: "Open Decision Desk",

@@ -414,3 +414,21 @@ export function getMembershipTierForPlanId(planId?: string): MembershipTier {
 export function getMembershipTierSignupHref(code: MembershipTierCode) {
   return `${premiumMembershipRoutes.signup}?tier=${code}`;
 }
+
+export type PurchasableMembershipTier = MembershipTierCode | "none" | null | undefined;
+
+export function canPurchaseOnline(membershipTier: PurchasableMembershipTier) {
+  return membershipTier === "free" || membershipTier === "premium";
+}
+
+export function getMarketplaceDiscount(membershipTier: PurchasableMembershipTier) {
+  return membershipTier === "premium" ? 10 : 0;
+}
+
+export function getServiceDiscount(membershipTier: PurchasableMembershipTier) {
+  return membershipTier === "premium" ? 25 : 0;
+}
+
+export function getAnnualServiceCredit(membershipTier: PurchasableMembershipTier) {
+  return membershipTier === "premium" ? 1000 : 0;
+}

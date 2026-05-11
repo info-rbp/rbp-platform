@@ -174,7 +174,7 @@ export function DecisionDeskFlow() {
       const missing = Array.isArray(value) ? value.length === 0 : !value;
 
       if (missing) {
-        nextErrors[field] = "Required for this Phase 1 mock flow.";
+        nextErrors[field] = "Required for this preview flow.";
       }
     });
 
@@ -591,7 +591,7 @@ export function DecisionDeskFlow() {
           <div className="space-y-4">
             <MockSubmissionState
               state={submissionState}
-              idleMessage="Ready to submit this Phase 1 mock Decision Desk request."
+              idleMessage="Ready to submit this Decision Desk request preview."
               loadingMessage="Submitting mock Decision Desk request..."
               successMessage="Mock Decision Desk request submitted."
               errorMessage="Mock submission failed. Review the highlighted fields."
@@ -666,7 +666,7 @@ export function DecisionDeskFlow() {
           <div className="space-y-6">
             <ConfirmationPanel
               title="Decision Desk request submitted"
-              statusLabel="Phase 1 mock submission received"
+              statusLabel="Preview submission received"
               message="Your request has moved into a simulated submitted state. No real advisor has been assigned and no backend record, upload, payment, auth session, or Frappe document was created."
               reference={submitResult.reference}
               primaryAction={

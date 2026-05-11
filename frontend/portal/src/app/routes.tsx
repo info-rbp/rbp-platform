@@ -78,6 +78,7 @@ import { MembershipInclusionsPage } from "./pages/membership/MembershipInclusion
 import { MembershipSignUpPage } from "./pages/membership/MembershipSignUpPage";
 import { MembershipFaqPage } from "./pages/membership/MembershipFaqPage";
 import { MembershipTermsPage } from "./pages/membership/MembershipTermsPage";
+import { MembershipReferralProgramPage } from "./pages/membership/MembershipReferralProgramPage";
 import { MembershipConfirmationPage } from "./pages/confirmation/MembershipConfirmationPage";
 
 // ── Offers and Resources pages ────────────────────────────────────────────────
@@ -303,10 +304,13 @@ export const router = createBrowserRouter([
           { path: "payment-terms", element: <Navigate to="/membership/terms" replace /> },
           { path: "sign-up-now", Component: MembershipSignUpPage },
           { path: "faq", Component: MembershipFaqPage },
+          { path: "referral-program", Component: MembershipReferralProgramPage },
           {
             path: "frequently-asked-questions",
             element: <Navigate to="/membership/faq" replace />,
           },
+          { path: "free", element: <Navigate to="/membership/sign-up-now?tier=free" replace /> },
+          { path: "premium", element: <Navigate to="/membership/sign-up-now?tier=premium" replace /> },
           { path: "terms", Component: MembershipTermsPage },
           { path: "confirmation", Component: MembershipConfirmationPage },
         ],

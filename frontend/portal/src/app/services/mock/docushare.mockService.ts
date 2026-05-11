@@ -114,7 +114,7 @@ export function submitMockDocuShareBrief(payload: MockDocuShareBriefPayload) {
       dashboardHref: "/portal/dashboard",
       timeline: mockDocuShareTimeline,
       filePlaceholderAcknowledgement:
-        "No real files were uploaded. Supporting information is represented by Phase 1 mock placeholders only.",
+        "No real files were uploaded. Supporting information is represented by preview placeholders only.",
     }),
     "Mock DocuShare brief submitted."
   );

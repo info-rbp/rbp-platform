@@ -302,7 +302,7 @@ export function TheFixerFlow() {
                 </div>
               </div>
               <div className="rounded-3xl border border-orange-200 bg-orange-50 p-6">
-                <p className="font-bold text-slate-950">Phase 1 mock-only notice</p>
+                <p className="font-bold text-slate-950">Preview-only notice</p>
                 <p className="mt-2 text-sm leading-6 text-slate-700">
                   No real ticket, escalation, email, upload, advisor assignment, or admin workflow is created.
                 </p>

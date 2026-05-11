@@ -13,7 +13,7 @@ export const mockNotifications: MockNotification[] = [
   {
     id: "notification-001",
     title: "Membership active",
-    message: "Your mock membership is active for the Phase 1 portal demo.",
+    message: "Your membership preview is active for the portal demo.",
     status: "active",
     createdAt: "2026-05-07T10:00:00Z",
     href: "/portal/dashboard",

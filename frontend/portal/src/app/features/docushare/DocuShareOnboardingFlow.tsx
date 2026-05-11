@@ -226,7 +226,7 @@ export function DocuShareOnboardingFlow() {
       const missing = Array.isArray(value) ? value.length === 0 : !value;
 
       if (missing) {
-        nextErrors[field] = "Required for this Phase 1 mock document brief.";
+        nextErrors[field] = "Required for this document brief preview.";
       }
     });
 
@@ -391,7 +391,7 @@ export function DocuShareOnboardingFlow() {
             </div>
           </div>
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-            This is a Phase 1 mock document brief. No files are uploaded and no document is
+            This is a document brief preview. No files are uploaded and no document is
             produced in this flow.
           </div>
         </div>
@@ -700,7 +700,7 @@ export function DocuShareOnboardingFlow() {
           <div className="space-y-4">
             <MockSubmissionState
               state={submissionState}
-              idleMessage="Ready to submit this Phase 1 mock DocuShare brief."
+              idleMessage="Ready to submit this DocuShare brief preview."
               loadingMessage="Submitting mock DocuShare brief..."
               successMessage="Mock DocuShare brief submitted."
               errorMessage="Mock submission failed. Review the highlighted fields."
@@ -798,7 +798,7 @@ export function DocuShareOnboardingFlow() {
           <div className="space-y-6">
             <ConfirmationPanel
               title="Your document brief has been submitted"
-              message="This is a Phase 1 mock submission. No files were uploaded, no document is being produced, and the status below is simulated for frontend review."
+              message="This is a preview submission. No files were uploaded, no document is being produced, and the status below is simulated for frontend review."
               reference={submitResult?.reference}
               statusLabel="Mock brief submitted"
               primaryAction={

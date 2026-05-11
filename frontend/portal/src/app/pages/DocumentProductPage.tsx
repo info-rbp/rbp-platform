@@ -60,10 +60,10 @@ function mockProductToDocument(product: (typeof mockDocumentProducts)[number]): 
     popular: product.id === "template-policy-001" || product.id === "suite-operations-001",
     category: product.category,
     description: product.description,
-    tags: [product.category, "DocuShare", "Phase 1 mock"],
+    tags: [product.category, "DocuShare", "Preview"],
     price: product.priceLabel,
     fullDescription:
-      "This Phase 1 mock Document Nucleus product exists so the DocuShare onboarding flow can be reviewed end to end. It can be used to prefill the mock brief route, but it does not create a real order, document, upload, payment or delivery workflow.",
+      "This Document Nucleus product preview exists so the DocuShare onboarding flow can be reviewed end to end. It can be used to prefill the brief route, but it does not create a real order, document, upload, payment or delivery workflow.",
     whatsIncluded: [
       "Mock document brief context",
       "Document group and product preselection",

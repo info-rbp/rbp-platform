@@ -1,17 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
   Briefcase, LayoutDashboard, FileText, CalendarCheck,
   Tag, Settings, LogOut, Bell, Zap, MessageSquare,
-  BookOpen, Menu, X, User,
+  BookOpen, Menu, X,
 } from "lucide-react";
 
-const USER = {
-  name: "Remote Business Partner",
-  email: "info@remotebusinesspartner.com.au",
-  plan: "Growth Partner Programme",
-  initials: "RB",
-};
+import { PortalSessionProvider, usePortalSession } from "../../context/PortalSessionContext";
 
 const navItems = [
   { label: "Dashboard",         icon: LayoutDashboard, href: "/portal/dashboard" },
@@ -24,13 +19,23 @@ const navItems = [
   { label: "Support",           icon: MessageSquare,   href: "/portal/support" },
 ];
 
-export function PortalLayout() {
+function PortalLayoutShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const session = usePortalSession();
 
-  function handleSignOut() {
-    navigate("/sign-in");
+  const redirectTo = `/login?redirect-to=${encodeURIComponent(`${location.pathname}${location.search}`)}`;
+
+  useEffect(() => {
+    if (!session.loading && (session.unauthenticated || session.isGuest)) {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [navigate, redirectTo, session.isGuest, session.loading, session.unauthenticated]);
+
+  async function handleSignOut() {
+    await fetch("/api/method/logout", { credentials: "include" }).catch(() => undefined);
+    navigate("/login", { replace: true });
   }
 
   const today = new Date().toLocaleDateString("en-AU", {
@@ -40,6 +45,28 @@ export function PortalLayout() {
   // Page title derived from the current path
   const activeItem = navItems.find((n) => location.pathname.startsWith(n.href));
   const pageTitle = activeItem?.label ?? "Portal";
+  const membershipLabel =
+    session.loading
+      ? "Loading account"
+      : session.membershipStatus
+        ? session.membershipStatus.replace(/_/g, " ")
+        : "Member account";
+
+  if (session.loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="h-4 w-36 rounded bg-slate-200" />
+          <div className="mt-4 h-3 w-full rounded bg-slate-100" />
+          <div className="mt-2 h-3 w-4/5 rounded bg-slate-100" />
+        </div>
+      </div>
+    );
+  }
+
+  if (session.unauthenticated || session.isGuest) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -82,11 +109,11 @@ export function PortalLayout() {
         <div className="px-4 py-3 border-b border-slate-100">
           <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl p-2.5">
             <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-black text-white">{USER.initials}</span>
+              <span className="text-xs font-black text-white">{session.initials}</span>
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-slate-800 truncate">{USER.name}</div>
-              <div className="text-[10px] text-blue-700 font-semibold truncate">{USER.plan}</div>
+              <div className="text-xs font-bold text-slate-800 truncate">{session.fullName}</div>
+              <div className="text-[10px] text-blue-700 font-semibold capitalize truncate">{membershipLabel}</div>
             </div>
           </div>
         </div>
@@ -155,13 +182,17 @@ export function PortalLayout() {
           <div className="flex items-center gap-2">
             <button className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors">
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-600 rounded-full" />
+              {session.notificationCount > 0 ? (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[9px] font-black text-white">
+                  {session.notificationCount > 9 ? "9+" : session.notificationCount}
+                </span>
+              ) : null}
             </button>
             <Link
               to="/portal/settings"
               className="w-7 h-7 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-800 transition-colors"
             >
-              <span className="text-xs font-black text-white">{USER.initials}</span>
+              <span className="text-xs font-black text-white">{session.initials}</span>
             </Link>
           </div>
         </header>
@@ -172,5 +203,13 @@ export function PortalLayout() {
         </main>
       </div>
     </div>
+  );
+}
+
+export function PortalLayout() {
+  return (
+    <PortalSessionProvider>
+      <PortalLayoutShell />
+    </PortalSessionProvider>
   );
 }
