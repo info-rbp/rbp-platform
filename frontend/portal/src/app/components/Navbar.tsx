@@ -19,6 +19,10 @@ function normalisePath(href: string) {
   return href.split("?")[0].split("#")[0];
 }
 
+function menuLinks(config: MegaConfig) {
+  return config.groups?.flatMap((group) => group.links) ?? config.links;
+}
+
 function MegaMenuPanel({ config, onClose }: { config: MegaConfig; onClose: () => void }) {
   return (
     <div className="absolute left-0 right-0 top-full z-50 px-4">
@@ -34,28 +38,55 @@ function MegaMenuPanel({ config, onClose }: { config: MegaConfig; onClose: () =>
           </aside>
 
           <div className="p-6 lg:p-7">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {config.links.map((link) => (
-                <Link
-                  key={`${config.key}-${link.href}-${link.label}`}
-                  to={link.href}
-                  onClick={onClose}
-                  className="group flex min-h-[64px] items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:shadow-md"
-                >
-                  <span>
-                    <span className="block text-sm font-bold leading-tight text-slate-900 group-hover:text-blue-700">
-                      {link.label}
-                    </span>
-                    {link.desc && (
-                      <span className="mt-1 block text-xs leading-snug text-slate-500">
-                        {link.desc}
+            {config.groups ? (
+              <div className="grid gap-6 xl:grid-cols-4">
+                {config.groups.map((group) => (
+                  <div key={`${config.key}-${group.heading}`}>
+                    <h3 className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">
+                      {group.heading}
+                    </h3>
+                    <div className="space-y-2">
+                      {group.links.map((link) => (
+                        <Link
+                          key={`${config.key}-${link.href}-${link.label}`}
+                          to={link.href}
+                          onClick={onClose}
+                          className="group flex min-h-[46px] items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:shadow-md"
+                        >
+                          <span className="block text-sm font-bold leading-tight text-slate-900 group-hover:text-blue-700">
+                            {link.label}
+                          </span>
+                          <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-blue-700" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {config.links.map((link) => (
+                  <Link
+                    key={`${config.key}-${link.href}-${link.label}`}
+                    to={link.href}
+                    onClick={onClose}
+                    className="group flex min-h-[64px] items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:shadow-md"
+                  >
+                    <span>
+                      <span className="block text-sm font-bold leading-tight text-slate-900 group-hover:text-blue-700">
+                        {link.label}
                       </span>
-                    )}
-                  </span>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-blue-700" />
-                </Link>
-              ))}
-            </div>
+                      {link.desc && (
+                        <span className="mt-1 block text-xs leading-snug text-slate-500">
+                          {link.desc}
+                        </span>
+                      )}
+                    </span>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-blue-700" />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -100,17 +131,38 @@ function MobileSection({
             {config.description}
           </p>
 
-          {config.links.map((link) => (
-            <Link
-              key={`${config.key}-${link.href}-${link.label}`}
-              to={link.href}
-              onClick={onClose}
-              className="flex items-center justify-between px-6 py-2.5 text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
-            >
-              {link.label}
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </Link>
-          ))}
+          {config.groups ? (
+            config.groups.map((group) => (
+              <div key={`${config.key}-${group.heading}`}>
+                <p className="px-6 pb-1 pt-3 text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
+                  {group.heading}
+                </p>
+                {group.links.map((link) => (
+                  <Link
+                    key={`${config.key}-${link.href}-${link.label}`}
+                    to={link.href}
+                    onClick={onClose}
+                    className="flex items-center justify-between px-6 py-2.5 text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                  >
+                    {link.label}
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+                  </Link>
+                ))}
+              </div>
+            ))
+          ) : (
+            config.links.map((link) => (
+              <Link
+                key={`${config.key}-${link.href}-${link.label}`}
+                to={link.href}
+                onClick={onClose}
+                className="flex items-center justify-between px-6 py-2.5 text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+              >
+                {link.label}
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+              </Link>
+            ))
+          )}
         </div>
       )}
     </div>
@@ -240,7 +292,7 @@ export function Navbar() {
             <div className="mx-auto flex h-12 min-w-max items-center justify-center gap-0.5">
               {MENUS.map((menu) => {
                 const isOpen = openDropdown === menu.key;
-                const isActive = menu.links.some((link) => {
+                const isActive = menuLinks(menu).some((link) => {
                   const path = normalisePath(link.href);
                   return path !== "/" && location.pathname.startsWith(path);
                 });

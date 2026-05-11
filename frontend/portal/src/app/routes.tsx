@@ -59,15 +59,15 @@ import { BusinessApplicationsPage } from "./pages/BusinessApplicationsPage";
 
 import { OperationsCenterPage } from "./pages/OperationsCenterPage";
 import { FinancePage } from "./pages/FinancePage";
-import { BusinessLendingPage } from "./pages/finance/BusinessLendingPage";
-import { BusinessInsurancePage } from "./pages/finance/BusinessInsurancePage";
 import { FinancialPlanningPage } from "./pages/finance/FinancialPlanningPage";
 import { CreditFundingPage } from "./pages/finance/CreditFundingPage";
-import { FinanceCalculatorsPage } from "./pages/operations/FinanceCalculatorsPage";
-import { ConnectivityPage } from "./pages/operations/ConnectivityPage";
 import { NbnPhonePage } from "./pages/operations/NbnPhonePage";
-import { SuperloopPage } from "./pages/operations/SuperloopPage";
 import { OperationsComingSoonPage } from "./pages/operations/OperationsComingSoonPage";
+import { OperationsInsurancePage } from "./pages/operations/OperationsInsurancePage";
+import {
+  OperationsFinancePage,
+  OperationsFinanceReferralPage,
+} from "./pages/operations/OperationsFinancePage";
 
 // ── Marketplace pages ─────────────────────────────────────────────────────────
 
@@ -242,24 +242,39 @@ export const router = createBrowserRouter([
             path: "finance",
             Component: Layout,
             children: [
-              { index: true, Component: FinancePage },
-              { path: "business-lending", Component: BusinessLendingPage },
-              { path: "business-insurance", Component: BusinessInsurancePage },
-              { path: "financial-planning", Component: FinancialPlanningPage },
-              { path: "credit-and-funding", Component: CreditFundingPage },
+              { index: true, Component: OperationsFinancePage },
+              { path: "get-funded", Component: OperationsFinanceReferralPage },
+              { path: "business-insurance", element: <Navigate to="/operations/insurance" replace /> },
+              { path: "business-lending", element: <Navigate to="/operations/finance/commercial-finance" replace /> },
+              { path: "credit-and-funding", element: <Navigate to="/operations/finance/commercial-finance" replace /> },
+              { path: "financial-planning", element: <Navigate to="/operations/finance/other-lending" replace /> },
+              { path: ":slug", Component: OperationsFinancePage },
             ],
           },
 
-          { path: "insurance", Component: BusinessInsurancePage },
-          { path: "calculators", Component: FinanceCalculatorsPage },
+          {
+            path: "insurance",
+            Component: Layout,
+            children: [
+              { index: true, Component: OperationsInsurancePage },
+              { path: ":slug", Component: OperationsInsurancePage },
+            ],
+          },
+          { path: "calculators", element: <Navigate to="/operations/finance/commercial-loan-calculator" replace /> },
 
           // Compatibility route retained for existing links.
-          { path: "superloop", Component: SuperloopPage },
+          { path: "superloop", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
 
           // Preferred connectivity routes.
-          { path: "connectivity", Component: ConnectivityPage },
-          { path: "connectivity/superloop", Component: SuperloopPage },
+          { path: "connectivity", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
+          { path: "connectivity/superloop", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
           { path: "connectivity/nbn-phone", Component: NbnPhonePage },
+          { path: "connectivity/nbn-phone/check-coverage", Component: NbnPhonePage },
+          { path: "connectivity/nbn-phone/our-nbn-plans", Component: NbnPhonePage },
+          { path: "connectivity/nbn-phone/getting-connected", Component: NbnPhonePage },
+          { path: "connectivity/nbn-phone/wifi-modems", Component: NbnPhonePage },
+          { path: "connectivity/nbn-phone/connect-now", Component: NbnPhonePage },
+          { path: "connectivity/nbn-phone/faqs", Component: NbnPhonePage },
 
           { path: "coming-soon", Component: OperationsComingSoonPage },
         ],
@@ -272,8 +287,8 @@ export const router = createBrowserRouter([
         Component: Layout,
         children: [
           { index: true, Component: FinancePage },
-          { path: "business-lending", Component: BusinessLendingPage },
-          { path: "business-insurance", Component: BusinessInsurancePage },
+          { path: "business-lending", element: <Navigate to="/operations/finance/commercial-finance" replace /> },
+          { path: "business-insurance", element: <Navigate to="/operations/insurance" replace /> },
           { path: "financial-planning", Component: FinancialPlanningPage },
           { path: "credit-and-funding", Component: CreditFundingPage },
         ],

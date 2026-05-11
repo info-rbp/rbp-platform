@@ -13,6 +13,10 @@ export interface MegaConfig {
   label: string;
   description: string;
   links: MegaLink[];
+  groups?: Array<{
+    heading: string;
+    links: MegaLink[];
+  }>;
 }
 
 // -- Mega menu data -------------------------------------------------------------
@@ -48,13 +52,58 @@ export const publicNavigation: MegaConfig[] = [
   {
     key: "operations",
     label: "Operations",
-    description: "Access business finance, insurance, connectivity, operations resources, and upcoming operational support.",
+    description: "Explore Business Insurance, Business Finance, Business NBN, and upcoming operational support pathways.",
     links: [
-      { label: "Business Finance", href: "/operations/finance" },
-      { label: "Business Insurance", href: "/operations/insurance" },
-      { label: "Business NBN", href: "/operations/connectivity/nbn-phone" },
-      { label: "Operations Resources", href: "/resources?category=operations" },
+      { label: "Business Insurance Overview", href: "/operations/insurance" },
+      { label: "Business Finance Overview", href: "/operations/finance" },
+      { label: "Business NBN Overview", href: "/operations/connectivity/nbn-phone" },
       { label: "Coming Soon", href: "/operations/coming-soon" },
+    ],
+    groups: [
+      {
+        heading: "Business Insurance",
+        links: [
+          { label: "Business Insurance Overview", href: "/operations/insurance" },
+          { label: "Public Liability Insurance", href: "/operations/insurance/public-liability-insurance" },
+          { label: "Professional Indemnity", href: "/operations/insurance/professional-indemnity" },
+          { label: "Cyber Liability", href: "/operations/insurance/cyber-liability" },
+          { label: "Management Liability", href: "/operations/insurance/management-liability" },
+          { label: "Business Insurance Pack", href: "/operations/insurance/business-insurance-pack" },
+          { label: "Industries Covered", href: "/operations/insurance/industries-covered" },
+          { label: "Get A Quote", href: "/operations/insurance/get-a-quote" },
+          { label: "Insurance FAQs", href: "/operations/insurance/faqs" },
+        ],
+      },
+      {
+        heading: "Business Finance",
+        links: [
+          { label: "Business Finance Overview", href: "/operations/finance" },
+          { label: "Commercial Finance", href: "/operations/finance/commercial-finance" },
+          { label: "Chattel Mortgage", href: "/operations/finance/chattel-mortgage" },
+          { label: "Unsecured Business Loans", href: "/operations/finance/unsecured-business-loans" },
+          { label: "Commercial Equipment Finance", href: "/operations/finance/commercial-equipment-finance" },
+          { label: "Business Vehicle Finance", href: "/operations/finance/business-vehicle-finance" },
+          { label: "Debtor Finance", href: "/operations/finance/debtor-finance" },
+          { label: "Finance Calculators", href: "/operations/finance/commercial-loan-calculator" },
+          { label: "Finance FAQs", href: "/operations/finance/faqs" },
+        ],
+      },
+      {
+        heading: "Business NBN",
+        links: [
+          { label: "Business NBN Overview", href: "/operations/connectivity/nbn-phone" },
+          { label: "Check Coverage", href: "/operations/connectivity/nbn-phone/check-coverage" },
+          { label: "Our NBN Plans", href: "/operations/connectivity/nbn-phone/our-nbn-plans" },
+          { label: "Getting Connected", href: "/operations/connectivity/nbn-phone/getting-connected" },
+          { label: "WiFi Modems", href: "/operations/connectivity/nbn-phone/wifi-modems" },
+          { label: "Connect Now", href: "/operations/connectivity/nbn-phone/connect-now" },
+          { label: "FAQs", href: "/operations/connectivity/nbn-phone/faqs" },
+        ],
+      },
+      {
+        heading: "Coming Soon",
+        links: [{ label: "Coming Soon", href: "/operations/coming-soon" }],
+      },
     ],
   },
   {
