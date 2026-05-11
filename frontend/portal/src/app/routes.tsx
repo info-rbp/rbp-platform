@@ -153,6 +153,8 @@ export const router = createBrowserRouter([
       { path: "help", Component: HelpCenterPage },
       { path: "sign-in", Component: SignInPage },
       { path: "dashboard", Component: DashboardPage },
+      { path: "nbn-phone", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
+      { path: "nbn-phone/connect-now", Component: NbnPhonePage },
 
       // ── Core Services ──────────────────────────────────────────────────────
 
