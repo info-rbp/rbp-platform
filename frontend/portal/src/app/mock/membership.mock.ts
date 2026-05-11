@@ -1,3 +1,8 @@
+import {
+  premiumMembershipInclusions,
+  premiumMembershipPlan,
+  premiumMembershipRoutes,
+} from "../data/premiumMembership";
 import type { MockMoney, MockTimelineItem } from "./types.mock";
 
 export interface MockMembershipPlan {
@@ -15,47 +20,49 @@ export interface MockMembershipPlan {
 export const mockMembershipPlans: MockMembershipPlan[] = [
   {
     id: "membership-rbp-weekly",
-    name: "Lifetime RBP Membership",
-    slug: "remote-business-partner-membership",
+    name: premiumMembershipPlan.name,
+    slug: "rbp-premium-membership",
     description:
-      "Grab the early bird offer with a discounted membership fee and all the inclusions you need to run your business",
+      "Access Core Services, Nucleus resources, service discounts, marketplace savings, member offers, and operations benefits through a premium weekly membership.",
     price: {
       amount: 25,
       currency: "AUD",
       gstIncluded: false,
-      label: "$25 + GST per week",
+      label: premiumMembershipPlan.earlyBirdPrice,
     },
     billingCycle: "weekly",
-    inclusions: [
-      "Unlimited Use of Core Services",
-      "Unlimited Access to Nucleus",
-      "25% Discount on On-Demand Services",
-      "Plus Much More",
-    ],
-    ctaHref: "/membership/remote-business-partner-membership",
-    status: "placeholder",
+    inclusions: premiumMembershipInclusions.flatMap((group) =>
+      group.items.slice(0, group.category === "Core" ? 4 : 1).map((item) => {
+        if (group.category === "Core") {
+          return `${item.name}: ${item.value} usage`;
+        }
+        return `${item.name}: ${item.value}`;
+      })
+    ),
+    ctaHref: premiumMembershipRoutes.signup,
+    status: "available",
   },
 ];
 
 export const mockMembershipTimeline: MockTimelineItem[] = [
   {
     id: "membership-started",
-    label: "Membership started",
-    description: "The membership sign-up flow has been started in mock mode.",
+    label: "Membership preview started",
+    description: "The premium membership sign-up preview has been started.",
     status: "draft",
     timestamp: "2026-05-07T09:00:00Z",
   },
   {
     id: "membership-payment-simulated",
-    label: "Payment simulated",
+    label: "Payment preview completed",
     description: "No real payment has been processed.",
     status: "pending",
     timestamp: "2026-05-07T09:05:00Z",
   },
   {
     id: "membership-active",
-    label: "Membership active",
-    description: "Mock membership status is active for portal demonstration.",
+    label: "Membership preview confirmed",
+    description: "Premium membership preview is active for portal demonstration.",
     status: "active",
     timestamp: "2026-05-07T09:10:00Z",
   },
@@ -80,20 +87,20 @@ export const mockMembershipSignupFields = [
 export const mockMembershipExtras = [
   {
     id: "extra-advisory-session",
-    title: "Extra advisory session",
-    description: "Add a mock strategy session for onboarding scenario testing.",
+    title: "Priority advisory session",
+    description: "Preview an added strategy session during the onboarding experience.",
     priceLabel: "$220 + GST once-off",
   },
   {
     id: "extra-docushare-setup",
-    title: "DocuShare setup",
-    description: "Mock document workspace setup and starter template mapping.",
+    title: "Nucleus setup session",
+    description: "Preview a document workspace setup and starter template mapping session.",
     priceLabel: "$180 + GST once-off",
   },
   {
     id: "extra-reporting-pack",
     title: "Reporting pack",
-    description: "Mock dashboard briefing for cash flow and decision visibility.",
+    description: "Preview a dashboard briefing for cash flow and decision visibility.",
     priceLabel: "$150 + GST once-off",
   },
 ];
@@ -117,7 +124,7 @@ export const mockMembershipManagedServiceOptions = [
   {
     id: "managed-hr",
     title: "Managed HR",
-    description: "People, team setup, and operational support in mock mode.",
+    description: "People, team setup, and operational support.",
   },
   {
     id: "managed-finance",
@@ -127,7 +134,7 @@ export const mockMembershipManagedServiceOptions = [
   {
     id: "managed-documents",
     title: "Documents and systems",
-    description: "DocuShare, process documentation, and app setup interest.",
+    description: "Nucleus, process documentation, and app setup interest.",
   },
   {
     id: "managed-growth",
