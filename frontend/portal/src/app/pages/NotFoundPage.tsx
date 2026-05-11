@@ -1,8 +1,23 @@
-import { Link } from "react-router";
+import { Link, Navigate, useLocation } from "react-router";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { MembershipReferralProgramPage } from "./membership/MembershipReferralProgramPage";
 
 export function NotFoundPage() {
+  const location = useLocation();
+
+  if (location.pathname === "/membership/referral-program") {
+    return <MembershipReferralProgramPage />;
+  }
+
+  if (location.pathname === "/membership/free") {
+    return <Navigate to="/membership/sign-up-now?tier=free" replace />;
+  }
+
+  if (location.pathname === "/membership/premium") {
+    return <Navigate to="/membership/sign-up-now?tier=premium" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -13,10 +28,16 @@ export function NotFoundPage() {
           <p className="mt-4 text-slate-600">The page you requested could not be found. Try one of these public pages.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {[
-              ["Home", "/"], ["On-Demand", "/on-demand"], ["Applications", "/applications"],
-              ["Membership", "/membership"], ["Contact", "/contact"], ["Help", "/help"],
+              ["Home", "/"],
+              ["On-Demand", "/on-demand"],
+              ["Applications", "/applications"],
+              ["Membership", "/membership"],
+              ["Contact", "/contact"],
+              ["Help", "/help"],
             ].map(([label, href]) => (
-              <Link key={href} to={href} className="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">{label}</Link>
+              <Link key={href} to={href} className="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-blue-800">
+                {label}
+              </Link>
             ))}
           </div>
         </div>
