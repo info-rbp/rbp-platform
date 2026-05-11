@@ -11,6 +11,14 @@ import { HelpCenterPage } from "./pages/HelpCenterPage";
 import { SignInPage } from "./pages/SignInPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import {
+  CoreBidManagementPage,
+  CoreBusinessAdvisorPage,
+  CoreDecisionDeskPage,
+  CoreRiskAdvisorPage,
+  CoreServicesLandingPage,
+  CoreTheFixerPage,
+} from "./pages/core-services/CorePublicPages";
 
 // ── About pages ───────────────────────────────────────────────────────────────
 
@@ -21,12 +29,8 @@ import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";
 // ── On-Demand pages ───────────────────────────────────────────────────────────
 
 import { OnDemandPage } from "./pages/OnDemandPage";
-import { BusinessAdvisorPage } from "./pages/BusinessAdvisorPage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { DocuSharePage } from "./pages/DocuSharePage";
-import { DecisionDeskPage } from "./pages/on-demand/DecisionDeskPage";
-import { TheFixerPage } from "./pages/on-demand/TheFixerPage";
-import { RiskAdvisorPage } from "./pages/on-demand/RiskAdvisorPage";
 
 // ── Document Nucleus pages ────────────────────────────────────────────────────
 
@@ -38,7 +42,6 @@ import { DocuShareOnboardingPage } from "./pages/DocuShareOnboardingPage";
 // ── Managed Services pages ────────────────────────────────────────────────────
 
 import { ManagedServicesPage } from "./pages/ManagedServicesPage";
-import { BidManagementPage } from "./pages/managed-services/BidManagementPage";
 import { RealEstatePage } from "./pages/managed-services/RealEstatePage";
 import { HRServicesPage } from "./pages/managed-services/HRServicesPage";
 
@@ -147,6 +150,21 @@ export const router = createBrowserRouter([
       { path: "sign-in", Component: SignInPage },
       { path: "dashboard", Component: DashboardPage },
 
+      // ── Core Services ──────────────────────────────────────────────────────
+
+      {
+        path: "core-services",
+        Component: Layout,
+        children: [
+          { index: true, Component: CoreServicesLandingPage },
+          { path: "business-advisor", Component: CoreBusinessAdvisorPage },
+          { path: "decision-desk", Component: CoreDecisionDeskPage },
+          { path: "the-fixer", Component: CoreTheFixerPage },
+          { path: "risk-advisor", Component: CoreRiskAdvisorPage },
+          { path: "bid-management", Component: CoreBidManagementPage },
+        ],
+      },
+
       // ── About ───────────────────────────────────────────────────────────────
 
       { path: "about/what-we-do", Component: WhatWeDoPage },
@@ -157,7 +175,7 @@ export const router = createBrowserRouter([
       // ── Legacy / direct public routes ──────────────────────────────────────
 
       { path: "services", Component: ServicesPage },
-      { path: "business-advisor", Component: BusinessAdvisorPage },
+      { path: "business-advisor", element: <Navigate to="/core-services/business-advisor" replace /> },
       { path: "docushare", Component: DocuSharePage },
       { path: "applications-legacy", Component: ApplicationsPage },
 
@@ -175,12 +193,12 @@ export const router = createBrowserRouter([
         Component: Layout,
         children: [
           { index: true, Component: OnDemandPage },
-          { path: "business-advisor", Component: BusinessAdvisorPage },
+          { path: "business-advisor", element: <Navigate to="/core-services/business-advisor" replace /> },
           { path: "services", Component: ServicesPage },
           { path: "documents", Component: DocuSharePage },
-          { path: "decision-desk", Component: DecisionDeskPage },
-          { path: "the-fixer", Component: TheFixerPage },
-          { path: "risk-advisor", Component: RiskAdvisorPage },
+          { path: "decision-desk", element: <Navigate to="/core-services/decision-desk" replace /> },
+          { path: "the-fixer", element: <Navigate to="/core-services/the-fixer" replace /> },
+          { path: "risk-advisor", element: <Navigate to="/core-services/risk-advisor" replace /> },
         ],
       },
 
@@ -191,7 +209,7 @@ export const router = createBrowserRouter([
         Component: Layout,
         children: [
           { index: true, Component: ManagedServicesPage },
-          { path: "bid-management", Component: BidManagementPage },
+          { path: "bid-management", element: <Navigate to="/core-services/bid-management" replace /> },
           { path: "real-estate", Component: RealEstatePage },
           { path: "hr-services", Component: HRServicesPage },
         ],
