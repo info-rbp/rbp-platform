@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 import { CheckboxField } from "./CheckboxField";
 
 export interface TermsAcceptanceProps {
@@ -10,8 +12,12 @@ export function TermsAcceptance({ checked = false, onChange }: TermsAcceptancePr
     <CheckboxField
       checked={checked}
       onChange={(event) => onChange?.(event.currentTarget.checked)}
-      label="I accept the mock Phase 1 terms"
-      description="This is a frontend-only acceptance state. No real agreement or payment is processed in Phase 1."
+      label="I understand the RBP Premium Membership inclusions and terms."
+      description={
+        <>
+          Review the <Link to="/membership/terms" className="font-semibold text-blue-700 hover:text-blue-800 hover:underline">Membership Terms</Link>. This frontend preview does not process a real payment or create a live account.
+        </>
+      }
     />
   );
 }
