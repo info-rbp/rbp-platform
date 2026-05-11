@@ -15,7 +15,7 @@ export function TermsAcceptance({ checked = false, onChange }: TermsAcceptancePr
       label="I understand the RBP Premium Membership inclusions and terms."
       description={
         <>
-          Review the <Link to="/membership/terms" className="font-semibold text-blue-700 hover:text-blue-800 hover:underline">Membership Terms</Link>. This frontend preview does not process a real payment or create a live account.
+          Review the <Link to="/membership/terms" className="font-semibold text-blue-700 hover:text-blue-800 hover:underline">Membership Terms</Link> before continuing.
         </>
       }
     />
