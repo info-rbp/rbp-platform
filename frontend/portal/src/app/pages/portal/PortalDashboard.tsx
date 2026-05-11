@@ -124,12 +124,11 @@ const upcomingSessions = [
 ];
 
 const healthMetrics = [
-  { label: "Revenue Growth",              value: 72, color: "bg-blue-600" },
-  { label: "Operational Efficiency",      value: 58, color: "bg-violet-600" },
-  { label: "Strategic Milestone Progress",value: 85, color: "bg-emerald-600" },
+  { label: "Revenue Growth", value: 72, color: "bg-blue-600" },
+  { label: "Operational Efficiency", value: 58, color: "bg-violet-600" },
+  { label: "Strategic Milestone Progress", value: 85, color: "bg-emerald-600" },
 ];
 
-// Set to false to simulate "no consultant yet assigned"
 const CONSULTANT_ASSIGNED = true;
 
 export function PortalDashboard() {
@@ -143,18 +142,18 @@ export function PortalDashboard() {
     "Your business";
 
   return (
-    <div className="px-4 sm:px-6 py-6 space-y-6">
+    <div className="px-4 py-6 space-y-6 sm:px-6">
       <PortalAdminReference
         portalRoute="/portal/dashboard"
         controlledBy={["Admin Dashboard", "Admin Membership"]}
       />
 
       <PortalStatusCard
-        title={membershipState?.selectedPlan ?? "Remote Business Partner Membership"}
+        title={membershipState?.selectedPlan ?? "RBP Premium Membership"}
         description={
           membershipState
-            ? `${membershipState.businessName ?? "Your business"} has a mock ${membershipState.membershipStatus ?? "active"} membership. Onboarding is ${membershipState.onboardingStatus ?? "in progress"}.`
-            : `${memberName} is viewing the active Phase 1 portal state for ${businessName}. Pending and guest-like membership states are documented in the shared mock scenarios.`
+            ? `${membershipState.businessName ?? "Your business"} has an active premium membership preview. Onboarding is ${membershipState.onboardingStatus ?? "in progress"}.`
+            : `${memberName} is viewing the membership portal preview for ${businessName}. Pending and guest-style membership states are documented in the shared preview scenarios.`
         }
         status={membershipState?.onboardingStatus === "complete" ? "active" : "in-progress"}
         href="/membership/confirmation"
@@ -163,7 +162,7 @@ export function PortalDashboard() {
       {decisionDeskState ? (
         <PortalStatusCard
           title={`Decision Desk ${decisionDeskState.reference}`}
-          description={`${decisionDeskState.businessName} submitted "${decisionDeskState.title}" as a Phase 1 mock request. No real advisor has been assigned.`}
+          description={`${decisionDeskState.businessName} submitted "${decisionDeskState.title}" as a preview request. No real advisor has been assigned.`}
           status={decisionDeskState.status}
           href={decisionDeskState.requestHref}
         />
@@ -172,42 +171,40 @@ export function PortalDashboard() {
       {docuShareState ? (
         <PortalStatusCard
           title={`DocuShare brief ${docuShareState.reference}`}
-          description={`${docuShareState.businessName} submitted "${docuShareState.documentType}" as a Phase 1 mock document brief. No files were uploaded and no real document is being produced.`}
+          description={`${docuShareState.businessName} submitted "${docuShareState.documentType}" as a preview document brief. No files were uploaded and no real document is being produced.`}
           status={docuShareState.status}
           href={docuShareState.documentsHref}
         />
       ) : null}
 
-      {/* ── Welcome banner ── */}
-      <div className="bg-blue-700 rounded-2xl px-6 py-5 relative overflow-hidden">
-        <div className="absolute -top-8 -right-8 w-44 h-44 bg-blue-600 rounded-full opacity-40 pointer-events-none" />
-        <div className="absolute -bottom-10 right-20 w-32 h-32 bg-blue-800 rounded-full opacity-40 pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-blue-700 px-6 py-5">
+        <div className="pointer-events-none absolute -top-8 -right-8 h-44 w-44 rounded-full bg-blue-600 opacity-40" />
+        <div className="pointer-events-none absolute right-20 -bottom-10 h-32 w-32 rounded-full bg-blue-800 opacity-40" />
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative z-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Star className="w-4 h-4 text-amber-300" />
-              <span className="text-xs font-bold text-blue-100 uppercase tracking-widest">
+            <div className="mb-1 flex items-center gap-2">
+              <Star className="h-4 w-4 text-amber-300" />
+              <span className="text-xs font-bold uppercase tracking-widest text-blue-100">
                 Growth Partner Programme
               </span>
             </div>
-            <h2 className="text-xl font-extrabold text-white mb-1.5">Welcome back, {memberName}.</h2>
-            <p className="text-sm text-blue-100 max-w-lg">
-              {businessName} has{" "}
-              <span className="font-bold text-white">{mockPortalDashboard.activeRequests.length} active mock requests</span>,{" "}
+            <h2 className="mb-1.5 text-xl font-extrabold text-white">Welcome back, {memberName}.</h2>
+            <p className="max-w-lg text-sm text-blue-100">
+              {businessName} has <span className="font-bold text-white">{mockPortalDashboard.activeRequests.length} active requests</span>,{" "}
               <span className="font-bold text-white">{mockPortalDashboard.notifications.length} notifications</span>, and recommended next actions ready.
             </p>
           </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex flex-shrink-0 items-center gap-2">
             <Link
               to="/portal/services"
-              className="inline-flex items-center gap-1.5 bg-white text-blue-700 font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-blue-50 transition-all"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-blue-700 transition-all hover:bg-blue-50"
             >
-              Open My Services <ArrowRight className="w-3.5 h-3.5" />
+              Open My Services <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <Link
               to="/portal/sessions"
-              className="hidden sm:inline-flex items-center gap-1.5 bg-blue-600/50 hover:bg-blue-600/70 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
+              className="hidden items-center gap-1.5 rounded-xl bg-blue-600/50 px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-blue-600/70 sm:inline-flex"
             >
               Book a Session
             </Link>
@@ -215,36 +212,33 @@ export function PortalDashboard() {
         </div>
       </div>
 
-      {/* ── Metric cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {mockPortalDashboard.metrics.map((s) => {
           const Icon = metricIcon[s.icon];
           const tone = metricTone[s.tone];
           return (
-          <Link
-            key={s.id}
-            to={s.href}
-            className={`bg-white rounded-2xl p-4 border ${tone.border} shadow-sm hover:shadow-md transition-shadow`}
-          >
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-3 ${tone.color}`}>
-              <Icon className="w-4 h-4" />
-            </div>
-            <div className="text-2xl font-extrabold text-slate-900 mb-0.5">{s.value}</div>
-            <div className="text-xs font-semibold text-slate-700 mb-0.5">{s.label}</div>
-            <div className="text-[10px] text-slate-400">{s.sub}</div>
-          </Link>
-        )})}
+            <Link
+              key={s.id}
+              to={s.href}
+              className={`rounded-2xl border bg-white p-4 shadow-sm transition-shadow hover:shadow-md ${tone.border}`}
+            >
+              <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-xl ${tone.color}`}>
+                <Icon className="h-4 w-4" />
+              </div>
+              <div className="mb-0.5 text-2xl font-extrabold text-slate-900">{s.value}</div>
+              <div className="mb-0.5 text-xs font-semibold text-slate-700">{s.label}</div>
+              <div className="text-[10px] text-slate-400">{s.sub}</div>
+            </Link>
+          );
+        })}
       </div>
 
-      {/* ── Recent Activity + Quick Actions ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:col-span-2">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Recent Activity</h3>
-            <Link to="/portal/services" className="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1">
-              View all <ChevronRight className="w-3.5 h-3.5" />
+            <Link to="/portal/services" className="flex items-center gap-1 text-xs font-semibold text-blue-700 hover:underline">
+              View all <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
           <div className="divide-y divide-slate-50">
@@ -252,21 +246,21 @@ export function PortalDashboard() {
               <Link
                 key={item.id}
                 to={item.href}
-                className="px-5 py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors"
+                className="flex items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-slate-50"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    {item.type === "service"  && <Zap          className="w-4 h-4 text-slate-500" />}
-                    {item.type === "document" && <FileText      className="w-4 h-4 text-slate-500" />}
-                    {item.type === "offer"    && <Tag           className="w-4 h-4 text-slate-500" />}
-                    {item.type === "session"  && <CalendarCheck className="w-4 h-4 text-slate-500" />}
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                    {item.type === "service" && <Zap className="h-4 w-4 text-slate-500" />}
+                    {item.type === "document" && <FileText className="h-4 w-4 text-slate-500" />}
+                    {item.type === "offer" && <Tag className="h-4 w-4 text-slate-500" />}
+                    {item.type === "session" && <CalendarCheck className="h-4 w-4 text-slate-500" />}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-bold text-slate-800 truncate">{item.title}</div>
+                    <div className="truncate text-xs font-bold text-slate-800">{item.title}</div>
                     <div className="text-[10px] text-slate-400">{item.date}</div>
                   </div>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg flex-shrink-0 ${activityStatusColor[item.status] ?? "bg-slate-100 text-slate-600"}`}>
+                <span className={`flex-shrink-0 rounded-lg px-2 py-1 text-[10px] font-bold ${activityStatusColor[item.status] ?? "bg-slate-100 text-slate-600"}`}>
                   {item.status}
                 </span>
               </Link>
@@ -274,35 +268,34 @@ export function PortalDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
+        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <div className="border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Quick Actions</h3>
           </div>
-          <div className="p-4 space-y-2">
+          <div className="space-y-2 p-4">
             {mockPortalDashboard.quickLinks.map((action) => {
               const Icon = quickActionIcon[action.icon];
               return (
-              <Link
-                key={action.id}
-                to={action.href}
-                className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${quickActionColor[action.emphasis]}`}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon className="w-3.5 h-3.5" />
-                  {action.label}
-                </div>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            )})}
+                <Link
+                  key={action.id}
+                  to={action.href}
+                  className={`flex items-center justify-between gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${quickActionColor[action.emphasis]}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-3.5 w-3.5" />
+                    {action.label}
+                  </div>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* ── Notifications + Next Steps ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <section className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <div className="border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Notifications</h3>
           </div>
           {mockPortalDashboard.notifications.length > 0 ? (
@@ -311,50 +304,49 @@ export function PortalDashboard() {
                 <Link
                   key={notification.id}
                   to={notification.href ?? "/portal/dashboard"}
-                  className="block px-5 py-4 hover:bg-slate-50 transition-colors"
+                  className="block px-5 py-4 transition-colors hover:bg-slate-50"
                 >
-                  <div className="flex items-center justify-between gap-3 mb-1">
+                  <div className="mb-1 flex items-center justify-between gap-3">
                     <p className="text-xs font-bold text-slate-900">{notification.title}</p>
                     <StatusBadge status={notification.status} />
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">{notification.message}</p>
+                  <p className="text-[11px] leading-relaxed text-slate-500">{notification.message}</p>
                 </Link>
               ))}
             </div>
           ) : (
             <div className="px-5 py-10 text-center">
-              <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+              <CheckCircle className="mx-auto mb-2 h-8 w-8 text-emerald-500" />
               <p className="text-sm font-bold text-slate-700">No notifications</p>
-              <p className="text-xs text-slate-400">Mock no-notification state is supported.</p>
+              <p className="text-xs text-slate-400">No notifications are currently available in this preview.</p>
             </div>
           )}
         </section>
 
-        <section className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
+        <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:col-span-2">
+          <div className="border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Recommended Next Actions</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-50">
+          <div className="grid grid-cols-1 divide-slate-50 md:grid-cols-3 md:divide-x md:divide-y-0">
             {mockPortalDashboard.nextSteps.map((step) => (
-              <Link key={step.id} to={step.href} className="p-5 hover:bg-slate-50 transition-colors">
+              <Link key={step.id} to={step.href} className="p-5 transition-colors hover:bg-slate-50">
                 <StatusBadge status={step.status} />
-                <h4 className="mt-3 text-xs font-extrabold text-slate-900 leading-snug">{step.title}</h4>
-                <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">{step.description}</p>
+                <h4 className="mt-3 text-xs font-extrabold leading-snug text-slate-900">{step.title}</h4>
+                <p className="mt-2 text-[11px] leading-relaxed text-slate-500">{step.description}</p>
               </Link>
             ))}
           </div>
         </section>
       </div>
 
-      {/* ── Phase 1 Flow Status ── */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-extrabold text-slate-900">Portal Status Cards</h3>
-          <span className="text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 px-2 py-1 rounded-md">
-            Frontend-only mock data
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-extrabold text-slate-900">Membership Preview Status</h3>
+          <span className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-400">
+            Preview data
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {mockPortalDashboard.flowStatuses.map((flow) => (
             <PortalStatusCard
               key={flow.id}
@@ -367,107 +359,101 @@ export function PortalDashboard() {
         </div>
       </div>
 
-      {/* ── Upcoming Sessions + Consultant ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-        {/* Upcoming Sessions */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm lg:col-span-2">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Upcoming Sessions</h3>
             <Link
               to="/portal/sessions"
-              className="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1"
+              className="flex items-center gap-1 text-xs font-semibold text-blue-700 hover:underline"
             >
-              Book new <ChevronRight className="w-3.5 h-3.5" />
+              Book new <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           {upcomingSessions.length > 0 ? (
             <div className="divide-y divide-slate-50">
               {upcomingSessions.map((s) => (
-                <div key={s.title} className="px-5 py-4 flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <CalendarCheck className="w-5 h-5 text-blue-700" />
+                <div key={s.title} className="flex items-center gap-4 px-5 py-4">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                    <CalendarCheck className="h-5 w-5 text-blue-700" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-900 mb-0.5">{s.title}</div>
-                    <div className="flex items-center gap-3 flex-wrap">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-0.5 text-xs font-bold text-slate-900">{s.title}</div>
+                    <div className="flex flex-wrap items-center gap-3">
                       <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                        <Clock className="w-3 h-3" /> {s.date} · {s.time}
+                        <Clock className="h-3 w-3" /> {s.date} · {s.time}
                       </span>
                       <span className="flex items-center gap-1 text-[10px] text-slate-500">
-                        <Users className="w-3 h-3" /> {s.consultant}
+                        <Users className="h-3 w-3" /> {s.consultant}
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-1 rounded-lg flex-shrink-0">
+                  <span className="flex-shrink-0 rounded-lg bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700">
                     {s.type}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            /* Empty state */
-            <div className="px-5 py-10 flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mb-3">
-                <CalendarCheck className="w-6 h-6 text-slate-300" />
+            <div className="flex flex-col items-center px-5 py-10 text-center">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
+                <CalendarCheck className="h-6 w-6 text-slate-300" />
               </div>
-              <div className="text-sm font-bold text-slate-700 mb-1">No sessions scheduled</div>
-              <p className="text-xs text-slate-400 mb-4 max-w-xs">
+              <div className="mb-1 text-sm font-bold text-slate-700">No sessions scheduled</div>
+              <p className="mb-4 max-w-xs text-xs text-slate-400">
                 Book your first advisory session with the RBP team to get started.
               </p>
               <Link
                 to="/portal/sessions"
-                className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-blue-800"
               >
-                Book a Session <ArrowRight className="w-3.5 h-3.5" />
+                Book a Session <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           )}
         </div>
 
-        {/* Your Consultant */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100">
+        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <div className="border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Your Consultant</h3>
           </div>
 
           {CONSULTANT_ASSIGNED ? (
-            <div className="p-5 flex flex-col items-center text-center">
-              <div className="w-14 h-14 bg-blue-700 rounded-2xl flex items-center justify-center mb-3">
+            <div className="flex flex-col items-center p-5 text-center">
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-700">
                 <span className="text-lg font-black text-white">JR</span>
               </div>
-              <div className="text-sm font-extrabold text-slate-900 mb-0.5">James Reynolds</div>
-              <div className="text-xs text-blue-700 font-semibold mb-2">Senior Business Adviser</div>
-              <div className="flex items-center gap-1 mb-3">
+              <div className="mb-0.5 text-sm font-extrabold text-slate-900">James Reynolds</div>
+              <div className="mb-2 text-xs font-semibold text-blue-700">Senior Business Adviser</div>
+              <div className="mb-3 flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
                 ))}
-                <span className="text-[10px] text-slate-400 ml-1">5.0</span>
+                <span className="ml-1 text-[10px] text-slate-400">5.0</span>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4">
+              <p className="mb-4 text-xs leading-relaxed text-slate-500">
                 Specialising in growth strategy, financial planning, and operational efficiency for Australian SMEs.
               </p>
               <Link
                 to="/portal/sessions"
-                className="w-full inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs py-2.5 rounded-xl transition-all"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-2.5 text-xs font-bold text-white transition-all hover:bg-blue-800"
               >
-                <MessageSquare className="w-3.5 h-3.5" /> Send a Message
+                <MessageSquare className="h-3.5 w-3.5" /> Send a Message
               </Link>
             </div>
           ) : (
-            /* Empty / unassigned state */
-            <div className="p-5 flex flex-col items-center text-center">
-              <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-3">
-                <Users className="w-7 h-7 text-slate-300" />
+            <div className="flex flex-col items-center p-5 text-center">
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+                <Users className="h-7 w-7 text-slate-300" />
               </div>
-              <div className="text-sm font-bold text-slate-700 mb-1">No consultant assigned yet</div>
-              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+              <div className="mb-1 text-sm font-bold text-slate-700">No consultant assigned yet</div>
+              <p className="mb-4 text-xs leading-relaxed text-slate-400">
                 Your consultant will appear here once assigned. This typically happens within 1 business day of joining.
               </p>
               <Link
                 to="/portal/support"
-                className="w-full inline-flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs py-2.5 rounded-xl transition-all"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-700 transition-all hover:bg-slate-50"
               >
                 Contact Support
               </Link>
@@ -476,30 +462,29 @@ export function PortalDashboard() {
         </div>
       </div>
 
-      {/* ── Business Health Snapshot ── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-5">
-        <div className="flex items-center justify-between mb-1">
+      <div className="rounded-2xl border border-slate-100 bg-white px-5 py-5 shadow-sm">
+        <div className="mb-1 flex items-center justify-between">
           <h3 className="text-sm font-extrabold text-slate-900">Business Health Snapshot</h3>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold text-slate-400 bg-slate-50 border border-slate-200 px-2 py-1 rounded-md">
+            <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-400">
               Demo data · Not live
             </span>
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg">
-              <TrendingUp className="w-3 h-3" /> On Track
+            <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700">
+              <TrendingUp className="h-3 w-3" /> On Track
             </span>
           </div>
         </div>
-        <p className="text-[11px] text-slate-400 mb-4">
+        <p className="mb-4 text-[11px] text-slate-400">
           Illustrative snapshot — your adviser will share real metrics with you after your next session.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
           {healthMetrics.map((m) => (
             <div key={m.label}>
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-600">{m.label}</span>
                 <span className="text-xs font-extrabold text-slate-900">{m.value}%</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${m.color}`}
                   style={{ width: `${m.value}%` }}
@@ -508,17 +493,16 @@ export function PortalDashboard() {
             </div>
           ))}
         </div>
-        <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between border-t border-slate-50 pt-4">
           <p className="text-[11px] text-slate-400">Updated after each advisory session</p>
           <Link
             to="/portal/services/business-health-snapshot"
-            className="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1"
+            className="flex items-center gap-1 text-xs font-semibold text-blue-700 hover:underline"
           >
-            View full snapshot <ChevronRight className="w-3.5 h-3.5" />
+            View full snapshot <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>
-
     </div>
   );
 }
