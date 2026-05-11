@@ -13,7 +13,7 @@ export function ConfirmationPanel({
   title,
   message,
   reference,
-  statusLabel = "Mock submission received",
+  statusLabel = "Submission received",
   primaryAction,
   secondaryAction,
 }: ConfirmationPanelProps) {
@@ -31,7 +31,7 @@ export function ConfirmationPanel({
         {reference ? (
           <div className="mt-5 rounded-2xl border border-emerald-200 bg-white p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Mock reference
+              Reference
             </p>
             <p className="mt-1 text-lg font-bold text-slate-950">{reference}</p>
           </div>
