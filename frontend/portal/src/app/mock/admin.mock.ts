@@ -82,7 +82,7 @@ export const mockAdminMetrics: MockAdminMetric[] = [
     id: "membership-activity",
     label: "Membership activity",
     value: "12",
-    description: "Mock membership sign-ups, onboarding records and payment simulations.",
+    description: "Membership preview sign-ups, onboarding records and payment preview states.",
     status: "active",
   },
   {
@@ -122,7 +122,7 @@ export const mockAdminQueues: MockAdminQueue[] = [
   {
     id: "membership",
     title: "Membership review",
-    description: "Review membership sign-ups, onboarding states, billing simulation and account status.",
+    description: "Review RBP Premium Membership sign-ups, onboarding states, payment preview states and account status.",
     count: 12,
     status: "pending",
     href: "/admin/membership",
@@ -219,14 +219,14 @@ export const mockAdminReviewRecords: MockAdminReviewRecord[] = [
   {
     id: "admin-membership-001",
     reference: "MEM-MOCK-001",
-    title: "Remote Business Partner Membership",
+    title: "RBP Premium Membership",
     type: "membership",
     owner: "Membership",
     submittedBy: "Demo Business Pty Ltd",
     submittedAt: "2026-05-07T09:10:00Z",
     priority: "medium",
     state: "approved",
-    summary: "Mock membership sign-up and onboarding state.",
+    summary: "RBP Premium Membership preview sign-up and onboarding state.",
     routeHint: "/admin/membership",
   },
 ];
