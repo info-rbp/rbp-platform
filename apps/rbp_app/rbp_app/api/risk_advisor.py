@@ -6,6 +6,7 @@ import frappe
 
 from rbp_app.permissions import require_login, require_system_manager
 from rbp_app.services import risk_advisor as service
+from rbp_app.services.admin_workflows import perform_domain_action
 
 
 def _payload(payload):
@@ -86,3 +87,38 @@ def update_action(action_name, payload=None):
 def complete_action(action_name):
     user = require_login()
     return service.complete_action(user, action_name)
+
+
+def _admin_action(action, assessment_name, **kwargs):
+    user = require_system_manager()
+    return perform_domain_action(user, "risk_advisor", service.ASSESSMENT_DOCTYPE, assessment_name, action, **kwargs)
+
+
+@frappe.whitelist()
+def admin_start_review(assessment_name, notes=None):
+    return _admin_action("start_review", assessment_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_request_more_information(assessment_name, notes):
+    return _admin_action("request_more_information", assessment_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_reject(assessment_name, notes):
+    return _admin_action("reject", assessment_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_mark_outcome_ready(assessment_name, notes=None):
+    return _admin_action("mark_outcome_ready", assessment_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_mark_completed(assessment_name, notes=None):
+    return _admin_action("mark_completed", assessment_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_archive(assessment_name, notes=None):
+    return _admin_action("archive", assessment_name, notes=notes)

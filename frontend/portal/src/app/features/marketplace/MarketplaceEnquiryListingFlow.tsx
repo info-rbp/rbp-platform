@@ -92,7 +92,7 @@ const sellerSteps = [
   { id: "details", label: "Details", description: "Add seller and listing details." },
   { id: "media", label: "Media", description: "Add mock media placeholders." },
   { id: "fees", label: "Fees", description: "Review mock fee/payment state." },
-  { id: "review", label: "Review", description: "Submit for mock admin review." },
+  { id: "review", label: "Review", description: "Submit the preview listing." },
 ];
 
 const enquirySteps = [

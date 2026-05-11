@@ -1,187 +1,79 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import {
   AlertCircle,
   ArrowRight,
   CheckCircle,
   ClipboardList,
-  FileText,
   LayoutDashboard,
-  ListChecks,
+  Loader2,
   Lock,
-  MessageSquare,
-  Settings,
+  RefreshCw,
   ShieldCheck,
-  ShoppingBag,
-  Users,
 } from "lucide-react";
 
-import {
-  mockAdminActionOptions,
-  mockAdminAuditRecords,
-  mockAdminAuditTrail,
-  mockAdminContentRecords,
-  mockAdminMetrics,
-  mockAdminQueues,
-  mockAdminReviewRecords,
-  type MockAdminReviewRecord,
-} from "../../mock";
+import { getAdminDashboard, type AdminDashboardPayload } from "../../api/admin.api";
+import { listAuditLogs, performAdminAction, type AuditLogEntry } from "../../api/adminActions.api";
+import { mockAdminMetrics, mockAdminQueues, mockAdminReviewRecords, type MockAdminReviewRecord } from "../../mock";
 import { submitMockAdminReviewAction } from "../../services/mock/admin.mockService";
-import { AdminReviewQueueCard } from "../../components/domain";
-import { MockSubmissionState, StatusTimeline } from "../../components/flow";
 import { FormSection, SelectField, TextAreaField } from "../../components/forms";
-import { ReviewStatusBadge, StatusBadge } from "../../components/status";
-
-type AdminView =
-  | "dashboard"
-  | "content"
-  | "requests"
-  | "decision-desk"
-  | "docushare"
-  | "connectivity"
-  | "risk-advisor"
-  | "fixer"
-  | "marketplace"
-  | "membership"
-  | "audit-review"
-  | "settings";
+import { MockSubmissionState } from "../../components/flow";
+import { StatusBadge } from "../../components/status";
 
 type SubmissionState = "idle" | "loading" | "success" | "error";
 
-const viewConfig: Record<AdminView, { title: string; description: string }> = {
-  dashboard: {
-    title: "Admin dashboard",
-    description: "Phase 1 admin command centre for content, requests, marketplace, membership and audit concepts.",
-  },
-  content: {
-    title: "Content review",
-    description: "Review public content, legal placeholders, resources, offers and help centre mock records.",
-  },
-  requests: {
-    title: "Service requests",
-    description: "Review all mock product/service submissions in one queue.",
-  },
-  "decision-desk": {
-    title: "Decision Desk requests",
-    description: "Review mock Decision Desk submissions and advisory status states.",
-  },
-  docushare: {
-    title: "DocuShare requests",
-    description: "Review mock document briefs, supporting placeholders and document status states.",
-  },
-  connectivity: {
-    title: "Connectivity orders",
-    description: "Review mock NBN/connectivity serviceability, order and provisioning states.",
-  },
-  "risk-advisor": {
-    title: "Risk Advisor assessments",
-    description: "Review mock assessment outcomes, risk scores and admin management states.",
-  },
-  fixer: {
-    title: "The Fixer requests",
-    description: "Review urgent issue mock triage, assignment and status states.",
-  },
-  marketplace: {
-    title: "Marketplace review",
-    description: "Review mock seller listings, buyer enquiries, fee states and publication concepts.",
-  },
-  membership: {
-    title: "Membership review",
-    description: "Review membership sign-ups, onboarding states and mock payment simulation records.",
-  },
-  "audit-review": {
-    title: "Audit and review",
-    description: "Review simulated admin actions, approval history and future compliance trail concepts.",
-  },
-  settings: {
-    title: "Admin settings",
-    description: "Mock admin preferences, review roles, notification settings and future permissions concepts.",
-  },
+const mockAdminEnabled = import.meta.env.DEV && import.meta.env.VITE_RBP_ENABLE_MOCK_ADMIN === "true";
+
+const domainDefaults: Record<string, { domain: string; doctype: string }> = {
+  decision: { domain: "decision_desk", doctype: "RBP Decision Desk Request" },
+  docushare: { domain: "docushare", doctype: "RBP DocuShare Document" },
+  connectivity: { domain: "connectivity", doctype: "RBP Connectivity Request" },
+  risk: { domain: "risk_advisor", doctype: "RBP Risk Advisor Assessment" },
+  fixer: { domain: "fixer", doctype: "RBP Fixer Case" },
+  marketplace: { domain: "marketplace", doctype: "RBP Marketplace Listing" },
+  membership: { domain: "membership", doctype: "RBP Onboarding Flow" },
 };
 
-const navItems = [
-  { href: "/admin/dashboard", label: "Dashboard", view: "dashboard", icon: LayoutDashboard },
-  { href: "/admin/content", label: "Content", view: "content", icon: FileText },
-  { href: "/admin/requests", label: "Requests", view: "requests", icon: ClipboardList },
-  { href: "/admin/requests/decision-desk", label: "Decision Desk", view: "decision-desk", icon: MessageSquare },
-  { href: "/admin/requests/docushare", label: "DocuShare", view: "docushare", icon: FileText },
-  { href: "/admin/requests/connectivity", label: "Connectivity", view: "connectivity", icon: ListChecks },
-  { href: "/admin/requests/risk-advisor", label: "Risk Advisor", view: "risk-advisor", icon: ShieldCheck },
-  { href: "/admin/requests/fixer", label: "The Fixer", view: "fixer", icon: AlertCircle },
-  { href: "/admin/marketplace", label: "Marketplace", view: "marketplace", icon: ShoppingBag },
-  { href: "/admin/membership", label: "Membership", view: "membership", icon: Users },
-  { href: "/admin/audit-review", label: "Audit", view: "audit-review", icon: CheckCircle },
-  { href: "/admin/settings", label: "Settings", view: "settings", icon: Settings },
-] as const;
-
-function inferView(pathname: string): AdminView {
-  if (pathname.includes("/admin/content") || pathname.includes("/admin/site-content")) return "content";
-  if (pathname.includes("/admin/requests/decision-desk")) return "decision-desk";
-  if (pathname.includes("/admin/requests/docushare")) return "docushare";
-  if (pathname.includes("/admin/requests/connectivity")) return "connectivity";
-  if (pathname.includes("/admin/requests/risk-advisor")) return "risk-advisor";
-  if (pathname.includes("/admin/requests/fixer") || pathname.includes("/admin/the-fixer")) return "fixer";
-  if (pathname.includes("/admin/requests")) return "requests";
-  if (pathname.includes("/admin/marketplace")) return "marketplace";
-  if (pathname.includes("/admin/membership") || pathname.includes("/admin/members")) return "membership";
-  if (pathname.includes("/admin/audit-review")) return "audit-review";
-  if (pathname.includes("/admin/settings")) return "settings";
-  return "dashboard";
-}
-
-function filterRecords(view: AdminView): MockAdminReviewRecord[] {
-  if (view === "dashboard" || view === "requests") return mockAdminReviewRecords;
-  if (view === "decision-desk") return mockAdminReviewRecords.filter((record) => record.owner === "Decision Desk");
-  if (view === "docushare") return mockAdminReviewRecords.filter((record) => record.owner === "DocuShare");
-  if (view === "connectivity") return mockAdminReviewRecords.filter((record) => record.owner === "Connectivity");
-  if (view === "risk-advisor") return mockAdminReviewRecords.filter((record) => record.owner === "Risk Advisor");
-  if (view === "fixer") return mockAdminReviewRecords.filter((record) => record.owner === "The Fixer");
-  if (view === "marketplace") return mockAdminReviewRecords.filter((record) => record.type === "marketplace");
-  if (view === "membership") return mockAdminReviewRecords.filter((record) => record.type === "membership");
-  return mockAdminReviewRecords;
-}
-
-function AdminShell({ children }: { children: React.ReactNode }) {
+function AdminShell({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const currentView = inferView(location.pathname);
+  const auditActive = location.pathname.includes("audit");
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-blue-700">
-              Phase 1 admin concepts
-            </p>
+            <p className="text-xs font-bold uppercase tracking-widest text-blue-700">RBP Desk command centre</p>
             <h1 className="mt-1 text-2xl font-black text-slate-950">
-              {viewConfig[currentView].title}
+              {auditActive ? "Audit trail" : "Production admin dashboard"}
             </h1>
             <p className="mt-1 max-w-3xl text-sm text-slate-600">
-              {viewConfig[currentView].description}
+              Live operational metrics and workflow actions. Frappe Desk remains the system of record for CRUD, forms, permissions and reports.
             </p>
           </div>
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-            Mock admin only. No auth, permissions, persistence or backend actions.
-          </div>
+          <a href="/desk" className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">
+            Open Desk <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[260px_minmax(0,1fr)] lg:px-8">
-        <aside className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:self-start">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:px-8">
+        <aside className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:self-start">
           <nav className="space-y-1">
-            {navItems.map((item) => {
+            {[
+              { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+              { href: "/admin/requests", label: "Queues", icon: ClipboardList },
+              { href: "/admin/audit-review", label: "Audit", icon: ShieldCheck },
+            ].map((item) => {
               const Icon = item.icon;
-              const active = currentView === item.view;
-
+              const active = location.pathname === item.href || (item.href.includes("audit") && auditActive);
               return (
                 <Link
                   key={item.href}
                   to={item.href}
                   className={[
-                    "flex items-center gap-3 rounded-2xl px-3 py-2 text-sm font-semibold transition",
-                    active
-                      ? "bg-blue-600 text-white"
-                      : "text-slate-700 hover:bg-slate-100",
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition",
+                    active ? "bg-blue-600 text-white" : "text-slate-700 hover:bg-slate-100",
                   ].join(" ")}
                 >
                   <Icon className="h-4 w-4" />
@@ -191,299 +83,316 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
         </aside>
-
         <main className="min-w-0">{children}</main>
       </div>
     </div>
   );
 }
 
-function MetricGrid() {
+function MetricGrid({ dashboard }: { dashboard: AdminDashboardPayload }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {mockAdminMetrics.map((metric) => (
-        <article key={metric.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      {dashboard.metrics.map((metric) => (
+        <a key={metric.key} href={metric.desk_url || "/desk"} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300">
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-slate-600">{metric.label}</p>
             <StatusBadge status={metric.status} />
           </div>
           <p className="text-3xl font-black text-slate-950">{metric.value}</p>
           <p className="mt-2 text-sm leading-6 text-slate-600">{metric.description}</p>
-        </article>
+        </a>
       ))}
     </div>
   );
 }
 
-function QueueGrid() {
+function QueueGrid({ dashboard }: { dashboard: AdminDashboardPayload }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {mockAdminQueues.map((queue) => (
-        <Link key={queue.id} to={queue.href}>
-          <AdminReviewQueueCard
-            title={queue.title}
-            description={queue.description}
-            count={queue.count}
-            status={queue.status}
-          />
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function RecordTable({ records }: { records: MockAdminReviewRecord[] }) {
-  if (records.length === 0) {
-    return (
-      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center">
-        <ClipboardList className="mx-auto mb-4 h-10 w-10 text-slate-300" />
-        <h3 className="text-lg font-bold text-slate-950">No mock records in this queue</h3>
-        <p className="mt-2 text-sm text-slate-600">
-          This empty state exists for Phase 1 admin review testing.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
-            <tr>
-              {["Reference", "Title", "Owner", "Submitted by", "Priority", "State", "Action"].map((header) => (
-                <th key={header} className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 bg-white">
-            {records.map((record) => (
-              <tr key={record.id} className="align-top">
-                <td className="px-5 py-4 text-sm font-bold text-slate-950">{record.reference}</td>
-                <td className="px-5 py-4">
-                  <p className="text-sm font-semibold text-slate-950">{record.title}</p>
-                  <p className="mt-1 max-w-md text-xs leading-5 text-slate-500">{record.summary}</p>
-                </td>
-                <td className="px-5 py-4 text-sm text-slate-700">{record.owner}</td>
-                <td className="px-5 py-4 text-sm text-slate-700">{record.submittedBy}</td>
-                <td className="px-5 py-4">
-                  <StatusBadge status={record.priority} />
-                </td>
-                <td className="px-5 py-4">
-                  <ReviewStatusBadge state={record.state} />
-                </td>
-                <td className="px-5 py-4">
-                  <Link to={record.routeHint} className="inline-flex items-center gap-2 text-sm font-bold text-blue-700">
-                    Review <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function ContentReviewPanel() {
-  return (
-    <div className="grid gap-4">
-      {mockAdminContentRecords.map((record) => (
-        <article key={record.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      {dashboard.queues.map((queue) => (
+        <a key={queue.key} href={queue.desk_url || "/desk"} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-300">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-blue-700">{record.section}</p>
-              <h3 className="mt-1 text-lg font-bold text-slate-950">{record.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Owner: {record.owner} • Last updated: {record.lastUpdated}
-              </p>
+              <h3 className="font-bold text-slate-950">{queue.label}</h3>
+              <p className="mt-2 text-sm text-slate-600">Open the Desk list view for triage and filtering.</p>
             </div>
-            <ReviewStatusBadge state={record.status} />
+            <span className="rounded-lg bg-blue-50 px-3 py-1 text-sm font-black text-blue-700">{queue.count}</span>
           </div>
-        </article>
+        </a>
       ))}
     </div>
   );
 }
 
-function AuditReviewPanel() {
+function RecentActivity({ dashboard }: { dashboard: AdminDashboardPayload }) {
+  const items = dashboard.recent_activity.slice(0, 8);
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-4">
-        {mockAdminAuditRecords.map((record) => (
-          <article key={record.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-bold text-slate-950">{record.action}</p>
-            <p className="mt-1 text-sm text-slate-600">{record.notes}</p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-500">
-              <span>Actor: {record.actor}</span>
-              <span>Target: {record.target}</span>
-              <span>{record.timestamp}</span>
-            </div>
-          </article>
-        ))}
+    <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="border-b border-slate-100 px-5 py-4">
+        <h2 className="font-bold text-slate-950">Recent audit activity</h2>
       </div>
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="mb-4 font-bold text-slate-950">Mock audit timeline</h3>
-        <StatusTimeline items={mockAdminAuditTrail} />
+      <div className="divide-y divide-slate-100">
+        {items.length ? (
+          items.map((item) => (
+            <a key={item.name} href={item.desk_url || "/desk"} className="block px-5 py-4 hover:bg-slate-50">
+              <p className="text-sm font-semibold text-slate-950">{item.summary || item.event_type}</p>
+              <p className="mt-1 text-xs text-slate-500">
+                {item.actor} • {item.target_doctype} {item.target_name} • {item.timestamp}
+              </p>
+            </a>
+          ))
+        ) : (
+          <p className="px-5 py-6 text-sm text-slate-600">No recent audit events are available yet.</p>
+        )}
       </div>
     </div>
   );
 }
 
-function SettingsConceptPanel() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {[
-        {
-          title: "Review roles",
-          description: "Future role mapping for content, requests, marketplace, membership and audit review.",
-          icon: Users,
-        },
-        {
-          title: "Notification preferences",
-          description: "Future admin notifications for submitted requests and required actions.",
-          icon: MessageSquare,
-        },
-        {
-          title: "Permissions",
-          description: "Future permission model. No real auth or permission enforcement in Phase 1.",
-          icon: Lock,
-        },
-        {
-          title: "Audit retention",
-          description: "Future backend policy for review and decision audit records.",
-          icon: Settings,
-        },
-      ].map((item) => {
-        const Icon = item.icon;
-        return (
-          <article key={item.title} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-600 text-white">
-              <Icon className="h-5 w-5" />
-            </div>
-            <h3 className="font-bold text-slate-950">{item.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
-          </article>
-        );
-      })}
-    </div>
-  );
-}
-
-function MockActionPanel({ records }: { records: MockAdminReviewRecord[] }) {
+function LiveActionPanel({ onSuccess }: { onSuccess: () => void }) {
   const [submissionState, setSubmissionState] = useState<SubmissionState>("idle");
-  const [selectedRecordId, setSelectedRecordId] = useState(records[0]?.id ?? "");
-  const [action, setAction] = useState("request-more-info");
+  const [recordName, setRecordName] = useState("");
+  const [domainKey, setDomainKey] = useState("decision");
+  const [action, setAction] = useState("start_review");
   const [notes, setNotes] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
+  const [message, setMessage] = useState("");
+
+  const selected = domainDefaults[domainKey];
+  const notesRequired = action === "reject" || action === "request_more_information";
+  const assignRequired = action === "assign";
 
   async function submitAction() {
+    if (!recordName || (notesRequired && !notes.trim()) || (assignRequired && !assignedTo.trim())) {
+      setSubmissionState("error");
+      setMessage("Record name and required action details must be provided.");
+      return;
+    }
+
     setSubmissionState("loading");
-
-    const result = await submitMockAdminReviewAction({
-      recordId: selectedRecordId,
-      action: action as "approve" | "reject" | "request-more-info",
+    const result = await performAdminAction({
+      domain: selected.domain,
+      record_doctype: selected.doctype,
+      record_name: recordName,
+      action,
       notes,
+      assigned_to: assignedTo || undefined,
     });
-
-    setSubmissionState(result.ok ? "success" : "error");
+    setSubmissionState(result.ok && result.data?.ok ? "success" : "error");
+    setMessage(result.data?.message || result.error || "Action submitted.");
+    if (result.ok && result.data?.ok) onSuccess();
   }
 
   return (
-    <FormSection
-      title="Mock admin action"
-      description="Simulate approve, reject or request-more-info actions. No backend update, email, notification or permission check occurs."
-    >
+    <FormSection title="Live admin action" description="Server-side workflow action with permission, state, audit and notification checks. Use Desk for full record editing.">
       <MockSubmissionState
         state={submissionState}
-        idleMessage="Ready for mock admin action."
-        loadingMessage="Submitting mock admin action..."
-        successMessage="Mock admin action recorded."
-        errorMessage="Mock admin action validation failed."
+        idleMessage="Ready for live admin action."
+        loadingMessage="Submitting action..."
+        successMessage={message || "Action completed."}
+        errorMessage={message || "Server validation failed."}
       />
       <SelectField
-        label="Record"
-        value={selectedRecordId}
-        onChange={(event) => setSelectedRecordId(event.currentTarget.value)}
-        options={records.map((record) => ({
-          label: `${record.reference} - ${record.title}`,
-          value: record.id,
-        }))}
+        label="Domain"
+        value={domainKey}
+        onChange={(event) => setDomainKey(event.currentTarget.value)}
+        options={Object.entries(domainDefaults).map(([key, value]) => ({ value: key, label: value.doctype }))}
       />
+      <label className="grid gap-2 text-sm font-semibold text-slate-700">
+        Record name
+        <input
+          value={recordName}
+          onChange={(event) => setRecordName(event.currentTarget.value)}
+          className="rounded-xl border border-slate-300 px-3 py-2 text-sm"
+          placeholder="RBP-..."
+        />
+      </label>
       <SelectField
         label="Action"
         value={action}
         onChange={(event) => setAction(event.currentTarget.value)}
-        options={mockAdminActionOptions.map((option) => ({
-          label: option.title,
-          value: option.id,
-        }))}
+        options={[
+          "assign",
+          "start_review",
+          "request_more_information",
+          "approve",
+          "reject",
+          "publish",
+          "close",
+          "cancel",
+          "archive",
+          "mark_outcome_ready",
+          "mark_completed",
+        ].map((value) => ({ value, label: value.replaceAll("_", " ") }))}
       />
-      <TextAreaField
-        label="Review notes"
-        value={notes}
-        onChange={(event) => setNotes(event.currentTarget.value)}
-        helpText="Notes remain frontend-only in Phase 1."
-      />
+      {assignRequired ? (
+        <label className="grid gap-2 text-sm font-semibold text-slate-700">
+          Assignee
+          <input value={assignedTo} onChange={(event) => setAssignedTo(event.currentTarget.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+        </label>
+      ) : null}
+      <TextAreaField label={notesRequired ? "Notes required" : "Notes"} value={notes} onChange={(event) => setNotes(event.currentTarget.value)} />
       <button
         type="button"
         onClick={submitAction}
-        className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white"
+        disabled={submissionState === "loading"}
+        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
       >
-        Submit mock action
+        {submissionState === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+        Submit action
       </button>
     </FormSection>
   );
 }
 
+function AuditPanel() {
+  const [logs, setLogs] = useState<AuditLogEntry[]>([]);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    listAuditLogs({ search }).then((result) => {
+      if (!active) return;
+      if (result.ok) setLogs(result.data?.audit_logs || []);
+      else setError(result.error || "Could not load audit logs.");
+    });
+    return () => {
+      active = false;
+    };
+  }, [search]);
+
+  return (
+    <div className="space-y-4">
+      <label className="grid gap-2 text-sm font-semibold text-slate-700">
+        Search audit logs
+        <input value={search} onChange={(event) => setSearch(event.currentTarget.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+      </label>
+      {error ? <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div> : null}
+      <div className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white shadow-sm">
+        {logs.map((log) => (
+          <article key={log.name} className="px-5 py-4">
+            <p className="text-sm font-bold text-slate-950">{log.summary || log.event_type}</p>
+            <p className="mt-1 text-xs text-slate-500">
+              {log.actor_label || log.actor} • {log.target_doctype} {log.target_name} • {log.timestamp}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MockFallback() {
+  const [submissionState, setSubmissionState] = useState<SubmissionState>("idle");
+  const [selectedRecordId, setSelectedRecordId] = useState(mockAdminReviewRecords[0]?.id ?? "");
+
+  async function submitAction() {
+    setSubmissionState("loading");
+    const result = await submitMockAdminReviewAction({ recordId: selectedRecordId, action: "approve", notes: "Explicit dev fallback." });
+    setSubmissionState(result.ok ? "success" : "error");
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-800">
+        Explicit dev mock admin fallback is enabled by VITE_RBP_ENABLE_MOCK_ADMIN.
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {mockAdminMetrics.map((metric) => (
+          <article key={metric.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-slate-600">{metric.label}</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{metric.value}</p>
+          </article>
+        ))}
+      </div>
+      <FormSection title="Dev mock action" description="No backend update, email, notification or permission check occurs.">
+        <MockSubmissionState state={submissionState} idleMessage="Ready." loadingMessage="Submitting mock action..." successMessage="Mock action recorded." errorMessage="Mock action failed." />
+        <SelectField
+          label="Record"
+          value={selectedRecordId}
+          onChange={(event) => setSelectedRecordId(event.currentTarget.value)}
+          options={(mockAdminReviewRecords as MockAdminReviewRecord[]).map((record) => ({ label: record.title, value: record.id }))}
+        />
+        <button type="button" onClick={submitAction} className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white">
+          Submit dev mock action
+        </button>
+      </FormSection>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {mockAdminQueues.map((queue) => (
+          <article key={queue.id} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="font-bold text-slate-950">{queue.title}</p>
+            <p className="mt-2 text-sm text-slate-600">{queue.description}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function AdminConcepts() {
   const location = useLocation();
-  const view = useMemo(() => inferView(location.pathname), [location.pathname]);
-  const records = filterRecords(view);
+  const [dashboard, setDashboard] = useState<AdminDashboardPayload | null>(null);
+  const [loading, setLoading] = useState(!mockAdminEnabled);
+  const [error, setError] = useState("");
+  const auditView = useMemo(() => location.pathname.includes("audit"), [location.pathname]);
+
+  function refresh() {
+    setLoading(true);
+    getAdminDashboard().then((result) => {
+      setLoading(false);
+      if (result.ok) {
+        setDashboard(result.data || null);
+        setError("");
+      } else {
+        setError(result.error || "Admin dashboard unavailable.");
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (!mockAdminEnabled) refresh();
+  }, []);
 
   return (
     <AdminShell>
-      <div className="space-y-6">
-        {view === "dashboard" ? (
-          <>
-            <MetricGrid />
-            <QueueGrid />
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
-              <RecordTable records={mockAdminReviewRecords.slice(0, 5)} />
-              <MockActionPanel records={mockAdminReviewRecords} />
-            </div>
-          </>
-        ) : null}
-
-        {view === "content" ? (
-          <>
-            <MetricGrid />
-            <ContentReviewPanel />
-          </>
-        ) : null}
-
-        {[
-          "requests",
-          "decision-desk",
-          "docushare",
-          "connectivity",
-          "risk-advisor",
-          "fixer",
-          "marketplace",
-          "membership",
-        ].includes(view) ? (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
-            <RecordTable records={records} />
-            <MockActionPanel records={records.length ? records : mockAdminReviewRecords} />
+      {mockAdminEnabled ? <MockFallback /> : null}
+      {!mockAdminEnabled && loading ? (
+        <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-700">
+          <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+          Loading live admin metrics...
+        </div>
+      ) : null}
+      {!mockAdminEnabled && error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm font-semibold text-red-700">
+          <div className="flex items-center gap-2">
+            {error.includes("Permission") || error.includes("Login") ? <Lock className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+            {error}
           </div>
-        ) : null}
-
-        {view === "audit-review" ? <AuditReviewPanel /> : null}
-
-        {view === "settings" ? <SettingsConceptPanel /> : null}
-      </div>
+        </div>
+      ) : null}
+      {!mockAdminEnabled && dashboard ? (
+        <div className="space-y-6">
+          <div className="flex justify-end">
+            <button type="button" onClick={refresh} className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
+          </div>
+          {auditView ? (
+            <AuditPanel />
+          ) : (
+            <>
+              <MetricGrid dashboard={dashboard} />
+              <QueueGrid dashboard={dashboard} />
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+                <RecentActivity dashboard={dashboard} />
+                <LiveActionPanel onSuccess={refresh} />
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
     </AdminShell>
   );
 }

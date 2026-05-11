@@ -271,7 +271,7 @@ export function ResourcesPage() {
               Preview Subscribe
             </button>
           </div>
-          <p className="text-slate-400 text-xs mt-3">Frontend-only placeholder. No email subscription or backend record is created.</p>
+          <p className="text-slate-400 text-xs mt-3">Frontend-only placeholder. It does not create a subscription or backend record.</p>
         </div>
       </section>
 

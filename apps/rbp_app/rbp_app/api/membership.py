@@ -13,6 +13,7 @@ from rbp_app.services.membership import (
     submit_onboarding as submit_onboarding_service,
     update_onboarding_step as update_onboarding_step_service,
 )
+from rbp_app.services.admin_workflows import perform_domain_action
 
 
 def _coerce_payload(payload):
@@ -96,3 +97,28 @@ def admin_complete_onboarding(flow_name):
         "status": flow.status,
         "completed_on": flow.completed_on,
     }
+
+
+def _admin_action(action, flow_name, **kwargs):
+    user = require_system_manager()
+    return perform_domain_action(user, "membership", "RBP Onboarding Flow", flow_name, action, **kwargs)
+
+
+@frappe.whitelist()
+def admin_start_review(flow_name, notes=None):
+    return _admin_action("start_review", flow_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_request_more_information(flow_name, notes):
+    return _admin_action("request_more_information", flow_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_mark_completed(flow_name, notes=None):
+    return _admin_action("mark_completed", flow_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_archive(flow_name, notes=None):
+    return _admin_action("archive", flow_name, notes=notes)

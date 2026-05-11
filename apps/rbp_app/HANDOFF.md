@@ -145,6 +145,20 @@ RBP does not modify Frappe core, does not replace Frappe Desk, and does not rebu
 ### Framework-core files changed
 **None.** Zero files in `frappe/` were modified.
 
+### Priority 3 admin production upgrade
+
+The admin layer is now Desk-first and production-oriented:
+
+- A private `Remote Business Partner` Desk workspace is installed through `rbp_app/fixtures/workspace.json` and exported via a narrow `Workspace` fixture in `hooks.py`.
+- Workspace links include implemented DocTypes only. `RBP Document Brief` and `RBP Fixer Request` are documented as missing optional DocTypes; existing equivalents are `RBP DocuShare Document` and `RBP Fixer Case`.
+- Implemented RBP DocTypes have defensive Desk list view scripts with state indicators and triage fields.
+- `rbp_app.api.admin.get_dashboard` returns live dashboard metrics, queue links, recent audit activity, alerts and Desk links.
+- `rbp_app.api.admin.perform_action` applies server-side admin actions through `rbp_app.services.workflows`, with role/state/domain validation, tenant-aware visibility, audit logs and notifications.
+- `rbp_app.api.audit` exposes admin audit lists and record trails plus a member-safe timeline endpoint that hides internal notes.
+- The React `/admin` route is a lightweight command centre by default. Mock admin behavior only runs in development when `VITE_RBP_ENABLE_MOCK_ADMIN=true`.
+
+Required site setup: create and assign the `RBP Admin` role if product operations need non-System-Manager admins. The code recognises the role, but no role fixture convention existed before this upgrade.
+
 ---
 
 ## 4. Route Map

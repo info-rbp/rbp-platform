@@ -53,6 +53,15 @@ The following admin routes are mapped to Frappe Desk equivalents:
 - Configure Desk list views, form layouts, and workflows.
 - Create a custom Desk workspace for RBP modules.
 
+### Priority 3 (Production Admin)
+- `Remote Business Partner` is installed as a private Desk workspace via a narrow `Workspace` fixture.
+- Desk list views use `frappe.listview_settings["DocType Name"]` in each implemented RBP DocType folder.
+- List indicators use the shared state colour convention: draft/pending orange, review blue, active/complete green, rejected/failed red, archived/closed grey.
+- The React `/admin` surface is a lightweight command centre only. CRUD, record filtering, reports, and operational work stay in Frappe Desk.
+- State-changing admin actions go through `rbp_app.services.workflows.perform_admin_action`, which validates admin role, domain, current state, required notes/assignee fields, and record visibility before saving.
+- Admin actions write `RBP Audit Log` when the DocType exists and create `RBP Notification` records for user-facing state changes when that service is installed.
+- `RBP Admin` is supported by permission helpers, but sites must create the role before assigning it because this app did not previously carry role fixtures. The workspace fixture uses `Administrator` and `System Manager` to keep install clean.
+
 ### Phase 3 (Enhancements)
 - Custom Desk pages for specialised admin views if needed.
 - Custom reports and dashboards.
@@ -72,3 +81,4 @@ The following scaffold files exist in the custom app for reference:
 2. Custom DocTypes will be created in the `rbp_app` module during the data model phase.
 3. Role-based access will be configured through Frappe's permission system.
 4. No custom admin frontend framework (Vue/React admin panel) is needed.
+5. Optional requested DocTypes that are not implemented yet are not linked from the workspace. Current omissions: `RBP Document Brief` and `RBP Fixer Request`.

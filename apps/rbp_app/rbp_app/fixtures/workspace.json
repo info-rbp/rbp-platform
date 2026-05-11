@@ -1,0 +1,58 @@
+[
+ {
+  "doctype": "Workspace",
+  "name": "Remote Business Partner",
+  "label": "Remote Business Partner",
+  "title": "Remote Business Partner",
+  "module": "RBP App",
+  "public": 0,
+  "is_hidden": 0,
+  "icon": "organization",
+  "indicator_color": "blue",
+  "content": "[{\"id\":\"overview\",\"type\":\"header\",\"data\":{\"text\":\"Overview\"}},{\"id\":\"membership\",\"type\":\"card\",\"data\":{\"card_name\":\"Membership\"}},{\"id\":\"service-requests\",\"type\":\"card\",\"data\":{\"card_name\":\"Service Requests\"}},{\"id\":\"marketplace\",\"type\":\"card\",\"data\":{\"card_name\":\"Marketplace\"}},{\"id\":\"connectivity\",\"type\":\"card\",\"data\":{\"card_name\":\"Connectivity\"}},{\"id\":\"documents-files\",\"type\":\"card\",\"data\":{\"card_name\":\"Documents & Files\"}},{\"id\":\"content-catalogue\",\"type\":\"card\",\"data\":{\"card_name\":\"Content & Catalogue\"}},{\"id\":\"notifications\",\"type\":\"card\",\"data\":{\"card_name\":\"Notifications\"}},{\"id\":\"billing-payments\",\"type\":\"card\",\"data\":{\"card_name\":\"Billing & Payments\"}},{\"id\":\"audit-compliance\",\"type\":\"card\",\"data\":{\"card_name\":\"Audit & Compliance\"}},{\"id\":\"settings\",\"type\":\"card\",\"data\":{\"card_name\":\"Settings\"}}]",
+  "roles": [
+   {
+    "role": "Administrator"
+   },
+   {
+    "role": "System Manager"
+   }
+  ],
+  "links": [
+   {"type":"Card Break","label":"Membership","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Membership Plan","link_to":"RBP Membership Plan","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Subscription","link_to":"RBP Subscription","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Onboarding Flow","link_to":"RBP Onboarding Flow","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Business Profile","link_to":"RBP Business Profile","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Tenant","link_to":"RBP Tenant","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Service Requests","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Decision Desk Request","link_to":"RBP Decision Desk Request","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Risk Advisor Assessment","link_to":"RBP Risk Advisor Assessment","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Fixer Case","link_to":"RBP Fixer Case","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Marketplace","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Marketplace Vendor","link_to":"RBP Marketplace Vendor","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Marketplace Listing","link_to":"RBP Marketplace Listing","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Marketplace Order","link_to":"RBP Marketplace Order","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Connectivity","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Connectivity Request","link_to":"RBP Connectivity Request","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Connectivity Provider","link_to":"RBP Connectivity Provider","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Connectivity Quote","link_to":"RBP Connectivity Quote","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Documents & Files","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP File Reference","link_to":"RBP File Reference","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"File","link_to":"File","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP DocuShare Document","link_to":"RBP DocuShare Document","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP DocuShare Folder","link_to":"RBP DocuShare Folder","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Notifications","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Notification","link_to":"RBP Notification","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Billing & Payments","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Payment Event","link_to":"RBP Payment Event","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"RBP Subscription","link_to":"RBP Subscription","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Audit & Compliance","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP Audit Log","link_to":"RBP Audit Log","link_type":"DocType","dependencies":null},
+   {"type":"Card Break","label":"Settings","link_to":null,"link_type":null},
+   {"type":"Link","label":"RBP App Entitlement","link_to":"RBP App Entitlement","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"User","link_to":"User","link_type":"DocType","dependencies":null},
+   {"type":"Link","label":"Role","link_to":"Role","link_type":"DocType","dependencies":null}
+  ]
+ }
+]

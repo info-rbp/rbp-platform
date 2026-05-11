@@ -331,7 +331,7 @@ export const mockAdminActionOptions = [
   {
     id: "request-more-info",
     title: "Request more info",
-    description: "Simulate asking for clarification. No notification is sent.",
+    description: "Simulate asking for clarification in the explicit dev fallback.",
   },
 ];
 

@@ -317,8 +317,8 @@ export function PortalDashboard() {
           ) : (
             <div className="px-5 py-10 text-center">
               <CheckCircle className="mx-auto mb-2 h-8 w-8 text-emerald-500" />
-              <p className="text-sm font-bold text-slate-700">No notifications</p>
-              <p className="text-xs text-slate-400">No notifications are currently available in this preview.</p>
+              <p className="text-sm font-bold text-slate-700">Inbox clear</p>
+              <p className="text-xs text-slate-400">Portal messages are currently unavailable in this preview.</p>
             </div>
           )}
         </section>

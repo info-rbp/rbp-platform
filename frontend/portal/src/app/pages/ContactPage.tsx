@@ -136,7 +136,7 @@ export function ContactPage() {
                   </div>
                   <h2 className="text-2xl font-extrabold text-slate-900 mb-3">Enquiry received</h2>
                   <p className="text-slate-600 mb-2">Thank you, <strong>{form.name}</strong>. This Phase 1 shell has simulated your enquiry submission.</p>
-                  <p className="text-slate-500 text-sm">No email, CRM, booking, or backend service was triggered by this mock confirmation.</p>
+                  <p className="text-slate-500 text-sm">This preview confirmation does not trigger CRM, booking, or backend services.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">

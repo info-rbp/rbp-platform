@@ -6,6 +6,7 @@ import frappe
 
 from rbp_app.permissions import require_login, require_system_manager
 from rbp_app.services import decision_desk as service
+from rbp_app.services.admin_workflows import perform_domain_action
 
 
 def _payload(payload):
@@ -74,3 +75,38 @@ def update_option(option_name, payload=None):
 def delete_option(option_name):
     user = require_login()
     return service.delete_option(user, option_name)
+
+
+def _admin_action(action, request_name, **kwargs):
+    user = require_system_manager()
+    return perform_domain_action(user, "decision_desk", service.REQUEST_DOCTYPE, request_name, action, **kwargs)
+
+
+@frappe.whitelist()
+def admin_start_review(request_name, notes=None):
+    return _admin_action("start_review", request_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_request_more_information(request_name, notes):
+    return _admin_action("request_more_information", request_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_approve(request_name, notes=None):
+    return _admin_action("approve", request_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_reject(request_name, notes):
+    return _admin_action("reject", request_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_archive(request_name, notes=None):
+    return _admin_action("archive", request_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_mark_outcome_ready(request_name, notes=None):
+    return _admin_action("mark_outcome_ready", request_name, notes=notes)

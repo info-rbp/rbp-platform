@@ -134,6 +134,18 @@ after_install = "rbp_app.install.after_install"
 export_python_type_annotations = True
 
 # ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
+# Desk-first admin assets owned by this app. Keep filters narrow so export/load
+# never overwrites unrelated workspace customisations.
+fixtures = [
+    {
+        "dt": "Workspace",
+        "filters": [["name", "=", "Remote Business Partner"]],
+    }
+]
+
+# ---------------------------------------------------------------------------
 # ARCHITECTURAL NOTES
 # ---------------------------------------------------------------------------
 # 1. This app owns all RBP business-specific website pages, templates,

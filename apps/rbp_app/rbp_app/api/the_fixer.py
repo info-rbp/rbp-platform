@@ -6,6 +6,7 @@ import frappe
 
 from rbp_app.permissions import require_login, require_system_manager
 from rbp_app.services import the_fixer as service
+from rbp_app.services.admin_workflows import perform_domain_action
 
 
 def _payload(payload):
@@ -86,3 +87,38 @@ def add_case_update(case_name, payload=None):
 def list_case_updates(case_name, filters=None):
     user = require_login()
     return service.list_case_updates(user, case_name, _payload(filters))
+
+
+def _admin_action(action, case_name, **kwargs):
+    user = require_system_manager()
+    return perform_domain_action(user, "fixer", service.CASE_DOCTYPE, case_name, action, **kwargs)
+
+
+@frappe.whitelist()
+def admin_start_review(case_name, notes=None):
+    return _admin_action("start_review", case_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_request_more_information(case_name, notes):
+    return _admin_action("request_more_information", case_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_reject(case_name, notes):
+    return _admin_action("reject", case_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_mark_outcome_ready(case_name, notes=None):
+    return _admin_action("mark_outcome_ready", case_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_mark_completed(case_name, notes=None):
+    return _admin_action("mark_completed", case_name, notes=notes)
+
+
+@frappe.whitelist()
+def admin_archive(case_name, notes=None):
+    return _admin_action("archive", case_name, notes=notes)

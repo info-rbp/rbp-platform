@@ -61,4 +61,16 @@ def require_system_manager():
 def is_admin_user(user=None):
 	"""Return whether the supplied user or current session user is an admin/system user."""
 
-	return is_system_manager(user)
+	user = user or _current_session_user()
+	roles = get_user_roles(user)
+	return is_system_manager(user) or "RBP Admin" in roles
+
+
+def require_admin_user():
+	"""Require the current user to administer RBP platform records."""
+
+	require_login()
+	if not is_admin_user():
+		raise frappe.PermissionError
+
+	return _current_session_user()
