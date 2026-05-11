@@ -45,14 +45,14 @@ export function MembershipConfirmationPage() {
           <ConfirmationPanel
             title={
               confirmation?.onboardingStatus === "complete"
-                ? "Premium membership onboarding complete"
-                : "Premium membership confirmation"
+                ? "Membership onboarding preview complete"
+                : "RBP Premium Membership Preview Confirmed"
             }
-            statusLabel={confirmation ? "Preview state saved" : "Confirmation preview"}
+            statusLabel="Membership preview saved"
             message={
               confirmation
-                ? "This confirmation reflects the latest premium membership preview state saved in this browser session. No real payment has been processed and no live account has been created."
-                : "This confirmation preview is shown when the sign-up flow has not yet been completed in the current browser session."
+                ? "This confirmation reflects the latest membership preview state saved in this browser session. This frontend preview does not process a real payment or create a live account."
+                : "This confirmation preview is shown when the sign-up flow has not been completed in the current browser session."
             }
             reference={primaryReference}
             primaryAction={
@@ -68,7 +68,7 @@ export function MembershipConfirmationPage() {
                 to="/membership/sign-up-now"
                 className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
               >
-                Return to sign-up preview
+                Return to sign-up
               </Link>
             }
           />
