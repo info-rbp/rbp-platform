@@ -64,8 +64,11 @@ export interface BillingSummary {
   plan?: string;
   plan_name?: string;
   membership_plan?: string;
+  membership_tier?: string;
   subscription_status?: string;
   current_period_end?: string;
+  billing_enabled?: boolean;
+  message?: string;
   [key: string]: unknown;
 }
 

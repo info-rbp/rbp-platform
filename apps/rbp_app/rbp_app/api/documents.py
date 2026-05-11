@@ -7,6 +7,8 @@ import frappe
 from rbp_app.permissions import require_login
 from rbp_app.services.documents import (
     attach_document_reference as attach_document_reference_service,
+    get_document as get_document_service,
+    get_document_download as get_document_download_service,
     get_documents as get_documents_service,
 )
 
@@ -25,6 +27,30 @@ def get_documents():
 
     user = require_login()
     return get_documents_service(user)
+
+
+@frappe.whitelist()
+def list_my_documents(filters=None):
+    """Return visible RBP File Reference records for the current portal user."""
+
+    user = require_login()
+    return get_documents_service(user, _coerce_payload(filters))
+
+
+@frappe.whitelist()
+def get_document_reference(name):
+    """Return a single visible RBP File Reference DTO."""
+
+    user = require_login()
+    return get_document_service(user=user, name=name)
+
+
+@frappe.whitelist()
+def get_document_download_url(name):
+    """Return a permission-checked download URL for a file reference."""
+
+    user = require_login()
+    return get_document_download_service(user=user, name=name)
 
 
 @frappe.whitelist()

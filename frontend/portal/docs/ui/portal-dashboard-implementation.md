@@ -75,11 +75,18 @@ No raw Stitch HTML, screenshots, extracted files, or source zips were copied int
 - Support request status cards and knowledge base entries.
 - Settings mock save confirmation and profile/preference state.
 
-## Known Placeholders
+## Priority 2 Live Data Notes
 
-- Portal data is static mock data and optional session storage from the membership flow.
-- Application access actions are mock CTAs only.
-- Document preview and download buttons do not access real files.
+- Dashboard/session data uses `rbp_app.api.dashboard.get_home`.
+- Services use `rbp_app.api.portal.list_my_services`, `get_service_record`, and `create_service_request_router`.
+- Documents use `rbp_app.api.documents.list_my_documents`, `get_document_reference`, and `get_document_download_url`.
+- Notifications use `rbp_app.api.notifications.list_my_notifications`, `get_unread_count`, `mark_notification_read`, and `mark_all_notifications_read`.
+- Mock portal services, documents and notifications are only allowed when `VITE_USE_MOCK_PORTAL=true` or an equivalent explicit development flag is present.
+
+## Remaining Placeholders
+
+- Application, offers, resources, support, and settings screens still use the existing portal mock/static content until their live APIs are prioritised.
+- Direct document upload is not implemented; uploads happen through supported service flows.
 - Support actions route to help content and do not create tickets.
 - Settings saves are local UI confirmation only.
 

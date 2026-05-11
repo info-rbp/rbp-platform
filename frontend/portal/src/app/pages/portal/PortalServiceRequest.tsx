@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { PortalAdminReference } from "./PortalAdminReference";
+import { createServiceRequestRouter } from "../../api/portalServices.api";
 import {
   ChevronRight, Zap, Users, BarChart2, Calculator, Tag,
   FileText, Upload, CheckCircle, ArrowRight, X,
@@ -8,11 +9,10 @@ import {
 
 const SERVICE_OPTIONS = [
   { id: "decision-desk",           label: "Decision Desk",          category: "On-Demand Service",   icon: Zap },
-  { id: "hr-services",             label: "HR Services",            category: "Managed Service",      icon: Users },
-  { id: "business-health-snapshot",label: "Business Health Snapshot",category: "Advisory",            icon: BarChart2 },
-  { id: "finance-calculator-pack", label: "Finance Calculator Pack", category: "Operations Tool",     icon: Calculator },
-  { id: "bid-management",          label: "Bid & Tender Management", category: "Managed Service",     icon: FileText },
-  { id: "xero-partner-offer",      label: "Xero Partner Offer",      category: "Partner Offer",       icon: Tag },
+  { id: "docushare",               label: "DocuShare",              category: "Document Service",     icon: FileText },
+  { id: "connectivity",            label: "Connectivity",           category: "Operations",           icon: Calculator },
+  { id: "risk-advisor",            label: "Risk Advisor",           category: "Advisory",             icon: BarChart2 },
+  { id: "the-fixer",               label: "The Fixer",              category: "On-Demand Service",    icon: Users },
 ];
 
 const PRIORITY_OPTIONS = [
@@ -36,6 +36,8 @@ export function PortalServiceRequest() {
   const [contact, setContact] = useState("email");
   const [fileName, setFileName] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function validate() {
@@ -46,11 +48,31 @@ export function PortalServiceRequest() {
     return e;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
+    setSubmitError(null);
+    setSubmitting(true);
+    const response = await createServiceRequestRouter(selectedService, {
+      title: SERVICE_OPTIONS.find((item) => item.id === selectedService)?.label,
+      summary: context,
+      business_context: context,
+      issue_summary: context,
+      issue_details: context,
+      notes: context,
+      priority,
+      urgency: priority === "urgent" ? "Urgent" : priority === "high" ? "High" : priority === "low" ? "Low" : "Normal",
+      contact_method: contact,
+      source_channel: "portal",
+      submit: true,
+    });
+    setSubmitting(false);
+    if (!response.ok) {
+      setSubmitError(response.error ?? "Service request could not be submitted.");
+      return;
+    }
     setSubmitted(true);
   }
 
@@ -261,12 +283,18 @@ export function PortalServiceRequest() {
         </div>
 
         {/* Submit */}
+        {submitError ? (
+          <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-xs font-semibold text-red-700">
+            {submitError}
+          </div>
+        ) : null}
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all"
+            disabled={submitting}
+            className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 disabled:bg-slate-300 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all"
           >
-            Submit Request <ArrowRight className="w-4 h-4" />
+            {submitting ? "Submitting..." : "Submit Request"} <ArrowRight className="w-4 h-4" />
           </button>
           <Link
             to="/portal/services"

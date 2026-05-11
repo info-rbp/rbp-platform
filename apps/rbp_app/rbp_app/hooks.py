@@ -42,6 +42,13 @@ website_redirects = [
     {"source": "/forgot-password", "target": "/login"},
     {"source": "/reset-password", "target": "/login"},
     {"source": "/verify-account", "target": "/login"},
+    {"source": "/portal/account", "target": "/portal/settings"},
+    {"source": "/portal/library", "target": "/portal/documents"},
+    {"source": "/portal/decision-desk", "target": "/portal/services?type=decision-desk"},
+    {"source": "/portal/decision-desk/history", "target": "/portal/services?type=decision-desk"},
+    {"source": "/portal/finance", "target": "/portal/services?type=finance"},
+    {"source": "/portal/finance/enquiries", "target": "/portal/services?type=finance"},
+    {"source": "/portal/sessions", "target": "/portal/services?type=session"},
 ]
 
 # ---------------------------------------------------------------------------

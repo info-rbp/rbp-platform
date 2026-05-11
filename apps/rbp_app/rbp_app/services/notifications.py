@@ -78,7 +78,7 @@ def get_notifications(user=None):
     filters = {"user": user, "status": ["!=", "Archived"]}
 
     try:
-        notifications = frappe.get_all(
+        rows = frappe.get_all(
             "RBP Notification",
             filters=filters,
             fields=[
@@ -97,11 +97,13 @@ def get_notifications(user=None):
                 "status",
                 "is_read",
                 "read_on",
+                "creation",
                 "modified",
             ],
             order_by="is_read asc, modified desc",
             limit_page_length=20,
         )
+        notifications = [_serialize_notification(row) for row in rows]
         unread_count = frappe.db.count(
             "RBP Notification",
             {"user": user, "is_read": 0, "status": ["!=", "Archived"]},
@@ -113,6 +115,37 @@ def get_notifications(user=None):
     return {
         "notifications": notifications,
         "unread_count": unread_count,
+    }
+
+
+def _serialize_notification(row):
+    return {
+        "name": row.get("name"),
+        "title": row.get("title"),
+        "message": row.get("message"),
+        "notification_type": row.get("notification_type"),
+        "status": row.get("status"),
+        "is_read": bool(row.get("is_read")),
+        "related_doctype": row.get("related_doctype"),
+        "related_name": row.get("related_name"),
+        "related_route": row.get("route"),
+        "route": row.get("route"),
+        "priority": row.get("priority"),
+        "created_on": row.get("creation") or row.get("modified"),
+        "read_on": row.get("read_on"),
+        "actor": row.get("trigger_source") or row.get("created_by_workflow"),
+    }
+
+
+def get_unread_count(user=None):
+    user = user or frappe.session.user
+    if not user or user == "Guest" or not _doctype_exists("RBP Notification"):
+        return {"unread_count": 0}
+    return {
+        "unread_count": frappe.db.count(
+            "RBP Notification",
+            {"user": user, "is_read": 0, "status": ["!=", "Archived"]},
+        )
     }
 
 

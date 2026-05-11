@@ -276,7 +276,7 @@ Additional customer-facing platform routes:
 8. **Platform tests are focused unit tests.** More integration tests should be added when tenant provisioning and live cross-app data are introduced. The local bench test command executed successfully.
 9. **Stripe is not wired yet.** `RBP Subscription` is available, but payment-provider synchronization is still future work.
 10. **Tenant provisioning is not wired yet.** `RBP Tenant` exists, but automated site/workspace provisioning remains future work.
-11. **Document repository is still placeholder-backed.** `RBP Notification` has service integration; document storage and retrieval still need a full repository implementation.
+11. **Priority 2 portal data is live-first.** Services aggregate through `rbp_app.api.portal`, documents use `RBP File Reference` through `rbp_app.api.documents`, and notifications expose unread/read state through `rbp_app.api.notifications`. Frontend mock fallback for these areas must stay behind `VITE_USE_MOCK_PORTAL=true`.
 12. **Most app-specific adapters are placeholders.** HRMS has the first safe summary adapter; ERPNext, CRM and LMS currently return availability placeholders.
 13. **Entitlement UI is not built yet.** `RBP App Entitlement` can drive service behavior, but there is no dedicated management UI beyond Frappe Desk forms.
 

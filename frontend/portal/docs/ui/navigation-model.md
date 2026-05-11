@@ -251,7 +251,53 @@ Portal navigation should include:
     Support
     Settings
 
-Phase 1 portal navigation uses mock user state only.
+Priority 2 portal navigation uses live Frappe session state and live portal data by default.
+
+Canonical member portal routes:
+
+    /portal/dashboard
+    /portal/membership
+    /portal/services
+    /portal/services/request
+    /portal/services/:id
+    /portal/documents
+    /portal/offers
+    /portal/apps
+    /portal/resources
+    /portal/billing
+    /portal/notifications
+    /portal/support
+    /portal/settings
+
+Portal sidebar navigation:
+
+    Dashboard
+    Membership
+    Services
+    Documents
+    Offers
+    Applications
+    Resources
+    Billing
+    Notifications
+    Support
+    Settings
+
+Portal data fallback rule:
+
+    Mock portal services, documents and notifications may only be loaded when VITE_USE_MOCK_PORTAL=true or an equivalent explicit development flag is enabled.
+
+## Portal Route Compatibility
+
+| Old route | Canonical route | Redirect behaviour | Owner |
+| --- | --- | --- | --- |
+| /portal/account | /portal/settings | React Navigate and Frappe website_redirects | Frontend and backend |
+| /portal/library | /portal/documents | React Navigate and Frappe website_redirects | Frontend and backend |
+| /portal/decision-desk | /portal/services?type=decision-desk | React Navigate and Frappe website_redirects | Frontend and backend |
+| /portal/decision-desk/history | /portal/services?type=decision-desk | React Navigate and Frappe website_redirects | Frontend and backend |
+| /portal/finance | /portal/services?type=finance | React Navigate and Frappe website_redirects | Frontend and backend |
+| /portal/finance/enquiries | /portal/services?type=finance | React Navigate and Frappe website_redirects | Frontend and backend |
+| /portal/sessions | /portal/services?type=session | React Navigate and Frappe website_redirects | Frontend and backend |
 
 ## Admin Concept Navigation
 
