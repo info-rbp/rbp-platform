@@ -125,13 +125,13 @@ export interface MockPortalSupportTicket {
 export const mockPortalMembershipScenarios = {
   active: {
     user: mockCurrentUser,
-    label: "Active membership",
+    label: "Active premium membership preview",
     status: "active" as MockPortalMembershipState,
     plan: mockMembershipPlans[0],
   },
   pending: {
     user: { ...mockCurrentUser, membershipStatus: "pending" as const },
-    label: "Pending membership",
+    label: "Pending membership preview",
     status: "pending" as MockPortalMembershipState,
     plan: mockMembershipPlans[0],
   },
@@ -202,7 +202,7 @@ export const mockPortalRecentActivity: MockPortalActivity[] = [
   {
     id: "activity-doc",
     type: "document",
-    title: "Mock Decision Summary placeholder added",
+    title: "Decision summary placeholder added",
     date: "6 May 2026",
     status: "Ready",
     href: "/portal/documents",
@@ -230,7 +230,7 @@ export const mockPortalNextSteps: MockPortalNextStep[] = [
   {
     id: "answer-decision-questions",
     title: "Answer Decision Desk clarification questions",
-    description: "Add the missing cost range so the mock adviser can complete the recommendation state.",
+    description: "Add the missing cost range so the adviser can complete the recommendation state.",
     status: "in-review",
     href: "/portal/services/decision-desk",
   },
@@ -244,7 +244,7 @@ export const mockPortalNextSteps: MockPortalNextStep[] = [
   {
     id: "confirm-connectivity",
     title: "Confirm connectivity service address",
-    description: "The mock NBN order is submitted and waiting on serviceability confirmation.",
+    description: "The NBN order is submitted and waiting on serviceability confirmation.",
     status: "submitted",
     href: "/operations/connectivity",
   },
@@ -254,14 +254,14 @@ export const mockPortalFlowStatuses: MockPortalFlowStatus[] = [
   {
     id: "flow-decision-desk",
     title: "Decision Desk",
-    description: "Request DD-MOCK-001 is in mock adviser review.",
+    description: "Request DD-MOCK-001 is in adviser review.",
     status: "in-review",
     href: "/on-demand/decision-desk",
   },
   {
     id: "flow-docushare",
     title: "DocuShare brief",
-    description: "DOC-MOCK-001 has supporting placeholder files attached.",
+    description: "DOC-MOCK-001 has supporting preview files attached.",
     status: "submitted",
     href: "/document-nucleus/brief",
   },
@@ -282,7 +282,7 @@ export const mockPortalFlowStatuses: MockPortalFlowStatus[] = [
   {
     id: "flow-fixer",
     title: "The Fixer",
-    description: "FIX-MOCK-001 has been assigned to the mock triage queue.",
+    description: "FIX-MOCK-001 has been assigned to the triage queue.",
     status: "assigned",
     href: "/on-demand/the-fixer",
   },
@@ -307,9 +307,9 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     source: "DocuShare" as const,
     category: brief.category,
     status: brief.status,
-    description: `Mock ${brief.jurisdiction} document brief for ${brief.intendedUse.toLowerCase()}.`,
+    description: `${brief.jurisdiction} document brief for ${brief.intendedUse.toLowerCase()}.`,
     lastUpdated: "7 May 2026",
-    nextAction: "Review simulated document status",
+    nextAction: "Review document status",
     ctaLabel: "Open DocuShare brief",
     ctaHref: "/document-nucleus/brief",
   })),
@@ -319,7 +319,7 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     source: "Connectivity" as const,
     category: order.serviceabilityStatus,
     status: order.status,
-    description: `Mock service order for ${order.serviceAddress}.`,
+    description: `Service order for ${order.serviceAddress}.`,
     lastUpdated: "6 May 2026",
     nextAction: "Confirm serviceability",
     ctaLabel: "View Connectivity",
@@ -365,7 +365,7 @@ export const mockPortalDocumentActivity: MockPortalDocumentActivity[] = [
     name: "Cash Flow Forecast Template",
     category: "Finance",
     date: "5 May 2026",
-    size: "Mock file",
+    size: "Preview file",
     status: "in-progress",
   },
   {
@@ -373,7 +373,7 @@ export const mockPortalDocumentActivity: MockPortalDocumentActivity[] = [
     name: "Tender Submission Review",
     category: "Bids",
     date: "4 May 2026",
-    size: "Mock file",
+    size: "Preview file",
     status: "in-review",
   },
 ];
@@ -431,7 +431,7 @@ export const mockPortalApplications: MockPortalApplication[] = [
     accessState: "included",
     icon: "support",
     actionLabel: "Open",
-    helpsWith: ["Track support status", "View request history", "Receive mock notifications"],
+    helpsWith: ["Track support status", "View request history", "Receive notifications"],
     capabilities: ["Ticket Status", "Priority Labels", "Request History", "Knowledge Base"],
   },
   {
@@ -486,7 +486,7 @@ export const mockPortalOffers: MockPortalOffer[] = [
     partner: "Xero",
     logo: "X",
     title: "3 months free subscription",
-    description: "Frontend-only member value card for accounting software offer states.",
+    description: "Member value card for accounting software offer states.",
     category: "Accounting",
     saving: "Up to $294",
     accessState: "included",
@@ -520,7 +520,7 @@ export const mockPortalResources: MockPortalResource[] = [
     title: resource.title,
     category: resource.category,
     typeLabel: resource.type === "tools" ? "Tool" as const : "Guide" as const,
-    readTime: resource.type === "tools" ? "Interactive mock" : "8 min",
+    readTime: resource.type === "tools" ? "Interactive preview" : "8 min",
     icon: "file" as const,
     href: resource.href,
   })),
@@ -545,14 +545,14 @@ export const mockPortalResources: MockPortalResource[] = [
 ];
 
 export const mockPortalSupportTickets: MockPortalSupportTicket[] = [
-  { id: "RBP-1042", subject: "Unable to access mock Xero integration", status: "Open", updated: "7 May 2026", priority: "High" },
+  { id: "RBP-1042", subject: "Unable to access Xero integration preview", status: "Open", updated: "7 May 2026", priority: "High" },
   { id: "RBP-1038", subject: "Question about membership plan upgrade", status: "Resolved", updated: "4 May 2026", priority: "Normal" },
   { id: "RBP-1031", subject: "Document template formatting issue", status: "Resolved", updated: "30 Apr 2026", priority: "Low" },
 ];
 
 export const mockPortalKnowledgeBase = [
-  { q: "How do I book an advisory session?", a: "Use the portal sessions area or the public contact flow; no real booking is created in Phase 1." },
-  { q: "Can I change my membership plan?", a: "The settings page shows mock membership states only. Real account changes are deferred." },
+  { q: "How do I book an advisory session?", a: "Use the portal sessions area or the public contact flow; no real booking is created in this preview." },
+  { q: "Can I change my membership plan?", a: "The settings page shows preview membership states only. Real account changes are deferred." },
   { q: "How do I access my documents?", a: "Document placeholders appear under the Documents section without real file upload or storage." },
   { q: "How do partner offers work?", a: "Offer cards show entitlement and eligibility states only; no redemption is processed." },
 ];
@@ -564,7 +564,7 @@ export const mockPortalSettingsProfile = {
   phone: mockCurrentUser.contact.phone ?? "0400 000 000",
   business: mockCurrentUser.contact.businessName ?? "Demo Business Pty Ltd",
   abn: "12 345 678 901",
-  plan: "Remote Business Partner Membership",
+  plan: "RBP Premium Membership",
   renewalDate: "1 July 2026",
   membershipStatus: "active" as MockPortalMembershipState,
 };
