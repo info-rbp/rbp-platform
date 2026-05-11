@@ -26,6 +26,11 @@ import {
 } from "../../components/domain";
 import { StatusBadge } from "../../components/status";
 import {
+  premiumMembershipInclusions,
+  premiumMembershipPlan,
+  premiumMembershipRoutes,
+} from "../../data/premiumMembership";
+import {
   mockMembershipExtras,
   mockMembershipGoalOptions,
   mockMembershipManagedServiceOptions,
@@ -70,18 +75,18 @@ interface MembershipFlowForm {
 const storageKey = "rbp.mockMembershipPurchaseOnboarding";
 
 const flowSteps: StepperStep[] = [
-  { id: "plan", label: "Plan", description: "Choose membership" },
-  { id: "account", label: "Account", description: "Contact details" },
-  { id: "inclusions", label: "Inclusions", description: "Confirm access" },
-  { id: "extras", label: "Extras", description: "Optional add-ons" },
-  { id: "payment", label: "Payment", description: "Mock only" },
-  { id: "review", label: "Review", description: "Submit sign-up" },
-  { id: "success", label: "Success", description: "Membership active" },
-  { id: "business-details", label: "Business", description: "Core details" },
+  { id: "plan", label: "Plan", description: "Confirm membership" },
+  { id: "account", label: "Account", description: "Member details" },
+  { id: "inclusions", label: "Inclusions", description: "Review access" },
+  { id: "extras", label: "Extras", description: "Optional extras" },
+  { id: "payment", label: "Payment", description: "Payment preview" },
+  { id: "review", label: "Review", description: "Review details" },
+  { id: "success", label: "Success", description: "Preview confirmed" },
+  { id: "business-details", label: "Business", description: "Business details" },
   { id: "profile", label: "Profile", description: "Business profile" },
   { id: "goals", label: "Goals", description: "Priorities" },
-  { id: "services", label: "Services", description: "Interests" },
-  { id: "team", label: "Team", description: "Invite team" },
+  { id: "services", label: "Services", description: "Service interests" },
+  { id: "team", label: "Team", description: "Team setup" },
   { id: "complete", label: "Complete", description: "Portal handoff" },
 ];
 
@@ -109,6 +114,30 @@ const initialForm: MembershipFlowForm = {
   managedServiceInterests: [],
 };
 
+const inclusionConfirmationGroups = [
+  {
+    title: "Core",
+    items: premiumMembershipInclusions.find((group) => group.category === "Core")?.items ?? [],
+  },
+  {
+    title: "Nucleus",
+    items: premiumMembershipInclusions.find((group) => group.category === "Nucleus")?.items ?? [],
+  },
+  {
+    title: "Services",
+    items: premiumMembershipInclusions.find((group) => group.category === "Services")?.items ?? [],
+  },
+  {
+    title: "Member Benefits",
+    items: [
+      ...(premiumMembershipInclusions.find((group) => group.category === "Marketplace")?.items ?? []),
+      ...(premiumMembershipInclusions.find((group) => group.category === "Offers")?.items ?? []),
+      ...(premiumMembershipInclusions.find((group) => group.category === "Operations")?.items ?? []),
+      ...(premiumMembershipInclusions.find((group) => group.category === "Other")?.items ?? []),
+    ],
+  },
+] as const;
+
 function writeMembershipSession(payload: Record<string, unknown>) {
   window.sessionStorage.setItem(storageKey, JSON.stringify(payload));
 }
@@ -119,6 +148,22 @@ function currencyLine(plan?: MockMembershipPlan) {
 
 function listValue(items: string[], fallback = "None selected") {
   return items.length > 0 ? items.join(", ") : fallback;
+}
+
+function paymentStateLabel(state: PaymentState) {
+  if (state === "simulated-success") {
+    return "Payment preview complete";
+  }
+
+  if (state === "simulated-failed") {
+    return "Payment preview failed";
+  }
+
+  if (state === "pending") {
+    return "Payment preview pending";
+  }
+
+  return "Not started";
 }
 
 export function MembershipPurchaseOnboardingFlow() {
@@ -164,26 +209,21 @@ export function MembershipPurchaseOnboardingFlow() {
 
   const orderLines = useMemo(
     () => [
-      { label: "Plan", value: selectedPlan?.name ?? "Not selected" },
+      { label: "Plan", value: selectedPlan?.name ?? premiumMembershipPlan.name },
       { label: "Membership", value: currencyLine(selectedPlan) },
-      { label: "Extras", value: selectedExtras.length ? `${selectedExtras.length} selected` : "Skipped" },
       {
-        label: "Payment",
-        value:
-          paymentState === "simulated-success"
-            ? "Simulated success"
-            : paymentState === "simulated-failed"
-              ? "Simulated failure"
-              : "Mock pending",
+        label: "Extras",
+        value: selectedExtras.length ? `${selectedExtras.length} selected` : "No extras selected",
       },
+      { label: "Payment", value: paymentStateLabel(paymentState) },
       {
         label: "Status",
         value: onboardingResult
           ? "Onboarding complete"
           : signupResult
-            ? "Membership active"
+            ? "Preview confirmed"
             : accountCreated
-              ? "Account created"
+              ? "Details captured"
               : "Draft",
       },
     ],
@@ -222,7 +262,7 @@ export function MembershipPurchaseOnboardingFlow() {
       const missing = Array.isArray(value) ? value.length === 0 : !value;
 
       if (missing) {
-        nextErrors[field] = "Required for this mock flow.";
+        nextErrors[field] = "Required to continue.";
       }
     });
 
@@ -236,7 +276,14 @@ export function MembershipPurchaseOnboardingFlow() {
     }
 
     if (currentStep.id === "account") {
-      const isValid = requireStepFields(["primaryContactName", "email", "businessName"]);
+      const isValid = requireStepFields([
+        "primaryContactName",
+        "email",
+        "phone",
+        "businessName",
+        "abnOrIdentifier",
+        "billingAddress",
+      ]);
       if (isValid) {
         setAccountCreated(true);
       }
@@ -246,10 +293,10 @@ export function MembershipPurchaseOnboardingFlow() {
     if (currentStep.id === "inclusions") {
       const nextErrors: Record<string, string> = {};
       if (!form.inclusionConfirmed) {
-        nextErrors.inclusionConfirmed = "Confirm the mock inclusions before continuing.";
+        nextErrors.inclusionConfirmed = "Confirm the membership inclusions before continuing.";
       }
       if (!form.acceptedTerms) {
-        nextErrors.acceptedTerms = "Accept the mock Phase 1 terms before continuing.";
+        nextErrors.acceptedTerms = "Review and accept the membership terms before continuing.";
       }
       setErrors(nextErrors);
       return Object.keys(nextErrors).length === 0;
@@ -258,10 +305,10 @@ export function MembershipPurchaseOnboardingFlow() {
     if (currentStep.id === "payment") {
       const nextErrors: Record<string, string> = {};
       if (!form.paymentMethodMock) {
-        nextErrors.paymentMethodMock = "Select a mock payment method.";
+        nextErrors.paymentMethodMock = "Select a payment preview method.";
       }
       if (paymentState !== "simulated-success") {
-        nextErrors.paymentState = "Simulate a successful mock payment to continue.";
+        nextErrors.paymentState = "Preview a successful payment to continue.";
       }
       setErrors(nextErrors);
       return Object.keys(nextErrors).length === 0;
@@ -391,23 +438,29 @@ export function MembershipPurchaseOnboardingFlow() {
 
   return (
     <WizardShell
-      eyebrow="Membership purchase onboarding"
-      title="Remote Business Partner membership"
-      description="A Phase 1 mock journey for choosing a membership, simulating payment, completing onboarding, and handing off to the portal. No real auth, payment, or backend calls are connected."
+      eyebrow="RBP Premium Membership Sign-Up"
+      title="Start Your Premium Membership"
+      description="Complete your membership details, confirm your inclusions, and preview the onboarding flow for RBP Premium Membership."
       steps={flowSteps}
       currentStepId={currentStep.id}
       aside={
         <div className="space-y-4">
-          <OrderSummaryCard title="Membership state" lines={orderLines} />
+          <OrderSummaryCard title="Membership summary" lines={orderLines} />
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <h3 className="font-semibold text-slate-950">Visible states</h3>
             <div className="mt-4 flex flex-wrap gap-2">
               <StatusBadge status={form.selectedPlanId ? "active" : "draft"} label="Plan selected" />
-              <StatusBadge status={accountCreated ? "active" : "draft"} label="Account created" />
-              <StatusBadge status={paymentState === "simulated-success" ? "active" : "pending"} label="Mock payment" />
-              <StatusBadge status={signupResult ? "active" : "draft"} label="Membership active" />
-              <StatusBadge status={onboardingResult ? "active" : signupResult ? "in-progress" : "draft"} label="Onboarding" />
-              <StatusBadge status={onboardingResult ? "active" : "draft"} label="Portal access" />
+              <StatusBadge status={accountCreated ? "active" : "draft"} label="Member details" />
+              <StatusBadge
+                status={paymentState === "simulated-success" ? "active" : "pending"}
+                label="Payment preview"
+              />
+              <StatusBadge status={signupResult ? "active" : "draft"} label="Preview confirmed" />
+              <StatusBadge
+                status={onboardingResult ? "active" : signupResult ? "in-progress" : "draft"}
+                label="Onboarding"
+              />
+              <StatusBadge status={onboardingResult ? "active" : "draft"} label="Portal handoff" />
             </div>
           </div>
         </div>
@@ -416,10 +469,15 @@ export function MembershipPurchaseOnboardingFlow() {
       <div className="space-y-6">
         {currentStep.id === "plan" ? (
           <FormSection
-            title="Select a membership plan"
-            description="The Stitch reference presents a premium Remote Business Partner membership entry point with plan selection before account creation."
+            title="Confirm membership"
+            description="Choose the current premium membership offer and review the included value before entering your member details."
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+              <span className="font-semibold">Early bird:</span> {premiumMembershipPlan.earlyBirdPrice}
+              <span className="mx-2 text-blue-300">|</span>
+              <span className="font-semibold">Normally:</span> {premiumMembershipPlan.standardPrice}
+            </div>
+            <div className="grid gap-4 md:grid-cols-1">
               {plans.map((plan) => (
                 <PlanSelectionCard
                   key={plan.id}
@@ -435,9 +493,9 @@ export function MembershipPurchaseOnboardingFlow() {
               <p className="text-sm font-medium text-red-600">{errors.selectedPlanId}</p>
             ) : null}
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <h3 className="text-sm font-semibold text-slate-900">Included in the mock plan</h3>
+              <h3 className="text-sm font-semibold text-slate-900">Included with your membership</h3>
               <ul className="mt-3 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
-                {(selectedPlan?.inclusions ?? []).map((inclusion) => (
+                {premiumMembershipPlan.planHighlights.map((inclusion) => (
                   <li key={inclusion}>- {inclusion}</li>
                 ))}
               </ul>
@@ -447,8 +505,8 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "account" ? (
           <FormSection
-            title="Create your mock member account"
-            description="Capture the core contact and business details used through the rest of the frontend flow."
+            title="Member details"
+            description="Enter the primary contact and business details for your premium membership preview."
           >
             <div className="grid gap-4 md:grid-cols-2">
               <TextField
@@ -459,7 +517,7 @@ export function MembershipPurchaseOnboardingFlow() {
                 placeholder="James Anderson"
               />
               <TextField
-                label="Email address"
+                label="Email"
                 type="email"
                 value={form.email}
                 onChange={(event) => updateField("email", event.currentTarget.value)}
@@ -467,10 +525,11 @@ export function MembershipPurchaseOnboardingFlow() {
                 placeholder="james@example.com.au"
               />
               <TextField
-                label="Phone number"
+                label="Phone"
                 type="tel"
                 value={form.phone}
                 onChange={(event) => updateField("phone", event.currentTarget.value)}
+                error={errors.phone}
                 placeholder="+61 400 000 000"
               />
               <TextField
@@ -480,37 +539,71 @@ export function MembershipPurchaseOnboardingFlow() {
                 error={errors.businessName}
                 placeholder="Anderson Advisory Pty Ltd"
               />
+              <TextField
+                label="ABN or business identifier"
+                value={form.abnOrIdentifier}
+                onChange={(event) => updateField("abnOrIdentifier", event.currentTarget.value)}
+                error={errors.abnOrIdentifier}
+                placeholder="12 345 678 901"
+              />
             </div>
+            <TextAreaField
+              label="Billing address"
+              value={form.billingAddress}
+              onChange={(event) => updateField("billingAddress", event.currentTarget.value)}
+              error={errors.billingAddress}
+              placeholder="Level 2, 100 Example Street, Perth WA 6000"
+            />
             <CheckboxField
               checked={form.marketingConsent}
               onChange={(event) => updateField("marketingConsent", event.currentTarget.checked)}
-              label="Send me mock membership updates"
-              description="Frontend-only preference for testing account creation state."
+              label="Keep me updated about premium membership launch news"
+              description="Optional preference for future membership communications."
             />
           </FormSection>
         ) : null}
 
         {currentStep.id === "inclusions" ? (
           <FormSection
-            title="Confirm membership inclusions"
-            description="Review the mock inclusions before moving into optional extras and payment simulation."
+            title="Confirm Your Premium Membership Inclusions"
+            description="Review the access groups included with RBP Premium Membership before moving to optional extras and payment preview."
           >
-            <div className="grid gap-3 md:grid-cols-2">
-              {(selectedPlan?.inclusions ?? []).map((inclusion) => (
-                <div key={inclusion} className="rounded-2xl border border-slate-200 bg-white p-4 text-sm font-medium text-slate-700">
-                  {inclusion}
-                </div>
+            <div className="grid gap-4 xl:grid-cols-2">
+              {inclusionConfirmationGroups.map((group) => (
+                <section
+                  key={group.title}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                >
+                  <h3 className="text-base font-bold text-slate-950">{group.title}</h3>
+                  <ul className="mt-4 space-y-3 text-sm text-slate-600">
+                    {group.items.map((item) => (
+                      <li key={`${group.title}-${item.name}`} className="flex justify-between gap-4">
+                        <span>{item.name}</span>
+                        <span className="font-semibold text-slate-900">{item.value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
               ))}
             </div>
             <CheckboxField
               checked={form.inclusionConfirmed}
               onChange={(event) => updateField("inclusionConfirmed", event.currentTarget.checked)}
-              label="I confirm these mock inclusions"
-              description="Required to demonstrate the inclusion confirmation state."
+              label="I understand the RBP Premium Membership inclusions and terms."
+              description="Review the included benefits and terms before continuing."
             />
             {errors.inclusionConfirmed ? (
               <p className="text-sm font-medium text-red-600">{errors.inclusionConfirmed}</p>
             ) : null}
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 text-sm">
+              <span className="text-slate-600">Need the detail behind eligibility, credits, and fair use?</span>
+              <Link
+                to={premiumMembershipRoutes.terms}
+                className="font-bold text-blue-700 hover:text-blue-800 hover:underline"
+              >
+                View Membership Terms
+              </Link>
+            </div>
             <TermsAcceptance
               checked={form.acceptedTerms}
               onChange={(checked) => updateField("acceptedTerms", checked)}
@@ -523,8 +616,8 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "extras" ? (
           <FormSection
-            title="Select optional extras"
-            description="Choose extras for the mock order, or continue without adding anything."
+            title="Optional extras"
+            description="Choose any optional extras you would like reflected in the preview, or continue without adding anything."
           >
             <div className="grid gap-4 md:grid-cols-3">
               {mockMembershipExtras.map((extra) => {
@@ -554,13 +647,16 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "payment" ? (
           <FormSection
-            title="Simulate payment details"
-            description="This step intentionally demonstrates payment states without collecting or processing real payment details."
+            title="Payment Preview"
+            description="Preview the weekly membership payment state before confirming your premium membership details."
           >
-            <PaymentSimulationPanel amountLabel={`${currencyLine(selectedPlan)}. No real payment will be processed.`} />
+            <PaymentSimulationPanel
+              title="Payment Preview"
+              amountLabel={`${premiumMembershipPlan.name} · ${currencyLine(selectedPlan)}`}
+            />
             <RadioCardGroup
               name="payment-method"
-              label="Mock payment method"
+              label="Payment preview method"
               value={form.paymentMethodMock}
               onChange={(value) => updateField("paymentMethodMock", value)}
               options={mockPaymentMethods.map((method) => ({
@@ -576,7 +672,7 @@ export function MembershipPurchaseOnboardingFlow() {
                 disabled={paymentState === "pending"}
                 className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
               >
-                {paymentState === "pending" ? "Simulating..." : "Simulate payment success"}
+                {paymentState === "pending" ? "Previewing..." : "Preview Payment Success"}
               </button>
               <button
                 type="button"
@@ -584,7 +680,7 @@ export function MembershipPurchaseOnboardingFlow() {
                 disabled={paymentState === "pending"}
                 className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 disabled:opacity-50"
               >
-                Simulate payment failure
+                Preview Payment Failure
               </button>
             </div>
             <MockSubmissionState
@@ -597,10 +693,10 @@ export function MembershipPurchaseOnboardingFlow() {
                       ? "error"
                       : "idle"
               }
-              idleMessage="Mock payment is ready to simulate."
-              loadingMessage="Mock payment pending..."
-              successMessage="Mock payment simulated successfully. No funds were charged."
-              errorMessage="Mock payment simulated failure. Try success to continue."
+              idleMessage="Payment preview is ready to start."
+              loadingMessage="Payment preview pending..."
+              successMessage="Payment preview completed. No funds were charged."
+              errorMessage="Payment preview failed. Try the success preview to continue."
             />
             {errors.paymentState ? (
               <p className="text-sm font-medium text-red-600">{errors.paymentState}</p>
@@ -612,33 +708,34 @@ export function MembershipPurchaseOnboardingFlow() {
           <div className="space-y-4">
             <MockSubmissionState
               state={submissionState}
-              idleMessage="Ready to submit the mock membership sign-up."
-              loadingMessage="Submitting mock membership sign-up..."
-              successMessage="Mock membership sign-up submitted."
-              errorMessage="Mock sign-up failed. Review the highlighted fields."
+              idleMessage="Ready to confirm your membership preview."
+              loadingMessage="Confirming membership preview..."
+              successMessage="Membership preview confirmed."
+              errorMessage="The preview could not be confirmed. Review the highlighted fields."
             />
             <ReviewSubmit
-              title="Review membership sign-up"
-              description="Confirm the mock membership purchase details before activating the simulated membership."
-              submitLabel="Submit mock membership sign-up"
+              title="Review Your Premium Membership Details"
+              description="Confirm your membership, account, and payment preview details before finalising the premium membership preview."
+              submitLabel="Confirm Membership Preview"
               isSubmitting={submissionState === "loading"}
               onSubmit={submitSignup}
               sections={[
                 {
-                  title: "Account",
+                  title: "Member details",
                   items: [
-                    { label: "Contact", value: form.primaryContactName || "Missing" },
+                    { label: "Primary contact", value: form.primaryContactName || "Missing" },
                     { label: "Email", value: form.email || "Missing" },
+                    { label: "Phone", value: form.phone || "Missing" },
                     { label: "Business", value: form.businessName || "Missing" },
                   ],
                 },
                 {
                   title: "Membership",
                   items: [
-                    { label: "Plan", value: selectedPlan?.name ?? "Missing" },
+                    { label: "Plan", value: selectedPlan?.name ?? premiumMembershipPlan.name },
                     { label: "Price", value: currencyLine(selectedPlan) },
                     { label: "Extras", value: listValue(selectedExtras.map((extra) => extra.title)) },
-                    { label: "Payment state", value: paymentState.replace(/-/g, " ") },
+                    { label: "Payment", value: paymentStateLabel(paymentState) },
                   ],
                 },
               ]}
@@ -649,9 +746,9 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "success" && signupResult ? (
           <ConfirmationPanel
-            title="Membership active"
-            statusLabel="Mock payment success"
-            message="Your Phase 1 mock membership is active and onboarding can begin. No real account, payment, or backend record was created."
+            title="RBP Premium Membership Preview Confirmed"
+            statusLabel="Preview confirmed"
+            message="Your premium membership preview has been completed. Continue to the member portal handoff or review your membership inclusions."
             reference={signupResult.reference}
             primaryAction={
               <button
@@ -664,10 +761,10 @@ export function MembershipPurchaseOnboardingFlow() {
             }
             secondaryAction={
               <Link
-                to="/membership/confirmation"
+                to={premiumMembershipRoutes.inclusions}
                 className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
               >
-                View confirmation
+                View Membership Inclusions
               </Link>
             }
           />
@@ -675,8 +772,8 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "business-details" ? (
           <FormSection
-            title="Business onboarding details"
-            description="Use the account details as a starting point and add the business identifiers needed for the mock onboarding handoff."
+            title="Business details"
+            description="Confirm the business identifiers and billing details used for the onboarding handoff."
           >
             <div className="grid gap-4 md:grid-cols-2">
               <TextField
@@ -706,7 +803,7 @@ export function MembershipPurchaseOnboardingFlow() {
         {currentStep.id === "profile" ? (
           <FormSection
             title="Business profile"
-            description="Capture the profile fields used to shape the mock portal state."
+            description="Capture the business profile used to shape the onboarding handoff."
           >
             <div className="grid gap-4 md:grid-cols-2">
               <SelectField
@@ -755,7 +852,7 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "goals" ? (
           <FormSection
-            title="Goals and priorities"
+            title="Priorities"
             description="Select the first areas where the member wants support."
           >
             <div className="grid gap-3 md:grid-cols-3">
@@ -781,7 +878,7 @@ export function MembershipPurchaseOnboardingFlow() {
             </div>
             {errors.goals ? <p className="text-sm font-medium text-red-600">{errors.goals}</p> : null}
             <TextAreaField
-              label="Biggest current business challenge"
+              label="Biggest challenge"
               value={form.biggestChallenge}
               onChange={(event) => updateField("biggestChallenge", event.currentTarget.value)}
               error={errors.biggestChallenge}
@@ -810,8 +907,8 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "services" ? (
           <FormSection
-            title="Managed services interests"
-            description="Select areas that should be visible to the mock adviser during portal handoff."
+            title="Service interests"
+            description="Select areas that should be visible during the onboarding handoff."
           >
             <SelectableCardGrid
               selectedId=""
@@ -833,20 +930,20 @@ export function MembershipPurchaseOnboardingFlow() {
         {currentStep.id === "team" ? (
           <FormSection
             title="Team setup"
-            description="Capture optional team invite placeholders, then complete onboarding."
+            description="Capture any team invite placeholders, then complete the onboarding handoff."
           >
             <TextAreaField
-              label="Team members to invite"
+              label="Team invites"
               value={form.teamInvites}
               onChange={(event) => updateField("teamInvites", event.currentTarget.value)}
-              placeholder="Name and email per line. This does not send real invitations."
+              placeholder="Name and email per line. This preview does not send real invitations."
             />
             <MockSubmissionState
               state={onboardingState}
-              idleMessage="Ready to complete mock onboarding."
-              loadingMessage="Completing mock onboarding..."
-              successMessage="Mock onboarding completed."
-              errorMessage="Mock onboarding failed. Review required fields."
+              idleMessage="Ready to complete onboarding."
+              loadingMessage="Completing onboarding..."
+              successMessage="Onboarding completed."
+              errorMessage="Onboarding could not be completed. Review the required fields."
             />
             <StepNavigation
               canGoBack
@@ -861,9 +958,9 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "complete" && onboardingResult ? (
           <ConfirmationPanel
-            title="Onboarding complete"
-            statusLabel="Portal access available"
-            message="The mock membership onboarding state is complete. The portal dashboard can now show active membership context and next-step placeholders."
+            title="Portal handoff ready"
+            statusLabel="Onboarding complete"
+            message="Your premium membership preview has been completed and the onboarding handoff is ready. Continue into the portal or review the membership confirmation summary."
             reference={onboardingResult.reference}
             primaryAction={
               <Link
