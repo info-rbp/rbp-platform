@@ -15,24 +15,25 @@ export interface MockMembershipPlan {
 export const mockMembershipPlans: MockMembershipPlan[] = [
   {
     id: "membership-rbp-weekly",
-    name: "Remote Business Partner Membership",
+    name: "Lifetime RBP Membership",
     slug: "remote-business-partner-membership",
-    description: "A frontend-only mock membership plan used for Phase 1 journey testing.",
+    description:
+      "Grab the early bird offer with a discounted membership fee and all the inclusions you need to run your business.",
     price: {
-      amount: 100,
+      amount: 25,
       currency: "AUD",
       gstIncluded: false,
-      label: "$100 + GST per week",
+      label: "$25 + GST per week",
     },
     billingCycle: "weekly",
     inclusions: [
-      "Mock access to On-Demand Services",
-      "Mock access to selected applications",
-      "Mock access to offers and resources",
-      "Mock portal dashboard experience",
+      "Unlimited Use of Core Services",
+      "Unlimited Access to Nucleus",
+      "25% Discount on On-Demand Services",
+      "Plus Much More",
     ],
-    ctaHref: "/membership/sign-up-now",
-    status: "placeholder",
+    ctaHref: "/membership/remote-business-partner-membership",
+    status: "available",
   },
 ];
 
@@ -40,7 +41,7 @@ export const mockMembershipTimeline: MockTimelineItem[] = [
   {
     id: "membership-started",
     label: "Membership started",
-    description: "The membership sign-up flow has been started in mock mode.",
+    description: "The membership sign-up flow has been started.",
     status: "draft",
     timestamp: "2026-05-07T09:00:00Z",
   },
@@ -54,7 +55,7 @@ export const mockMembershipTimeline: MockTimelineItem[] = [
   {
     id: "membership-active",
     label: "Membership active",
-    description: "Mock membership status is active for portal demonstration.",
+    description: "Membership status is active for portal demonstration.",
     status: "active",
     timestamp: "2026-05-07T09:10:00Z",
   },
@@ -78,22 +79,22 @@ export const mockMembershipSignupFields = [
 
 export const mockMembershipExtras = [
   {
-    id: "extra-advisory-session",
-    title: "Extra advisory session",
-    description: "Add a mock strategy session for onboarding scenario testing.",
-    priceLabel: "$220 + GST once-off",
+    id: "extra-core-services",
+    title: "Core service access",
+    description: "Use core business support services as part of your membership.",
+    priceLabel: "Included",
   },
   {
-    id: "extra-docushare-setup",
-    title: "DocuShare setup",
-    description: "Mock document workspace setup and starter template mapping.",
-    priceLabel: "$180 + GST once-off",
+    id: "extra-nucleus",
+    title: "Nucleus access",
+    description: "Access business resources, documents, tools, and platform assets.",
+    priceLabel: "Included",
   },
   {
-    id: "extra-reporting-pack",
-    title: "Reporting pack",
-    description: "Mock dashboard briefing for cash flow and decision visibility.",
-    priceLabel: "$150 + GST once-off",
+    id: "extra-on-demand-discount",
+    title: "On-demand service discount",
+    description: "Receive 25% off eligible on-demand services.",
+    priceLabel: "25% discount",
   },
 ];
 
@@ -116,7 +117,7 @@ export const mockMembershipManagedServiceOptions = [
   {
     id: "managed-hr",
     title: "Managed HR",
-    description: "People, team setup, and operational support in mock mode.",
+    description: "People, team setup, and operational support.",
   },
   {
     id: "managed-finance",
