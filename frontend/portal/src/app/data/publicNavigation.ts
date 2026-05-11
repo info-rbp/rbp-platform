@@ -27,12 +27,12 @@ export const publicNavigation: MegaConfig[] = [
     label: "Core",
     description: "Core advisory services for targeted business guidance, decisions, problem solving, risk support, and bid management.",
     links: [
-      { label: "Core Services", href: "/on-demand/services" },
-      { label: "Business Advisor", href: "/on-demand/business-advisor" },
-      { label: "Decision Desk", href: "/on-demand/decision-desk" },
-      { label: "The Fixer", href: "/on-demand/the-fixer" },
-      { label: "Risk Advisor", href: "/on-demand/risk-advisor" },
-      { label: "Bid Management", href: "/managed-services/bid-management" },
+      { label: "Core Services", href: "/core-services" },
+      { label: "Business Advisor", href: "/core-services/business-advisor" },
+      { label: "Decision Desk", href: "/core-services/decision-desk" },
+      { label: "The Fixer", href: "/core-services/the-fixer" },
+      { label: "Risk Advisor", href: "/core-services/risk-advisor" },
+      { label: "Bid Management", href: "/core-services/bid-management" },
     ],
   },
   {
