@@ -1,7 +1,8 @@
 import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+
 import { ConfirmationPanel } from "../../components/flow";
+import { Footer } from "../../components/Footer";
+import { Navbar } from "../../components/Navbar";
 import { StatusBadge } from "../../components/status";
 import { membershipFlowStorageKey } from "../../features/membership/MembershipPurchaseOnboardingFlow";
 
@@ -34,7 +35,7 @@ function readStoredConfirmation(): StoredMembershipConfirmation | null {
 export function MembershipConfirmationPage() {
   const confirmation = readStoredConfirmation();
   const primaryReference =
-    confirmation?.onboardingReference ?? confirmation?.signupReference ?? "MEM-MOCK-PREVIEW";
+    confirmation?.onboardingReference ?? confirmation?.signupReference ?? "MEM-PREVIEW-001";
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -44,16 +45,14 @@ export function MembershipConfirmationPage() {
           <ConfirmationPanel
             title={
               confirmation?.onboardingStatus === "complete"
-                ? "Membership onboarding complete"
-                : "Membership confirmation"
+                ? "Premium membership onboarding complete"
+                : "Premium membership confirmation"
             }
-            statusLabel={
-              confirmation ? "Mock membership state saved" : "Mock confirmation preview"
-            }
+            statusLabel={confirmation ? "Preview state saved" : "Confirmation preview"}
             message={
               confirmation
-                ? "This confirmation reflects the latest frontend-only membership flow state saved in this browser session. No real backend record, authentication account, or payment exists."
-                : "This fallback confirmation is shown when the sign-up flow has not been completed in the current browser session."
+                ? "This confirmation reflects the latest premium membership preview state saved in this browser session. No real payment has been processed and no live account has been created."
+                : "This confirmation preview is shown when the sign-up flow has not yet been completed in the current browser session."
             }
             reference={primaryReference}
             primaryAction={
@@ -69,13 +68,13 @@ export function MembershipConfirmationPage() {
                 to="/membership/sign-up-now"
                 className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
               >
-                Return to mock flow
+                Return to sign-up preview
               </Link>
             }
           />
 
           <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-950">Mock status summary</h2>
+            <h2 className="text-lg font-bold text-slate-950">Membership status summary</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               <StatusBadge
                 status={confirmation?.membershipStatus ?? "placeholder"}
@@ -83,7 +82,7 @@ export function MembershipConfirmationPage() {
               />
               <StatusBadge
                 status={confirmation?.paymentStatus ?? "placeholder"}
-                label={`Payment: ${confirmation?.paymentStatus ?? "not simulated"}`}
+                label={`Payment: ${confirmation?.paymentStatus ?? "not started"}`}
               />
               <StatusBadge
                 status={confirmation?.onboardingStatus ?? "placeholder"}
@@ -106,7 +105,7 @@ export function MembershipConfirmationPage() {
               <div>
                 <dt className="font-semibold text-slate-500">Plan</dt>
                 <dd className="mt-1 text-slate-900">
-                  {confirmation?.selectedPlan ?? "Remote Business Partner Membership"}
+                  {confirmation?.selectedPlan ?? "RBP Premium Membership"}
                 </dd>
               </div>
             </dl>
