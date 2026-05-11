@@ -45,8 +45,8 @@ export const publicNavigation: MegaConfig[] = [
       { label: "Documentation Suites", href: "/document-nucleus/category/documentation-suites" },
       { label: "Toolkits", href: "/document-nucleus/category/toolkits" },
       { label: "Industry Packs", href: "/document-nucleus/category/industry-packs" },
-      { label: "Process", href: "/document-nucleus/category/process" },
-      { label: "Customisation", href: "/document-nucleus/category/customisation" },
+      { label: "Process", href: "/document-nucleus/process" },
+      { label: "Customisation", href: "/document-nucleus/customisation" },
     ],
   },
   {
