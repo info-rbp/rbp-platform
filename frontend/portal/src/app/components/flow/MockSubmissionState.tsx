@@ -8,10 +8,10 @@ export interface MockSubmissionStateProps {
 
 export function MockSubmissionState({
   state,
-  idleMessage = "Ready for mock submission.",
-  loadingMessage = "Simulating submission...",
-  successMessage = "Mock submission completed.",
-  errorMessage = "Mock submission failed. Review the highlighted fields.",
+  idleMessage = "Ready to continue.",
+  loadingMessage = "Processing...",
+  successMessage = "Completed.",
+  errorMessage = "Something went wrong. Review the highlighted fields.",
 }: MockSubmissionStateProps) {
   const messageByState = {
     idle: idleMessage,
