@@ -78,7 +78,7 @@ export const publicNavigation: MegaConfig[] = [
       { label: "About Us", href: "/about" },
       { label: "Our Platform", href: "/" },
       { label: "Discovery Call", href: "/contact?reason=discovery-call" },
-      { label: "Contact Us", href: "/contact" },
+      { label: "Work For Us", href: "/about/work-for-us" },\n      { label: "Contact Us", href: "/contact" },
     ],
   },
 ];

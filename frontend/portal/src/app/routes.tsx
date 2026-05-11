@@ -24,7 +24,7 @@ import {
 
 import { WhatWeDoPage } from "./pages/about/WhatWeDoPage";
 import { OurProcessPage } from "./pages/about/OurProcessPage";
-import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";
+import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";\nimport { WorkForUsPage } from "./pages/about/WorkForUsPage";
 
 // ── On-Demand pages ───────────────────────────────────────────────────────────
 
@@ -107,11 +107,13 @@ import { PortalDashboard } from "./pages/portal/PortalDashboard";
 import { PortalServices } from "./pages/portal/PortalServices";
 import { PortalServiceRequest } from "./pages/portal/PortalServiceRequest";
 import { PortalServiceDetail } from "./pages/portal/PortalServiceDetail";
-import { PortalSessions } from "./pages/portal/PortalSessions";
+import { PortalMembership } from "./pages/portal/PortalMembership";
 import { PortalDocuments } from "./pages/portal/PortalDocuments";
 import { PortalOffers } from "./pages/portal/PortalOffers";
 import { PortalApps } from "./pages/portal/PortalApps";
 import { PortalResources } from "./pages/portal/PortalResources";
+import { PortalBilling } from "./pages/portal/PortalBilling";
+import { PortalNotifications } from "./pages/portal/PortalNotifications";
 import { PortalSupport } from "./pages/portal/PortalSupport";
 import { PortalSettings } from "./pages/portal/PortalSettings";
 
@@ -170,7 +172,7 @@ export const router = createBrowserRouter([
       { path: "about/what-we-do", Component: WhatWeDoPage },
       { path: "about/our-process", Component: OurProcessPage },
       { path: "about/process", Component: OurProcessPage },
-      { path: "about/work-with-us", Component: WorkWithUsPage },
+      { path: "about/work-with-us", Component: WorkWithUsPage },\n      { path: "about/work-for-us", Component: WorkForUsPage },
 
       // ── Legacy / direct public routes ──────────────────────────────────────
 
@@ -354,6 +356,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/portal/dashboard" replace /> },
           { path: "dashboard", Component: PortalDashboard },
+          { path: "membership", Component: PortalMembership },
           {
             path: "services",
             Component: Layout,
@@ -363,11 +366,19 @@ export const router = createBrowserRouter([
               { path: ":id", Component: PortalServiceDetail },
             ],
           },
-          { path: "sessions", Component: PortalSessions },
+          { path: "account", element: <Navigate to="/portal/settings" replace /> },
+          { path: "library", element: <Navigate to="/portal/documents" replace /> },
+          { path: "decision-desk", element: <Navigate to="/portal/services?type=decision-desk" replace /> },
+          { path: "decision-desk/history", element: <Navigate to="/portal/services?type=decision-desk" replace /> },
+          { path: "finance", element: <Navigate to="/portal/services?type=finance" replace /> },
+          { path: "finance/enquiries", element: <Navigate to="/portal/services?type=finance" replace /> },
+          { path: "sessions", element: <Navigate to="/portal/services?type=session" replace /> },
           { path: "documents", Component: PortalDocuments },
           { path: "offers", Component: PortalOffers },
           { path: "apps", Component: PortalApps },
           { path: "resources", Component: PortalResources },
+          { path: "billing", Component: PortalBilling },
+          { path: "notifications", Component: PortalNotifications },
           { path: "support", Component: PortalSupport },
           { path: "settings", Component: PortalSettings },
         ],
