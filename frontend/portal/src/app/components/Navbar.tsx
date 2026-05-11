@@ -235,31 +235,35 @@ export function Navbar() {
 
       {/* Tier 2: Main nav (desktop) */}
       <div className="hidden lg:block bg-white border-b border-slate-100 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center justify-start xl:justify-center gap-0.5 h-12 overflow-x-auto">
-            {MENUS.map((menu) => {
-              const isOpen = openDropdown === menu.key;
-              const isActive = menu.links.some((link) => {
-                const path = normalisePath(link.href);
-                return path !== "/" && location.pathname.startsWith(path);
-              });
+        <div className="w-full px-3 sm:px-4 lg:px-6 2xl:px-8">
+          <nav className="h-12 overflow-x-auto" aria-label="Primary navigation">
+            <div className="mx-auto flex h-12 min-w-max items-center justify-center gap-0.5">
+              {MENUS.map((menu) => {
+                const isOpen = openDropdown === menu.key;
+                const isActive = menu.links.some((link) => {
+                  const path = normalisePath(link.href);
+                  return path !== "/" && location.pathname.startsWith(path);
+                });
 
-              return (
-                <button
-                  type="button"
-                  key={menu.key}
-                  onClick={() => toggleDropdown(menu.key)}
-                  className={`flex items-center gap-1 px-2.5 py-2 rounded-lg text-[13px] font-semibold transition-all whitespace-nowrap ${
-                    isActive || isOpen
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
-                  {menu.label}
-                  <ChevronDown className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    type="button"
+                    key={menu.key}
+                    onClick={() => toggleDropdown(menu.key)}
+                    aria-haspopup="true"
+                    aria-expanded={isOpen}
+                    className={`flex shrink-0 items-center gap-1 px-2 py-2 xl:px-2.5 rounded-lg text-[12px] xl:text-[13px] font-semibold transition-all whitespace-nowrap ${
+                      isActive || isOpen
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>{menu.label}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                );
+              })}
+            </div>
           </nav>
         </div>
 
