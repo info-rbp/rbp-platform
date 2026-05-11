@@ -73,7 +73,7 @@ export const publicNavigation: MegaConfig[] = [
     key: "about-us",
     label: "About Us",
     description:
-      "Learn who we are, how the platform works, and how to contact the Remote Business Partner team.",
+      "Learn who we are, how the platform works, how to start a conversation, and how to connect with Remote Business Partner.",
     links: [
       { label: "About Us", href: "/about" },
       { label: "Our Platform", href: "/" },
