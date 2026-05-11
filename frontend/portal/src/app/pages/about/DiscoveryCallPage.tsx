@@ -1,103 +1,95 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import { Navbar } from "../../components/Navbar";
 import { Footer } from "../../components/Footer";
 import {
   ArrowRight,
+  CalendarDays,
   CheckCircle,
+  Clock,
+  Compass,
   FileText,
-  Handshake,
-  Lightbulb,
-  Megaphone,
-  Network,
-  Send,
-  Settings,
-  Store,
+  HelpCircle,
+  MessageSquare,
+  PhoneCall,
+  Route,
   Users,
 } from "lucide-react";
 
-const partnershipTypes = [
+const callPurposes = [
   {
-    icon: Lightbulb,
-    title: "Advisory Partners",
-    desc: "Specialists who can support business owners with practical advice across strategy, operations, finance, people, risk, digital, and growth.",
+    icon: Compass,
+    title: "Understand your business",
+    desc: "Share where the business is now, what is changing, and what kind of support you are exploring.",
   },
   {
-    icon: Settings,
-    title: "Service Delivery Partners",
-    desc: "Reliable operators and service providers who can help deliver support across defined business needs and managed service pathways.",
-  },
-  {
-    icon: Network,
-    title: "Technology & Application Partners",
-    desc: "Product, software, integration, automation, and workflow partners who can strengthen the RBP platform ecosystem.",
-  },
-  {
-    icon: Store,
-    title: "Marketplace Partners",
-    desc: "Businesses that want to list relevant products, services, offers, or opportunities for the RBP small business audience.",
-  },
-  {
-    icon: Megaphone,
-    title: "Referral Partners",
-    desc: "Organisations and professionals who work with small businesses and want a structured way to refer clients into RBP pathways.",
+    icon: Route,
+    title: "Identify the right pathway",
+    desc: "We help determine whether services, membership, documents, applications, marketplace support, or another pathway fits best.",
   },
   {
     icon: FileText,
-    title: "Content & Resource Partners",
-    desc: "Partners who can contribute useful guides, tools, templates, education, or resources for small business users.",
+    title: "Clarify next steps",
+    desc: "The goal is to leave the conversation with a clearer direction, not another vague meeting about having more meetings.",
   },
 ];
 
-const partnerQualities = [
-  "Practical specialists who understand small business realities",
-  "Reliable partners who communicate clearly and follow through",
-  "Commercially useful service providers with defined outcomes",
-  "Technology and application providers that solve real workflow problems",
-  "Partners who can support the RBP ecosystem without turning everything into corporate theatre",
-];
-
-const benefits = [
-  "Access a growing small business audience",
-  "Participate in structured service and referral pathways",
-  "Support businesses through advisory, delivery, marketplace, or resource models",
-  "Contribute to a connected business support ecosystem",
-  "Create future opportunities for platform, marketplace, and membership alignment",
-];
-
-const partnershipOptions = [
-  "Advisory partnership",
-  "Service delivery partnership",
-  "Technology or application partnership",
-  "Marketplace partnership",
-  "Referral partnership",
-  "Content or resource partnership",
+const bookingReasons = [
+  "I want to understand RBP membership",
+  "I need help choosing the right service",
+  "I want business advisory support",
+  "I need document or process support",
+  "I want to discuss partnership opportunities",
+  "I am exploring marketplace or application options",
   "Other",
 ];
 
-export function WorkWithUsPage() {
+const businessStages = [
+  "Idea or early-stage business",
+  "Established small business",
+  "Growing business",
+  "Business going through change",
+  "Business preparing for sale, funding, or expansion",
+  "Other",
+];
+
+const timeZones = [
+  "Australian Eastern Time",
+  "Australian Central Time",
+  "Australian Western Time",
+  "New Zealand Time",
+  "United Kingdom Time",
+  "United States / Canada Time",
+  "Other",
+];
+
+export function DiscoveryCallPage() {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
-    organisationName: "",
-    contactName: "",
+    fullName: "",
     email: "",
     phone: "",
+    businessName: "",
     website: "",
-    partnershipType: "",
-    servicesOffered: "",
-    regionsServed: "",
+    businessStage: "",
+    reason: "",
+    preferredTime: "",
+    timeZone: "",
     message: "",
     consent: false,
   });
 
-  const updateForm = (key: keyof typeof form, value: string | boolean) => {
+  const updateForm = (
+    key: keyof typeof form,
+    value: string | boolean
+  ) => {
     setForm((current) => ({
       ...current,
       [key]: value,
     }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     setSubmitted(true);
   };
@@ -112,57 +104,56 @@ export function WorkWithUsPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-blue-200">
-                <Handshake className="h-3.5 w-3.5" />
-                Work With Us
+                <CalendarDays className="h-3.5 w-3.5" />
+                Discovery Call
               </div>
 
               <h1 className="text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
-                Partner with Remote Business Partner.
+                Book a discovery call with Remote Business Partner.
               </h1>
 
               <p className="mt-6 max-w-3xl text-base leading-relaxed text-slate-300 sm:text-lg">
-                Work with us to support small businesses through advisory, services, applications, marketplace offers,
-                resources, and specialist delivery pathways.
+                Tell us where your business is now, what you are trying to solve, and we will help identify the right
+                next step across services, membership, documents, applications, marketplace support, or partnerships.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <a
-                  href="#partner-enquiry"
+                  href="#booking-form"
                   className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-6 py-3 font-bold text-white transition hover:bg-blue-800"
                 >
-                  Submit Partnership Enquiry <ArrowRight className="h-4 w-4" />
+                  Request a Call <ArrowRight className="h-4 w-4" />
                 </a>
 
                 <Link
-                  to="/about/discovery-call"
+                  to="/about/our-platform"
                   className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-slate-900 transition hover:bg-slate-100"
                 >
-                  Book Discovery Call
+                  Explore Our Platform
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Partnership types */}
-        <section className="py-16 lg:py-24">
+        {/* What the call is for */}
+        <section className="py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 max-w-3xl">
               <p className="mb-4 text-xs font-extrabold uppercase tracking-widest text-blue-700">
-                Partnership Types
+                What The Call Is For
               </p>
               <h2 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
-                We are building a practical partner ecosystem around small business support.
+                A practical conversation about the best next move for your business.
               </h2>
               <p className="mt-5 leading-relaxed text-slate-600">
-                RBP is designed to connect small businesses with the right support pathways. That includes trusted
-                partners who can contribute expertise, services, technology, marketplace value, referrals, and useful
-                resources.
+                The discovery call is designed to understand your situation, clarify your priorities, and point you
+                toward a useful pathway. Revolutionary stuff: a call with an actual purpose.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {partnershipTypes.map((item) => {
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {callPurposes.map((item) => {
                 const Icon = item.icon;
 
                 return (
@@ -179,76 +170,28 @@ export function WorkWithUsPage() {
           </div>
         </section>
 
-        {/* Why partner */}
-        <section className="bg-slate-50 py-16 lg:py-24">
-          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-              <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-blue-700">
-                Why Partner With RBP
-              </p>
-              <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                Help small businesses access better support through a clearer platform model.
-              </h2>
-
-              <div className="mt-6 space-y-3">
-                {benefits.map((benefit) => (
-                  <div key={benefit} className="flex gap-3 rounded-xl bg-slate-50 p-4">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-700" />
-                    <p className="text-sm leading-relaxed text-slate-700">{benefit}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-blue-100 bg-blue-50 p-8 shadow-sm">
-              <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-blue-700">
-                Who We Are Looking For
-              </p>
-              <h2 className="text-2xl font-black tracking-tight text-slate-900">
-                Partners who can be useful, reliable, and clear.
-              </h2>
-
-              <div className="mt-6 space-y-3">
-                {partnerQualities.map((quality) => (
-                  <div key={quality} className="flex gap-3 rounded-xl bg-white p-4">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-700" />
-                    <p className="text-sm leading-relaxed text-slate-700">{quality}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Partner enquiry form */}
-        <section id="partner-enquiry" className="py-16 lg:py-24 scroll-mt-28">
+        {/* Booking form */}
+        <section id="booking-form" className="bg-slate-50 py-16 lg:py-20 scroll-mt-28">
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
             <aside className="space-y-6">
               <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                  <Users className="h-6 w-6" />
+                  <PhoneCall className="h-6 w-6" />
                 </div>
-                <h2 className="text-xl font-black text-slate-900">Partnership focus</h2>
+                <h2 className="text-xl font-black text-slate-900">Who should book?</h2>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                  This page is for organisations, advisors, service providers, suppliers, technology providers, and
-                  collaborators. Employment interest belongs on the Work For Us page, because mixing those together is
-                  how inboxes become compost heaps.
+                  Business owners, founders, operators, and managers exploring advisory, services, membership,
+                  document support, marketplace pathways, applications, or partnerships.
                 </p>
-                <Link
-                  to="/about/work-for-us"
-                  className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-800"
-                >
-                  Looking for future roles? <ArrowRight className="h-4 w-4" />
-                </Link>
               </div>
 
               <div className="rounded-2xl border border-blue-100 bg-blue-50 p-6 shadow-sm">
                 <h2 className="font-bold text-slate-900">What happens next?</h2>
                 <div className="mt-4 space-y-4">
                   {[
-                    "We review the partnership enquiry.",
-                    "We assess fit against RBP platform pathways.",
-                    "We follow up if there is a clear next step.",
+                    "We review the details you submit.",
+                    "We identify the most relevant RBP pathway.",
+                    "We follow up with a booking option or recommended next step.",
                   ].map((item, index) => (
                     <div key={item} className="flex gap-3">
                       <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-700 text-xs font-bold text-white">
@@ -261,15 +204,15 @@ export function WorkWithUsPage() {
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="font-bold text-slate-900">Prefer a conversation?</h2>
+                <h2 className="font-bold text-slate-900">Not ready to book?</h2>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                  If you want to discuss the partnership fit first, book a discovery call.
+                  Send a general enquiry instead and we will route your message.
                 </p>
                 <Link
-                  to="/about/discovery-call"
+                  to="/contact"
                   className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-800"
                 >
-                  Book Discovery Call <ArrowRight className="h-4 w-4" />
+                  Contact Us <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </aside>
@@ -280,10 +223,10 @@ export function WorkWithUsPage() {
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                     <CheckCircle className="h-8 w-8" />
                   </div>
-                  <h2 className="mt-5 text-2xl font-black text-slate-900">Partnership enquiry received</h2>
+                  <h2 className="mt-5 text-2xl font-black text-slate-900">Discovery call request received</h2>
                   <p className="mt-3 text-slate-600">
-                    Thanks, <strong>{form.contactName}</strong>. We will review the partnership details for{" "}
-                    <strong>{form.organisationName}</strong> and follow up if there is a clear fit.
+                    Thanks, <strong>{form.fullName}</strong>. We will review your details and follow up with the next
+                    available booking option or recommended pathway.
                   </p>
 
                   <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -305,44 +248,29 @@ export function WorkWithUsPage() {
                 <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                   <div>
                     <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-extrabold uppercase tracking-widest text-blue-700">
-                      <Send className="h-3.5 w-3.5" />
-                      Partnership Enquiry
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      Booking Request
                     </div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900">Tell us about the partnership opportunity</h2>
+                    <h2 className="text-2xl font-black tracking-tight text-slate-900">Request a discovery call</h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                      Share enough context for us to understand who you are, what you offer, and how the partnership may
-                      support the RBP ecosystem.
+                      Share a few details so we can understand the context and recommend the right next step.
                     </p>
                   </div>
 
                   <div className="mt-8 grid gap-5">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="grid gap-1.5 text-sm font-bold text-slate-700">
-                        Organisation name <span className="text-red-500">*</span>
+                        Full name <span className="text-red-500">*</span>
                         <input
                           required
                           type="text"
-                          value={form.organisationName}
-                          onChange={(event) => updateForm("organisationName", event.target.value)}
-                          className="rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                          placeholder="Organisation name"
-                        />
-                      </label>
-
-                      <label className="grid gap-1.5 text-sm font-bold text-slate-700">
-                        Contact name <span className="text-red-500">*</span>
-                        <input
-                          required
-                          type="text"
-                          value={form.contactName}
-                          onChange={(event) => updateForm("contactName", event.target.value)}
+                          value={form.fullName}
+                          onChange={(event) => updateForm("fullName", event.target.value)}
                           className="rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                           placeholder="Your name"
                         />
                       </label>
-                    </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
                       <label className="grid gap-1.5 text-sm font-bold text-slate-700">
                         Email address <span className="text-red-500">*</span>
                         <input
@@ -354,7 +282,9 @@ export function WorkWithUsPage() {
                           placeholder="you@company.com"
                         />
                       </label>
+                    </div>
 
+                    <div className="grid gap-4 sm:grid-cols-2">
                       <label className="grid gap-1.5 text-sm font-bold text-slate-700">
                         Phone number
                         <input
@@ -363,6 +293,17 @@ export function WorkWithUsPage() {
                           onChange={(event) => updateForm("phone", event.target.value)}
                           className="rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                           placeholder="Optional"
+                        />
+                      </label>
+
+                      <label className="grid gap-1.5 text-sm font-bold text-slate-700">
+                        Business name
+                        <input
+                          type="text"
+                          value={form.businessName}
+                          onChange={(event) => updateForm("businessName", event.target.value)}
+                          className="rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                          placeholder="Your business"
                         />
                       </label>
                     </div>
@@ -380,55 +321,78 @@ export function WorkWithUsPage() {
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="grid gap-1.5 text-sm font-bold text-slate-700">
-                        Partnership type <span className="text-red-500">*</span>
+                        Business stage <span className="text-red-500">*</span>
                         <select
                           required
-                          value={form.partnershipType}
-                          onChange={(event) => updateForm("partnershipType", event.target.value)}
+                          value={form.businessStage}
+                          onChange={(event) => updateForm("businessStage", event.target.value)}
                           className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                         >
-                          <option value="">Select partnership type...</option>
-                          {partnershipOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
+                          <option value="">Select business stage...</option>
+                          {businessStages.map((stage) => (
+                            <option key={stage} value={stage}>
+                              {stage}
                             </option>
                           ))}
                         </select>
                       </label>
 
                       <label className="grid gap-1.5 text-sm font-bold text-slate-700">
-                        Regions served
+                        Main reason for call <span className="text-red-500">*</span>
+                        <select
+                          required
+                          value={form.reason}
+                          onChange={(event) => updateForm("reason", event.target.value)}
+                          className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                        >
+                          <option value="">Select a reason...</option>
+                          {bookingReasons.map((reason) => (
+                            <option key={reason} value={reason}>
+                              {reason}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="grid gap-1.5 text-sm font-bold text-slate-700">
+                        Preferred date/time
                         <input
                           type="text"
-                          value={form.regionsServed}
-                          onChange={(event) => updateForm("regionsServed", event.target.value)}
+                          value={form.preferredTime}
+                          onChange={(event) => updateForm("preferredTime", event.target.value)}
                           className="rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                          placeholder="Example: Australia, remote, global"
+                          placeholder="Example: Tuesday morning"
                         />
+                      </label>
+
+                      <label className="grid gap-1.5 text-sm font-bold text-slate-700">
+                        Time zone
+                        <select
+                          value={form.timeZone}
+                          onChange={(event) => updateForm("timeZone", event.target.value)}
+                          className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                        >
+                          <option value="">Select time zone...</option>
+                          {timeZones.map((timeZone) => (
+                            <option key={timeZone} value={timeZone}>
+                              {timeZone}
+                            </option>
+                          ))}
+                        </select>
                       </label>
                     </div>
 
                     <label className="grid gap-1.5 text-sm font-bold text-slate-700">
-                      Services or products offered <span className="text-red-500">*</span>
-                      <textarea
-                        required
-                        rows={4}
-                        value={form.servicesOffered}
-                        onChange={(event) => updateForm("servicesOffered", event.target.value)}
-                        className="resize-none rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                        placeholder="Summarise what your organisation offers..."
-                      />
-                    </label>
-
-                    <label className="grid gap-1.5 text-sm font-bold text-slate-700">
-                      Message / partnership context <span className="text-red-500">*</span>
+                      Message / context <span className="text-red-500">*</span>
                       <textarea
                         required
                         rows={5}
                         value={form.message}
                         onChange={(event) => updateForm("message", event.target.value)}
                         className="resize-none rounded-xl border border-slate-200 px-4 py-3 font-normal text-slate-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                        placeholder="Tell us how you think the partnership could work..."
+                        placeholder="Tell us what you would like to discuss..."
                       />
                     </label>
 
@@ -441,7 +405,7 @@ export function WorkWithUsPage() {
                         className="mt-1"
                       />
                       <span>
-                        I agree to be contacted by Remote Business Partner about this partnership enquiry.
+                        I agree to be contacted by Remote Business Partner about this discovery call request.
                       </span>
                     </label>
 
@@ -449,11 +413,42 @@ export function WorkWithUsPage() {
                       type="submit"
                       className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-700 px-8 py-4 font-bold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-800"
                     >
-                      Submit Partnership Enquiry <ArrowRight className="h-4 w-4" />
+                      Request Discovery Call <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
                 </form>
               )}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ / reassurance */}
+        <section className="py-16 lg:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <HelpCircle className="mb-4 h-8 w-8 text-blue-700" />
+                <h3 className="font-bold text-slate-900">Is this a sales call?</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  It is a discovery conversation. The aim is to understand fit and recommend the right next step.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <Clock className="mb-4 h-8 w-8 text-blue-700" />
+                <h3 className="font-bold text-slate-900">How long does it take?</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  Discovery calls should be short, focused, and useful. The booking details can be confirmed after review.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <Users className="mb-4 h-8 w-8 text-blue-700" />
+                <h3 className="font-bold text-slate-900">Who will respond?</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  Your request will be reviewed and routed toward the most relevant RBP pathway or contact point.
+                </p>
+              </div>
             </div>
           </div>
         </section>
