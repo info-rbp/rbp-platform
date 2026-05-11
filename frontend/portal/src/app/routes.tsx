@@ -25,6 +25,9 @@ import {
 import { WhatWeDoPage } from "./pages/about/WhatWeDoPage";
 import { OurProcessPage } from "./pages/about/OurProcessPage";
 import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";
+import { WorkForUsPage } from "./pages/about/WorkForUsPage";
+import { DiscoveryCallPage } from "./pages/about/DiscoveryCallPage";
+import { OurPlatformPage } from "./pages/about/OurPlatformPage";
 
 // ── On-Demand pages ───────────────────────────────────────────────────────────
 
@@ -145,6 +148,7 @@ export const router = createBrowserRouter([
       { index: true, Component: HomePage },
       { path: "about", Component: AboutPage },
       { path: "contact", Component: ContactPage },
+      { path: "discovery-call", element: <Navigate to="/about/discovery-call" replace /> },
       { path: "contact/success", Component: ContactSuccessPage },
       { path: "help", Component: HelpCenterPage },
       { path: "sign-in", Component: SignInPage },
@@ -170,6 +174,9 @@ export const router = createBrowserRouter([
       { path: "about/what-we-do", Component: WhatWeDoPage },
       { path: "about/our-process", Component: OurProcessPage },
       { path: "about/process", Component: OurProcessPage },
+      { path: "about/our-platform", Component: OurPlatformPage },
+      { path: "about/discovery-call", Component: DiscoveryCallPage },
+      { path: "about/work-for-us", Component: WorkForUsPage },
       { path: "about/work-with-us", Component: WorkWithUsPage },
 
       // ── Legacy / direct public routes ──────────────────────────────────────
