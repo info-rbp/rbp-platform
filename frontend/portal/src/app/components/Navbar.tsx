@@ -1,114 +1,92 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router";
 import {
-  Menu, X, Briefcase, ChevronDown, Search, LogIn, UserPlus, ArrowRight,
+  Menu,
+  X,
+  Briefcase,
+  ChevronDown,
+  Search,
+  LogIn,
+  UserPlus,
+  ArrowRight,
 } from "lucide-react";
 
 import { publicNavigation as MENUS, type MegaConfig } from "../data/publicNavigation";
 
-// ── Mega menu panel (desktop) ─────────────────────────────────────────────────
+// -- Mega menu panel (desktop) -------------------------------------------------
+
+function normalisePath(href: string) {
+  return href.split("?")[0].split("#")[0];
+}
 
 function MegaMenuPanel({ config, onClose }: { config: MegaConfig; onClose: () => void }) {
-  const cols = Math.min(config.sections.length, 3);
-
   return (
-    <div className="absolute top-full left-0 right-0 z-50">
-      {/* Panel */}
-      <div className="bg-white border-b border-slate-200 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-7">
-          <div className="flex gap-8">
+    <div className="absolute left-0 right-0 top-full z-50 px-4">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-b-3xl border border-slate-200 bg-white shadow-2xl">
+        <div className="grid lg:grid-cols-[300px_1fr]">
+          <aside className="border-b border-slate-200 bg-slate-50 px-8 py-7 lg:border-b-0 lg:border-r">
+            <h2 className="text-2xl font-bold leading-tight tracking-tight text-slate-950">
+              {config.label}
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              {config.description}
+            </p>
+          </aside>
 
-            {/* Left sidebar */}
-            <div className="w-52 flex-shrink-0 space-y-1">
-              {config.overview && (
+          <div className="p-6 lg:p-7">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {config.links.map((link) => (
                 <Link
-                  to={config.overview.href}
+                  key={`${config.key}-${link.href}-${link.label}`}
+                  to={link.href}
                   onClick={onClose}
-                  className="flex items-center justify-between w-full px-4 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-sm font-bold transition-colors mb-3 group"
+                  className="group flex min-h-[64px] items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:shadow-md"
                 >
-                  {config.overview.label}
-                  <ArrowRight className="w-3.5 h-3.5 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+                  <span>
+                    <span className="block text-sm font-bold leading-tight text-slate-900 group-hover:text-blue-700">
+                      {link.label}
+                    </span>
+                    {link.desc && (
+                      <span className="mt-1 block text-xs leading-snug text-slate-500">
+                        {link.desc}
+                      </span>
+                    )}
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-blue-700" />
                 </Link>
-              )}
-
-              <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-1 pt-1 pb-1">
-                Contents
-              </p>
-              {config.sections.map((s) => (
-                <div key={s.heading} className="px-3 py-1.5 text-xs font-semibold text-slate-500 rounded-lg">
-                  {s.heading}
-                </div>
               ))}
             </div>
-
-            {/* Divider */}
-            <div className="w-px bg-slate-100 flex-shrink-0 self-stretch" />
-
-            {/* Right — sections grid */}
-            <div
-              className="flex-1 grid gap-x-8 gap-y-6"
-              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-            >
-              {config.sections.map((section) => (
-                <div key={section.heading}>
-                  <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 px-1">
-                    {section.heading}
-                  </p>
-                  <div className="space-y-0.5">
-                    {section.links.map((link) => (
-                      <Link
-                        key={link.href}
-                        to={link.href}
-                        onClick={onClose}
-                        className="block px-2 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
-                      >
-                        <span className="block text-sm font-semibold text-slate-800 group-hover:text-blue-700 transition-colors leading-snug">
-                          {link.label}
-                        </span>
-                        {link.desc && (
-                          <span className="block text-xs text-slate-400 leading-snug mt-0.5">{link.desc}</span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA strip */}
-          <div className="mt-7 pt-5 border-t border-slate-100 flex items-center justify-between gap-6">
-            <p className="text-sm text-slate-600">{config.cta.text}</p>
-            <Link
-              to={config.cta.href}
-              onClick={onClose}
-              className="flex-shrink-0 inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all"
-            >
-              {config.cta.btnLabel}
-              <ArrowRight className="w-4 h-4" />
-            </Link>
           </div>
         </div>
       </div>
-      {/* Click-outside overlay */}
-      <div className="fixed inset-0 -z-10" onClick={onClose} />
+
+      <button
+        type="button"
+        aria-label="Close menu"
+        className="fixed inset-0 -z-10 cursor-default"
+        onClick={onClose}
+      />
     </div>
   );
 }
 
-// ── Mobile section accordion ──────────────────────────────────────────────────
+// -- Mobile section accordion --------------------------------------------------
 
 function MobileSection({
-  config, isOpen, onToggle, onClose,
+  config,
+  isOpen,
+  onToggle,
+  onClose,
 }: {
-  config: MegaConfig; isOpen: boolean; onToggle: () => void; onClose: () => void;
+  config: MegaConfig;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
 }) {
-  const allLinks = config.sections.flatMap((s) => s.links);
-  const overviewLink = config.overview;
-
   return (
     <div className="border-t border-slate-100">
       <button
+        type="button"
         onClick={onToggle}
         className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
       >
@@ -118,58 +96,35 @@ function MobileSection({
 
       {isOpen && (
         <div className="bg-slate-50 pb-2">
-          {overviewLink && (
+          <p className="px-6 pt-3 pb-2 text-xs leading-5 text-slate-500">
+            {config.description}
+          </p>
+
+          {config.links.map((link) => (
             <Link
-              to={overviewLink.href}
+              key={`${config.key}-${link.href}-${link.label}`}
+              to={link.href}
               onClick={onClose}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-50 transition-colors"
+              className="flex items-center justify-between px-6 py-2.5 text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
             >
-              {overviewLink.label}
-              <ArrowRight className="w-3.5 h-3.5" />
+              {link.label}
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </Link>
-          )}
-          {config.sections.map((section) => (
-            <div key={section.heading}>
-              <p className="px-6 pt-3 pb-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
-                {section.heading}
-              </p>
-              {section.links.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  onClick={onClose}
-                  className="block px-6 py-2 text-sm text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
           ))}
-          {/* CTA */}
-          <div className="mx-5 mt-3 p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3">
-            <p className="text-xs text-slate-500 leading-snug">{config.cta.text}</p>
-            <Link
-              to={config.cta.href}
-              onClick={onClose}
-              className="flex-shrink-0 text-xs font-bold text-blue-700 hover:underline"
-            >
-              {config.cta.btnLabel}
-            </Link>
-          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ── Main Navbar ───────────────────────────────────────────────────────────────
+// -- Main Navbar ---------------------------------------------------------------
 
 export function Navbar() {
-  const [mobileOpen,          setMobileOpen]          = useState(false);
-  const [openDropdown,        setOpenDropdown]        = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openMobileAccordion, setOpenMobileAccordion] = useState<string | null>(null);
-  const [scrolled,            setScrolled]            = useState(false);
-  const [searchOpen,          setSearchOpen]          = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const headerRef = useRef<HTMLElement>(null);
 
@@ -194,7 +149,7 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const activeMenu = MENUS.find((m) => m.key === openDropdown) ?? null;
+  const activeMenu = MENUS.find((menu) => menu.key === openDropdown) ?? null;
 
   function toggleDropdown(key: string) {
     setOpenDropdown((prev) => (prev === key ? null : key));
@@ -212,12 +167,10 @@ export function Navbar() {
         scrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-white"
       }`}
     >
-      {/* ── Tier 1: Utility bar ── */}
+      {/* Tier 1: Utility bar */}
       <div className="border-b border-slate-100 bg-slate-50/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-10">
-
-            {/* Logo */}
             <Link to="/" className="flex items-center gap-2 flex-shrink-0">
               <div className="w-6 h-6 bg-blue-700 rounded-md flex items-center justify-center">
                 <Briefcase className="w-3.5 h-3.5 text-white" />
@@ -228,9 +181,9 @@ export function Navbar() {
               <span className="sm:hidden text-sm font-black text-slate-800">RBP</span>
             </Link>
 
-            {/* Utility right */}
             <div className="flex items-center gap-1">
               <button
+                type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                 aria-label="Search"
@@ -249,8 +202,8 @@ export function Navbar() {
               >
                 <UserPlus className="w-3 h-3" /> Join Now
               </Link>
-              {/* Mobile hamburger */}
               <button
+                type="button"
                 onClick={() => setMobileOpen(!mobileOpen)}
                 className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors ml-1"
                 aria-label="Toggle menu"
@@ -262,7 +215,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ── Search bar (expandable) ── */}
+      {/* Search bar */}
       {searchOpen && (
         <div className="border-b border-slate-100 bg-white px-4 sm:px-6 lg:px-8 py-2">
           <div className="max-w-2xl mx-auto flex items-center gap-3">
@@ -270,33 +223,33 @@ export function Navbar() {
             <input
               autoFocus
               type="text"
-              placeholder="Search services, applications, resources…"
+              placeholder="Search services, applications, resources..."
               className="flex-1 text-sm text-slate-800 placeholder-slate-400 outline-none bg-transparent"
             />
-            <button onClick={() => setSearchOpen(false)} className="text-slate-400 hover:text-slate-700">
+            <button type="button" onClick={() => setSearchOpen(false)} className="text-slate-400 hover:text-slate-700">
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* ── Tier 2: Main nav (desktop) ── */}
+      {/* Tier 2: Main nav (desktop) */}
       <div className="hidden lg:block bg-white border-b border-slate-100 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center justify-center gap-0.5 h-12">
-
-            {/* Mega menu triggers */}
+          <nav className="flex items-center justify-start xl:justify-center gap-0.5 h-12 overflow-x-auto">
             {MENUS.map((menu) => {
-              const isOpen   = openDropdown === menu.key;
-              const isActive = menu.sections.flatMap((s) => s.links).some((l) =>
-                location.pathname.startsWith(l.href.split("?")[0].split("#")[0])
-              ) || (menu.overview && location.pathname.startsWith(menu.overview.href));
+              const isOpen = openDropdown === menu.key;
+              const isActive = menu.links.some((link) => {
+                const path = normalisePath(link.href);
+                return path !== "/" && location.pathname.startsWith(path);
+              });
 
               return (
                 <button
+                  type="button"
                   key={menu.key}
                   onClick={() => toggleDropdown(menu.key)}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                  className={`flex items-center gap-1 px-2.5 py-2 rounded-lg text-[13px] font-semibold transition-all whitespace-nowrap ${
                     isActive || isOpen
                       ? "bg-blue-50 text-blue-700"
                       : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
@@ -310,7 +263,6 @@ export function Navbar() {
           </nav>
         </div>
 
-        {/* Mega menu panel */}
         {activeMenu && (
           <MegaMenuPanel
             config={activeMenu}
@@ -319,11 +271,9 @@ export function Navbar() {
         )}
       </div>
 
-      {/* ── Mobile menu ── */}
+      {/* Mobile menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-slate-100 shadow-xl max-h-[85vh] overflow-y-auto">
-
-          {/* Home */}
           <Link
             to="/"
             onClick={closeMobile}
@@ -334,7 +284,6 @@ export function Navbar() {
             Home
           </Link>
 
-          {/* All mega menus as accordions */}
           {MENUS.map((menu) => (
             <MobileSection
               key={menu.key}
@@ -345,7 +294,6 @@ export function Navbar() {
             />
           ))}
 
-          {/* Mobile utility actions */}
           <div className="border-t border-slate-100 px-4 py-4 space-y-2">
             <Link
               to="/sign-in"
@@ -359,7 +307,7 @@ export function Navbar() {
               onClick={closeMobile}
               className="flex items-center justify-center gap-2 py-3 text-sm font-bold bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition-colors"
             >
-              <UserPlus className="w-4 h-4" /> Join Now — Explore Membership
+              <UserPlus className="w-4 h-4" /> Join Now
             </Link>
           </div>
         </div>
