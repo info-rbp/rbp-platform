@@ -25,7 +25,7 @@ export function CTABanner() {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <Link
-                to="/contact?reason=discovery-call"
+                to="/about/discovery-call"
                 className="inline-flex items-center justify-center gap-2 bg-white hover:bg-blue-50 text-blue-900 px-8 py-3.5 rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-lg"
               >
                 Book Discovery Call

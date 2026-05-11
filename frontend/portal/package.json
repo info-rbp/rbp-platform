@@ -24,7 +24,8 @@
     "audit:backend-collection-contracts": "node scripts/audit-backend-collection-contracts.mjs",
     "audit:backend-resources-help-center": "node scripts/audit-backend-resources-help-center.mjs",
     "audit:firebase-auth-security-plan": "node scripts/audit-firebase-auth-security-plan.mjs",
-    "audit:phase1": "node scripts/phase1-audit.mjs"
+    "audit:phase1": "node scripts/phase1-audit.mjs",
+    "check:about-ux": "node scripts/check-about-area-ux.cjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

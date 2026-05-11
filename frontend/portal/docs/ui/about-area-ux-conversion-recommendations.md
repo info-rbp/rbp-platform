@@ -21,6 +21,12 @@ The goal is to reduce confusion, dead links, vague CTAs, and the classic website
 
 | Page | Route | UX Purpose |
 |---|---|---|
+| About Us | `/about` | Explain who RBP is and guide users to the next step. |
+| Our Platform | `/about/our-platform` | Explain the platform ecosystem. |
+| Discovery Call | `/about/discovery-call` | Capture structured discovery call requests. |
+| Work With Us | `/about/work-with-us` | Capture partnership interest. |
+| Work For Us | `/about/work-for-us` | Capture future employment and contractor interest. |
+| Contact Us | `/contact` | Handle general enquiries and routing. |
 | About Us | `/about` | Establish trust, explain who RBP is, explain what has been built, and guide users to the next step. |
 | Our Platform | `/about/our-platform` | Explain the platform ecosystem and how the major product areas fit together. |
 | Discovery Call | `/about/discovery-call` | Convert interested visitors into structured discovery call requests. |
@@ -37,6 +43,13 @@ The goal is to reduce confusion, dead links, vague CTAs, and the classic website
 | Book Discovery Call | `/about/discovery-call` |
 | Request Discovery Call | `/about/discovery-call` |
 | Explore Our Platform | `/about/our-platform` |
+| Explore Services | `/core-services` |
+| View Membership | `/membership` |
+| Partner With Us | `/about/work-with-us` |
+| Work With Us | `/about/work-with-us` |
+| Work For Us | `/about/work-for-us` |
+| Register Interest | `/about/work-for-us` |
+| Contact Us | `/contact` |
 | Our Platform | `/about/our-platform` |
 | Explore Services | `/core-services` |
 | View Services | `/core-services` |
@@ -173,6 +186,7 @@ Quick-action links:
 3. Work With Us must be partnership-focused.
 4. Work For Us must be employment/future-opportunity-focused.
 5. Contact Us should route general enquiries, not absorb every user intent.
+6. Footer navigation should include the main About-area pathways.
 6. The About Us menu must expose all About-area pages.
 7. Public copy must not mention mock forms, Phase 1, frontend-only behaviour, or missing backend integration.
 8. Mobile navigation must expose the same About-area options as desktop navigation.

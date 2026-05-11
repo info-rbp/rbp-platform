@@ -85,7 +85,7 @@ export function ServicesPage() {
         breadcrumb="Services"
         image={heroImage}
         bullets={["On-demand expert advisory", "Tailored to your budget", "Across 7 service verticals"]}
-        ctaPrimary={{ label: "Book Discovery Call", href: "/contact?reason=discovery-call" }}
+        ctaPrimary={{ label: "Book Discovery Call", href: "/about/discovery-call" }}
         ctaSecondary={{ label: "Explore All Services", href: "/on-demand/services" }}
         stat={{ value: "200+", label: "Businesses Supported", sublabel: "And growing" }}
       />
@@ -129,7 +129,7 @@ export function ServicesPage() {
                 <p className="font-semibold text-blue-700 mb-3 text-sm">{s.desc}</p>
                 <p className="text-slate-600 text-sm leading-relaxed mb-6">{s.details}</p>
                 <Link
-                  to="/contact?reason=discovery-call"
+                  to="/about/discovery-call"
                   className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 px-6 rounded-xl transition-all text-sm"
                 >
                   Enquire Now <ArrowRight className="w-4 h-4" />
