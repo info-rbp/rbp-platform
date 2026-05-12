@@ -1,1 +1,2 @@
 rbp_app.patches.set_rbp_home_page
+rbp_app.patches.milestone6_seed_membership_plans

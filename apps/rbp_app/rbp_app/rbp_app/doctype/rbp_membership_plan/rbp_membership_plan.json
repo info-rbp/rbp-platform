@@ -14,14 +14,17 @@
   "plan_code",
   "plan_name",
   "status",
+  "active",
   "description",
   "billing_cycle",
   "amount",
+  "price",
   "currency",
   "stripe_product_id",
   "stripe_price_id",
   "included_apps",
   "included_capabilities",
+  "included_entitlements",
   "is_public",
   "sort_order",
   "notes"
@@ -77,12 +80,16 @@
   {
    "fieldname": "stripe_product_id",
    "fieldtype": "Data",
-   "label": "Stripe Product ID"
+   "label": "Stripe Product ID",
+   "description": "Stripe product ID, for example prod_xxx.",
+   "in_list_view": 0
   },
   {
    "fieldname": "stripe_price_id",
    "fieldtype": "Data",
-   "label": "Stripe Price ID"
+   "label": "Stripe Price ID",
+   "description": "Stripe price ID, for example price_xxx. Required before checkout can start.",
+   "in_list_view": 1
   },
   {
    "fieldname": "included_apps",
@@ -111,6 +118,27 @@
    "fieldname": "notes",
    "fieldtype": "Small Text",
    "label": "Notes"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "label": "Price",
+   "description": "Canonical price used by frontend/API. Kept in sync with legacy Amount where applicable.",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "active",
+   "fieldtype": "Check",
+   "label": "Active",
+   "default": "1",
+   "description": "Canonical active flag used by launch APIs.",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "included_entitlements",
+   "fieldtype": "Small Text",
+   "label": "Included Entitlements",
+   "description": "JSON array or newline-separated entitlement keys granted by this membership plan."
   }
  ],
  "has_web_view": 0,
@@ -121,7 +149,7 @@
  "is_submittable": 0,
  "issingle": 0,
  "istable": 0,
- "modified": "2026-05-07 00:00:00.000000",
+ "modified": "2026-05-12 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "RBP App",
  "name": "RBP Membership Plan",
