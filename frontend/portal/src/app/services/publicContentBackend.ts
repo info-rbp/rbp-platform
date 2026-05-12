@@ -76,7 +76,7 @@ function sortBySortOrderThenTitle<T extends { title?: string; question?: string 
   });
 }
 
-export async function listResourceRecords() {
+export async function listResourceRecords(_options?: { publicOnly?: boolean }) {
   return sortBySortOrderThenTitle(
     publicResources.map((resource, index) => ({
       ...resource,
@@ -87,7 +87,7 @@ export async function listResourceRecords() {
   );
 }
 
-export async function listHelpArticleRecords() {
+export async function listHelpArticleRecords(_options?: { publicOnly?: boolean }) {
   return sortBySortOrderThenTitle(
     helpArticles.map((article, index) => ({
       ...article,
