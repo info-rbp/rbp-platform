@@ -3,8 +3,23 @@ import os
 import unittest
 
 
-ROOT = Path(__file__).resolve().parents[3]
-SCRIPT = ROOT / "scripts" / "confirm_backend_baseline.sh"
+def find_backend_baseline_script():
+    """Locate the backend baseline script from either repo-root or app-root layout."""
+
+    current = Path(__file__).resolve()
+
+    for parent in current.parents:
+        candidate = parent / "scripts" / "confirm_backend_baseline.sh"
+        if candidate.exists():
+            return candidate
+
+    raise AssertionError(
+        "Could not find scripts/confirm_backend_baseline.sh from test path "
+        f"{current}"
+    )
+
+
+SCRIPT = find_backend_baseline_script()
 
 
 class BackendBaselineScriptTest(unittest.TestCase):
