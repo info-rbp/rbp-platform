@@ -12,6 +12,10 @@ from frappe.utils import get_url
 from rbp_app.permissions import require_login
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.tenancy import get_current_tenant_name
+from rbp_app.services.environment import (
+    get_stripe_mode as runtime_get_stripe_mode,
+    is_stripe_enabled as runtime_is_stripe_enabled,
+)
 
 
 STRIPE_API_VERSION = "2026-02-25.clover"
@@ -60,14 +64,14 @@ def _as_bool(value: Any, default: bool = False) -> bool:
 
 
 def get_stripe_mode() -> str:
-    mode = str(_conf_value("RBP_STRIPE_MODE", "rbp_stripe_mode", default="test")).strip().lower()
+    mode = runtime_get_stripe_mode()
     if mode not in {"test", "live"}:
         raise frappe.ValidationError("RBP_STRIPE_MODE must be test or live.")
     return mode
 
 
 def is_stripe_enabled() -> bool:
-    return _as_bool(_conf_value("RBP_ENABLE_STRIPE", "rbp_enable_stripe", default=True), default=True)
+    return runtime_is_stripe_enabled()
 
 
 def get_stripe_secret_key() -> str:

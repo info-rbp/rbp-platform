@@ -13,6 +13,10 @@ from rbp_app.permissions import require_login
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.notifications import create_notification
 from rbp_app.services.tenancy import get_current_tenant_name
+from rbp_app.services.environment import (
+    is_application_interest_enabled as runtime_is_application_interest_enabled,
+    is_application_provisioning_enabled as runtime_is_application_provisioning_enabled,
+)
 
 
 APPLICATION_STATUSES = {
@@ -190,13 +194,9 @@ def normalize_key(value: str) -> str:
 
 
 def is_application_provisioning_enabled() -> bool:
-    """Return the server-side provisioning flag.
+    """Return the centralized server-side provisioning flag."""
 
-    This milestone intentionally keeps customer provisioning disabled. A future
-    feature-flag layer can replace this implementation without changing callers.
-    """
-
-    return False
+    return runtime_is_application_provisioning_enabled()
 
 
 def get_current_user() -> str:
@@ -504,6 +504,8 @@ def list_portal_applications(filters=None):
 
 def _assert_interest_allowed(application, source_channel: str) -> None:
     admin_source = source_channel in {"admin", "import"} and is_admin_user()
+    if not runtime_is_application_interest_enabled() and not admin_source:
+        frappe.throw("Application interest registration is disabled.", frappe.PermissionError)
     if getattr(application, "archived", 0):
         frappe.throw("Interest is not available for archived applications.", frappe.PermissionError)
     if getattr(application, "status", None) == "disabled":

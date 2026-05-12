@@ -1,0 +1,65 @@
+name: Backend Baseline
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_bench_baseline:
+        description: Run bench-dependent validation when a bench/site is available
+        required: false
+        default: "false"
+
+jobs:
+  backend-static-baseline:
+    name: Backend static baseline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Compile rbp_app backend
+        run: |
+          python -m compileall -q rbp_app/rbp_app
+
+      - name: Verify generated artifacts are not visible to git
+        run: |
+          status="$(git status --short --untracked-files=all)"
+          printf '%s\n' "$status"
+          printf '%s\n' "$status" | grep -E '(__pycache__/|\.pyc$|\.pytest_cache/|\.coverage$|htmlcov/|node_modules/|(^|/)dist/|(^|/)build/|start/sites/.*/private/backups/|start/sites/.*/logs/|start/logs/|\.log$)' && {
+            echo "Generated artifacts are visible in git status."
+            exit 1
+          } || true
+
+  backend-bench-baseline:
+    name: Backend bench baseline
+    runs-on: ubuntu-latest
+    needs: backend-static-baseline
+    env:
+      RBP_BENCH_ROOT: start
+      RBP_BASELINE_SITE: rbp-minimal.localhost
+      RBP_APP_NAME: rbp_app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Run or explicitly skip bench baseline
+        env:
+          RUN_BENCH_BASELINE: ${{ github.event.inputs.run_bench_baseline || 'false' }}
+        run: |
+          if [ ! -d "$RBP_BENCH_ROOT/sites/$RBP_BASELINE_SITE" ] && [ "$RUN_BENCH_BASELINE" != "true" ]; then
+            echo "Skipping bench-dependent baseline: $RBP_BENCH_ROOT/sites/$RBP_BASELINE_SITE is not available in this CI environment."
+            exit 0
+          fi
+          scripts/confirm_backend_baseline.sh
