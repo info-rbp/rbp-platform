@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link, useSearchParams } from "react-router";
 import { Briefcase, Eye, EyeOff, AlertCircle, Lock, Mail } from "lucide-react";
-import { mockAdminAuthService } from "../../services/mock/auth.mockService";
+import { getSafeReturnTo, mockAdminAuthService } from "../../services/mock/auth.mockService";
 
 export function AdminSignInPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo"), "/admin/dashboard");
 
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
@@ -20,9 +22,9 @@ export function AdminSignInPage() {
     const response = await mockAdminAuthService.signIn({ email, password });
 
     if (response.ok) {
-      navigate("/admin/dashboard");
+      navigate(returnTo, { replace: true });
     } else {
-      setError("Invalid credentials. Please check your email and password.");
+      setError(response.message);
       setLoading(false);
     }
   }
@@ -46,7 +48,10 @@ export function AdminSignInPage() {
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
 
           <h1 className="text-white font-extrabold text-base mb-1">Administrator Sign In</h1>
-          <p className="text-slate-400 text-xs mb-6">Restricted access — authorised personnel only.</p>
+          <p className="text-slate-400 text-xs mb-2">Restricted access — authorised personnel only.</p>
+          <p className="text-slate-500 text-xs leading-5 mb-6">
+            Frontend mock admin sign-in is active for QA until Frappe authentication is connected.
+          </p>
 
           {error && (
             <div className="flex items-start gap-2 bg-red-950/60 border border-red-800/60 text-red-400 text-xs px-3 py-2.5 rounded-xl mb-4">
@@ -107,10 +112,10 @@ export function AdminSignInPage() {
             </button>
           </form>
 
-          {/* Test credentials hint */}
+          {/* Development auth hint */}
           <div className="mt-5 pt-4 border-t border-slate-800">
             <p className="text-[10px] text-slate-600 text-center">
-              Test credentials: <span className="text-slate-500 font-mono">admin@remotebusinesspartner.com.au</span> / <span className="text-slate-500 font-mono">Admin2024!</span>
+              Development bridge: any non-empty email and password creates a mock RBP Admin session.
             </p>
           </div>
         </div>

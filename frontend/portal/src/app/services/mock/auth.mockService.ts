@@ -5,6 +5,12 @@ import type {
   PortalAdminAuthUser,
   PortalCustomerAuthUser,
 } from "../../types/portal";
+import {
+  clearAuthSession,
+  getAuthSession,
+  isAdminUser,
+  setMockAuthSession,
+} from "../../auth/authSession";
 import { mockFailure, mockSuccess } from "./mockClient";
 
 const CUSTOMER_AUTH_KEY = "rbp_customer_auth";
@@ -83,6 +89,16 @@ export function createAuthHref(returnTo: string, path = "/signin") {
 
 export const mockAuthService: AuthService = {
   getCurrentUser() {
+    const session = getAuthSession();
+
+    if (session && !isAdminUser(session)) {
+      return {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+      };
+    }
+
     return readJson<PortalCustomerAuthUser>(CUSTOMER_AUTH_KEY);
   },
 
@@ -113,6 +129,10 @@ export const mockAuthService: AuthService = {
     };
 
     writeJson(CUSTOMER_AUTH_KEY, user);
+    setMockAuthSession({
+      user,
+      roles: ["Website User", "RBP Member", "RBP Business Owner"],
+    });
     return mockSuccess("/mock/auth/signin", user, "Mock customer signed in.");
   },
 
@@ -132,21 +152,37 @@ export const mockAuthService: AuthService = {
     };
 
     writeJson(CUSTOMER_AUTH_KEY, user);
+    setMockAuthSession({
+      user,
+      roles: ["Website User", "RBP Member", "RBP Business Owner"],
+    });
     return mockSuccess("/mock/auth/signup", user, "Mock customer account created.");
   },
 
   async signOut() {
+    clearAuthSession();
     window.localStorage.removeItem(CUSTOMER_AUTH_KEY);
     return mockSuccess("/mock/auth/signout", { signedOut: true }, "Mock customer signed out.");
   },
 
   isAuthenticated() {
-    return Boolean(this.getCurrentUser());
+    return Boolean(getAuthSession() ?? this.getCurrentUser());
   },
 };
 
 export const mockAdminAuthService: AdminAuthService = {
   getCurrentAdmin() {
+    const session = getAuthSession();
+
+    if (session && isAdminUser(session)) {
+      return {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        role: "admin",
+      };
+    }
+
     if (window.localStorage.getItem(LEGACY_ADMIN_AUTH_KEY) === "true") {
       return DEMO_ADMIN;
     }
@@ -155,21 +191,36 @@ export const mockAdminAuthService: AdminAuthService = {
   },
 
   async signIn(payload) {
-    if (
-      payload.email.trim().toLowerCase() !== DEMO_ADMIN.email ||
-      payload.password !== "Admin2024!"
-    ) {
-      return mockFailure("/mock/admin/signin", "Invalid admin credentials.", [
-        { field: "email", code: "invalid", message: "Admin credentials do not match." },
+    const email = payload.email.trim().toLowerCase();
+
+    if (!email || !payload.password) {
+      return mockFailure("/mock/admin/signin", "Email and password are required.", [
+        { field: "email", code: "required", message: "Email is required." },
+        { field: "password", code: "required", message: "Password is required." },
       ]);
     }
 
-    writeJson(ADMIN_AUTH_KEY, DEMO_ADMIN);
+    const admin = {
+      ...DEMO_ADMIN,
+      email,
+      name: email === DEMO_ADMIN.email ? DEMO_ADMIN.name : "RBP Mock Administrator",
+    };
+
+    writeJson(ADMIN_AUTH_KEY, admin);
     window.localStorage.setItem(LEGACY_ADMIN_AUTH_KEY, "true");
-    return mockSuccess("/mock/admin/signin", DEMO_ADMIN, "Mock admin signed in.");
+    setMockAuthSession({
+      user: {
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+      },
+      roles: ["RBP Admin"],
+    });
+    return mockSuccess("/mock/admin/signin", admin, "Mock admin signed in.");
   },
 
   async signOut() {
+    clearAuthSession();
     window.localStorage.removeItem(ADMIN_AUTH_KEY);
     window.localStorage.removeItem(LEGACY_ADMIN_AUTH_KEY);
     return mockSuccess("/mock/admin/signout", { signedOut: true }, "Mock admin signed out.");

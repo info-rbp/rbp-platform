@@ -30,6 +30,7 @@ import {
   premiumMembershipPlan,
   premiumMembershipRoutes,
 } from "../../data/premiumMembership";
+import { isMockMembershipConfirmationEnabled } from "../../config/runtime";
 import {
   mockMembershipExtras,
   mockMembershipGoalOptions,
@@ -44,6 +45,7 @@ import {
   type MockMembershipOnboardingResult,
   type MockMembershipSignupResult,
 } from "../../services/mock/membership.mockService";
+import { membershipFlowStorageKey } from "../../services/membershipConfirmationService";
 
 type PaymentState = "idle" | "pending" | "simulated-success" | "simulated-failed";
 type SubmissionState = "idle" | "loading" | "success" | "error";
@@ -71,8 +73,6 @@ interface MembershipFlowForm {
   goals: string[];
   managedServiceInterests: string[];
 }
-
-export const membershipFlowStorageKey = "rbp.mockMembershipPurchaseOnboarding";
 
 const flowSteps: StepperStep[] = [
   { id: "plan", label: "Plan", description: "Confirm membership" },
@@ -139,7 +139,12 @@ const inclusionConfirmationGroups = [
 ] as const;
 
 function writeMembershipSession(payload: Record<string, unknown>) {
+  if (!isMockMembershipConfirmationEnabled()) {
+    return false;
+  }
+
   window.sessionStorage.setItem(membershipFlowStorageKey, JSON.stringify(payload));
+  return true;
 }
 
 function currencyLine(plan?: MockMembershipPlan) {
@@ -178,6 +183,7 @@ export function MembershipPurchaseOnboardingFlow() {
   const [signupResult, setSignupResult] = useState<MockMembershipSignupResult | null>(null);
   const [onboardingResult, setOnboardingResult] =
     useState<MockMembershipOnboardingResult | null>(null);
+  const mockConfirmationEnabled = isMockMembershipConfirmationEnabled();
 
   useEffect(() => {
     let mounted = true;
@@ -730,9 +736,13 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "success" && signupResult ? (
           <ConfirmationPanel
-            title="RBP Premium Membership Preview Confirmed"
-            statusLabel="Payment preview complete"
-            message="Your premium membership preview has been completed. Continue to onboarding or review your confirmation details."
+            title="RBP Premium Membership Development Preview Confirmed"
+            statusLabel="Development preview only"
+            message={
+              mockConfirmationEnabled
+                ? "Your premium membership development preview has been completed. No real payment, membership, account, or portal access has been created."
+                : "Backend integration is required before this flow can issue a real membership confirmation."
+            }
             reference={signupResult.reference}
             primaryAction={
               <button
@@ -744,12 +754,21 @@ export function MembershipPurchaseOnboardingFlow() {
               </button>
             }
             secondaryAction={
-              <Link
-                to="/membership/confirmation"
-                className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
-              >
-                View confirmation
-              </Link>
+              mockConfirmationEnabled ? (
+                <Link
+                  to="/membership/confirmation"
+                  className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
+                >
+                  View development confirmation
+                </Link>
+              ) : (
+                <Link
+                  to="/membership/overview"
+                  className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700"
+                >
+                  Return to membership
+                </Link>
+              )
             }
           />
         ) : null}
@@ -942,25 +961,47 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "complete" && onboardingResult ? (
           <ConfirmationPanel
-            title="Membership onboarding preview complete"
-            statusLabel="Portal handoff ready"
-            message="Your RBP Premium Membership preview and onboarding details have been completed. Continue to the member portal dashboard."
+            title="Membership onboarding development preview complete"
+            statusLabel="Development preview only"
+            message={
+              mockConfirmationEnabled
+                ? "Your RBP Premium Membership development preview and onboarding details have been completed. No real account or portal access has been created."
+                : "Backend integration is required before onboarding can create a real member account or portal handoff."
+            }
             reference={onboardingResult.reference}
             primaryAction={
-              <Link
-                to={onboardingResult.portalHref}
-                className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white"
-              >
-                Go to portal dashboard
-              </Link>
+              mockConfirmationEnabled ? (
+                <Link
+                  to={onboardingResult.portalHref}
+                  className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white"
+                >
+                  Open development portal preview
+                </Link>
+              ) : (
+                <Link
+                  to="/membership/overview"
+                  className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white"
+                >
+                  Return to membership
+                </Link>
+              )
             }
             secondaryAction={
-              <Link
-                to="/membership/confirmation"
-                className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
-              >
-                View confirmation
-              </Link>
+              mockConfirmationEnabled ? (
+                <Link
+                  to="/membership/confirmation"
+                  className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700"
+                >
+                  View development confirmation
+                </Link>
+              ) : (
+                <Link
+                  to="/contact"
+                  className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700"
+                >
+                  Contact support
+                </Link>
+              )
             }
           />
         ) : null}

@@ -1,11 +1,9 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router";
 
 import { ScrollToHash } from "./components/ScrollToHash";
-import {
-  RequireAccountGate,
-  RequireAdminAuth,
-  RequireCustomerAuth,
-} from "./components/auth/AccountGate";
+import { RequireAccountGate } from "./components/auth/AccountGate";
+import { RequireAdmin } from "./auth/RequireAdmin";
+import { RequireAuth } from "./auth/RequireAuth";
 import type { PortalProductKey } from "./types/portal";
 
 // ── Core public pages ─────────────────────────────────────────────────────────
@@ -188,7 +186,7 @@ export const router = createBrowserRouter([
       { path: "discovery-call", element: <Navigate to="/about/discovery-call" replace /> },
       { path: "contact/success", Component: ContactSuccessPage },
       { path: "help", Component: HelpCenterPage },
-      { path: "sign-in", element: <Navigate to="/signin" replace /> },
+      { path: "sign-in", Component: SignInPage },
       { path: "signin", Component: SignInPage },
       { path: "signup", Component: SignupPage },
       { path: "signout", Component: SignOutPage },
@@ -468,39 +466,40 @@ export const router = createBrowserRouter([
       // ── Member Portal ──────────────────────────────────────────────────────
 
       {
-        path: "portal",
-        element: (
-          <RequireCustomerAuth>
-            <PortalLayout />
-          </RequireCustomerAuth>
-        ),
+        element: <RequireAuth />,
         children: [
-          { index: true, element: <Navigate to="/portal/dashboard" replace /> },
-          { path: "dashboard", Component: PortalDashboard },
           {
-            path: "services",
-            Component: Layout,
+            path: "portal",
+            Component: PortalLayout,
             children: [
-              { index: true, Component: PortalServices },
-              { path: "request", Component: PortalServiceRequest },
-              { path: "decision-desk/start", Component: PortalDecisionDeskStart },
-              { path: "docushare/start", Component: PortalDocuShareStart },
-              { path: "nbn/start", Component: PortalNbnStart },
-              { path: "risk-advisor/start", Component: PortalRiskAdvisorStart },
-              { path: "the-fixer/start", Component: PortalTheFixerStart },
-              { path: ":id", Component: PortalServiceDetail },
+              { index: true, element: <Navigate to="/portal/dashboard" replace /> },
+              { path: "dashboard", Component: PortalDashboard },
+              {
+                path: "services",
+                Component: Layout,
+                children: [
+                  { index: true, Component: PortalServices },
+                  { path: "request", Component: PortalServiceRequest },
+                  { path: "decision-desk/start", Component: PortalDecisionDeskStart },
+                  { path: "docushare/start", Component: PortalDocuShareStart },
+                  { path: "nbn/start", Component: PortalNbnStart },
+                  { path: "risk-advisor/start", Component: PortalRiskAdvisorStart },
+                  { path: "the-fixer/start", Component: PortalTheFixerStart },
+                  { path: ":id", Component: PortalServiceDetail },
+                ],
+              },
+              { path: "marketplace/listings/new", Component: PortalMarketplaceListingNew },
+              { path: "marketplace/offers/new", Component: PortalMarketplaceOfferNew },
+              { path: "membership/checkout", Component: PortalMembershipCheckout },
+              { path: "sessions", Component: PortalSessions },
+              { path: "documents", Component: PortalDocuments },
+              { path: "offers", Component: PortalOffers },
+              { path: "apps", Component: PortalApps },
+              { path: "resources", Component: PortalResources },
+              { path: "support", Component: PortalSupport },
+              { path: "settings", Component: PortalSettings },
             ],
           },
-          { path: "marketplace/listings/new", Component: PortalMarketplaceListingNew },
-          { path: "marketplace/offers/new", Component: PortalMarketplaceOfferNew },
-          { path: "membership/checkout", Component: PortalMembershipCheckout },
-          { path: "sessions", Component: PortalSessions },
-          { path: "documents", Component: PortalDocuments },
-          { path: "offers", Component: PortalOffers },
-          { path: "apps", Component: PortalApps },
-          { path: "resources", Component: PortalResources },
-          { path: "support", Component: PortalSupport },
-          { path: "settings", Component: PortalSettings },
         ],
       },
 
@@ -511,65 +510,67 @@ export const router = createBrowserRouter([
         children: [
           { path: "signin", Component: AdminSignInPage },
           {
-            element: (
-              <RequireAdminAuth>
-                <AdminLayout />
-              </RequireAdminAuth>
-            ),
+            element: <RequireAdmin />,
             children: [
-              { path: "dashboard", Component: AdminDashboard },
+              {
+                Component: AdminLayout,
+                children: [
+                  { index: true, element: <Navigate to="/admin/dashboard" replace /> },
+                  { path: "dashboard", Component: AdminDashboard },
 
-              // Admin dashboard utility routes.
-              { path: "content", Component: AdminCrudPage },
-              { path: "requests", Component: AdminCrudPage },
-              { path: "requests/decision-desk", Component: AdminCrudPage },
-              { path: "requests/docushare", Component: AdminCrudPage },
-              { path: "requests/connectivity", Component: AdminCrudPage },
-              { path: "requests/risk-advisor", Component: AdminCrudPage },
-              { path: "requests/fixer", Component: AdminCrudPage },
-              { path: "decision-desk", Component: AdminCrudPage },
-              { path: "docushare", Component: AdminCrudPage },
-              { path: "connectivity", Component: AdminCrudPage },
-              { path: "risk-advisor", Component: AdminCrudPage },
-              { path: "users", Component: AdminCrudPage },
-              { path: "audit-review", Component: AdminCrudPage },
-              { path: "tasks", Component: AdminCrudPage },
-              { path: "discovery-calls", Component: AdminCrudPage },
-              { path: "other", Component: AdminCrudPage },
+                  // Admin dashboard utility routes.
+                  { path: "content", Component: AdminCrudPage },
+                  { path: "requests", Component: AdminCrudPage },
+                  { path: "requests/decision-desk", Component: AdminCrudPage },
+                  { path: "requests/docushare", Component: AdminCrudPage },
+                  { path: "requests/connectivity", Component: AdminCrudPage },
+                  { path: "requests/risk-advisor", Component: AdminCrudPage },
+                  { path: "requests/fixer", Component: AdminCrudPage },
+                  { path: "decision-desk", Component: AdminCrudPage },
+                  { path: "docushare", Component: AdminCrudPage },
+                  { path: "connectivity", Component: AdminCrudPage },
+                  { path: "risk-advisor", Component: AdminCrudPage },
+                  { path: "users", Component: AdminCrudPage },
+                  { path: "audit-review", Component: AdminCrudPage },
+                  { path: "tasks", Component: AdminCrudPage },
+                  { path: "discovery-calls", Component: AdminCrudPage },
+                  { path: "other", Component: AdminCrudPage },
 
-              // Top-level legacy/admin shortcuts.
-              { path: "members", Component: AdminCrudPage },
-              { path: "services", Component: AdminCrudPage },
-              { path: "sessions", Component: AdminCrudPage },
-              { path: "documents", Component: AdminCrudPage },
-              { path: "the-fixer", Component: AdminCrudPage },
+                  // Top-level legacy/admin shortcuts.
+                  { path: "members", Component: AdminCrudPage },
+                  { path: "services", Component: AdminCrudPage },
+                  { path: "sessions", Component: AdminCrudPage },
+                  { path: "documents", Component: AdminCrudPage },
+                  { path: "the-fixer", Component: AdminCrudPage },
 
-              // Admin CRUD scaffold sections.
-              { path: "on-demand", Component: AdminCrudPage },
-              { path: "on-demand/*", Component: AdminCrudPage },
-              { path: "managed-services", Component: AdminCrudPage },
-              { path: "managed-services/*", Component: AdminCrudPage },
-              { path: "applications", Component: AdminCrudPage },
-              { path: "applications/*", Component: AdminCrudPage },
-              { path: "operations", Component: AdminCrudPage },
-              { path: "operations/*", Component: AdminCrudPage },
-              { path: "marketplace", Component: AdminCrudPage },
-              { path: "marketplace/*", Component: AdminCrudPage },
-              { path: "membership", Component: AdminCrudPage },
-              { path: "membership/*", Component: AdminCrudPage },
-              { path: "offers", Component: AdminCrudPage },
-              { path: "offers/*", Component: AdminCrudPage },
-              { path: "resources", Component: AdminCrudPage },
-              { path: "resources/*", Component: AdminCrudPage },
-              { path: "help-center", Component: AdminCrudPage },
-              { path: "help-center/*", Component: AdminCrudPage },
-              { path: "site-content", Component: AdminCrudPage },
-              { path: "site-content/*", Component: AdminCrudPage },
-              { path: "settings", Component: AdminCrudPage },
-              { path: "settings/*", Component: AdminCrudPage },
+                  // Admin CRUD scaffold sections.
+                  { path: "on-demand", Component: AdminCrudPage },
+                  { path: "on-demand/*", Component: AdminCrudPage },
+                  { path: "managed-services", Component: AdminCrudPage },
+                  { path: "managed-services/*", Component: AdminCrudPage },
+                  { path: "applications", Component: AdminCrudPage },
+                  { path: "applications/*", Component: AdminCrudPage },
+                  { path: "operations", Component: AdminCrudPage },
+                  { path: "operations/*", Component: AdminCrudPage },
+                  { path: "marketplace", Component: AdminCrudPage },
+                  { path: "marketplace/*", Component: AdminCrudPage },
+                  { path: "membership", Component: AdminCrudPage },
+                  { path: "membership/*", Component: AdminCrudPage },
+                  { path: "offers", Component: AdminCrudPage },
+                  { path: "offers/*", Component: AdminCrudPage },
+                  { path: "resources", Component: AdminCrudPage },
+                  { path: "resources/*", Component: AdminCrudPage },
+                  { path: "help-center", Component: AdminCrudPage },
+                  { path: "help-center/*", Component: AdminCrudPage },
+                  { path: "site-content", Component: AdminCrudPage },
+                  { path: "site-content/*", Component: AdminCrudPage },
+                  { path: "settings", Component: AdminCrudPage },
+                  { path: "settings/*", Component: AdminCrudPage },
 
-              // Admin fallback.
-              { path: "*", Component: AdminCrudPage },
+                  // Admin fallback.
+                  { path: "*", Component: AdminCrudPage },
+                ],
+              },
             ],
           },
         ],

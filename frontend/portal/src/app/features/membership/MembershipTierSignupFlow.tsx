@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router";
 
 import { ConfirmationPanel, StepNavigation, WizardShell, type StepperStep } from "../../components/flow";
 import { StatusBadge } from "../../components/status";
+import { isMockMembershipConfirmationEnabled } from "../../config/runtime";
 import { membershipTierByCode, type MembershipTierCode } from "../../data/membershipTiers";
 import {
   mockMembershipExtras,
@@ -18,8 +19,7 @@ import {
   type MockMembershipOnboardingResult,
   type MockMembershipSignupResult,
 } from "../../services/mock/membership.mockService";
-
-const membershipFlowStorageKey = "rbp.mockMembershipPurchaseOnboarding";
+import { membershipFlowStorageKey } from "../../services/membershipConfirmationService";
 
 type PaymentState = "idle" | "pending" | "simulated-success" | "simulated-failed";
 type SubmissionState = "idle" | "loading" | "success" | "error";
@@ -51,7 +51,7 @@ const steps: StepperStep[] = [
   { id: "extras", label: "Extras", description: "Optional extras" },
   { id: "payment", label: "Activation", description: "Payment or activation" },
   { id: "review", label: "Review", description: "Confirm details" },
-  { id: "success", label: "Success", description: "Membership active" },
+  { id: "success", label: "Success", description: "Preview saved" },
   { id: "business", label: "Business", description: "Business profile" },
   { id: "goals", label: "Goals", description: "Priorities" },
   { id: "services", label: "Services", description: "Interests" },
@@ -92,7 +92,12 @@ function paymentLabel(tier: MembershipTierCode, paymentState: PaymentState) {
 }
 
 function writeMembershipSession(payload: Record<string, unknown>) {
+  if (!isMockMembershipConfirmationEnabled()) {
+    return false;
+  }
+
   window.sessionStorage.setItem(membershipFlowStorageKey, JSON.stringify(payload));
+  return true;
 }
 
 export function MembershipTierSignupFlow() {
@@ -109,6 +114,7 @@ export function MembershipTierSignupFlow() {
   const [onboardingState, setOnboardingState] = useState<SubmissionState>("idle");
   const [signupResult, setSignupResult] = useState<MockMembershipSignupResult | null>(null);
   const [onboardingResult, setOnboardingResult] = useState<MockMembershipOnboardingResult | null>(null);
+  const mockConfirmationEnabled = isMockMembershipConfirmationEnabled();
 
   useEffect(() => {
     let mounted = true;
@@ -141,7 +147,14 @@ export function MembershipTierSignupFlow() {
       ["Membership", selectedPlan?.name ?? selectedTier.name],
       ["Price", selectedPlan?.price.label ?? selectedTier.priceLabel],
       ["Payment", paymentLabel(selectedTierCode, paymentState)],
-      ["Status", onboardingResult ? "Onboarding complete" : signupResult ? "Membership active" : "Draft"],
+      [
+        "Status",
+        onboardingResult
+          ? "Development onboarding preview complete"
+          : signupResult
+            ? "Development membership preview saved"
+            : "Draft",
+      ],
     ],
     [onboardingResult, paymentState, selectedPlan, selectedTier.name, selectedTier.priceLabel, selectedTierCode, signupResult]
   );
@@ -292,7 +305,7 @@ export function MembershipTierSignupFlow() {
               </div>
             ))}
           </dl>
-          <StatusBadge status={signupResult ? "active" : "draft"} label={signupResult ? "Membership active" : "Draft"} />
+          <StatusBadge status={signupResult ? "active" : "draft"} label={signupResult ? "Development membership preview saved" : "Draft"} />
         </div>
       }
     >
@@ -398,7 +411,32 @@ export function MembershipTierSignupFlow() {
         )}
 
         {currentStep.id === "success" && signupResult && (
-          <ConfirmationPanel title={isFree ? "RBP Free Membership Activated" : "RBP Premium Membership Preview Confirmed"} statusLabel={isFree ? "No payment required" : "Payment preview complete"} message={isFree ? "Your Free Membership preview has been activated. You can now continue onboarding, purchase products and services online, and manage your basic member profile." : "Your Premium Membership preview has been completed. Continue to onboarding or review your confirmation details."} reference={signupResult.reference} primaryAction={<button type="button" onClick={goNext} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">Continue to onboarding</button>} secondaryAction={<Link to="/membership/confirmation" className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700">View confirmation</Link>} />
+          <ConfirmationPanel
+            title={isFree ? "RBP Free Membership Development Preview Saved" : "RBP Premium Membership Development Preview Confirmed"}
+            statusLabel="Development preview only"
+            message={
+              mockConfirmationEnabled
+                ? "This is a development-only membership preview. No real membership, payment, account, or portal access has been created."
+                : "Backend integration is required before this flow can issue a real membership confirmation."
+            }
+            reference={signupResult.reference}
+            primaryAction={
+              <button type="button" onClick={goNext} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">
+                Continue to onboarding
+              </button>
+            }
+            secondaryAction={
+              mockConfirmationEnabled ? (
+                <Link to="/membership/confirmation" className="rounded-xl border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700">
+                  View development confirmation
+                </Link>
+              ) : (
+                <Link to="/membership/overview" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700">
+                  Return to membership
+                </Link>
+              )
+            }
+          />
         )}
 
         {currentStep.id === "business" && (
@@ -418,7 +456,36 @@ export function MembershipTierSignupFlow() {
         )}
 
         {currentStep.id === "complete" && onboardingResult && (
-          <ConfirmationPanel title="Membership onboarding complete" statusLabel="Portal handoff ready" message={returnTo ? "Your membership is active. Continue your purchase or open the portal dashboard." : "Your membership onboarding preview is complete. Your portal dashboard is ready."} reference={onboardingResult.reference} primaryAction={<Link to={returnTo || "/portal/dashboard"} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">{returnTo ? "Continue Purchase" : "Go to portal dashboard"}</Link>} secondaryAction={<Link to="/marketplace" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">Browse Marketplace</Link>} />
+          <ConfirmationPanel
+            title="Membership onboarding development preview complete"
+            statusLabel="Development preview only"
+            message={
+              mockConfirmationEnabled
+                ? "This onboarding handoff is a development-only preview. No real account or portal access has been created."
+                : "Backend integration is required before onboarding can create a real member account or portal handoff."
+            }
+            reference={onboardingResult.reference}
+            primaryAction={
+              returnTo ? (
+                <Link to={returnTo} className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">
+                  Continue purchase path
+                </Link>
+              ) : mockConfirmationEnabled ? (
+                <Link to="/portal/dashboard" className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">
+                  Open development portal preview
+                </Link>
+              ) : (
+                <Link to="/membership/overview" className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white">
+                  Return to membership
+                </Link>
+              )
+            }
+            secondaryAction={
+              <Link to="/marketplace" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700">
+                Browse Marketplace
+              </Link>
+            }
+          />
         )}
 
         {!['review','success','team','complete'].includes(currentStep.id) && <StepNavigation canGoBack={stepIndex > 0} canContinue onBack={goBack} onContinue={goNext} continueLabel="Continue" />}

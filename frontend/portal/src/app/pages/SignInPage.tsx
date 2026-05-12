@@ -192,6 +192,9 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                   <p className="text-slate-500 text-sm">
                     Sign in to your RBP account to continue{pendingIntent ? `: ${pendingIntent.label}` : "."}
                   </p>
+                  <p className="mt-2 text-xs leading-5 text-slate-400">
+                    Frontend mock sign-in is active for QA until Frappe authentication is connected.
+                  </p>
                 </div>
 
                 {/* Social logins */}
@@ -318,6 +321,9 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                 <div className="mb-6">
                   <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Create your account</h2>
                   <p className="text-slate-500 text-sm">Join thousands of Australian small businesses supported by RBP.</p>
+                  <p className="mt-2 text-xs leading-5 text-slate-400">
+                    This creates a mock member session for frontend QA only.
+                  </p>
                 </div>
 
                 {/* Social logins */}

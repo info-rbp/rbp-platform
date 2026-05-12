@@ -173,13 +173,6 @@ export function AdminLayout() {
     return active ? new Set([active]) : new Set(["admin-dashboard"]);
   });
 
-  // Auth guard
-  useEffect(() => {
-    if (localStorage.getItem("rbp_admin_auth") !== "true") {
-      navigate("/admin/signin", { replace: true });
-    }
-  }, [navigate]);
-
   // Auto-expand the group that owns the new route whenever the path changes
   useEffect(() => {
     const active = getActiveGroup(location.pathname);

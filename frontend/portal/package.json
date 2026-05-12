@@ -6,6 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "audit:route-guards": "node scripts/audit-route-guards.mjs",
+    "audit:membership-confirmation-safety": "node scripts/audit-membership-confirmation-safety.mjs",
     "audit:public-content": "node scripts/audit-public-content.mjs",
     "audit:admin-content-model": "node scripts/audit-admin-content-model.mjs",
     "audit:admin-crud-schema": "node scripts/audit-admin-crud-schema.mjs",

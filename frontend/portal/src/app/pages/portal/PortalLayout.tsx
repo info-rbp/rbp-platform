@@ -32,7 +32,7 @@ export function PortalLayout() {
 
   async function handleSignOut() {
     await mockAuthService.signOut();
-    navigate("/signin");
+    navigate("/sign-in");
   }
 
   const today = new Date().toLocaleDateString("en-AU", {
