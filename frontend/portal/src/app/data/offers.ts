@@ -18,6 +18,19 @@ export interface OfferCategoryFilter {
 }
 
 export interface PublicOffer {
+  highlight?: boolean;
+  accentColor?: string;
+  categoryBg?: string;
+  categoryText?: string;
+  badgeColor?: string;
+  badge?: string;
+  offer?: string;
+  subOffer?: string;
+  saving?: string;
+  desc?: string;
+  features?: string[];
+  availability?: string;
+
   id: string;
   title: string;
   partner: string;
@@ -25,7 +38,7 @@ export interface PublicOffer {
   category: OfferCategory;
   offerType: "exclusive" | "top" | "standard";
   href: string;
-  status: "ready" | "placeholder" | "content-required" | "backend-later";
+  status: "ready" | "placeholder" | "content-required" | "backend-later" | "legal-review-required";
 }
 
 export const offerCategoryFilters: OfferCategoryFilter[] = [

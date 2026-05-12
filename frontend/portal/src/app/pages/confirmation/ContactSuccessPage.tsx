@@ -1,44 +1,34 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function ContactSuccessPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Confirmation</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Contact Request Received</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder confirmation for successful public contact form submission.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/contact" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Contact</Link>
-              <Link to="/help" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Help Center</Link>
-              <Link to="/" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Home</Link>
-              </div>
-            </section>
-            <Link
-              to="/on-demand"
-              className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition-colors"
-            >
-              Explore Services
-            </Link>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Confirmation"
+      title="Contact Request Received"
+      intro="Thanks, your enquiry has been received. The next step is to review your request and direct it to the most suitable pathway."
+      statusLabel="Request received"
+      reviewNote="Email confirmations and backend notification records will be enabled once the Frappe integration and notification workflow are connected."
+      sections={[
+        {
+          title: "What happens next",
+          body: "The request should be reviewed for topic, urgency, and required follow-up. If your enquiry relates to a discovery call, available times should be confirmed before anything is booked."
+        },
+        {
+          title: "If your request is urgent",
+          body: "Use the contact pathway again with the urgency clearly stated, or include the relevant business impact so the request can be prioritised during review."
+        },
+        {
+          title: "Reference",
+          body: "A formal reference number will be generated once backend enquiry records and notification events are enabled."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Help Center", href: "/help" },
+        { label: "On-Demand Services", href: "/on-demand" },
+        { label: "Membership", href: "/membership" }
+      ]}
+      primaryAction={{ label: "Explore Services", href: "/on-demand" }}
+      secondaryAction={{ label: "Return Home", href: "/" }}
+    />
   );
 }

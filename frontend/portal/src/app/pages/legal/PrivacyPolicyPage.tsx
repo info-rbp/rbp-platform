@@ -1,38 +1,38 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Legal</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Privacy Policy</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder for how personal information is collected, used, stored, and protected on the public website.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/legal" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Legal Index</Link>
-              <Link to="/legal/terms-of-use" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Terms of Use</Link>
-              <Link to="/contact" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Contact</Link>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Legal"
+      title="Privacy Policy"
+      intro="This interim privacy summary explains the types of information Remote Business Partner may collect through public forms, membership flows, service requests, and future portal activity."
+      statusLabel="Draft summary"
+      reviewNote="This privacy summary should be reviewed and finalised before production launch, especially before collecting live account, payment, or uploaded document data."
+      sections={[
+        {
+          title: "Information we may collect",
+          body: "The platform may collect contact details, business information, service request details, membership preferences, document references, support enquiries, and technical usage information."
+        },
+        {
+          title: "How information is expected to be used",
+          body: "Information should be used to respond to enquiries, process service requests, manage membership pathways, provide support, improve the platform, and maintain operational records."
+        },
+        {
+          title: "Portal and service records",
+          body: "Once backend integration is enabled, portal records, uploaded files, workflow statuses, and notifications should be governed by user permissions and tenant-level access rules."
+        },
+        {
+          title: "User choices",
+          body: "Users should be able to request updates to their details, ask questions about privacy handling, and manage communication preferences once account and notification features are connected."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Terms of Use", href: "/legal/terms-of-use" },
+        { label: "Services Policy", href: "/legal/services-policy" },
+        { label: "Contact", href: "/contact?reason=privacy" }
+      ]}
+      primaryAction={{ label: "Contact About Privacy", href: "/contact?reason=privacy" }}
+      secondaryAction={{ label: "Back to Legal", href: "/legal" }}
+    />
   );
 }

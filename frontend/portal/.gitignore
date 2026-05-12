@@ -12,3 +12,9 @@ node_modules/
 # Local external source material staging
 /docs/source-material/_incoming/
 /docs/source-material/_raw/
+
+test-results/
+
+playwright-report/
+
+.playwright/

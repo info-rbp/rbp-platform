@@ -1,44 +1,37 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function OurProcessPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">About</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Our Process</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">A placeholder summary of how discovery, planning, delivery, and support are structured for public-facing engagements.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/about/what-we-do" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">What We Do</Link>
-              <Link to="/about/work-with-us" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Work With Us</Link>
-              <Link to="/on-demand" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">On-Demand Services</Link>
-              </div>
-            </section>
-            <Link
-              to="/about/discovery-call"
-              className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition-colors"
-            >
-              Book a Discovery Call
-            </Link>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="About"
+      title="Our Process"
+      intro="Our process is designed to help business owners move from enquiry to a clear next step, whether they need a quick answer, a structured service request, or a longer-term support pathway."
+      statusLabel="Content ready"
+      sections={[
+        {
+          title: "1. Understand the need",
+          body: "We start by clarifying the business context, urgency, desired outcome, and whether the request belongs in advisory, documents, marketplace, applications, managed services, or membership."
+        },
+        {
+          title: "2. Match the pathway",
+          body: "The platform routes each request toward the most suitable service flow so the user is not forced to guess which form, service, or support channel applies."
+        },
+        {
+          title: "3. Review and respond",
+          body: "Submitted requests are intended to move through admin review, assignment, workflow status updates, notifications, and portal visibility once the backend integration is connected."
+        },
+        {
+          title: "4. Improve over time",
+          body: "As services mature, the content, admin review process, member portal, and backend workflows should be refined based on actual user activity and support patterns."
+        }
+      ]}
+      relatedLinks={[
+        { label: "What We Do", href: "/about/what-we-do" },
+        { label: "Discovery Call", href: "/contact?reason=discovery-call" },
+        { label: "Help Center", href: "/help" }
+      ]}
+      primaryAction={{ label: "Book a Discovery Call", href: "/contact?reason=discovery-call" }}
+      secondaryAction={{ label: "View Membership", href: "/membership" }}
+    />
   );
 }

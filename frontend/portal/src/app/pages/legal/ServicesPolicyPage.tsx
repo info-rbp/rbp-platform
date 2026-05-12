@@ -1,38 +1,38 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function ServicesPolicyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Legal</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Services Policy</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder for service boundaries, delivery assumptions, and public policy notices.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/legal" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Legal Index</Link>
-              <Link to="/legal/terms-of-use" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Terms of Use</Link>
-              <Link to="/legal/terms-of-engagement" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Terms of Engagement</Link>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Legal"
+      title="Services Policy"
+      intro="This interim services policy explains how Remote Business Partner service pathways should be requested, reviewed, assigned, delivered, and updated."
+      statusLabel="Draft summary"
+      reviewNote="The services policy should be finalised before live service fulfilment, admin review workflows, advisor assignment, or portal status updates are relied on."
+      sections={[
+        {
+          title: "Service requests",
+          body: "Users should submit enough context for the team to understand the issue, desired outcome, urgency, supporting materials, and preferred contact method."
+        },
+        {
+          title: "Review and assignment",
+          body: "Requests should be reviewed before work begins so they can be categorised, prioritised, assigned, priced if needed, and moved into the right workflow."
+        },
+        {
+          title: "Service outcomes",
+          body: "Outcomes may include written guidance, document support, marketplace review, operational recommendations, connectivity follow-up, or a managed service pathway."
+        },
+        {
+          title: "Limits and dependencies",
+          body: "Service delivery may depend on user-provided information, third-party providers, membership status, payment state, advisor availability, and backend workflow readiness."
+        }
+      ]}
+      relatedLinks={[
+        { label: "On-Demand Services", href: "/on-demand" },
+        { label: "Managed Services", href: "/managed-services" },
+        { label: "Terms of Engagement", href: "/legal/terms-of-engagement" }
+      ]}
+      primaryAction={{ label: "Explore Services", href: "/on-demand" }}
+      secondaryAction={{ label: "Back to Legal", href: "/legal" }}
+    />
   );
 }

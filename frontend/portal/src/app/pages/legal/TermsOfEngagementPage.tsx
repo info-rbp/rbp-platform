@@ -1,38 +1,38 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function TermsOfEngagementPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Legal</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Terms of Engagement</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder for commercial engagement terms that apply to public service enquiries and scoped work.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/legal" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Legal Index</Link>
-              <Link to="/legal/payment-policy" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Payment Policy</Link>
-              <Link to="/contact" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Contact</Link>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Legal"
+      title="Terms of Engagement"
+      intro="These interim engagement terms explain how service requests, advisory work, document support, managed services, and specialist assistance should be scoped and delivered."
+      statusLabel="Draft summary"
+      reviewNote="Final engagement terms should be approved before paid services, live advisor assignment, or formal service delivery begins."
+      sections={[
+        {
+          title: "Scope of work",
+          body: "Each engagement should define the requested outcome, assumptions, inclusions, exclusions, timeframe, responsibilities, and any required supporting information."
+        },
+        {
+          title: "Client responsibilities",
+          body: "Clients should provide accurate business details, relevant documents, timely responses, and approval for any agreed direction before work proceeds."
+        },
+        {
+          title: "Delivery and review",
+          body: "Requests should move through submission, review, assignment, work-in-progress, outcome delivery, and closure once backend workflows are active."
+        },
+        {
+          title: "Changes to scope",
+          body: "Material changes to requested work should be reviewed before delivery continues, especially where pricing, timelines, or specialist involvement may change."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Services Policy", href: "/legal/services-policy" },
+        { label: "Payment Policy", href: "/legal/payment-policy" },
+        { label: "Contact", href: "/contact?reason=engagement-terms" }
+      ]}
+      primaryAction={{ label: "Ask About Engagement Terms", href: "/contact?reason=engagement-terms" }}
+      secondaryAction={{ label: "Back to Legal", href: "/legal" }}
+    />
   );
 }

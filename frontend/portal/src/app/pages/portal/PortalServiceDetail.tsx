@@ -120,6 +120,7 @@ const DETAIL_DATA: Record<string, ServiceDetail> = {
 };
 
 const STATUS_COLOR: Record<ServiceStatus, string> = {
+  "Outcome Ready": "bg-purple-50 text-purple-700 border-purple-200",
   Active:        "bg-emerald-50 text-emerald-700",
   "In Progress": "bg-amber-50 text-amber-700",
   Requested:     "bg-blue-50 text-blue-700",

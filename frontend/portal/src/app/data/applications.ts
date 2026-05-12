@@ -3,7 +3,7 @@ export interface ApplicationCategory {
   title: string;
   summary: string;
   href: string;
-  status: "ready" | "placeholder" | "content-required" | "backend-later";
+  status: "ready" | "placeholder" | "content-required" | "backend-later" | "legal-review-required";
 }
 
 export const applicationCategories: ApplicationCategory[] = [

@@ -1,38 +1,38 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function TermsOfUsePage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Legal</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Terms of Use</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder for website terms, acceptable use standards, and user responsibilities.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/legal" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Legal Index</Link>
-              <Link to="/legal/privacy-policy" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Privacy Policy</Link>
-              <Link to="/legal/services-policy" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Services Policy</Link>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Legal"
+      title="Terms of Use"
+      intro="These interim terms explain expected use of the Remote Business Partner website, public pages, service pathways, membership areas, and future portal features."
+      statusLabel="Draft summary"
+      reviewNote="These terms should be finalised before production launch and linked from sign-up, sign-in, contact, payment, and service request flows."
+      sections={[
+        {
+          title: "Using the platform",
+          body: "Users are expected to provide accurate information, use forms and resources for legitimate business purposes, and avoid submitting harmful, unlawful, misleading, or abusive content."
+        },
+        {
+          title: "Accounts and portal access",
+          body: "Future account access should be governed by authentication, role permissions, membership status, and tenant-level data ownership rules."
+        },
+        {
+          title: "Content and resources",
+          body: "Public resources, guides, templates, calculators, and platform materials should be treated as general business support unless a specific service agreement says otherwise."
+        },
+        {
+          title: "Availability and changes",
+          body: "Services, resources, offers, and platform features may change over time as the product moves through staged rollout and backend integration."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Privacy Policy", href: "/legal/privacy-policy" },
+        { label: "Terms of Engagement", href: "/legal/terms-of-engagement" },
+        { label: "Payment Policy", href: "/legal/payment-policy" }
+      ]}
+      primaryAction={{ label: "Contact Support", href: "/contact?reason=terms-of-use" }}
+      secondaryAction={{ label: "Back to Legal", href: "/legal" }}
+    />
   );
 }

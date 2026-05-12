@@ -234,7 +234,7 @@ export function DecisionDeskFlow() {
     setSubmissionState("loading");
     setErrors({});
 
-    const response = await submitMockDecisionDeskRequest(form);
+    const response = await submitMockDecisionDeskRequest(form as unknown as MockDecisionDeskPayload);
 
     if (!response.ok || !response.data) {
       setSubmissionState("error");

@@ -1,38 +1,38 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function PaymentPolicyPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Legal</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Payment Policy</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder for billing, invoicing, refunds, and payment timing applicable to public services.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/legal" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Legal Index</Link>
-              <Link to="/legal/terms-of-engagement" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Terms of Engagement</Link>
-              <Link to="/legal/services-policy" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Services Policy</Link>
-              </div>
-            </section>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Legal"
+      title="Payment Policy"
+      intro="This interim payment policy explains how membership, service fees, marketplace listing fees, connectivity orders, and future platform payments should be presented and recorded."
+      statusLabel="Draft summary"
+      reviewNote="Final payment terms should be confirmed before live payment processing, subscriptions, refunds, or provider webhooks are enabled."
+      sections={[
+        {
+          title: "Payment states",
+          body: "The platform should distinguish between pending, authorised, paid, failed, refunded, cancelled, disputed, and not-required payment states."
+        },
+        {
+          title: "Membership and services",
+          body: "Membership or service payments should clearly show pricing, billing period, inclusions, payment timing, and any conditions before a user confirms."
+        },
+        {
+          title: "Failed or interrupted payments",
+          body: "If a payment fails or cannot be confirmed, the user should receive clear next steps and the platform should avoid showing membership or service access as active."
+        },
+        {
+          title: "Refunds and adjustments",
+          body: "Refunds, credits, cancellations, or billing corrections should be recorded against the relevant account, payment event, service request, or subscription."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Membership", href: "/membership" },
+        { label: "Terms of Engagement", href: "/legal/terms-of-engagement" },
+        { label: "Contact Billing Support", href: "/contact?reason=billing" }
+      ]}
+      primaryAction={{ label: "Contact Billing Support", href: "/contact?reason=billing" }}
+      secondaryAction={{ label: "Back to Legal", href: "/legal" }}
+    />
   );
 }

@@ -1,44 +1,34 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function ThankYouPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Confirmation</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Thank You</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Confirmation placeholder shown after a general public form submission.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Home</Link>
-              <Link to="/contact" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Contact</Link>
-              <Link to="/resources" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Resources</Link>
-              </div>
-            </section>
-            <Link
-              to="/"
-              className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition-colors"
-            >
-              Return Home
-            </Link>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Confirmation"
+      title="Thank You"
+      intro="Your submission has been received through the frontend flow. The page now explains what should happen next instead of pretending a generic placeholder is a product feature."
+      statusLabel="Submission received"
+      reviewNote="Backend records, email confirmation, and workflow status updates will be connected in a later integration phase."
+      sections={[
+        {
+          title: "What happens next",
+          body: "The submitted information should be reviewed and routed to the correct support pathway once backend workflow handling is enabled."
+        },
+        {
+          title: "Keep a copy",
+          body: "If this was an important request, keep a copy of the details you submitted until confirmation emails and portal records are active."
+        },
+        {
+          title: "Need another pathway?",
+          body: "Users can continue exploring services, resources, membership, or contact support if they need a different outcome."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Contact", href: "/contact" },
+        { label: "Resources", href: "/resources" },
+        { label: "Help Center", href: "/help" }
+      ]}
+      primaryAction={{ label: "Return Home", href: "/" }}
+      secondaryAction={{ label: "Explore Resources", href: "/resources" }}
+    />
   );
 }

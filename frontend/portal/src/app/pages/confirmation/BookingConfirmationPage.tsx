@@ -1,44 +1,34 @@
-import { Link } from "react-router";
-import { Navbar } from "../../components/Navbar";
-import { Footer } from "../../components/Footer";
+import { InterimContentPage } from "../../components/public/InterimContentPage";
 
 export function BookingConfirmationPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-10 shadow-sm">
-            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-slate-400">Confirmation</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Booking Confirmation</h1>
-            <p className="mt-4 max-w-3xl text-slate-600">Placeholder confirmation for discovery call or consultation booking requests.</p>
-
-            <section className="mt-8 rounded-xl border border-blue-100 bg-blue-50/60 p-5">
-              <h2 className="text-lg font-bold text-slate-900">Content update in progress</h2>
-              <p className="mt-2 text-sm text-slate-600">
-                This page is a public placeholder for the enhanced sitemap. Detailed content, FAQs, and service specifics
-                will be published in a future content release.
-              </p>
-            </section>
-
-            <section className="mt-8">
-              <h2 className="text-sm font-extrabold uppercase tracking-widest text-slate-400">Related public links</h2>
-              <div className="mt-3 flex flex-wrap gap-4">
-              <Link to="/contact" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Contact</Link>
-              <Link to="/on-demand" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">On-Demand</Link>
-              <Link to="/managed-services" className="text-sm font-semibold text-blue-700 hover:text-blue-800 hover:underline">Managed Services</Link>
-              </div>
-            </section>
-            <Link
-              to="/services"
-              className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-800 transition-colors"
-            >
-              Back to Services
-            </Link>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <InterimContentPage
+      eyebrow="Confirmation"
+      title="Booking Request Received"
+      intro="Your booking or consultation request has been received. The next step is to confirm availability, context, and the most useful discussion format."
+      statusLabel="Booking request"
+      reviewNote="Calendar confirmation, email notification, and booking reference generation will be connected when backend scheduling and notification services are ready."
+      sections={[
+        {
+          title: "What happens next",
+          body: "The request should be reviewed and matched with a suitable follow-up option. If the requested time is unavailable, an alternative time should be proposed."
+        },
+        {
+          title: "Prepare for the call",
+          body: "Before the discussion, prepare a short summary of the business issue, current blockers, desired outcome, urgency, and any supporting documents."
+        },
+        {
+          title: "No confirmed calendar event yet",
+          body: "This screen confirms the frontend request pathway. A booking should only be treated as confirmed once a calendar invite or direct confirmation is issued."
+        }
+      ]}
+      relatedLinks={[
+        { label: "Contact", href: "/contact" },
+        { label: "On-Demand Services", href: "/on-demand" },
+        { label: "Managed Services", href: "/managed-services" }
+      ]}
+      primaryAction={{ label: "Explore Services", href: "/on-demand" }}
+      secondaryAction={{ label: "Return Home", href: "/" }}
+    />
   );
 }

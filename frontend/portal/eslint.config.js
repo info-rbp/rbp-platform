@@ -12,8 +12,10 @@ export default [
       "build",
       "coverage",
       "node_modules",
-      "*.config.js",
-      "*.config.cjs"
+      "test-results",
+      "playwright-report",
+      "src/imports/pasted_text/**",
+      "scripts/**"
     ]
   },
   js.configs.recommended,
@@ -57,7 +59,9 @@ export default [
       ],
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      "jsx-a11y/anchor-is-valid": "warn"
+      "jsx-a11y/anchor-is-valid": "warn",
+      "no-extra-boolean-cast": "off",
+      "@typescript-eslint/no-unused-expressions": "off"
     }
   }
 ];

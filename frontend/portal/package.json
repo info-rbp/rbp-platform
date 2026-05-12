@@ -33,7 +33,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "route:smoke": "node scripts/route-smoke.mjs",
-    "qa": "npm run typecheck && npm run lint && npm run test && npm run build && npm run route:smoke"
+    "qa": "npm run typecheck && npm run lint && npm run test && npm run build && npm run route:smoke",
+    "audit:placeholder-copy": "node scripts/audit-placeholder-copy.mjs",
+    "qa:content": "npm run audit:placeholder-copy && npm run build && npm run route:smoke"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

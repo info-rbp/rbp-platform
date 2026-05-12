@@ -596,7 +596,7 @@ function ResourceMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -777,7 +777,7 @@ function HelpCenterMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -960,7 +960,7 @@ function LegalPagesMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -1208,7 +1208,7 @@ function MembershipMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -1466,7 +1466,7 @@ function MarketplaceMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -1688,7 +1688,7 @@ function OfferMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -1886,7 +1886,7 @@ function ApplicationMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell
@@ -2053,7 +2053,7 @@ function ServiceMockCrud() {
           </p>
         </div>
         <AdminTableControls controls={table} />
-        <AdminTable rows={table.rows} columns={columns} />
+        <AdminTable rows={table.rows as Array<{ id: string }>} columns={columns} />
       </div>
 
       <AdminFormShell

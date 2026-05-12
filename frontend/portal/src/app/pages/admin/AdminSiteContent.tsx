@@ -12,8 +12,7 @@ import {
   Info, FileText, CheckCircle, Clock, AlertTriangle,
   LayoutGrid, Layers, Zap, Settings, Activity,
   LayoutTemplate, Anchor, Navigation, Search, AlignLeft,
-  List, Check
-} from "lucide-react";
+  List, Check, Eye } from "lucide-react";
 import {
   CardShell, CardHeader, Badge, StatusBadge, VisibilityBadge,
   RowActions, StatCard, ItemStatus

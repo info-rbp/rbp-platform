@@ -595,7 +595,7 @@ function CoreServicePage({ config }: { config: CoreServiceConfig }) {
         </div>
       </section>
 
-      <CTABanner {...memberCta} />
+      <CTABanner />
       <Footer />
     </div>
   );
