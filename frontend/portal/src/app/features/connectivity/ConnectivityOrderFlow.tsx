@@ -177,7 +177,7 @@ function ConnectivityOverviewCards() {
   );
 }
 
-export function ConnectivityOrderFlow() {
+export function ConnectivityOrderFlow({ embedded = false }: { embedded?: boolean }) {
   const location = useLocation();
   const initialFamily = getInitialFamilyFromPath(location.pathname);
 
@@ -268,7 +268,7 @@ export function ConnectivityOrderFlow() {
   if (submissionState === "success") {
     return (
       <div className="min-h-screen bg-slate-50">
-        <Navbar />
+        {!embedded ? <Navbar /> : null}
         <section className="py-12">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
             <ConfirmationPanel
@@ -293,16 +293,16 @@ export function ConnectivityOrderFlow() {
             </div>
           </div>
         </section>
-        <Footer />
+        {!embedded ? <Footer /> : null}
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
-      <ConnectivityHero />
-      <ConnectivityOverviewCards />
+      {!embedded ? <Navbar /> : null}
+      {!embedded ? <ConnectivityHero /> : null}
+      {!embedded ? <ConnectivityOverviewCards /> : null}
 
       <section id="order" className="scroll-mt-28 bg-slate-50 py-12">
         <WizardShell
@@ -613,7 +613,7 @@ export function ConnectivityOrderFlow() {
         </div>
       </section>
 
-      <Footer />
+      {!embedded ? <Footer /> : null}
     </div>
   );
 }

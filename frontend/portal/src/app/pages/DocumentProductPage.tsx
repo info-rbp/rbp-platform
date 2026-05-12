@@ -132,7 +132,7 @@ export function DocumentProductPage() {
       : categoryMeta.a);
   const formats = doc.format.split(" / ");
   const currentFormat = selectedFormat || formats[0];
-  const briefHref = `/document-nucleus/brief?category=${doc.category}&product=${doc.id}`;
+  const briefHref = "/portal/services/docushare/start";
 
   // Related docs — same category, excluding current
   const related = allDocuments[doc.category]?.filter((d) => d.id !== doc.id).slice(0, 4) ?? [];
@@ -292,7 +292,7 @@ export function DocumentProductPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/document-nucleus/brief"
+                to="/portal/services/docushare/start"
                 className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-bold text-base border-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all"
               >
                 <MessageCircle className="w-4 h-4" />

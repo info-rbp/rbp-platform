@@ -107,7 +107,7 @@ export function DocumentOverviewPage() {
               <ArrowRight className="w-4 h-4" />
             </a>
             <Link
-              to="/document-nucleus/brief"
+              to="/portal/services/docushare/start"
               className="inline-flex items-center gap-2 bg-white text-slate-950 hover:bg-blue-50 font-bold px-7 py-3.5 rounded-xl transition-all hover:-translate-y-0.5"
             >
               Start a document brief
@@ -196,10 +196,10 @@ export function DocumentOverviewPage() {
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                     <Link
-                      to={`/document-nucleus/brief?category=${cat.id}`}
+                      to="/portal/services/docushare/start"
                       className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-blue-700"
                     >
-                      Create a mock DocuShare brief
+                      Submit through your account
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -288,7 +288,7 @@ export function DocumentOverviewPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              to="/document-nucleus/brief"
+              to="/portal/services/docushare/start"
               className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition-all shadow-lg hover:-translate-y-0.5"
             >
               Start a document brief

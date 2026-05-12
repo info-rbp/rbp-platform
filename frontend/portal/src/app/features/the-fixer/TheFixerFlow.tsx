@@ -106,7 +106,7 @@ function TheFixerHero() {
               href="#fixer-request"
               className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-orange-400"
             >
-              Start mock request <ArrowRight className="h-4 w-4" />
+              Start request <ArrowRight className="h-4 w-4" />
             </a>
             <Link
               to="/portal/services"
@@ -187,7 +187,7 @@ function TheFixerOverviewCards() {
   );
 }
 
-export function TheFixerFlow() {
+export function TheFixerFlow({ embedded = false }: { embedded?: boolean }) {
   const [step, setStep] = useState("problem");
   const [submissionState, setSubmissionState] = useState<SubmissionState>("idle");
   const [reference, setReference] = useState("");
@@ -237,7 +237,7 @@ export function TheFixerFlow() {
   if (submissionState === "success") {
     return (
       <div className="min-h-screen bg-slate-50">
-        <Navbar />
+        {!embedded ? <Navbar /> : null}
         <section className="py-12">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
             <div className="space-y-6">
@@ -270,16 +270,16 @@ export function TheFixerFlow() {
             </div>
           </div>
         </section>
-        <Footer />
+        {!embedded ? <Footer /> : null}
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
-      <TheFixerHero />
-      <TheFixerOverviewCards />
+      {!embedded ? <Navbar /> : null}
+      {!embedded ? <TheFixerHero /> : null}
+      {!embedded ? <TheFixerOverviewCards /> : null}
 
       <section id="fixer-request" className="scroll-mt-28 bg-slate-50 py-12">
         <WizardShell
@@ -545,7 +545,7 @@ export function TheFixerFlow() {
         </div>
       </section>
 
-      <Footer />
+      {!embedded ? <Footer /> : null}
     </div>
   );
 }

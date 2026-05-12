@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import {
   Briefcase, Mail, Lock, Eye, EyeOff, User, Building2,
   ArrowRight, CheckCircle, ChevronRight, Linkedin,
 } from "lucide-react";
+import {
+  clearPendingAccountIntent,
+  getPendingAccountIntent,
+  getSafeReturnTo,
+  mockAuthService,
+} from "../services/mock/auth.mockService";
 
 type Tab = "signin" | "signup";
 
@@ -25,9 +31,12 @@ const benefits = [
   "Connect with your dedicated RBP consultant",
 ];
 
-export function SignInPage() {
+export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>("signin");
+  const [searchParams] = useSearchParams();
+  const pendingIntent = getPendingAccountIntent();
+  const returnTo = getSafeReturnTo(searchParams.get("returnTo") ?? pendingIntent?.returnTo);
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -35,25 +44,47 @@ export function SignInPage() {
   // Sign-in form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signupFirstName, setSignupFirstName] = useState("");
+  const [signupLastName, setSignupLastName] = useState("");
+  const [signupBusinessName, setSignupBusinessName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const VALID_EMAIL = "info@remotebusinesspartner.com.au";
-  const VALID_PASSWORD = "Foxtrot19!";
-
-  function handleSignIn(e: React.FormEvent) {
+  async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    // Simulate a brief auth delay
-    setTimeout(() => {
-      if (email.trim().toLowerCase() === VALID_EMAIL && password === VALID_PASSWORD) {
-        navigate("/portal/dashboard");
-      } else {
-        setError("Incorrect email or password. Please try again.");
-        setLoading(false);
-      }
-    }, 700);
+    const response = await mockAuthService.signIn({ email, password });
+
+    if (response.ok) {
+      clearPendingAccountIntent();
+      navigate(returnTo, { replace: true });
+    } else {
+      setError(response.message);
+      setLoading(false);
+    }
+  }
+
+  async function handleSignUp(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const name = `${signupFirstName} ${signupLastName}`.trim();
+    const response = await mockAuthService.signUp({
+      name,
+      email: signupEmail,
+      businessName: signupBusinessName,
+    });
+
+    if (response.ok) {
+      clearPendingAccountIntent();
+      navigate(returnTo, { replace: true });
+    } else {
+      setError(response.message);
+      setLoading(false);
+    }
   }
 
   return (
@@ -158,7 +189,9 @@ export function SignInPage() {
               <div>
                 <div className="mb-6">
                   <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Welcome back</h2>
-                  <p className="text-slate-500 text-sm">Sign in to your RBP account to continue.</p>
+                  <p className="text-slate-500 text-sm">
+                    Sign in to your RBP account to continue{pendingIntent ? `: ${pendingIntent.label}` : "."}
+                  </p>
                 </div>
 
                 {/* Social logins */}
@@ -303,7 +336,13 @@ export function SignInPage() {
                   <div className="flex-1 h-px bg-slate-200" />
                 </div>
 
-                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-4" onSubmit={handleSignUp}>
+                  {error && (
+                    <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3">
+                      <span className="text-xs font-medium">{error}</span>
+                    </div>
+                  )}
+
                   {/* Name row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -312,7 +351,10 @@ export function SignInPage() {
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                           type="text"
+                          value={signupFirstName}
+                          onChange={(event) => setSignupFirstName(event.currentTarget.value)}
                           placeholder="Jane"
+                          required
                           className="w-full pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         />
                       </div>
@@ -321,7 +363,10 @@ export function SignInPage() {
                       <label className="block text-xs font-bold text-slate-700 mb-1.5">Last name</label>
                       <input
                         type="text"
+                        value={signupLastName}
+                        onChange={(event) => setSignupLastName(event.currentTarget.value)}
                         placeholder="Smith"
+                        required
                         className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                     </div>
@@ -334,6 +379,8 @@ export function SignInPage() {
                       <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="text"
+                        value={signupBusinessName}
+                        onChange={(event) => setSignupBusinessName(event.currentTarget.value)}
                         placeholder="Your Business Pty Ltd"
                         className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
@@ -347,7 +394,10 @@ export function SignInPage() {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type="email"
+                        value={signupEmail}
+                        onChange={(event) => setSignupEmail(event.currentTarget.value)}
                         placeholder="you@yourbusiness.com.au"
+                        required
                         className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                     </div>
@@ -361,6 +411,7 @@ export function SignInPage() {
                       <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Create a strong password"
+                        required
                         className="w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                       <button
@@ -381,6 +432,7 @@ export function SignInPage() {
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Repeat your password"
+                        required
                         className="w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                       <button
@@ -403,9 +455,10 @@ export function SignInPage() {
 
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl transition-all"
+                    disabled={loading}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all"
                   >
-                    Create Account <ArrowRight className="w-4 h-4" />
+                    {loading ? "Creating account..." : "Create Account"} <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
 

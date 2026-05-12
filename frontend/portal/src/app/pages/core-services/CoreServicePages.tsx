@@ -72,7 +72,7 @@ const memberCta = {
   title: "Unlock Core Services through your RBP membership",
   description:
     "Core Services are designed for members who need structured guidance, written advice, and practical support without turning the public website into a request form circus.",
-  primaryCta: { label: "Sign Up for Membership", href: "/membership/sign-up-now" },
+  primaryCta: { label: "Create account to continue", href: "/portal/membership/checkout" },
   secondaryCta: { label: "Explore Core Services", href: "/core-services" },
 };
 
@@ -380,7 +380,7 @@ function CoreServicePage({ config }: { config: CoreServiceConfig }) {
         breadcrumb={config.accent}
         image={config.heroImage}
         bullets={config.bullets}
-        ctaPrimary={{ label: "Sign Up for Membership", href: "/membership/sign-up-now" }}
+        ctaPrimary={{ label: "Create account to continue", href: "/portal/membership/checkout" }}
         ctaSecondary={{ label: "Explore Core Services", href: "/core-services" }}
         stat={config.stat}
       />
@@ -585,10 +585,10 @@ function CoreServicePage({ config }: { config: CoreServiceConfig }) {
           </div>
           <div className="text-center mt-10">
             <Link
-              to="/membership/sign-up-now"
+              to="/portal/membership/checkout"
               className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-200 hover:shadow-xl hover:-translate-y-0.5"
             >
-              Sign Up for Membership
+              Create account to continue
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

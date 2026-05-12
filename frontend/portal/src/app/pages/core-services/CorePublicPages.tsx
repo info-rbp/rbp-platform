@@ -47,6 +47,8 @@ type ServiceConfig = {
   outcomeTitle: string;
   outcomeIntro: string;
   outcomes: string[];
+  startHref?: string;
+  startLabel?: string;
 };
 
 const heroImages = {
@@ -146,6 +148,8 @@ const configs: Record<CoreServiceKey, ServiceConfig> = {
     outcomeTitle: "What members receive",
     outcomeIntro: "Decision Desk produces practical written guidance, not a public submission widget pretending to be a service page.",
     outcomes: ["A clear summary of the decision being considered", "Options, trade-offs, and risk considerations", "Recommended direction or decision pathway", "Next steps the member can action or escalate"],
+    startHref: "/portal/services/decision-desk/start",
+    startLabel: "Start request",
   },
   theFixer: {
     title: "Solve a Specific Problem with",
@@ -184,6 +188,8 @@ const configs: Record<CoreServiceKey, ServiceConfig> = {
     outcomeTitle: "What members receive",
     outcomeIntro: "The Fixer keeps the focus narrow enough to be useful, which is apparently radical in a world addicted to endless discovery calls.",
     outcomes: ["A defined problem statement", "Root-cause and impact considerations", "Prioritised resolution steps", "Recommended follow-on support if needed"],
+    startHref: "/portal/services/the-fixer/start",
+    startLabel: "Request The Fixer",
   },
   riskAdvisor: {
     title: "Strengthen Decisions with",
@@ -222,6 +228,8 @@ const configs: Record<CoreServiceKey, ServiceConfig> = {
     outcomeTitle: "What members receive",
     outcomeIntro: "Risk Advisor turns vague unease into a structured risk view. Sadly, it cannot stop humans from ignoring obvious warnings, but it tries.",
     outcomes: ["A structured summary of relevant risks", "Prioritisation by impact and urgency", "Control and mitigation considerations", "Recommended next steps or escalation pathway"],
+    startHref: "/portal/services/risk-advisor/start",
+    startLabel: "Start assessment",
   },
   bidManagement: {
     title: "Improve Tender Outcomes with",
@@ -271,11 +279,11 @@ function MembershipCta() {
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700 mb-3">Membership access</p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight mb-3">Unlock Core Services through your RBP membership</h2>
-            <p className="text-slate-600 leading-relaxed">Core Services are designed for members who need structured guidance, written advice, and practical support. Sign up to access the secure member workflows.</p>
+            <p className="text-slate-600 leading-relaxed">Core Services are designed for members who need structured guidance, written advice, and practical support. Create an account or sign in to access the secure member workflows.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/membership/sign-up-now" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">
-              Sign Up for Membership <ArrowRight className="w-4 h-4" />
+            <Link to="/portal/membership/checkout" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">
+              Create account to continue <ArrowRight className="w-4 h-4" />
             </Link>
             <Link to="/core-services" className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-6 py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all">
               Explore Core Services
@@ -299,7 +307,7 @@ function ServicePage({ config }: { config: ServiceConfig }) {
         breadcrumb={config.accent}
         image={config.image}
         bullets={config.bullets}
-        ctaPrimary={{ label: "Sign Up for Membership", href: "/membership/sign-up-now" }}
+        ctaPrimary={{ label: config.startLabel ?? "Create account to continue", href: config.startHref ?? "/portal/membership/checkout" }}
         ctaSecondary={{ label: "Explore Core Services", href: "/core-services" }}
         stat={config.stat}
       />
@@ -448,7 +456,7 @@ export function CoreServicesLandingPage() {
         breadcrumb="Core Services"
         image={heroImages.advisor}
         bullets={["Business guidance", "Written advice", "Member service pathways"]}
-        ctaPrimary={{ label: "Sign Up for Membership", href: "/membership/sign-up-now" }}
+        ctaPrimary={{ label: "Create account to continue", href: "/portal/membership/checkout" }}
         ctaSecondary={{ label: "Compare Core Services", href: "#core-service-list" }}
         stat={{ value: "5", label: "Core Services", sublabel: "Advisor, Decision Desk, Fixer, Risk, Bid" }}
       />
@@ -491,7 +499,7 @@ export function CoreServicesLandingPage() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-300 mb-4">Core Services</p>
               <h3 className="text-2xl font-extrabold mb-5">Designed for members, explained for visitors</h3>
               <p className="text-slate-300 leading-relaxed mb-6">This structure keeps the frontend website clean while preserving the secure backend/member workflow for actual requests. Astonishingly, the public site does not need to be a filing cabinet with buttons.</p>
-              <Link to="/membership/sign-up-now" className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">Sign Up for Membership <ArrowRight className="w-4 h-4" /></Link>
+              <Link to="/portal/membership/checkout" className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">Create account to continue <ArrowRight className="w-4 h-4" /></Link>
             </div>
           </div>
         </div>

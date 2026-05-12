@@ -96,7 +96,7 @@ export const publicNavigation: MegaConfig[] = [
           { label: "Our NBN Plans", href: "/operations/connectivity/nbn-phone/our-nbn-plans" },
           { label: "Getting Connected", href: "/operations/connectivity/nbn-phone/getting-connected" },
           { label: "WiFi Modems", href: "/operations/connectivity/nbn-phone/wifi-modems" },
-          { label: "Connect Now", href: "/operations/connectivity/nbn-phone/connect-now" },
+          { label: "Order through account", href: "/portal/services/nbn/start" },
           { label: "FAQs", href: "/operations/connectivity/nbn-phone/faqs" },
         ],
       },
@@ -116,7 +116,7 @@ export const publicNavigation: MegaConfig[] = [
       { label: "What's Included", href: "/membership/inclusions" },
       { label: "Frequently Asked Questions", href: "/membership/faq" },
       { label: "Referral Program", href: "/membership/referral-program" },
-      { label: "Sign Up Now", href: "/membership/sign-up-now" },
+      { label: "Create account to continue", href: "/portal/membership/checkout" },
     ],
   },
   {

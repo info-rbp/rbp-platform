@@ -1,6 +1,12 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router";
 
 import { ScrollToHash } from "./components/ScrollToHash";
+import {
+  RequireAccountGate,
+  RequireAdminAuth,
+  RequireCustomerAuth,
+} from "./components/auth/AccountGate";
+import type { PortalProductKey } from "./types/portal";
 
 // ── Core public pages ─────────────────────────────────────────────────────────
 
@@ -9,6 +15,7 @@ import { AboutPage } from "./pages/AboutPage";
 import { ContactPage } from "./pages/ContactPage";
 import { HelpCenterPage } from "./pages/HelpCenterPage";
 import { SignInPage } from "./pages/SignInPage";
+import { SignOutPage } from "./pages/SignOutPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import {
@@ -40,7 +47,6 @@ import { DocuSharePage } from "./pages/DocuSharePage";
 import { DocumentOverviewPage } from "./pages/DocumentOverviewPage";
 import { DocumentCategoryPage } from "./pages/DocumentCategoryPage";
 import { DocumentProductPage } from "./pages/DocumentProductPage";
-import { DocuShareOnboardingPage } from "./pages/DocuShareOnboardingPage";
 import { DocumentProcessPage } from "./pages/document-nucleus/DocumentProcessPage";
 import { DocumentCustomisationPage } from "./pages/document-nucleus/DocumentCustomisationPage";
 
@@ -78,7 +84,6 @@ import { MarketplacePage } from "./pages/MarketplacePage";
 import { MembershipOverviewPage } from "./pages/membership/MembershipOverviewPage";
 import { RemoteBusinessPartnerMembershipPage } from "./pages/membership/RemoteBusinessPartnerMembershipPage";
 import { MembershipInclusionsPage } from "./pages/membership/MembershipInclusionsPage";
-import { MembershipSignUpPage } from "./pages/membership/MembershipSignUpPage";
 import { MembershipFaqPage } from "./pages/membership/MembershipFaqPage";
 import { MembershipTermsPage } from "./pages/membership/MembershipTermsPage";
 import { MembershipConfirmationPage } from "./pages/confirmation/MembershipConfirmationPage";
@@ -117,6 +122,16 @@ import { PortalApps } from "./pages/portal/PortalApps";
 import { PortalResources } from "./pages/portal/PortalResources";
 import { PortalSupport } from "./pages/portal/PortalSupport";
 import { PortalSettings } from "./pages/portal/PortalSettings";
+import {
+  PortalDecisionDeskStart,
+  PortalDocuShareStart,
+  PortalMarketplaceListingNew,
+  PortalMarketplaceOfferNew,
+  PortalMembershipCheckout,
+  PortalNbnStart,
+  PortalRiskAdvisorStart,
+  PortalTheFixerStart,
+} from "./pages/portal/PortalStartPages";
 
 // ── Admin Portal ──────────────────────────────────────────────────────────────
 
@@ -138,6 +153,28 @@ function Layout() {
   return <Outlet />;
 }
 
+function SignupPage() {
+  return <SignInPage initialTab="signup" />;
+}
+
+function AccountGateFor({
+  returnTo,
+  label,
+  product,
+  authPath,
+}: {
+  returnTo: string;
+  label: string;
+  product?: PortalProductKey;
+  authPath?: "/signin" | "/signup";
+}) {
+  return (
+    <RequireAccountGate returnTo={returnTo} label={label} product={product} authPath={authPath}>
+      <Navigate to={returnTo} replace />
+    </RequireAccountGate>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -151,10 +188,22 @@ export const router = createBrowserRouter([
       { path: "discovery-call", element: <Navigate to="/about/discovery-call" replace /> },
       { path: "contact/success", Component: ContactSuccessPage },
       { path: "help", Component: HelpCenterPage },
-      { path: "sign-in", Component: SignInPage },
+      { path: "sign-in", element: <Navigate to="/signin" replace /> },
+      { path: "signin", Component: SignInPage },
+      { path: "signup", Component: SignupPage },
+      { path: "signout", Component: SignOutPage },
       { path: "dashboard", Component: DashboardPage },
       { path: "nbn-phone", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
-      { path: "nbn-phone/connect-now", Component: NbnPhonePage },
+      {
+        path: "nbn-phone/connect-now",
+        element: (
+          <AccountGateFor
+            returnTo="/portal/services/nbn/start"
+            label="Order NBN through your account"
+            product="connectivity"
+          />
+        ),
+      },
 
       // ── Core Services ──────────────────────────────────────────────────────
 
@@ -191,7 +240,16 @@ export const router = createBrowserRouter([
       // ── Document Nucleus ───────────────────────────────────────────────────
 
       { path: "document-nucleus/overview", Component: DocumentOverviewPage },
-      { path: "document-nucleus/brief", Component: DocuShareOnboardingPage },
+      {
+        path: "document-nucleus/brief",
+        element: (
+          <AccountGateFor
+            returnTo="/portal/services/docushare/start"
+            label="Submit a DocuShare brief through your account"
+            product="docushare"
+          />
+        ),
+      },
       { path: "document-nucleus/process", Component: DocumentProcessPage },
       { path: "document-nucleus/customisation", Component: DocumentCustomisationPage },
       { path: "document-nucleus/category/process", element: <Navigate to="/document-nucleus/process" replace /> },
@@ -275,7 +333,16 @@ export const router = createBrowserRouter([
           { path: "connectivity/nbn-phone/our-nbn-plans", Component: NbnPhonePage },
           { path: "connectivity/nbn-phone/getting-connected", Component: NbnPhonePage },
           { path: "connectivity/nbn-phone/wifi-modems", Component: NbnPhonePage },
-          { path: "connectivity/nbn-phone/connect-now", Component: NbnPhonePage },
+          {
+            path: "connectivity/nbn-phone/connect-now",
+            element: (
+              <AccountGateFor
+                returnTo="/portal/services/nbn/start"
+                label="Order NBN through your account"
+                product="connectivity"
+              />
+            ),
+          },
           { path: "connectivity/nbn-phone/faqs", Component: NbnPhonePage },
 
           { path: "coming-soon", Component: OperationsComingSoonPage },
@@ -304,8 +371,26 @@ export const router = createBrowserRouter([
         children: [
           { index: true, Component: MarketplacePage },
           { path: "product/:id", Component: MarketplacePage },
-          { path: "enquiry/:id", Component: MarketplacePage },
-          { path: "listing/new", Component: MarketplacePage },
+          {
+            path: "enquiry/:id",
+            element: (
+              <AccountGateFor
+                returnTo="/portal/marketplace/offers/new"
+                label="Make an offer through your account"
+                product="marketplace-offer"
+              />
+            ),
+          },
+          {
+            path: "listing/new",
+            element: (
+              <AccountGateFor
+                returnTo="/portal/marketplace/listings/new"
+                label="Create a marketplace listing through your account"
+                product="marketplace-listing"
+              />
+            ),
+          },
         ],
       },
 
@@ -325,7 +410,17 @@ export const router = createBrowserRouter([
           { path: "pricing", element: <Navigate to="/membership/overview" replace /> },
           { path: "usage", element: <Navigate to="/membership/terms" replace /> },
           { path: "payment-terms", element: <Navigate to="/membership/terms" replace /> },
-          { path: "sign-up-now", Component: MembershipSignUpPage },
+          {
+            path: "sign-up-now",
+            element: (
+              <AccountGateFor
+                returnTo="/portal/membership/checkout"
+                label="Complete membership checkout through your account"
+                product="membership"
+                authPath="/signup"
+              />
+            ),
+          },
           { path: "faq", Component: MembershipFaqPage },
           {
             path: "frequently-asked-questions",
@@ -374,7 +469,11 @@ export const router = createBrowserRouter([
 
       {
         path: "portal",
-        Component: PortalLayout,
+        element: (
+          <RequireCustomerAuth>
+            <PortalLayout />
+          </RequireCustomerAuth>
+        ),
         children: [
           { index: true, element: <Navigate to="/portal/dashboard" replace /> },
           { path: "dashboard", Component: PortalDashboard },
@@ -384,9 +483,17 @@ export const router = createBrowserRouter([
             children: [
               { index: true, Component: PortalServices },
               { path: "request", Component: PortalServiceRequest },
+              { path: "decision-desk/start", Component: PortalDecisionDeskStart },
+              { path: "docushare/start", Component: PortalDocuShareStart },
+              { path: "nbn/start", Component: PortalNbnStart },
+              { path: "risk-advisor/start", Component: PortalRiskAdvisorStart },
+              { path: "the-fixer/start", Component: PortalTheFixerStart },
               { path: ":id", Component: PortalServiceDetail },
             ],
           },
+          { path: "marketplace/listings/new", Component: PortalMarketplaceListingNew },
+          { path: "marketplace/offers/new", Component: PortalMarketplaceOfferNew },
+          { path: "membership/checkout", Component: PortalMembershipCheckout },
           { path: "sessions", Component: PortalSessions },
           { path: "documents", Component: PortalDocuments },
           { path: "offers", Component: PortalOffers },
@@ -404,7 +511,11 @@ export const router = createBrowserRouter([
         children: [
           { path: "signin", Component: AdminSignInPage },
           {
-            Component: AdminLayout,
+            element: (
+              <RequireAdminAuth>
+                <AdminLayout />
+              </RequireAdminAuth>
+            ),
             children: [
               { path: "dashboard", Component: AdminDashboard },
 
@@ -416,6 +527,11 @@ export const router = createBrowserRouter([
               { path: "requests/connectivity", Component: AdminCrudPage },
               { path: "requests/risk-advisor", Component: AdminCrudPage },
               { path: "requests/fixer", Component: AdminCrudPage },
+              { path: "decision-desk", Component: AdminCrudPage },
+              { path: "docushare", Component: AdminCrudPage },
+              { path: "connectivity", Component: AdminCrudPage },
+              { path: "risk-advisor", Component: AdminCrudPage },
+              { path: "users", Component: AdminCrudPage },
               { path: "audit-review", Component: AdminCrudPage },
               { path: "tasks", Component: AdminCrudPage },
               { path: "discovery-calls", Component: AdminCrudPage },

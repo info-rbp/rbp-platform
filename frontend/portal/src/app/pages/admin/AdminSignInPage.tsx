@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Briefcase, Eye, EyeOff, AlertCircle, Lock, Mail } from "lucide-react";
-
-const ADMIN_EMAIL    = "admin@remotebusinesspartner.com.au";
-const ADMIN_PASSWORD = "Admin2024!";
+import { mockAdminAuthService } from "../../services/mock/auth.mockService";
 
 export function AdminSignInPage() {
   const navigate = useNavigate();
@@ -14,20 +12,19 @@ export function AdminSignInPage() {
   const [error,    setError]    = useState("");
   const [loading,  setLoading]  = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        localStorage.setItem("rbp_admin_auth", "true");
-        navigate("/admin/dashboard");
-      } else {
-        setError("Invalid credentials. Please check your email and password.");
-      }
+    const response = await mockAdminAuthService.signIn({ email, password });
+
+    if (response.ok) {
+      navigate("/admin/dashboard");
+    } else {
+      setError("Invalid credentials. Please check your email and password.");
       setLoading(false);
-    }, 700);
+    }
   }
 
   return (

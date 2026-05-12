@@ -6,6 +6,7 @@ import {
   Menu, X, ChevronRight, ChevronDown, Bell,
   ShoppingBag, BookOpen, HelpCircle, Globe,
 } from "lucide-react";
+import { mockAdminAuthService } from "../../services/mock/auth.mockService";
 
 // ── Nav data ──────────────────────────────────────────────────────────────────
 
@@ -198,8 +199,8 @@ export function AdminLayout() {
     });
   }
 
-  function handleSignOut() {
-    localStorage.removeItem("rbp_admin_auth");
+  async function handleSignOut() {
+    await mockAdminAuthService.signOut();
     navigate("/admin/signin");
   }
 

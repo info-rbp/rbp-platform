@@ -1,4 +1,5 @@
 export * from "./mockClient";
+export * from "./auth.mockService";
 export * from "./membership.mockService";
 export * from "./decisionDesk.mockService";
 export * from "./docushare.mockService";

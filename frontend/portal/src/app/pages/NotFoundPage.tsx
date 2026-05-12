@@ -11,11 +11,11 @@ export function NotFoundPage() {
   }
 
   if (location.pathname === "/membership/free") {
-    return <Navigate to="/membership/sign-up-now?tier=free" replace />;
+    return <Navigate to="/portal/membership/checkout" replace />;
   }
 
   if (location.pathname === "/membership/premium") {
-    return <Navigate to="/membership/sign-up-now?tier=premium" replace />;
+    return <Navigate to="/portal/membership/checkout" replace />;
   }
 
   return (

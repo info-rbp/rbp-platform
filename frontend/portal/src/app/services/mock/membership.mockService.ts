@@ -5,6 +5,7 @@ import {
   type MockPaymentStatus,
 } from "../../mock";
 import type { MembershipTierCode } from "../../data/membershipTiers";
+import type { MembershipService } from "../../types/portal";
 import {
   createMockReference,
   mockFailure,
@@ -12,6 +13,7 @@ import {
   mockPost,
   requireFields,
 } from "./mockClient";
+import { listMockPortalActivity, recordMockPortalActivity } from "./portal.mockService";
 
 export interface MockMembershipSignupPayload extends Record<string, unknown> {
   selectedPlanId?: string;
@@ -66,7 +68,7 @@ function resolveMembershipTier(payload: MockMembershipSignupPayload): Membership
   return "premium";
 }
 
-export function submitMockMembershipSignup(payload: MockMembershipSignupPayload) {
+export async function submitMockMembershipSignup(payload: MockMembershipSignupPayload) {
   const membershipTier = resolveMembershipTier(payload);
   const errors = requireFields(payload, [
     "selectedPlanId",
@@ -112,7 +114,7 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
     );
   }
 
-  return mockPost(
+  const response = await mockPost(
     "/mock/membership/signup",
     payload,
     () => ({
@@ -127,9 +129,25 @@ export function submitMockMembershipSignup(payload: MockMembershipSignupPayload)
       ? "Free Membership activated."
       : "Premium Membership preview submitted."
   );
+
+  if (response.ok && response.data) {
+    await recordMockPortalActivity({
+      id: "membership-current",
+      product: "membership",
+      title: response.data.membershipTier === "free" ? "Free membership activated" : "Premium membership checkout",
+      description: `${String(payload.businessName ?? "Your business")} completed the mock membership checkout path.`,
+      status: response.data.membershipStatus,
+      reference: response.data.reference,
+      href: "/portal/membership/checkout",
+      adminHref: "/admin/membership",
+      nextAction: "Complete onboarding details",
+    });
+  }
+
+  return response;
 }
 
-export function submitMockMembershipOnboarding(payload: MockMembershipOnboardingPayload) {
+export async function submitMockMembershipOnboarding(payload: MockMembershipOnboardingPayload) {
   const errors = requireFields(payload, ["businessName", "industry", "businessSize"]);
 
   if (!Array.isArray(payload.goals) || payload.goals.length === 0) {
@@ -150,7 +168,7 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
     );
   }
 
-  return mockPost(
+  const response = await mockPost(
     "/mock/membership/onboarding",
     payload,
     () => ({
@@ -166,4 +184,42 @@ export function submitMockMembershipOnboarding(payload: MockMembershipOnboarding
     }),
     "Membership onboarding preview completed."
   );
+
+  if (response.ok && response.data) {
+    await recordMockPortalActivity({
+      id: "membership-current",
+      product: "membership",
+      title: "Membership onboarding complete",
+      description: `${String(payload.businessName ?? "Your business")} has completed the mock onboarding profile.`,
+      status: "active",
+      reference: response.data.reference,
+      href: "/portal/dashboard",
+      adminHref: "/admin/membership",
+      nextAction: "Review portal services",
+    });
+  }
+
+  return response;
 }
+
+export function getMockMembershipStatus() {
+  return Promise.resolve(listMockPortalActivity("membership"));
+}
+
+export const mockMembershipService: MembershipService = {
+  createCheckout(payload) {
+    return submitMockMembershipSignup(payload);
+  },
+
+  completeOnboarding(payload) {
+    return submitMockMembershipOnboarding(payload);
+  },
+
+  async getStatus() {
+    return mockGet(
+      "/mock/membership/status",
+      "active" as const,
+      "Mock membership status returned."
+    );
+  },
+};

@@ -151,7 +151,7 @@ export function DocumentCategoryPage() {
             <Link to="/document-nucleus/overview" className="inline-flex items-center gap-2 bg-blue-700 text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-800 transition-all">
               View document options <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link to="/document-nucleus/brief" className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl hover:bg-slate-50 transition-all">
+            <Link to="/portal/services/docushare/start" className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 font-bold px-6 py-3 rounded-xl hover:bg-slate-50 transition-all">
               Start a document brief
             </Link>
           </div>
@@ -196,7 +196,7 @@ export function DocumentCategoryPage() {
                 ← All Categories
               </Link>
               <Link
-                to={`/document-nucleus/brief?category=${categoryId}`}
+                to="/portal/services/docushare/start"
                 className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold text-sm px-5 py-2.5 rounded-xl transition-all hover:bg-white/90"
               >
                 Start a document brief
@@ -455,7 +455,7 @@ export function DocumentCategoryPage() {
                     <Clock className="w-3.5 h-3.5" /> {doc.deliveryTime}
                   </span>
                   <Link
-                    to={`/document-nucleus/brief?category=${categoryId}&product=${doc.id}`}
+                    to="/portal/services/docushare/start"
                     className={`inline-flex items-center gap-2 text-sm font-bold py-2 px-4 rounded-xl transition-all ${meta.color} text-white hover:opacity-90 whitespace-nowrap`}
                   >
                     Request <ArrowRight className="w-3.5 h-3.5" />
@@ -477,10 +477,10 @@ export function DocumentCategoryPage() {
               <p className="text-slate-500 text-sm">Get in touch and we'll scope a custom document to your exact requirements.</p>
             </div>
             <Link
-              to={`/document-nucleus/brief?category=${categoryId}`}
+              to="/portal/services/docushare/start"
               className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-200 whitespace-nowrap"
             >
-              Create a mock DocuShare brief
+              Submit through your account
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

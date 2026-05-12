@@ -8,6 +8,7 @@ import {
   mockAdminReviewQueues,
   mockAdminReviewRecords,
 } from "../../mock";
+import type { AdminService } from "../../types/portal";
 import {
   createMockReference,
   mockFailure,
@@ -71,3 +72,17 @@ export function submitMockAdminReviewAction(payload: MockAdminReviewActionPayloa
     "Mock admin review action submitted."
   );
 }
+
+export const mockAdminService: AdminService = {
+  listDashboardQueues() {
+    return getMockAdminReviewQueues();
+  },
+
+  updateRecordStatus(id, payload) {
+    return submitMockAdminReviewAction({
+      recordId: id,
+      action: (payload.action as MockAdminReviewActionPayload["action"]) ?? "request-more-info",
+      notes: String(payload.notes ?? "Mock admin status update."),
+    });
+  },
+};

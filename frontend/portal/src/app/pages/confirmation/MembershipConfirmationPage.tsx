@@ -88,10 +88,10 @@ export function MembershipConfirmationPage() {
             reference={primaryReference}
             primaryAction={
               <Link
-                to={confirmation?.portalHref ?? "/membership/sign-up-now?tier=free"}
+                to={confirmation?.portalHref ?? "/portal/membership/checkout"}
                 className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-semibold text-white"
               >
-                {confirmation ? "Go to portal dashboard" : "Create Free Membership"}
+                {confirmation ? "Go to portal dashboard" : "Create account to continue"}
               </Link>
             }
             secondaryAction={

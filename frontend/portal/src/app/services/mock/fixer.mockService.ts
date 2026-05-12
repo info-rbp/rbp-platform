@@ -8,6 +8,7 @@ import {
   mockFixerTimeline,
   mockFixerUrgencyOptions,
 } from "../../mock";
+import type { FixerService } from "../../types/portal";
 import {
   createMockReference,
   mockFailure,
@@ -15,6 +16,7 @@ import {
   mockPost,
   requireFields,
 } from "./mockClient";
+import { listMockPortalActivity, recordMockPortalActivity } from "./portal.mockService";
 
 export interface MockFixerRequestPayload extends Record<string, unknown> {
   issueTitle?: string;
@@ -55,7 +57,7 @@ export function getMockFixerSetup() {
   );
 }
 
-export function submitMockFixerRequest(payload: MockFixerRequestPayload) {
+export async function submitMockFixerRequest(payload: MockFixerRequestPayload) {
   const errors = requireFields(payload, [
     "issueTitle",
     "issueCategory",
@@ -86,7 +88,7 @@ export function submitMockFixerRequest(payload: MockFixerRequestPayload) {
     );
   }
 
-  return mockPost(
+  const response = await mockPost(
     "/mock/fixer/request",
     payload,
     () => ({
@@ -99,4 +101,56 @@ export function submitMockFixerRequest(payload: MockFixerRequestPayload) {
     }),
     "Mock Fixer request submitted."
   );
+
+  if (response.ok && response.data) {
+    await recordMockPortalActivity({
+      id: "the-fixer-current",
+      product: "the-fixer",
+      title: String(payload.issueTitle ?? "The Fixer request"),
+      description: String(payload.issueDescription ?? "Fixer request submitted through the customer portal."),
+      status: "assigned",
+      reference: response.data.reference,
+      href: "/portal/services/the-fixer/start",
+      adminHref: "/admin/the-fixer",
+      nextAction: "Assigned for triage",
+    });
+  }
+
+  return response;
 }
+
+export function listMyFixerRequests() {
+  return Promise.resolve(listMockPortalActivity("the-fixer"));
+}
+
+export const mockFixerService: FixerService = {
+  createRequestDraft(payload) {
+    return recordMockPortalActivity({
+      product: "the-fixer",
+      title: String(payload.issueTitle ?? "The Fixer request draft"),
+      description: String(payload.issueDescription ?? "Draft Fixer request."),
+      status: "draft",
+      href: "/portal/services/the-fixer/start",
+      adminHref: "/admin/the-fixer",
+      nextAction: "Complete issue context and desired resolution",
+    });
+  },
+
+  submitRequest(id) {
+    return recordMockPortalActivity({
+      id,
+      product: "the-fixer",
+      title: "The Fixer request",
+      description: "Fixer request submitted through the customer portal.",
+      status: "assigned",
+      reference: createMockReference("FIX"),
+      href: "/portal/services/the-fixer/start",
+      adminHref: "/admin/the-fixer",
+      nextAction: "Assigned for triage",
+    });
+  },
+
+  listMyRequests() {
+    return Promise.resolve(listMockPortalActivity("the-fixer"));
+  },
+};

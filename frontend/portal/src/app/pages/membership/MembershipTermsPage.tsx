@@ -50,11 +50,11 @@ export function MembershipTermsPage() {
               <Link to={premiumMembershipRoutes.inclusions} className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">
                 View Membership Inclusions
               </Link>
-              <Link to="/membership/sign-up-now?tier=free" className="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
-                Create Free Membership
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
+                Create account to continue
               </Link>
-              <Link to="/membership/sign-up-now?tier=premium" className="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
-                Start Premium Membership
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
+                Continue in portal
               </Link>
             </div>
           </section>

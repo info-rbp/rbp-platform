@@ -2,11 +2,8 @@ import { FileText, Download, Eye, Search, Filter, Clock, CheckCircle, AlertCircl
 import { useState } from "react";
 import { Link } from "react-router";
 import { PortalAdminReference } from "./PortalAdminReference";
-import {
-  docuShareFlowStorageKey,
-  type DocuShareStoredState,
-} from "../../features/docushare";
 import { mockPortalDocumentActivity } from "../../mock";
+import { getCurrentMockPortalState } from "../../services/mock/portal.mockService";
 
 const categoryIcon: Record<string, string> = {
   Advisory: "bg-blue-50 text-blue-700",
@@ -27,37 +24,21 @@ const statusColor: Record<string, string> = {
   submitted: "bg-blue-50 text-blue-700",
 };
 
-function readDocuShareDocumentState(): DocuShareStoredState | null {
-  const rawValue = window.sessionStorage.getItem(docuShareFlowStorageKey);
-
-  if (!rawValue) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(rawValue) as DocuShareStoredState;
-  } catch {
-    return null;
-  }
-}
-
 export function PortalDocuments() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const docuShareState = readDocuShareDocumentState();
-  const documents = docuShareState
-    ? [
-        {
-          id: "portal-docushare-current",
-          name: `${docuShareState.documentType} brief placeholder`,
-          category: "DocuShare",
-          date: "Just now",
-          size: "Mock file",
-          status: docuShareState.status,
-        },
-        ...mockPortalDocumentActivity,
-      ]
-    : mockPortalDocumentActivity;
+  const portalState = getCurrentMockPortalState();
+  const docuShareDocuments = portalState.activities
+    .filter((activity) => activity.product === "docushare")
+    .map((activity) => ({
+      id: `document-${activity.id}`,
+      name: `${activity.title} placeholder`,
+      category: "DocuShare",
+      date: activity.updatedAt,
+      size: "Mock file",
+      status: activity.status,
+    }));
+  const documents = [...docuShareDocuments, ...mockPortalDocumentActivity];
   const categories = ["All", ...Array.from(new Set(documents.map((document) => document.category)))];
 
   const filtered = documents.filter((d) => {
@@ -81,10 +62,10 @@ export function PortalDocuments() {
 
       <div className="flex flex-wrap gap-3">
         <Link
-          to="/document-nucleus/brief"
+          to="/portal/services/docushare/start"
           className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-800"
         >
-          Create a mock DocuShare brief
+          Submit through your account
         </Link>
         <Link
           to="/document-nucleus/overview"

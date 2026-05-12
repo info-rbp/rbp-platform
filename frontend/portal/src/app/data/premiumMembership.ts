@@ -28,7 +28,7 @@ export interface PremiumMembershipTermsSection {
 export const premiumMembershipRoutes = {
   overview: "/membership/overview",
   inclusions: "/membership/inclusions",
-  signup: "/membership/sign-up-now",
+  signup: "/portal/membership/checkout",
   faq: "/membership/faq",
   terms: "/membership/terms",
 } as const;
@@ -505,7 +505,7 @@ export const premiumMembershipNavigationPages = [
   },
   {
     id: "sign-up-now",
-    title: "Sign Up Now",
+    title: "Create Account to Continue",
     summary:
       "Guide visitors through the premium membership sign-up preview flow.",
     href: premiumMembershipRoutes.signup,

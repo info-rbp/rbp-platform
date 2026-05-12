@@ -27,7 +27,7 @@ export function DocumentCustomisationPage() {
         breadcrumb="Customisation"
         image={heroImage}
         bullets={["Template adaptation", "Custom document scoping", "Member-specific requirements"]}
-        ctaPrimary={{ label: "Start a Custom Brief", href: "/document-nucleus/brief?type=customisation" }}
+        ctaPrimary={{ label: "Submit through your account", href: "/portal/services/docushare/start" }}
         ctaSecondary={{ label: "Explore Nucleus", href: "/document-nucleus/overview" }}
         stat={{ value: "Custom", label: "Document Support", sublabel: "Adapt, scope, configure" }}
       />
@@ -90,7 +90,7 @@ export function DocumentCustomisationPage() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight mb-3">Need something more specific than a template?</h2>
               <p className="text-slate-600 leading-relaxed">Use the customisation pathway to scope the document properly and capture the detail needed to create something useful.</p>
             </div>
-            <Link to="/document-nucleus/brief?type=customisation" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">
+            <Link to="/portal/services/docushare/start" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">
               Start a Custom Brief <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

@@ -8,6 +8,7 @@ import {
   mockRiskQuestions,
   mockRiskTimeline,
 } from "../../mock";
+import type { RiskAdvisorService } from "../../types/portal";
 import {
   createMockReference,
   mockFailure,
@@ -15,6 +16,7 @@ import {
   mockPost,
   requireFields,
 } from "./mockClient";
+import { listMockPortalActivity, recordMockPortalActivity } from "./portal.mockService";
 
 export interface MockRiskAssessmentPayload extends Record<string, unknown> {
   businessName?: string;
@@ -75,7 +77,7 @@ export function getMockRiskAdvisorSetup() {
   );
 }
 
-export function submitMockRiskAssessment(payload: MockRiskAssessmentPayload) {
+export async function submitMockRiskAssessment(payload: MockRiskAssessmentPayload) {
   const errors = requireFields(payload, [
     "businessName",
     "industry",
@@ -106,7 +108,7 @@ export function submitMockRiskAssessment(payload: MockRiskAssessmentPayload) {
     );
   }
 
-  return mockPost(
+  const response = await mockPost(
     "/mock/risk-advisor/assessment",
     payload,
     () => {
@@ -123,4 +125,56 @@ export function submitMockRiskAssessment(payload: MockRiskAssessmentPayload) {
     },
     "Mock Risk Advisor assessment submitted."
   );
+
+  if (response.ok && response.data) {
+    await recordMockPortalActivity({
+      id: "risk-advisor-current",
+      product: "risk-advisor",
+      title: `${String(payload.businessName ?? "Business")} risk assessment`,
+      description: `Mock score ${response.data.mockScore}/100: ${response.data.scoreBand.label}.`,
+      status: "outcome-ready",
+      reference: response.data.reference,
+      href: "/portal/services/risk-advisor/start",
+      adminHref: "/admin/risk-advisor",
+      nextAction: "Review risk outcome",
+    });
+  }
+
+  return response;
 }
+
+export function listMyRiskAdvisorAssessments() {
+  return Promise.resolve(listMockPortalActivity("risk-advisor"));
+}
+
+export const mockRiskAdvisorService: RiskAdvisorService = {
+  createAssessmentDraft(payload) {
+    return recordMockPortalActivity({
+      product: "risk-advisor",
+      title: `${String(payload.businessName ?? "Business")} risk assessment draft`,
+      description: String(payload.priorityOutcome ?? "Draft Risk Advisor assessment."),
+      status: "draft",
+      href: "/portal/services/risk-advisor/start",
+      adminHref: "/admin/risk-advisor",
+      nextAction: "Complete risk categories and controls",
+    });
+  },
+
+  submitAssessment(id) {
+    return recordMockPortalActivity({
+      id,
+      product: "risk-advisor",
+      title: "Risk Advisor assessment",
+      description: "Risk Advisor assessment submitted through the customer portal.",
+      status: "outcome-ready",
+      reference: createMockReference("RISK"),
+      href: "/portal/services/risk-advisor/start",
+      adminHref: "/admin/risk-advisor",
+      nextAction: "Review risk outcome",
+    });
+  },
+
+  listMyAssessments() {
+    return Promise.resolve(listMockPortalActivity("risk-advisor"));
+  },
+};

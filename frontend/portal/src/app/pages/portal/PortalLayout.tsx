@@ -5,6 +5,7 @@ import {
   Tag, Settings, LogOut, Bell, Zap, MessageSquare,
   BookOpen, Menu, X, User,
 } from "lucide-react";
+import { mockAuthService } from "../../services/mock/auth.mockService";
 
 const USER = {
   name: "Remote Business Partner",
@@ -29,8 +30,9 @@ export function PortalLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  function handleSignOut() {
-    navigate("/sign-in");
+  async function handleSignOut() {
+    await mockAuthService.signOut();
+    navigate("/signin");
   }
 
   const today = new Date().toLocaleDateString("en-AU", {

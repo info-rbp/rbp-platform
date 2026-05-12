@@ -11,14 +11,17 @@ import {
   mockDocumentProducts,
   type MockTimelineItem,
 } from "../../mock";
+import type { DocuShareService } from "../../types/portal";
 import {
   createMockReference,
   mockFailure,
   mockGet,
   mockPost,
+  mockSuccess,
   requireFields,
   type MockValidationError,
 } from "./mockClient";
+import { listMockPortalActivity, recordMockPortalActivity } from "./portal.mockService";
 
 export interface MockDocuShareBriefPayload extends Record<string, unknown> {
   businessName?: string;
@@ -65,7 +68,7 @@ export function getMockDocumentProducts() {
   );
 }
 
-export function submitMockDocuShareBrief(payload: MockDocuShareBriefPayload) {
+export async function submitMockDocuShareBrief(payload: MockDocuShareBriefPayload) {
   const errors = requireFields(payload, [
     "businessName",
     "contactName",
@@ -103,7 +106,7 @@ export function submitMockDocuShareBrief(payload: MockDocuShareBriefPayload) {
     );
   }
 
-  return mockPost(
+  const response = await mockPost(
     "/mock/docushare/brief",
     payload,
     () => ({
@@ -118,4 +121,78 @@ export function submitMockDocuShareBrief(payload: MockDocuShareBriefPayload) {
     }),
     "Mock DocuShare brief submitted."
   );
+
+  if (response.ok && response.data) {
+    await recordMockPortalActivity({
+      id: "docushare-current",
+      product: "docushare",
+      title: `${String(payload.documentType ?? "DocuShare")} brief`,
+      description: String(payload.businessContext ?? "DocuShare brief submitted through the customer portal."),
+      status: "submitted",
+      reference: response.data.reference,
+      href: "/portal/services/docushare/start",
+      adminHref: "/admin/docushare",
+      nextAction: "Await document review",
+    });
+  }
+
+  return response;
 }
+
+export function listMyDocuShareBriefs() {
+  return Promise.resolve(listMockPortalActivity("docushare"));
+}
+
+export const mockDocuShareService: DocuShareService = {
+  createDraft(payload) {
+    return recordMockPortalActivity({
+      product: "docushare",
+      title: `${String(payload.documentType ?? "DocuShare")} brief draft`,
+      description: String(payload.businessContext ?? "Draft DocuShare brief."),
+      status: "draft",
+      href: "/portal/services/docushare/start",
+      adminHref: "/admin/docushare",
+      nextAction: "Complete document requirements",
+    });
+  },
+
+  updateDraft(id, payload) {
+    return recordMockPortalActivity({
+      id,
+      product: "docushare",
+      title: `${String(payload.documentType ?? "DocuShare")} brief draft`,
+      description: String(payload.businessContext ?? "Updated DocuShare brief."),
+      status: "in-progress",
+      href: "/portal/services/docushare/start",
+      adminHref: "/admin/docushare",
+      nextAction: "Review and submit document brief",
+    });
+  },
+
+  submitBrief(id) {
+    return recordMockPortalActivity({
+      id,
+      product: "docushare",
+      title: "DocuShare brief",
+      description: "DocuShare brief submitted through the customer portal.",
+      status: "submitted",
+      reference: createMockReference("DOC"),
+      href: "/portal/services/docushare/start",
+      adminHref: "/admin/docushare",
+      nextAction: "Await document review",
+    });
+  },
+
+  listMyBriefs() {
+    return Promise.resolve(listMockPortalActivity("docushare"));
+  },
+
+  async getBrief(id) {
+    const response = listMockPortalActivity("docushare");
+    return mockSuccess(
+      "/mock/docushare/brief/detail",
+      response.data?.find((item) => item.id === id) ?? null,
+      "Mock DocuShare brief returned."
+    );
+  },
+};

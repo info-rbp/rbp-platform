@@ -26,11 +26,11 @@ export function MembershipInclusionsPage() {
               Both memberships give users access to the RBP platform. Free Membership allows users to purchase products and services online and access selected benefits. RBP Premium Membership unlocks enhanced access, discounts, credits, and premium member benefits.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/membership/sign-up-now?tier=free" className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">
-                Create Free Membership
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">
+                Create account to continue
               </Link>
-              <Link to="/membership/sign-up-now?tier=premium" className="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
-                Start Premium Membership
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
+                Continue in portal
               </Link>
             </div>
           </section>
@@ -120,8 +120,8 @@ export function MembershipInclusionsPage() {
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3 sm:mt-0 sm:justify-end">
-              <Link to="/membership/sign-up-now?tier=free" className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">Create Free Membership</Link>
-              <Link to="/membership/sign-up-now?tier=premium" className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100">Start Premium Membership</Link>
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">Create account to continue</Link>
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100">Continue in portal</Link>
               <Link to={premiumMembershipRoutes.faq} className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100">Read FAQs</Link>
             </div>
           </section>

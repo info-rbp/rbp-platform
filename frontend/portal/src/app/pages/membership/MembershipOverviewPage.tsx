@@ -70,16 +70,16 @@ export function MembershipOverviewPage() {
                 Compare Memberships
               </a>
               <Link
-                to="/membership/sign-up-now?tier=free"
+                to="/portal/membership/checkout"
                 className="inline-flex items-center rounded-xl border border-white/30 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
               >
-                Create Free Membership
+                Create account to continue
               </Link>
               <Link
-                to="/membership/sign-up-now?tier=premium"
+                to="/portal/membership/checkout"
                 className="inline-flex items-center rounded-xl bg-blue-500 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-400"
               >
-                Start Premium Membership
+                Continue in portal
               </Link>
             </div>
           </section>

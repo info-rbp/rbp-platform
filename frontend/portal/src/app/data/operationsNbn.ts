@@ -8,7 +8,7 @@ export const nbnFlow = [
   { title: "Our NBN Plans", href: "/operations/connectivity/nbn-phone/our-nbn-plans" },
   { title: "Getting Connected", href: "/operations/connectivity/nbn-phone/getting-connected" },
   { title: "WiFi Modems", href: "/operations/connectivity/nbn-phone/wifi-modems" },
-  { title: "Connect Now", href: "/operations/connectivity/nbn-phone/connect-now" },
+  { title: "Connect Now", href: "/portal/services/nbn/start" },
   { title: "FAQs", href: "/operations/connectivity/nbn-phone/faqs" },
 ];
 

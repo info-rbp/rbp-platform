@@ -43,8 +43,8 @@ export function MembershipReferralProgramPage() {
                 Invite business owners to join RBP and help them access practical support, services, tools, and member benefits.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/membership/sign-up-now" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-slate-100">
-                  Sign Up Now <ArrowRight className="h-4 w-4" />
+                <Link to="/portal/membership/checkout" className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition-colors hover:bg-slate-100">
+                  Create account to continue <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link to="/contact" className="inline-flex items-center gap-2 rounded-xl border border-white/30 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10">
                   Contact Us
@@ -116,7 +116,7 @@ export function MembershipReferralProgramPage() {
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3 sm:mt-0 sm:justify-end">
-              <Link to="/membership/sign-up-now" className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">Sign Up Now</Link>
+              <Link to="/portal/membership/checkout" className="inline-flex items-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">Create account to continue</Link>
               <Link to="/contact" className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100">Contact Us</Link>
             </div>
           </section>

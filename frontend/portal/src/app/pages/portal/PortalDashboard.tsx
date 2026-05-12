@@ -2,73 +2,14 @@ import { Link } from "react-router";
 import { PortalAdminReference } from "./PortalAdminReference";
 import { PortalStatusCard } from "../../components/domain";
 import { StatusBadge } from "../../components/status";
-import {
-  decisionDeskFlowStorageKey,
-  type DecisionDeskStoredState,
-} from "../../features/decision-desk";
-import {
-  docuShareFlowStorageKey,
-  type DocuShareStoredState,
-} from "../../features/docushare";
-import { membershipFlowStorageKey } from "../../features/membership/MembershipPurchaseOnboardingFlow";
 import { mockPortalDashboard } from "../../mock";
+import { getCurrentMockPortalState } from "../../services/mock/portal.mockService";
 import {
   Zap, CalendarCheck, FileText, CheckCircle, Tag,
   Star, ArrowRight, ChevronRight, TrendingUp, Clock,
   Users, MessageSquare, AlertCircle, HeadphonesIcon,
   AppWindowIcon, Plus,
 } from "lucide-react";
-
-interface StoredMembershipDashboardState {
-  signupReference?: string;
-  onboardingReference?: string;
-  membershipStatus?: string;
-  onboardingStatus?: string;
-  businessName?: string;
-  selectedPlan?: string;
-}
-
-function readMembershipDashboardState(): StoredMembershipDashboardState | null {
-  const rawValue = window.sessionStorage.getItem(membershipFlowStorageKey);
-
-  if (!rawValue) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(rawValue) as StoredMembershipDashboardState;
-  } catch {
-    return null;
-  }
-}
-
-function readDecisionDeskDashboardState(): DecisionDeskStoredState | null {
-  const rawValue = window.sessionStorage.getItem(decisionDeskFlowStorageKey);
-
-  if (!rawValue) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(rawValue) as DecisionDeskStoredState;
-  } catch {
-    return null;
-  }
-}
-
-function readDocuShareDashboardState(): DocuShareStoredState | null {
-  const rawValue = window.sessionStorage.getItem(docuShareFlowStorageKey);
-
-  if (!rawValue) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(rawValue) as DocuShareStoredState;
-  } catch {
-    return null;
-  }
-}
 
 const metricIcon = {
   zap: Zap,
@@ -132,12 +73,11 @@ const healthMetrics = [
 const CONSULTANT_ASSIGNED = true;
 
 export function PortalDashboard() {
-  const membershipState = readMembershipDashboardState();
-  const decisionDeskState = readDecisionDeskDashboardState();
-  const docuShareState = readDocuShareDashboardState();
-  const memberName = mockPortalDashboard.user.contact.name;
+  const portalState = getCurrentMockPortalState();
+  const activePortalActivities = portalState.activities;
+  const memberName = portalState.customer.name;
   const businessName =
-    membershipState?.businessName ??
+    portalState.customer.businessName ??
     mockPortalDashboard.user.contact.businessName ??
     "Your business";
 
@@ -149,33 +89,23 @@ export function PortalDashboard() {
       />
 
       <PortalStatusCard
-        title={membershipState?.selectedPlan ?? "RBP Premium Membership"}
-        description={
-          membershipState
-            ? `${membershipState.businessName ?? "Your business"} has an active premium membership preview. Onboarding is ${membershipState.onboardingStatus ?? "in progress"}.`
-            : `${memberName} is viewing the membership portal preview for ${businessName}. Pending and guest-style membership states are documented in the shared preview scenarios.`
-        }
-        status={membershipState?.onboardingStatus === "complete" ? "active" : "in-progress"}
-        href="/membership/confirmation"
+        title={portalState.membershipPlan}
+        description={`${memberName} is viewing the authenticated portal for ${businessName}. Product requests, orders, listings, offers, documents, and admin updates are read from the shared mock portal model.`}
+        status={portalState.membershipStatus === "active" ? "active" : "in-progress"}
+        href="/portal/membership/checkout"
       />
 
-      {decisionDeskState ? (
-        <PortalStatusCard
-          title={`Decision Desk ${decisionDeskState.reference}`}
-          description={`${decisionDeskState.businessName} submitted "${decisionDeskState.title}" as a preview request. No real advisor has been assigned.`}
-          status={decisionDeskState.status}
-          href={decisionDeskState.requestHref}
-        />
-      ) : null}
-
-      {docuShareState ? (
-        <PortalStatusCard
-          title={`DocuShare brief ${docuShareState.reference}`}
-          description={`${docuShareState.businessName} submitted "${docuShareState.documentType}" as a preview document brief. No files were uploaded and no real document is being produced.`}
-          status={docuShareState.status}
-          href={docuShareState.documentsHref}
-        />
-      ) : null}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {activePortalActivities.slice(0, 3).map((activity) => (
+          <PortalStatusCard
+            key={activity.id}
+            title={activity.reference ? `${activity.title} ${activity.reference}` : activity.title}
+            description={activity.description}
+            status={activity.status}
+            href={activity.href}
+          />
+        ))}
+      </div>
 
       <div className="relative overflow-hidden rounded-2xl bg-blue-700 px-6 py-5">
         <div className="pointer-events-none absolute -top-8 -right-8 h-44 w-44 rounded-full bg-blue-600 opacity-40" />
@@ -191,8 +121,8 @@ export function PortalDashboard() {
             </div>
             <h2 className="mb-1.5 text-xl font-extrabold text-white">Welcome back, {memberName}.</h2>
             <p className="max-w-lg text-sm text-blue-100">
-              {businessName} has <span className="font-bold text-white">{mockPortalDashboard.activeRequests.length} active requests</span>,{" "}
-              <span className="font-bold text-white">{mockPortalDashboard.notifications.length} notifications</span>, and recommended next actions ready.
+              {businessName} has <span className="font-bold text-white">{activePortalActivities.length} product activities</span>,{" "}
+              <span className="font-bold text-white">{portalState.notifications.length} notifications</span>, and recommended next actions ready.
             </p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
@@ -242,7 +172,7 @@ export function PortalDashboard() {
             </Link>
           </div>
           <div className="divide-y divide-slate-50">
-            {mockPortalDashboard.recentActivity.map((item) => (
+            {activePortalActivities.slice(0, 8).map((item) => (
               <Link
                 key={item.id}
                 to={item.href}
@@ -250,14 +180,14 @@ export function PortalDashboard() {
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100">
-                    {item.type === "service" && <Zap className="h-4 w-4 text-slate-500" />}
-                    {item.type === "document" && <FileText className="h-4 w-4 text-slate-500" />}
-                    {item.type === "offer" && <Tag className="h-4 w-4 text-slate-500" />}
-                    {item.type === "session" && <CalendarCheck className="h-4 w-4 text-slate-500" />}
+                    {["decision-desk", "connectivity", "risk-advisor", "the-fixer"].includes(item.product) && <Zap className="h-4 w-4 text-slate-500" />}
+                    {item.product === "docushare" && <FileText className="h-4 w-4 text-slate-500" />}
+                    {(item.product === "marketplace-listing" || item.product === "marketplace-offer") && <Tag className="h-4 w-4 text-slate-500" />}
+                    {item.product === "membership" && <CalendarCheck className="h-4 w-4 text-slate-500" />}
                   </div>
                   <div className="min-w-0">
                     <div className="truncate text-xs font-bold text-slate-800">{item.title}</div>
-                    <div className="text-[10px] text-slate-400">{item.date}</div>
+                    <div className="text-[10px] text-slate-400">{item.updatedAt}</div>
                   </div>
                 </div>
                 <span className={`flex-shrink-0 rounded-lg px-2 py-1 text-[10px] font-bold ${activityStatusColor[item.status] ?? "bg-slate-100 text-slate-600"}`}>
@@ -298,9 +228,9 @@ export function PortalDashboard() {
           <div className="border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Notifications</h3>
           </div>
-          {mockPortalDashboard.notifications.length > 0 ? (
+          {portalState.notifications.length > 0 ? (
             <div className="divide-y divide-slate-50">
-              {mockPortalDashboard.notifications.map((notification) => (
+              {portalState.notifications.map((notification) => (
                 <Link
                   key={notification.id}
                   to={notification.href ?? "/portal/dashboard"}
@@ -341,13 +271,13 @@ export function PortalDashboard() {
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-slate-900">Membership Preview Status</h3>
+          <h3 className="text-sm font-extrabold text-slate-900">Authenticated Product Activity</h3>
           <span className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-400">
             Preview data
           </span>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {mockPortalDashboard.flowStatuses.map((flow) => (
+          {activePortalActivities.map((flow) => (
             <PortalStatusCard
               key={flow.id}
               title={flow.title}

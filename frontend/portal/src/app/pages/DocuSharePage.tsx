@@ -37,7 +37,7 @@ export function DocuSharePage() {
         image={heroImage}
         bullets={["256-bit encrypted storage", "Instant team sharing", "Full audit trails"]}
         ctaPrimary={{ label: "Explore Documents", href: "/document-nucleus/overview" }}
-        ctaSecondary={{ label: "Start a mock brief", href: "/document-nucleus/brief" }}
+        ctaSecondary={{ label: "Submit through your account", href: "/portal/services/docushare/start" }}
         stat={{ value: "256-bit", label: "Encryption Standard", sublabel: "Bank-level security" }}
       />
 
@@ -64,10 +64,10 @@ export function DocuSharePage() {
                 ))}
               </div>
               <Link
-                to="/document-nucleus/brief"
+                to="/portal/services/docushare/start"
                 className="inline-flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-xl transition-all"
               >
-                Create a mock DocuShare brief <ArrowRight className="w-4 h-4" />
+                Submit through your account <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
             <div className="rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">

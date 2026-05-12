@@ -11,6 +11,7 @@ import { mockResources } from "./resources.mock";
 import { mockRiskAssessments } from "./riskAdvisor.mock";
 import type { MockStatus } from "./types.mock";
 import { mockCurrentUser, mockGuestUser } from "./user.mock";
+import type { PortalDashboardState } from "../types/portal";
 
 export type MockPortalMembershipState = "active" | "pending" | "none";
 export type MockPortalAccessState = "included" | "available" | "locked" | "coming-soon";
@@ -299,7 +300,7 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     lastUpdated: "7 May 2026",
     nextAction: "Review consultant questions",
     ctaLabel: "Continue Decision Desk",
-    ctaHref: "/on-demand/decision-desk",
+    ctaHref: "/portal/services/decision-desk/start",
   })),
   ...mockDocuShareBriefs.map((brief) => ({
     id: "docushare-brief",
@@ -311,7 +312,7 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     lastUpdated: "7 May 2026",
     nextAction: "Review document status",
     ctaLabel: "Open DocuShare brief",
-    ctaHref: "/document-nucleus/brief",
+    ctaHref: "/portal/services/docushare/start",
   })),
   ...mockConnectivityOrders.map((order) => ({
     id: "connectivity-order",
@@ -323,7 +324,7 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     lastUpdated: "6 May 2026",
     nextAction: "Confirm serviceability",
     ctaLabel: "View Connectivity",
-    ctaHref: "/operations/connectivity",
+    ctaHref: "/portal/services/nbn/start",
   })),
   ...mockRiskAssessments.map((assessment) => ({
     id: "risk-advisor",
@@ -335,7 +336,7 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     lastUpdated: "6 May 2026",
     nextAction: `Review score ${assessment.score}/100`,
     ctaLabel: "Review Risk Advisor",
-    ctaHref: "/on-demand/risk-advisor",
+    ctaHref: "/portal/services/risk-advisor/start",
   })),
   ...mockFixerRequests.map((request) => ({
     id: "the-fixer",
@@ -347,7 +348,7 @@ export const mockPortalServiceRequests: MockPortalServiceRequest[] = [
     lastUpdated: "5 May 2026",
     nextAction: "Assigned for triage",
     ctaLabel: "Open The Fixer",
-    ctaHref: "/on-demand/the-fixer",
+    ctaHref: "/portal/services/the-fixer/start",
   })),
 ];
 
@@ -587,4 +588,41 @@ export const mockPortalDashboard = {
   quickLinks: mockPortalQuickActions,
   nextSteps: mockPortalNextSteps,
   flowStatuses: mockPortalFlowStatuses,
+};
+
+export const mockPortalState: PortalDashboardState = {
+  customer: {
+    id: mockCurrentUser.id,
+    name: mockCurrentUser.contact.name,
+    email: mockCurrentUser.contact.email,
+    businessName: mockCurrentUser.contact.businessName,
+  },
+  membershipStatus: "active",
+  membershipPlan: "RBP Premium Membership",
+  activities: mockPortalServiceRequests.map((request) => ({
+    id: request.id,
+    product:
+      request.source === "Decision Desk"
+        ? "decision-desk"
+        : request.source === "DocuShare"
+          ? "docushare"
+          : request.source === "Connectivity"
+            ? "connectivity"
+            : request.source === "Risk Advisor"
+              ? "risk-advisor"
+              : "the-fixer",
+    title: request.title,
+    description: request.description,
+    status: request.status as PortalDashboardState["activities"][number]["status"],
+    href: request.ctaHref,
+    nextAction: request.nextAction,
+    updatedAt: request.lastUpdated,
+  })),
+  notifications: mockNotifications.map((notification) => ({
+    id: notification.id,
+    title: notification.title,
+    message: notification.message,
+    status: notification.status as PortalDashboardState["notifications"][number]["status"],
+    href: notification.href ?? "/portal/dashboard",
+  })),
 };

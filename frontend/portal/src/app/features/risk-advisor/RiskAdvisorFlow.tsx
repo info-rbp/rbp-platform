@@ -115,7 +115,7 @@ function RiskAdvisorHero() {
               href="#assessment"
               className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
             >
-              Start mock assessment <ArrowRight className="h-4 w-4" />
+              Start assessment <ArrowRight className="h-4 w-4" />
             </a>
             <Link
               to="/portal/services"
@@ -192,7 +192,7 @@ function RiskAdvisorOverviewCards() {
   );
 }
 
-export function RiskAdvisorFlow() {
+export function RiskAdvisorFlow({ embedded = false }: { embedded?: boolean }) {
   const [step, setStep] = useState("business");
   const [submissionState, setSubmissionState] = useState<SubmissionState>("idle");
   const [reference, setReference] = useState("");
@@ -248,7 +248,7 @@ export function RiskAdvisorFlow() {
   if (submissionState === "success") {
     return (
       <div className="min-h-screen bg-slate-50">
-        <Navbar />
+        {!embedded ? <Navbar /> : null}
         <section className="py-12">
           <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
             <div className="space-y-6">
@@ -279,16 +279,16 @@ export function RiskAdvisorFlow() {
             </div>
           </div>
         </section>
-        <Footer />
+        {!embedded ? <Footer /> : null}
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
-      <RiskAdvisorHero />
-      <RiskAdvisorOverviewCards />
+      {!embedded ? <Navbar /> : null}
+      {!embedded ? <RiskAdvisorHero /> : null}
+      {!embedded ? <RiskAdvisorOverviewCards /> : null}
 
       <section id="assessment" className="scroll-mt-28 bg-slate-50 py-12">
         <WizardShell
@@ -531,7 +531,7 @@ export function RiskAdvisorFlow() {
         </div>
       </section>
 
-      <Footer />
+      {!embedded ? <Footer /> : null}
     </div>
   );
 }

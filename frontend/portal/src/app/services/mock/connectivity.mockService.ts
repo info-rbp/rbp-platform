@@ -5,6 +5,7 @@ import {
   mockConnectivityServiceFamilies,
   mockConnectivityTimeline,
 } from "../../mock";
+import type { ConnectivityService } from "../../types/portal";
 import {
   createMockReference,
   mockFailure,
@@ -12,6 +13,7 @@ import {
   mockPost,
   requireFields,
 } from "./mockClient";
+import { listMockPortalActivity, recordMockPortalActivity } from "./portal.mockService";
 
 export interface MockServiceabilityPayload extends Record<string, unknown> {
   serviceAddress?: string;
@@ -82,7 +84,7 @@ export function checkMockServiceability(payload: MockServiceabilityPayload) {
   );
 }
 
-export function submitMockConnectivityOrder(payload: MockConnectivityOrderPayload) {
+export async function submitMockConnectivityOrder(payload: MockConnectivityOrderPayload) {
   const errors = requireFields(payload, [
     "serviceAddress",
     "selectedPlanId",
@@ -111,7 +113,7 @@ export function submitMockConnectivityOrder(payload: MockConnectivityOrderPayloa
     );
   }
 
-  return mockPost(
+  const response = await mockPost(
     "/mock/connectivity/order",
     payload,
     () => ({
@@ -123,4 +125,60 @@ export function submitMockConnectivityOrder(payload: MockConnectivityOrderPayloa
     }),
     "Mock connectivity order submitted."
   );
+
+  if (response.ok && response.data) {
+    await recordMockPortalActivity({
+      id: "connectivity-current",
+      product: "connectivity",
+      title: "Business NBN order",
+      description: `NBN order for ${String(payload.serviceAddress ?? "the selected service address")}.`,
+      status: "submitted",
+      reference: response.data.reference,
+      href: "/portal/services/nbn/start",
+      adminHref: "/admin/connectivity",
+      nextAction: "Await serviceability confirmation",
+    });
+  }
+
+  return response;
 }
+
+export function listMyConnectivityOrders() {
+  return Promise.resolve(listMockPortalActivity("connectivity"));
+}
+
+export const mockConnectivityService: ConnectivityService = {
+  checkAvailability(payload) {
+    return checkMockServiceability(payload);
+  },
+
+  createOrderDraft(payload) {
+    return recordMockPortalActivity({
+      product: "connectivity",
+      title: "Business NBN order draft",
+      description: `Draft NBN order for ${String(payload.serviceAddress ?? "the selected service address")}.`,
+      status: "draft",
+      href: "/portal/services/nbn/start",
+      adminHref: "/admin/connectivity",
+      nextAction: "Complete address availability and plan selection",
+    });
+  },
+
+  submitOrder(id) {
+    return recordMockPortalActivity({
+      id,
+      product: "connectivity",
+      title: "Business NBN order",
+      description: "NBN order submitted through the customer portal.",
+      status: "submitted",
+      reference: createMockReference("NBN"),
+      href: "/portal/services/nbn/start",
+      adminHref: "/admin/connectivity",
+      nextAction: "Await serviceability confirmation",
+    });
+  },
+
+  listMyOrders() {
+    return Promise.resolve(listMockPortalActivity("connectivity"));
+  },
+};

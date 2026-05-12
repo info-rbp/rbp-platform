@@ -153,7 +153,7 @@ function MarketplaceHero() {
               Browse listings <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              to="/marketplace/listing/new"
+              to="/portal/marketplace/listings/new"
               className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
             >
               List with us <ArrowRight className="h-4 w-4" />
@@ -247,7 +247,7 @@ function MarketplaceLanding() {
                 <h3 className="mb-2 text-xl font-bold text-slate-900">{item.title}</h3>
                 <p className="mb-5 text-sm leading-relaxed text-slate-600">{item.description}</p>
                 <Link
-                  to={item.id === "list-with-us" ? "/marketplace/listing/new" : "/marketplace"}
+                  to={item.id === "list-with-us" ? "/portal/marketplace/listings/new" : "/marketplace"}
                   className="inline-flex items-center gap-2 text-sm font-bold text-amber-700 hover:text-amber-800"
                 >
                   {item.id === "list-with-us" ? "Start a mock listing" : "Explore marketplace"}
@@ -365,13 +365,13 @@ function MarketplaceLanding() {
           <ShoppingBag className="mx-auto mb-5 h-12 w-12 text-amber-400" />
           <h2 className="mb-4 text-3xl font-extrabold">Want to list something?</h2>
           <p className="mb-8 text-slate-300">
-            Start a frontend-only seller listing flow. No real listing is published and no real payment is processed.
+            Create a seller listing through your account. No real listing is published and no real payment is processed.
           </p>
           <Link
-            to="/marketplace/listing/new"
+            to="/portal/marketplace/listings/new"
             className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-8 py-4 font-bold text-slate-900 shadow-lg transition hover:-translate-y-0.5 hover:bg-amber-400"
           >
-            Start mock seller listing <ArrowRight className="h-4 w-4" />
+            Create listing through your account <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -415,13 +415,13 @@ function MarketplaceDetail() {
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                to={`/marketplace/enquiry/${item.id}`}
+                to="/portal/marketplace/offers/new"
                 className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-slate-950 hover:bg-amber-400"
               >
                 Enquire about listing <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/marketplace/listing/new"
+                to="/portal/marketplace/listings/new"
                 className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
               >
                 List something similar
@@ -842,24 +842,33 @@ function SellerListingFlow() {
   );
 }
 
-export function MarketplaceEnquiryListingFlow() {
+export function MarketplaceEnquiryListingFlow({
+  embedded = false,
+  forcedView,
+}: {
+  embedded?: boolean;
+  forcedView?: "landing" | "detail" | "enquiry" | "seller";
+}) {
   const location = useLocation();
 
   const view = useMemo(() => {
+    if (forcedView) return forcedView;
     if (location.pathname.includes("/marketplace/listing/new")) return "seller";
+    if (location.pathname.includes("/marketplace/listings/new")) return "seller";
+    if (location.pathname.includes("/marketplace/offers/new")) return "enquiry";
     if (location.pathname.includes("/marketplace/enquiry/")) return "enquiry";
     if (location.pathname.includes("/marketplace/product/")) return "detail";
     return "landing";
-  }, [location.pathname]);
+  }, [forcedView, location.pathname]);
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      {!embedded ? <Navbar /> : null}
       {view === "seller" ? <SellerListingFlow /> : null}
       {view === "enquiry" ? <BuyerEnquiryFlow /> : null}
       {view === "detail" ? <MarketplaceDetail /> : null}
       {view === "landing" ? <MarketplaceLanding /> : null}
-      <Footer />
+      {!embedded ? <Footer /> : null}
     </div>
   );
 }

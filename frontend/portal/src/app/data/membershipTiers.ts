@@ -194,8 +194,8 @@ export const freeMembershipTier: MembershipTier = {
   billingLabel: "Free account",
   description:
     "Create a free RBP account to purchase products and services online, access member offers, save your business details, and manage your basic member profile.",
-  ctaLabel: "Create Free Membership",
-  ctaHref: "/membership/sign-up-now?tier=free",
+  ctaLabel: "Create account to continue",
+  ctaHref: "/portal/membership/checkout",
   status: "available",
   checkoutRequired: false,
   stripeRequired: false,
@@ -225,8 +225,8 @@ export const premiumMembershipTier: MembershipTier = {
   billingLabel: "Early bird weekly subscription",
   description:
     "Unlock the full RBP Premium Membership with Core Services, Nucleus access, service discounts, annual service credits, marketplace savings, operations benefits, and referral rewards.",
-  ctaLabel: "Start Premium Membership",
-  ctaHref: "/membership/sign-up-now?tier=premium",
+  ctaLabel: "Continue in portal",
+  ctaHref: "/portal/membership/checkout",
   status: "available",
   recommended: true,
   checkoutRequired: true,

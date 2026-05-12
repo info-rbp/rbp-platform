@@ -28,7 +28,7 @@ export function DocumentProcessPage() {
         image={heroImage}
         bullets={["Guided document pathway", "Structured business context", "Clear review process"]}
         ctaPrimary={{ label: "Explore Nucleus", href: "/document-nucleus/overview" }}
-        ctaSecondary={{ label: "Start a Document Brief", href: "/document-nucleus/brief" }}
+        ctaSecondary={{ label: "Submit through your account", href: "/portal/services/docushare/start" }}
         stat={{ value: "4", label: "Process Stages", sublabel: "Select, brief, configure, generate" }}
       />
 
@@ -77,7 +77,7 @@ export function DocumentProcessPage() {
               <p className="text-slate-300 leading-relaxed mb-6">Start with the Nucleus overview or create a document brief. The detailed member workflow can then collect the information needed to generate or customise the right document.</p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link to="/document-nucleus/overview" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-800 transition-all">Explore Nucleus <ArrowRight className="w-4 h-4" /></Link>
-                <Link to="/document-nucleus/brief" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10 transition-all">Start a Brief</Link>
+                <Link to="/portal/services/docushare/start" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10 transition-all">Submit through your account</Link>
               </div>
             </div>
           </div>

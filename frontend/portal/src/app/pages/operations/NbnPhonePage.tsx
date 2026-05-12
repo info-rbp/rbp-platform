@@ -191,7 +191,7 @@ function NbnWifiModemsPage() {
     <NbnPageShell
       title="WiFi Modems"
       subtitle="Router suitability depends on NBN technology, speed tier, Wi-Fi coverage needs, VoIP requirements, and provider settings."
-      primary={{ label: "Connect Now", href: "/operations/connectivity/nbn-phone/connect-now" }}
+      primary={{ label: "Continue in portal", href: "/portal/services/nbn/start" }}
     >
       <OperationsProductGrid>
         {modemOptions.map((option) => (
