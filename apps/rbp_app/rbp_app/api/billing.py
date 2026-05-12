@@ -7,6 +7,7 @@ from rbp_app.services.billing import (
     get_subscription_status as get_subscription_status_service,
     record_payment_event as record_payment_event_service,
 )
+from rbp_app.services.stripe_gateway import create_membership_checkout_session as create_checkout_session_service
 
 
 @frappe.whitelist()
@@ -33,3 +34,16 @@ def record_payment_event(payload=None):
         "related_doctype": event.related_doctype,
         "related_name": event.related_name,
     }
+
+
+@frappe.whitelist()
+def create_membership_checkout_session(plan_code=None, success_url=None, cancel_url=None):
+    """Create a Stripe Checkout Session for the logged-in user's membership plan."""
+
+    user = require_login()
+    return create_checkout_session_service(
+        plan_code,
+        success_url=success_url,
+        cancel_url=cancel_url,
+        user=user,
+    )

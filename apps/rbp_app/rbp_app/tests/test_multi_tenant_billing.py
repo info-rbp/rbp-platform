@@ -1,3 +1,4 @@
+import importlib.util
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -167,6 +168,10 @@ class TestTenantAccess(TestCase):
 
 
 class TestSharedBenchAuthAllowlist(TestCase):
+    def setUp(self):
+        if importlib.util.find_spec("mail") is None:
+            self.skipTest("Optional Frappe Mail app is not installed in this bench.")
+
     def test_mail_does_not_claim_global_auth_routes(self):
         from mail import hooks as mail_hooks
 
