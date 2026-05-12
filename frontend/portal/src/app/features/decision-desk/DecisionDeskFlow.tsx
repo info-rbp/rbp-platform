@@ -38,6 +38,7 @@ import {
   submitMockDecisionDeskRequest,
   type MockDecisionDeskSubmitResult,
 } from "../../services/mock/decisionDesk.mockService";
+import type { MockDecisionDeskPayload } from "../../services/mock/decisionDesk.mockService";
 import {
   decisionDeskFlowStorageKey,
   type DecisionDeskFlowForm,

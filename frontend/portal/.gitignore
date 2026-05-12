@@ -18,3 +18,7 @@ test-results/
 playwright-report/
 
 .playwright/
+
+# Application source config files must be tracked.
+!src/app/config/
+!src/app/config/**
