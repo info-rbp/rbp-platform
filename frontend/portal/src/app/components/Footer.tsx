@@ -1,6 +1,8 @@
 import { Link } from "react-router";
 import { Briefcase } from "lucide-react";
 
+import { useRuntimeConfig } from "../hooks/useRuntimeConfig";
+
 const footerSections = {
   Company: [
     { label: "About Us", href: "/about" },
@@ -32,6 +34,14 @@ const footerSections = {
 };
 
 export function Footer() {
+  const { config } = useRuntimeConfig();
+  const showApplications =
+    config.features.application_provisioning || config.features.application_interest;
+  const sections = {
+    ...footerSections,
+    Services: footerSections.Services.filter((item) => showApplications || item.href !== "/applications"),
+  };
+
   return (
     <footer className="bg-slate-900 text-white">
       <div className="mx-auto max-w-7xl px-4 pb-8 pt-14 sm:px-6 lg:px-8">
@@ -51,7 +61,7 @@ export function Footer() {
             </p>
           </div>
 
-          {Object.entries(footerSections).map(([heading, links]) => (
+          {Object.entries(sections).map(([heading, links]) => (
             <div key={heading}>
               <h5 className="mb-3 text-xs font-bold uppercase tracking-wider text-white">{heading}</h5>
               <ul className="space-y-2">

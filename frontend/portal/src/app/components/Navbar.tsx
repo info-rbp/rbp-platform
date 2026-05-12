@@ -11,7 +11,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import { publicNavigation as MENUS, type MegaConfig } from "../data/publicNavigation";
+import {
+  filterPublicNavigationForRuntime,
+  publicNavigation,
+  type MegaConfig,
+} from "../data/publicNavigation";
+import { useRuntimeConfig } from "../hooks/useRuntimeConfig";
 
 // -- Mega menu panel (desktop) -------------------------------------------------
 
@@ -172,6 +177,7 @@ function MobileSection({
 // -- Main Navbar ---------------------------------------------------------------
 
 export function Navbar() {
+  const { config } = useRuntimeConfig();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openMobileAccordion, setOpenMobileAccordion] = useState<string | null>(null);
@@ -201,7 +207,8 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const activeMenu = MENUS.find((menu) => menu.key === openDropdown) ?? null;
+  const menus = filterPublicNavigationForRuntime(publicNavigation, config.features);
+  const activeMenu = menus.find((menu) => menu.key === openDropdown) ?? null;
 
   function toggleDropdown(key: string) {
     setOpenDropdown((prev) => (prev === key ? null : key));
@@ -290,7 +297,7 @@ export function Navbar() {
         <div className="w-full px-3 sm:px-4 lg:px-6 2xl:px-8">
           <nav className="h-12 overflow-x-auto" aria-label="Primary navigation">
             <div className="mx-auto flex h-12 min-w-max items-center justify-center gap-0.5">
-              {MENUS.map((menu) => {
+              {menus.map((menu) => {
                 const isOpen = openDropdown === menu.key;
                 const isActive = menuLinks(menu).some((link) => {
                   const path = normalisePath(link.href);
@@ -340,7 +347,7 @@ export function Navbar() {
             Home
           </Link>
 
-          {MENUS.map((menu) => (
+          {menus.map((menu) => (
             <MobileSection
               key={menu.key}
               config={menu}

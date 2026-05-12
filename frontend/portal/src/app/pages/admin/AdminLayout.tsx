@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router";
 import {
   Briefcase, LayoutDashboard, Users, Zap, AppWindowIcon,
@@ -7,6 +7,7 @@ import {
   ShoppingBag, BookOpen, HelpCircle, Globe,
 } from "lucide-react";
 import { mockAdminAuthService } from "../../services/mock/auth.mockService";
+import { useRuntimeConfig } from "../../hooks/useRuntimeConfig";
 
 // ── Nav data ──────────────────────────────────────────────────────────────────
 
@@ -160,9 +161,16 @@ function getActiveGroup(pathname: string): string | null {
   return NAV_GROUPS.find(g => g.children.some(c => isChildActive(c.href, pathname)))?.key ?? null;
 }
 
+function getRuntimeNavGroups(adminApplicationsEnabled: boolean): NavGroup[] {
+  return adminApplicationsEnabled
+    ? NAV_GROUPS
+    : NAV_GROUPS.filter((group) => group.key !== "applications");
+}
+
 // ── Layout ────────────────────────────────────────────────────────────────────
 
 export function AdminLayout() {
+  const { config } = useRuntimeConfig();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -172,6 +180,10 @@ export function AdminLayout() {
     const active = getActiveGroup(window.location.pathname);
     return active ? new Set([active]) : new Set(["admin-dashboard"]);
   });
+  const navGroups = useMemo(
+    () => getRuntimeNavGroups(config.features.admin_applications),
+    [config.features.admin_applications],
+  );
 
   // Auth guard
   useEffect(() => {
@@ -182,14 +194,14 @@ export function AdminLayout() {
 
   // Auto-expand the group that owns the new route whenever the path changes
   useEffect(() => {
-    const active = getActiveGroup(location.pathname);
+    const active = navGroups.find(g => g.children.some(c => isChildActive(c.href, location.pathname)))?.key ?? null;
     if (active) {
       setOpenGroups(prev => {
         if (prev.has(active)) return prev;
         return new Set([...prev, active]);
       });
     }
-  }, [location.pathname]);
+  }, [location.pathname, navGroups]);
 
   function toggleGroup(key: string) {
     setOpenGroups(prev => {
@@ -205,10 +217,10 @@ export function AdminLayout() {
   }
 
   // Derive breadcrumb label for the top bar
-  const activeGroupLabel = NAV_GROUPS.find(g =>
+  const activeGroupLabel = navGroups.find(g =>
     g.children.some(c => isChildActive(c.href, location.pathname))
   )?.label ?? "Admin";
-  const activeChildLabel = NAV_GROUPS
+  const activeChildLabel = navGroups
     .flatMap(g => g.children)
     .find(c => isChildActive(c.href, location.pathname))?.label ?? null;
 
@@ -228,7 +240,7 @@ export function AdminLayout() {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-0.5">
-        {NAV_GROUPS.map((group) => {
+        {navGroups.map((group) => {
           const Icon         = group.icon;
           const isOpen       = openGroups.has(group.key);
           const groupActive  = group.children.some(c => isChildActive(c.href, location.pathname));
@@ -365,3 +377,7 @@ export function AdminLayout() {
     </div>
   );
 }
+  const navGroups = useMemo(
+    () => getRuntimeNavGroups(config.features.admin_applications),
+    [config.features.admin_applications],
+  );

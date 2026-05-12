@@ -7,6 +7,7 @@ from rbp_app.services.apps import get_available_app_cards
 from rbp_app.services.apps import get_enabled_platform_modules
 from rbp_app.services.apps import group_app_cards_by_category
 from rbp_app.services.billing import get_subscription_status
+from rbp_app.services.environment import get_safe_public_runtime_config
 from rbp_app.services.integrations import get_integrations_status
 from rbp_app.services.notifications import get_notifications
 
@@ -59,4 +60,5 @@ def get_dashboard_payload(user=None):
 		"notifications": get_notifications(user),
 		"billing": get_subscription_status(user),
 		"integrations": get_integrations_status(user),
+		"runtime": get_safe_public_runtime_config(),
 	}

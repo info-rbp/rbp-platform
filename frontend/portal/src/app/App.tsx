@@ -1,6 +1,11 @@
 import { RouterProvider } from "react-router";
 import { router } from "./routes";
+import { RuntimeConfigProvider } from "./hooks/useRuntimeConfig";
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <RuntimeConfigProvider>
+      <RouterProvider router={router} />
+    </RuntimeConfigProvider>
+  );
 }

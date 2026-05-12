@@ -3,6 +3,7 @@
 import frappe
 
 from rbp_app.permissions import is_admin_user
+from rbp_app.services.environment import is_application_provisioning_enabled
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -240,6 +241,9 @@ def _entitlement_card(row):
 
 def get_available_app_cards(user=None):
 	"""Build portal app cards from installed apps and enabled RBP modules."""
+
+	if not is_admin_user(user) and not is_application_provisioning_enabled():
+		return get_enabled_platform_modules(user)
 
 	entitlement_rows = _get_entitlement_rows(user)
 	if entitlement_rows:

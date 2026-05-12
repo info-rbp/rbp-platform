@@ -1,11 +1,14 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router";
 
 import { ScrollToHash } from "./components/ScrollToHash";
+import { EnvironmentBanner } from "./components/EnvironmentBanner";
 import {
   RequireAccountGate,
   RequireAdminAuth,
   RequireCustomerAuth,
 } from "./components/auth/AccountGate";
+import { canShowPublicApplications } from "./config/runtime";
+import { useRuntimeConfig } from "./hooks/useRuntimeConfig";
 import type { PortalProductKey } from "./types/portal";
 
 // ── Core public pages ─────────────────────────────────────────────────────────
@@ -143,6 +146,7 @@ import { AdminCrudPage } from "./pages/admin/AdminCrudPage";
 function Root() {
   return (
     <>
+      <EnvironmentBanner />
       <ScrollToHash />
       <Outlet />
     </>
@@ -155,6 +159,54 @@ function Layout() {
 
 function SignupPage() {
   return <SignInPage initialTab="signup" />;
+}
+
+function FeatureUnavailablePage({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
+      <div className="max-w-lg rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-xl">
+        <p className="text-xs font-bold uppercase tracking-widest text-blue-700">Feature unavailable</p>
+        <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">{title}</h1>
+        <p className="mt-3 text-sm leading-7 text-slate-600">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function PublicApplicationsGate() {
+  const { config } = useRuntimeConfig();
+
+  if (!canShowPublicApplications(config)) {
+    return (
+      <FeatureUnavailablePage
+        title="Applications are not available"
+        description="Applications visibility is disabled in this environment."
+      />
+    );
+  }
+
+  return <BusinessApplicationsPage />;
+}
+
+function AdminApplicationsGate() {
+  const { config } = useRuntimeConfig();
+
+  if (!config.features.admin_applications) {
+    return (
+      <FeatureUnavailablePage
+        title="Admin Applications are disabled"
+        description="The admin application management area is disabled by the current runtime flags."
+      />
+    );
+  }
+
+  return <AdminCrudPage />;
 }
 
 function AccountGateFor({
@@ -288,7 +340,7 @@ export const router = createBrowserRouter([
 
       // ── Applications ───────────────────────────────────────────────────────
 
-      { path: "applications", Component: BusinessApplicationsPage },
+      { path: "applications", Component: PublicApplicationsGate },
 
       // ── Operations ─────────────────────────────────────────────────────────
 
@@ -549,8 +601,8 @@ export const router = createBrowserRouter([
               { path: "on-demand/*", Component: AdminCrudPage },
               { path: "managed-services", Component: AdminCrudPage },
               { path: "managed-services/*", Component: AdminCrudPage },
-              { path: "applications", Component: AdminCrudPage },
-              { path: "applications/*", Component: AdminCrudPage },
+              { path: "applications", Component: AdminApplicationsGate },
+              { path: "applications/*", Component: AdminApplicationsGate },
               { path: "operations", Component: AdminCrudPage },
               { path: "operations/*", Component: AdminCrudPage },
               { path: "marketplace", Component: AdminCrudPage },

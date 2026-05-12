@@ -5,6 +5,7 @@ from unittest.mock import patch
 import frappe
 
 from rbp_app.api import apps as apps_api
+from rbp_app.services import environment
 
 
 class TestApiApps(TestCase):
@@ -22,6 +23,7 @@ class TestApiApps(TestCase):
 				"get_installed_apps",
 				return_value=["frappe", "erpnext", "custom_portal"],
 			),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_APPLICATION_PROVISIONING": "true"}),
 		):
 			result = apps_api.get_available_apps()
 
@@ -40,7 +42,22 @@ class TestApiApps(TestCase):
 			patch.object(apps_api.frappe, "session", SimpleNamespace(user="manager@example.com"), create=True),
 			patch.object(apps_api.frappe, "get_roles", return_value=["System Manager"]),
 			patch.object(apps_api.frappe, "get_installed_apps", return_value=["frappe"]),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_APPLICATION_PROVISIONING": "false"}),
 		):
 			result = apps_api.get_available_apps()
 
 		self.assertIn("billing", {card["key"] for card in result["apps"]})
+
+	def test_application_provisioning_flag_hides_customer_app_cards(self):
+		with (
+			patch.object(apps_api.frappe, "session", SimpleNamespace(user="member@example.com"), create=True),
+			patch.object(apps_api.frappe, "get_roles", return_value=["Website User"]),
+			patch.object(apps_api.frappe, "get_installed_apps", return_value=["frappe", "erpnext"]),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_APPLICATION_PROVISIONING": "false"}),
+		):
+			result = apps_api.get_available_apps()
+
+		apps_by_key = {card["key"] for card in result["apps"]}
+		self.assertNotIn("frappe", apps_by_key)
+		self.assertNotIn("erpnext", apps_by_key)
+		self.assertIn("documents", apps_by_key)

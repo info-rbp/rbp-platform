@@ -6,6 +6,7 @@ import frappe
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
+from rbp_app.services.environment import get_runtime_settings, is_stripe_enabled
 from rbp_app.services.tenancy import doctype_exists, get_rbp_tenant_for_user
 
 
@@ -22,11 +23,15 @@ PAYMENT_STATES = {
 
 
 def _placeholder():
+    runtime = get_runtime_settings()
     return {
         "status": "not_configured",
         "plan": None,
         "message": "Billing is not configured for this portal yet.",
         "billing_enabled": False,
+        "stripe_enabled": runtime.enable_stripe,
+        "stripe_mode": runtime.stripe_mode,
+        "stripe_test_mode": runtime.stripe_test_mode,
     }
 
 
@@ -51,6 +56,11 @@ def _coerce_payload(payload):
 
 def get_subscription_status(user=None):
     """Return current user's subscription status or a safe placeholder."""
+
+    runtime = get_runtime_settings()
+
+    if not runtime.enable_stripe:
+        return _placeholder()
 
     if not _doctype_exists("RBP Subscription"):
         return _placeholder()
@@ -107,12 +117,18 @@ def get_subscription_status(user=None):
         "plan": subscription.get("plan"),
         "message": "Subscription status is available.",
         "billing_enabled": True,
+        "stripe_enabled": runtime.enable_stripe,
+        "stripe_mode": runtime.stripe_mode,
+        "stripe_test_mode": runtime.stripe_test_mode,
         "subscription": subscription,
     }
 
 
 def record_payment_event(payload, user=None):
     """Record an idempotent payment event and optionally update a subscription."""
+
+    if not is_stripe_enabled():
+        raise frappe.ValidationError("Stripe billing is disabled for this environment.")
 
     payload = _coerce_payload(payload)
 

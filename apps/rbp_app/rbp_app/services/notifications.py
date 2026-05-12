@@ -5,6 +5,7 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
+from rbp_app.services.environment import get_runtime_settings
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -27,10 +28,15 @@ def create_notification(
     trigger_source=None,
     created_by_workflow=None,
 ):
+    runtime = get_runtime_settings()
     if not _doctype_exists("RBP Notification"):
         return None
 
     tenant = tenant or get_current_tenant_name(user)
+    if not runtime.enable_email_notifications and delivery_channel == "Email":
+        delivery_channel = "Portal"
+    if runtime.email_sandbox_mode and delivery_channel == "Email":
+        delivery_channel = "Portal"
 
     doc = frappe.get_doc(
         {
@@ -69,10 +75,14 @@ def create_notification(
 def get_notifications(user=None):
     """Return portal notifications for a user."""
 
+    runtime = get_runtime_settings()
     if not user or user == "Guest" or not _doctype_exists("RBP Notification"):
         return {
             "notifications": [],
             "unread_count": 0,
+            "email_notifications_enabled": runtime.enable_email_notifications,
+            "email_sandbox_mode": runtime.email_sandbox_mode,
+            "email_delivery_mode": runtime.email_delivery_mode,
         }
 
     filters = {"user": user, "status": ["!=", "Archived"]}
@@ -113,6 +123,9 @@ def get_notifications(user=None):
     return {
         "notifications": notifications,
         "unread_count": unread_count,
+        "email_notifications_enabled": runtime.enable_email_notifications,
+        "email_sandbox_mode": runtime.email_sandbox_mode,
+        "email_delivery_mode": runtime.email_delivery_mode,
     }
 
 

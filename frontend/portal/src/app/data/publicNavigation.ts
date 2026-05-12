@@ -19,6 +19,11 @@ export interface MegaConfig {
   }>;
 }
 
+export interface PublicNavigationRuntimeFlags {
+  application_provisioning: boolean;
+  application_interest: boolean;
+}
+
 // -- Mega menu data -------------------------------------------------------------
 // The public header intentionally uses only five top-level menu groups. Each
 // group renders through the existing side-by-side mega-menu layout.
@@ -145,3 +150,25 @@ export const publicNavigation: MegaConfig[] = [
     ],
   },
 ];
+
+export function filterPublicNavigationForRuntime(
+  menus: MegaConfig[],
+  flags: PublicNavigationRuntimeFlags,
+): MegaConfig[] {
+  const showApplications = flags.application_provisioning || flags.application_interest;
+
+  return menus.map((menu) => {
+    if (menu.key !== "platform" || showApplications) {
+      return menu;
+    }
+
+    return {
+      ...menu,
+      links: menu.links.filter((link) => link.href !== "/applications"),
+      groups: menu.groups?.map((group) => ({
+        ...group,
+        links: group.links.filter((link) => link.href !== "/applications"),
+      })),
+    };
+  });
+}

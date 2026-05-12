@@ -20,6 +20,7 @@ class TestApiDashboard(TestCase):
 			"quick_links": [{"label": "Dashboard"}],
 			"notifications": {"notifications": [], "unread_count": 0},
 			"billing": {"status": "not_configured", "billing_enabled": False},
+			"runtime": {"environment": "qa"},
 		}
 
 		with (
@@ -34,3 +35,4 @@ class TestApiDashboard(TestCase):
 		self.assertIn("quick_links", result)
 		self.assertIn("notifications", result)
 		self.assertIn("billing", result)
+		self.assertIn("runtime", result)

@@ -21,6 +21,7 @@ import {
 import { PortalAdminReference } from "./PortalAdminReference";
 import { EntitlementBadge } from "../../components/status";
 import { mockPortalApplications, mockPortalIntegrations } from "../../mock";
+import { useRuntimeConfig } from "../../hooks/useRuntimeConfig";
 
 const iconMap = {
   layers: Layers,
@@ -44,6 +45,7 @@ const filterTabs = ["All", "included", "available", "locked", "coming-soon"] as 
 type FilterTab = typeof filterTabs[number];
 
 export function PortalApps() {
+  const { config } = useRuntimeConfig();
   const [activeTab, setActiveTab] = useState<"Applications" | "Integrations">("Applications");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
   const [selectedId, setSelectedId] = useState(mockPortalApplications[0]?.id);
@@ -56,6 +58,13 @@ export function PortalApps() {
     activeFilter === "All"
       ? mockPortalApplications
       : mockPortalApplications.filter((application) => application.accessState === activeFilter);
+  const provisioningEnabled = config.features.application_provisioning;
+  const interestEnabled = config.features.application_interest;
+  const requestActionLabel = provisioningEnabled
+    ? "Request Access"
+    : interestEnabled
+      ? "Register Interest"
+      : "Requests Disabled";
 
   return (
     <div className="px-4 sm:px-6 py-6 space-y-6">
@@ -72,13 +81,26 @@ export function PortalApps() {
             Mock application tiles with access, entitlement, locked, and planned states.
           </p>
         </div>
-        <Link
-          to="/portal/support"
-          className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
-        >
-          Request Access <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+        {interestEnabled || provisioningEnabled ? (
+          <Link
+            to="/portal/support"
+            className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
+          >
+            {requestActionLabel} <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        ) : (
+          <span className="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-500">
+            {requestActionLabel}
+          </span>
+        )}
       </div>
+
+      {!provisioningEnabled ? (
+        <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
+          Customer application provisioning is disabled by the current runtime flags.
+          {interestEnabled ? " Members can register interest, but no provisioning action is exposed." : " Member interest capture is disabled too."}
+        </div>
+      ) : null}
 
       <div className="flex items-center gap-4 border-b border-slate-200">
         {(["Applications", "Integrations"] as const).map((tab) => (
@@ -171,14 +193,16 @@ export function PortalApps() {
                           View details <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                         <Link
-                          to={application.accessState === "included" ? "/portal/apps" : "/portal/support"}
+                          to={application.accessState === "included" || !provisioningEnabled ? "/portal/apps" : "/portal/support"}
                           className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all ${
                             application.accessState === "included"
                               ? "bg-blue-700 hover:bg-blue-800 text-white"
                               : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
                           }`}
                         >
-                          {application.actionLabel}
+                          {!provisioningEnabled && application.accessState !== "included"
+                            ? requestActionLabel
+                            : application.actionLabel}
                         </Link>
                       </div>
                     </article>
@@ -236,12 +260,14 @@ export function PortalApps() {
                     ))}
                   </div>
                 </div>
-                <Link
-                  to="/portal/support"
-                  className="w-full inline-flex items-center justify-center gap-2 font-bold text-sm py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white transition-all"
-                >
-                  Mock Access Request <ExternalLink className="w-4 h-4" />
-                </Link>
+                {provisioningEnabled || interestEnabled ? (
+                  <Link
+                    to="/portal/support"
+                    className="w-full inline-flex items-center justify-center gap-2 font-bold text-sm py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white transition-all"
+                  >
+                    {provisioningEnabled ? "Mock Access Request" : "Register Interest"} <ExternalLink className="w-4 h-4" />
+                  </Link>
+                ) : null}
               </div>
             </aside>
           ) : null}

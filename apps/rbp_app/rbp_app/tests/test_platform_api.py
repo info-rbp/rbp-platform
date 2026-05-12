@@ -10,6 +10,7 @@ from rbp_app.api import apps as apps_api
 from rbp_app.api import billing, dashboard, documents, hr, integrations, me, notifications
 from rbp_app.services import apps as apps_service
 from rbp_app.services import billing as billing_service
+from rbp_app.services import environment
 from rbp_app.services import notifications as notifications_service
 from rbp_app.services.adapters import erpnext
 
@@ -134,6 +135,7 @@ class TestAvailableAppsApi(TestCase):
 				return_value=["frappe", "rbp_app", "erpnext", "custom_portal"],
 			),
 			patch.object(apps_api.frappe, "get_roles", return_value=["Website User"]),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_APPLICATION_PROVISIONING": "true"}),
 		):
 			result = apps_api.get_available_apps()
 
@@ -156,6 +158,7 @@ class TestAvailableAppsApi(TestCase):
 			patch.object(apps_api.frappe, "session", SimpleNamespace(user="member@example.com"), create=True),
 			patch.object(apps_api.frappe, "get_installed_apps", return_value=["frappe", "rbp_app"]),
 			patch.object(apps_api.frappe, "get_roles", return_value=["Website User"]),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_APPLICATION_PROVISIONING": "true"}),
 		):
 			result = apps_api.get_available_apps()
 
@@ -195,6 +198,7 @@ class TestAvailableAppsApi(TestCase):
 			patch.object(apps_service.frappe, "get_all", return_value=rows),
 			patch.object(apps_service, "is_app_installed", return_value=True),
 			patch.object(apps_service, "is_admin_user", return_value=False),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_APPLICATION_PROVISIONING": "true"}),
 		):
 			result = apps_service.get_available_app_cards("member@example.com")
 
@@ -239,6 +243,7 @@ class TestDashboardApi(TestCase):
 		self.assertIn("notifications", result)
 		self.assertIn("billing", result)
 		self.assertIn("integrations", result)
+		self.assertIn("runtime", result)
 
 
 class TestPlaceholderApis(TestCase):
@@ -252,9 +257,29 @@ class TestPlaceholderApis(TestCase):
 		with patch.object(notifications, "require_login", return_value="member@example.com"):
 			notifications_result = notifications.get_notifications()
 
-		self.assertEqual(set(billing_result), {"status", "plan", "message", "billing_enabled"})
+		self.assertEqual(
+			set(billing_result),
+			{
+				"status",
+				"plan",
+				"message",
+				"billing_enabled",
+				"stripe_enabled",
+				"stripe_mode",
+				"stripe_test_mode",
+			},
+		)
 		self.assertEqual(set(documents_result), {"documents", "count", "module_enabled"})
-		self.assertEqual(set(notifications_result), {"notifications", "unread_count"})
+		self.assertEqual(
+			set(notifications_result),
+			{
+				"notifications",
+				"unread_count",
+				"email_notifications_enabled",
+				"email_sandbox_mode",
+				"email_delivery_mode",
+			},
+		)
 
 	def test_billing_service_uses_subscription_when_available(self):
 		subscription = {
@@ -272,6 +297,7 @@ class TestPlaceholderApis(TestCase):
 			patch.object(billing_service, "_get_user_tenant", return_value="TENANT-1"),
 			patch.object(billing_service.frappe, "db", SimpleNamespace(count=MagicMock(return_value=1)), create=True),
 			patch.object(billing_service.frappe, "get_all", return_value=[subscription]),
+			patch.dict(environment.os.environ, {"RBP_ENABLE_STRIPE": "true"}),
 		):
 			result = billing_service.get_subscription_status("member@example.com")
 

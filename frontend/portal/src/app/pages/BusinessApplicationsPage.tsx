@@ -4,6 +4,7 @@ import { applicationCategories } from "../data/applications";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { ArrowRight, Search, Layers, CheckCircle, X, ChevronRight } from "lucide-react";
+import { useRuntimeConfig } from "../hooks/useRuntimeConfig";
 
 const heroImage = "https://images.unsplash.com/photo-1763718528755-4bca23f82ac3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb2Z0d2FyZSUyMGFwcGxpY2F0aW9ucyUyMGRhc2hib2FyZCUyMGJ1c2luZXNzJTIwdGVjaG5vbG9neXxlbnwxfHx8fDE3Nzc1NDY4NDF8MA&ixlib=rb-4.1.0&q=80&w=1080";
 
@@ -53,8 +54,15 @@ const statusColors: Record<Status, string> = {
 const applicationAnchorSections = applicationCategories;
 
 export function BusinessApplicationsPage() {
+  const { config } = useRuntimeConfig();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const provisioningEnabled = config.features.application_provisioning;
+  const interestEnabled = config.features.application_interest;
+  const primaryCtaLabel = provisioningEnabled ? "Request a Setup" : "Register Interest";
+  const primaryCtaHref = interestEnabled || provisioningEnabled
+    ? "/contact?reason=application-interest"
+    : "/contact";
 
   const filtered = apps.filter((a) => {
     const matchCat = activeCategory === "All" || a.category === activeCategory;
@@ -89,8 +97,8 @@ export function BusinessApplicationsPage() {
                 ))}
               </div>
               <div className="flex flex-wrap gap-3">
-                <Link to="/contact?reason=application-setup" className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold px-7 py-4 rounded-xl transition-all shadow-lg hover:-translate-y-0.5">
-                  Request a Setup <ArrowRight className="w-4 h-4" />
+                <Link to={primaryCtaHref} className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold px-7 py-4 rounded-xl transition-all shadow-lg hover:-translate-y-0.5">
+                  {primaryCtaLabel} <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link to="/marketplace" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-7 py-4 rounded-xl transition-all">
                   View Setup Packages
@@ -109,6 +117,15 @@ export function BusinessApplicationsPage() {
           </div>
         </div>
       </section>
+
+      {!provisioningEnabled ? (
+        <section className="border-y border-amber-100 bg-amber-50 py-5">
+          <div className="mx-auto max-w-7xl px-4 text-sm font-semibold text-amber-900 sm:px-6 lg:px-8">
+            Application provisioning is disabled in this environment.
+            {interestEnabled ? " Public interest capture remains available." : " Public interest capture is also disabled."}
+          </div>
+        </section>
+      ) : null}
 
       {/* Search + filter */}
       <div className="sticky top-[84px] z-30 bg-white border-b border-slate-200 shadow-sm">

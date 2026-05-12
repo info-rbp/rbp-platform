@@ -69,6 +69,26 @@ export interface BillingSummary {
   [key: string]: unknown;
 }
 
+export interface PublicRuntimeConfigPayload {
+  environment: string;
+  qa_banner_enabled: boolean;
+  stripe: {
+    enabled: boolean;
+    mode: "test" | "live";
+    test_mode: boolean;
+  };
+  email: {
+    notifications_enabled: boolean;
+    sandbox_mode: boolean;
+    delivery_mode: "disabled" | "sandbox" | "enabled";
+  };
+  features: {
+    application_provisioning: boolean;
+    application_interest: boolean;
+    admin_applications: boolean;
+  };
+}
+
 export interface IntegrationStatus {
   name?: string;
   label?: string;
@@ -86,4 +106,5 @@ export interface PortalDashboardPayload {
   notifications: NotificationSummary[];
   billing: BillingSummary;
   integrations: IntegrationStatus[] | Record<string, IntegrationStatus>;
+  runtime?: PublicRuntimeConfigPayload;
 }
