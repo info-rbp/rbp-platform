@@ -195,6 +195,7 @@ from rbp_app.services.email_notifications import (
     admin_notification_recipients,
     as_dict_rows,
     send_event_email,
+    summarize_delivery_results,
 )
 
 
@@ -239,6 +240,6 @@ def emit_event_notification(*,event_type:str,user:str|None=None,tenant:str|None=
             recipients.extend(list(admin_recipients or admin_notification_recipients()))
         recipients=list(dict.fromkeys([r for r in recipients if r]))
         deliveries=as_dict_rows(send_event_email(event_type=event_type, recipients=recipients, context=context, subject=subject))
-    summary="not_requested" if not send_email else ("disabled" if deliveries and all(d["status"]=="disabled" for d in deliveries) else "blocked" if deliveries and all(d["status"]=="blocked" for d in deliveries) else "failed" if any(d["status"]=="failed" for d in deliveries) else "sent" if deliveries and all(d["status"]=="sent" for d in deliveries) else "partial")
+    summary="not_requested" if not send_email else summarize_delivery_results([type("R", (), d)() for d in deliveries])
     _record_delivery_logs(getattr(portal_doc,"name",None), deliveries, related_doctype, related_name)
     return {"ok":True,"event_type":event_type,"portal":getattr(portal_doc,"name",None),"email":summary,"deliveries":deliveries,"metadata":metadata}
