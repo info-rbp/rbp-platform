@@ -24,7 +24,10 @@ def create_case(payload=None):
 
 @frappe.whitelist()
 def create_request(payload=None):
-    return create_case(payload)
+    data = _payload(payload)
+    data["submit"] = True
+    user = require_login()
+    return service.create_case(user, data)
 
 
 @frappe.whitelist()
@@ -75,7 +78,8 @@ def admin_update_case_status(case_name, status, payload=None):
 
 @frappe.whitelist()
 def admin_update_status(request_name, status, payload=None):
-    return admin_update_case_status(request_name, status, payload)
+    user = require_system_manager()
+    return service.admin_update_case_status(user, request_name, status, _payload(payload))
 
 
 @frappe.whitelist()

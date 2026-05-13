@@ -7,9 +7,9 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
 from rbp_app.services.reference_ids import generate_reference_id
 from rbp_app.services.notifications import create_notification, emit_event_notification
+from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -118,6 +118,13 @@ def _get_doc(doctype, name):
     return frappe.get_doc(doctype, name)
 
 
+def _has_field(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return True
+
+
 def _set_fields(doc, payload, fields):
     for field in fields:
         if field in payload:
@@ -190,19 +197,23 @@ def _audit(event_type, user, doc, message=None, metadata=None):
 def _notify(user, title, message, doc, trigger_source, *, priority="Normal", notification_type="Info"):
     if not user:
         return None
-    return create_notification(
-        user=user,
-        tenant=getattr(doc, "tenant", None),
-        title=title,
-        message=message,
-        priority=priority,
-        notification_type=notification_type,
-        route=f"/portal/connectivity/{doc.name}",
-        related_doctype=getattr(doc, "doctype", None),
-        related_name=doc.name,
-        trigger_source=trigger_source,
-        created_by_workflow="connectivity",
-    )
+    try:
+        return create_notification(
+            user=user,
+            tenant=getattr(doc, "tenant", None),
+            title=title,
+            message=message,
+            priority=priority,
+            notification_type=notification_type,
+            route=service_routes("connectivity", doc.name)["portal_route"],
+            related_doctype=getattr(doc, "doctype", None),
+            related_name=doc.name,
+            trigger_source=trigger_source,
+            created_by_workflow="connectivity",
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP connectivity notification failed")
+        return None
 
 
 def _admin_recipients():
@@ -234,6 +245,7 @@ def _emit_notification_event(event_type, doc, message, context):
 def _serialize_request(doc, quotes=None):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "business_profile": getattr(doc, "business_profile", None),
@@ -254,8 +266,10 @@ def _serialize_request(doc, quotes=None):
         "submitted_on": getattr(doc, "submitted_on", None),
         "reviewed_on": getattr(doc, "reviewed_on", None),
         "closed_on": getattr(doc, "closed_on", None),
+        "source_channel": getattr(doc, "source_channel", None),
         "notes": getattr(doc, "notes", None),
         "quotes": quotes or [],
+        **service_routes("connectivity", doc.name),
     }
 
 
@@ -327,6 +341,37 @@ def _set_request_status_dates(doc, status):
         doc.closed_on = timestamp
 
 
+def _notification_context(doc):
+    routes = service_routes("connectivity", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": getattr(doc, "service_type", None) or "Connectivity",
+        "status": getattr(doc, "status", None),
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
+
+
+def _notify_request_submitted(user, doc):
+    _notify(user, "Connectivity request submitted", "Your connectivity request was submitted.", doc, "connectivity.submit_request")
+    for recipient in _admin_recipients():
+        _notify(
+            recipient,
+            "Connectivity request submitted",
+            f"{doc.owner_user} submitted a connectivity request.",
+            doc,
+            "connectivity.submit_request.admin",
+            priority="High",
+        )
+    _emit_notification_event(
+        "connectivity.nbn_order_submitted",
+        doc,
+        "Your connectivity order has been received.",
+        _notification_context(doc),
+    )
+    _audit("connectivity_request_submitted", user, doc, "Connectivity request submitted.")
+
+
 def create_request(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -342,18 +387,22 @@ def create_request(user, payload):
             "owner_user": user,
             "status": "Draft",
             "workflow_state": "Draft",
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, REQUEST_FIELDS)
-    if frappe.get_meta(REQUEST_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+    doc.source_channel = "portal"
+    if _has_field(REQUEST_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
         doc.reference_id = generate_reference_id("RBP-NBN")
-    if frappe.get_meta(REQUEST_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
-        doc.submitted_on = now_datetime()
-    if frappe.get_meta(REQUEST_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
-        doc.source_channel = "portal"
+    if payload.get("submit"):
+        doc.status = "Submitted"
+        doc.workflow_state = "Submitted"
+        _set_request_status_dates(doc, "Submitted")
     doc.insert(ignore_permissions=True)
 
     _audit("connectivity_request_created", user, doc, "Connectivity request created.")
+    if payload.get("submit"):
+        _notify_request_submitted(user, doc)
     return _serialize_request(doc)
 
 
@@ -382,31 +431,14 @@ def submit_request(user, request_name):
 
     doc.status = "Submitted"
     doc.workflow_state = "Submitted"
+    if _has_field(REQUEST_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-NBN")
+    if _has_field(REQUEST_DOCTYPE, "source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.submitted_on = now_datetime()
     doc.save(ignore_permissions=True)
 
-    _notify(user, "Connectivity request submitted", "Your connectivity request was submitted.", doc, "connectivity.submit_request")
-    for recipient in _admin_recipients():
-        _notify(
-            recipient,
-            "Connectivity request submitted",
-            f"{doc.owner_user} submitted a connectivity request.",
-            doc,
-            "connectivity.submit_request.admin",
-            priority="High",
-        )
-    _emit_notification_event(
-        "connectivity.nbn_order_submitted",
-        doc,
-        "Your connectivity order has been received.",
-        {
-            "reference_id": doc.name,
-            "service_name": getattr(doc, "service_type", None) or "Connectivity",
-            "status": doc.status,
-            "portal_url": "/portal/services/nbn/start",
-        },
-    )
-    _audit("connectivity_request_submitted", user, doc, "Connectivity request submitted.")
+    _notify_request_submitted(user, doc)
     return _serialize_request(doc)
 
 
@@ -428,6 +460,7 @@ def list_my_requests(user, filters=None):
         filters=query_filters,
         fields=[
             "name",
+            "reference_id",
             "tenant",
             "owner_user",
             "business_profile",
@@ -448,6 +481,7 @@ def list_my_requests(user, filters=None):
             "submitted_on",
             "reviewed_on",
             "closed_on",
+            "source_channel",
             "notes",
             "modified",
         ],
@@ -459,6 +493,7 @@ def list_my_requests(user, filters=None):
             for row in rows
             if row.get("owner_user") == user or row.get("assigned_to") == user
         ]
+    rows = [{**row, **service_routes("connectivity", row.get("name"))} for row in rows]
     return {"requests": rows, "count": len(rows)}
 
 
@@ -510,14 +545,8 @@ def admin_update_status(user, request_name, status, payload=None):
         "admin.status_updated",
         doc,
         f"Your connectivity request is now {status}.",
-        {
-            "reference_id": doc.name,
-            "service_name": getattr(doc, "service_type", None) or "Connectivity",
-            "status": status,
-            "admin_note": payload.get("notes"),
-            "portal_url": "/portal/services/nbn/start",
-        },
-    )
+            {**_notification_context(doc), "admin_note": payload.get("notes")},
+        )
     _audit("connectivity_status_updated", user, doc, "Connectivity status updated.", {"from_status": current_status, "to_status": status})
     return _serialize_request(doc)
 

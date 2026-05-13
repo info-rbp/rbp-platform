@@ -53,11 +53,23 @@ class TestPortalServiceActivity(unittest.TestCase):
             patch("rbp_app.services.portal.doctype_exists", return_value=True),
             patch("rbp_app.services.portal.get_current_tenant_name", return_value="TEN-1"),
             patch("rbp_app.services.portal.is_admin_user", return_value=False),
-            patch("rbp_app.services.portal._existing_fields", return_value={"name", "owner", "modified"}),
-            patch("rbp_app.services.portal.frappe.get_all", return_value=[{"name": "A", "owner": "owner@example.com", "modified": "2026-01-01"}]),
+            patch("rbp_app.services.portal._existing_fields", return_value={"name", "tenant", "owner", "modified"}),
+            patch("rbp_app.services.portal.frappe.get_all", return_value=[{"name": "A", "tenant": "TEN-1", "owner": "owner@example.com", "modified": "2026-01-01"}]),
         ):
             result = portal.get_my_service_activity("owner@example.com")
             self.assertEqual(result["records"][0]["name"], "A")
+
+    def test_customer_skips_doctype_without_tenant_protection(self):
+        with (
+            patch("rbp_app.services.portal.doctype_exists", return_value=True),
+            patch("rbp_app.services.portal.get_current_tenant_name", return_value="TEN-1"),
+            patch("rbp_app.services.portal.is_admin_user", return_value=False),
+            patch("rbp_app.services.portal._existing_fields", return_value={"name", "owner", "modified"}),
+            patch("rbp_app.services.portal.frappe.get_all") as get_all,
+        ):
+            result = portal.get_my_service_activity("owner@example.com")
+            self.assertEqual(result["records"], [])
+            get_all.assert_not_called()
 
 
 if __name__ == "__main__":

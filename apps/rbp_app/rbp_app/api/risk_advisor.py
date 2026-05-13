@@ -60,7 +60,8 @@ def admin_update_assessment_status(assessment_name, status, payload=None):
 
 @frappe.whitelist()
 def admin_update_status(assessment_name, status, payload=None):
-    return admin_update_assessment_status(assessment_name, status, payload)
+    user = require_system_manager()
+    return service.admin_update_assessment_status(user, assessment_name, status, _payload(payload))
 
 
 @frappe.whitelist()

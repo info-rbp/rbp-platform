@@ -13,6 +13,7 @@
  "field_order": [
   "tenant",
   "owner_user",
+  "reference_id",
   "business_profile",
   "title",
   "category",
@@ -38,6 +39,7 @@
  "fields": [
   {"fieldname": "tenant", "fieldtype": "Link", "label": "Tenant", "options": "RBP Tenant", "reqd": 1, "in_list_view": 1},
   {"fieldname": "owner_user", "fieldtype": "Link", "label": "Owner User", "options": "User", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "reference_id", "fieldtype": "Data", "label": "Reference ID", "read_only": 1, "in_list_view": 1},
   {"fieldname": "business_profile", "fieldtype": "Link", "label": "Business Profile", "options": "RBP Business Profile"},
   {"fieldname": "title", "fieldtype": "Data", "label": "Title", "reqd": 1, "in_list_view": 1},
   {"fieldname": "category", "fieldtype": "Select", "label": "Category", "options": "General\nFinance\nOperations\nPeople\nTechnology\nCompliance\nGrowth\nEmergency", "in_list_view": 1},
@@ -52,7 +54,7 @@
   {"fieldname": "reviewed_on", "fieldtype": "Datetime", "label": "Reviewed On"},
   {"fieldname": "resolved_on", "fieldtype": "Datetime", "label": "Resolved On"},
   {"fieldname": "closed_on", "fieldtype": "Datetime", "label": "Closed On"},
-  {"fieldname": "source_channel", "fieldtype": "Data", "label": "Source Channel"},
+  {"fieldname": "source_channel", "fieldtype": "Data", "label": "Source Channel", "default": "portal", "read_only": 1},
   {"fieldname": "related_decision_request", "fieldtype": "Link", "label": "Related Decision Request", "options": "RBP Decision Desk Request"},
   {"fieldname": "related_docushare_document", "fieldtype": "Link", "label": "Related DocuShare Document", "options": "RBP DocuShare Document"},
   {"fieldname": "related_marketplace_order", "fieldtype": "Link", "label": "Related Marketplace Order", "options": "RBP Marketplace Order"},
