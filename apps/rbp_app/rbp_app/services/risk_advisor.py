@@ -7,7 +7,9 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
+from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -95,6 +97,13 @@ def _get_doc(doctype, name):
     return frappe.get_doc(doctype, name)
 
 
+def _has_field(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return True
+
+
 def _set_fields(doc, payload, allowed_fields):
     for field in allowed_fields:
         if field in payload:
@@ -135,6 +144,7 @@ def _apply_risk_score(doc):
 def _serialize_assessment(doc, risks=None, actions=None):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "business_profile": getattr(doc, "business_profile", None),
@@ -150,9 +160,11 @@ def _serialize_assessment(doc, risks=None, actions=None):
         "submitted_on": getattr(doc, "submitted_on", None),
         "reviewed_on": getattr(doc, "reviewed_on", None),
         "closed_on": getattr(doc, "closed_on", None),
+        "source_channel": getattr(doc, "source_channel", None),
         "notes": getattr(doc, "notes", None),
         "risks": risks or [],
         "actions": actions or [],
+        **service_routes("risk_advisor", doc.name),
     }
 
 
@@ -244,19 +256,23 @@ def _audit(event_type, user, doc, message=None, metadata=None):
 def _notify(user, title, message, assessment, trigger_source, *, priority="Normal", notification_type="Info"):
     if not user:
         return None
-    return create_notification(
-        user=user,
-        tenant=getattr(assessment, "tenant", None),
-        title=title,
-        message=message,
-        priority=priority,
-        notification_type=notification_type,
-        route=f"/portal/risk-advisor/{assessment.name}",
-        related_doctype=ASSESSMENT_DOCTYPE,
-        related_name=assessment.name,
-        trigger_source=trigger_source,
-        created_by_workflow="risk_advisor",
-    )
+    try:
+        return create_notification(
+            user=user,
+            tenant=getattr(assessment, "tenant", None),
+            title=title,
+            message=message,
+            priority=priority,
+            notification_type=notification_type,
+            route=service_routes("risk_advisor", assessment.name)["portal_route"],
+            related_doctype=ASSESSMENT_DOCTYPE,
+            related_name=assessment.name,
+            trigger_source=trigger_source,
+            created_by_workflow="risk_advisor",
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP Risk Advisor notification failed")
+        return None
 
 
 def _admin_recipients():
@@ -281,6 +297,50 @@ def _notify_admins_submitted(assessment):
         )
 
 
+def _emit_notification_event(event_type, assessment, message, context):
+    return safe_emit_event_notification(
+        log_title="RBP risk advisor notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(assessment, "tenant", None),
+        customer_email=getattr(assessment, "owner_user", None),
+        related_doctype=ASSESSMENT_DOCTYPE,
+        related_name=assessment.name,
+        message=message,
+        context=context,
+    )
+
+
+def _notification_context(doc):
+    routes = service_routes("risk_advisor", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": "Risk Advisor",
+        "status": getattr(doc, "status", None),
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
+
+
+def _notify_assessment_submitted(user, doc):
+    _notify(
+        doc.owner_user,
+        "Risk assessment submitted",
+        "Your Risk Advisor assessment has been submitted.",
+        doc,
+        "risk_advisor.submit_assessment.user",
+    )
+    _notify_admins_submitted(doc)
+    _emit_notification_event(
+        "risk_advisor.assessment_submitted",
+        doc,
+        "Your Risk Advisor assessment has been received.",
+        _notification_context(doc),
+    )
+    _audit("risk_advisor_assessment_submitted", user, doc, "Risk Advisor assessment submitted.")
+
+
 def create_assessment(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -299,12 +359,23 @@ def create_assessment(user, payload):
             "assessment_type": "General",
             "risk_score": 0,
             "risk_level": "Low",
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, DRAFT_ASSESSMENT_FIELDS)
+    doc.source_channel = "portal"
+    if _has_field(ASSESSMENT_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-RISK")
+    if payload.get("submit"):
+        _validate_assessment_transition(doc.status, "Submitted")
+        doc.status = "Submitted"
+        doc.workflow_state = "Submitted"
+        doc.submitted_on = now_datetime()
     doc.insert(ignore_permissions=True)
 
     _audit("risk_advisor_assessment_created", user, doc, "Risk Advisor assessment created.")
+    if payload.get("submit"):
+        _notify_assessment_submitted(user, doc)
     return _serialize_assessment(doc)
 
 
@@ -336,18 +407,14 @@ def submit_assessment(user, assessment_name):
     _validate_assessment_transition(doc.status, "Submitted")
     doc.status = "Submitted"
     doc.workflow_state = "Submitted"
+    if _has_field(ASSESSMENT_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-RISK")
+    if _has_field(ASSESSMENT_DOCTYPE, "source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.submitted_on = now_datetime()
     doc.save(ignore_permissions=True)
 
-    _notify(
-        doc.owner_user,
-        "Risk assessment submitted",
-        "Your Risk Advisor assessment has been submitted.",
-        doc,
-        "risk_advisor.submit_assessment.user",
-    )
-    _notify_admins_submitted(doc)
-    _audit("risk_advisor_assessment_submitted", user, doc, "Risk Advisor assessment submitted.")
+    _notify_assessment_submitted(user, doc)
     return _serialize_assessment(doc)
 
 
@@ -371,6 +438,7 @@ def list_my_assessments(user, filters=None):
         filters=query_filters,
         fields=[
             "name",
+            "reference_id",
             "tenant",
             "owner_user",
             "business_profile",
@@ -385,6 +453,7 @@ def list_my_assessments(user, filters=None):
             "submitted_on",
             "reviewed_on",
             "closed_on",
+            "source_channel",
             "modified",
         ],
         order_by="modified desc",
@@ -393,6 +462,7 @@ def list_my_assessments(user, filters=None):
     if not _is_admin(user):
         rows = [row for row in rows if row.get("owner_user") == user or row.get("assigned_to") == user]
 
+    rows = [{**row, **service_routes("risk_advisor", row.get("name"))} for row in rows]
     return {"assessments": rows, "count": len(rows)}
 
 
@@ -508,6 +578,12 @@ def admin_update_assessment_status(user, assessment_name, status, payload=None):
             f"Your Risk Advisor assessment is now {status}.",
             doc,
             "risk_advisor.admin_update_assessment_status",
+        )
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your Risk Advisor assessment is now {status}.",
+            {**_notification_context(doc), "admin_note": payload.get("notes")},
         )
 
     _audit(

@@ -7,7 +7,9 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
+from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -109,6 +111,13 @@ def _get_doc(doctype, name):
     return frappe.get_doc(doctype, name)
 
 
+def _has_field(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return True
+
+
 def _set_fields(doc, payload, allowed_fields):
     for field in allowed_fields:
         if field in payload:
@@ -129,6 +138,7 @@ def _validate_related_references(payload, tenant):
 def _serialize_case(doc, tasks=None, updates=None):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "business_profile": getattr(doc, "business_profile", None),
@@ -154,6 +164,7 @@ def _serialize_case(doc, tasks=None, updates=None):
         "notes": getattr(doc, "notes", None),
         "tasks": tasks or [],
         "updates": updates or [],
+        **service_routes("the_fixer", doc.name),
     }
 
 
@@ -246,19 +257,23 @@ def _audit(event_type, user, doc, message=None, metadata=None):
 def _notify(user, title, message, doc, trigger_source, *, priority="Normal", notification_type="Info"):
     if not user:
         return None
-    return create_notification(
-        user=user,
-        tenant=getattr(doc, "tenant", None),
-        title=title,
-        message=message,
-        priority=priority,
-        notification_type=notification_type,
-        route=f"/app/rbp-fixer-case/{doc.name}",
-        related_doctype=CASE_DOCTYPE,
-        related_name=doc.name,
-        trigger_source=trigger_source,
-        created_by_workflow="the_fixer",
-    )
+    try:
+        return create_notification(
+            user=user,
+            tenant=getattr(doc, "tenant", None),
+            title=title,
+            message=message,
+            priority=priority,
+            notification_type=notification_type,
+            route=service_routes("the_fixer", doc.name)["portal_route"],
+            related_doctype=CASE_DOCTYPE,
+            related_name=doc.name,
+            trigger_source=trigger_source,
+            created_by_workflow="the_fixer",
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP Fixer notification failed")
+        return None
 
 
 def _admin_recipients():
@@ -283,6 +298,44 @@ def _notify_admins_new_case(doc):
         )
 
 
+def _emit_notification_event(event_type, doc, message, context):
+    return safe_emit_event_notification(
+        log_title="RBP fixer notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=getattr(doc, "owner_user", None),
+        related_doctype=CASE_DOCTYPE,
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
+
+
+def _notification_context(doc):
+    routes = service_routes("the_fixer", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": "The Fixer",
+        "status": getattr(doc, "status", None),
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
+
+
+def _notify_case_submitted(user, doc):
+    _notify(doc.owner_user, "Fixer case submitted", "Your Fixer case has been submitted.", doc, "the_fixer.submit_case.user")
+    _notify_admins_new_case(doc)
+    _emit_notification_event(
+        "fixer.request_submitted",
+        doc,
+        "Your Fixer request has been received.",
+        _notification_context(doc),
+    )
+    _audit("fixer_case_submitted", user, doc, "Fixer case submitted.")
+
+
 def create_case(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -301,13 +354,22 @@ def create_case(user, payload):
             "workflow_state": "Draft",
             "urgency": payload.get("urgency") or "Medium",
             "impact": payload.get("impact") or "Medium",
-            "source_channel": payload.get("source_channel") or "portal",
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, CASE_DRAFT_FIELDS)
+    doc.source_channel = "portal"
+    if _has_field(CASE_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-FIX")
+    if payload.get("submit"):
+        doc.status = "Submitted"
+        doc.workflow_state = "Submitted"
+        doc.submitted_on = now_datetime()
     doc.insert(ignore_permissions=True)
 
     _audit("fixer_case_created", user, doc, "Fixer case created.")
+    if payload.get("submit"):
+        _notify_case_submitted(user, doc)
     return _serialize_case(doc)
 
 
@@ -339,12 +401,14 @@ def submit_case(user, case_name):
 
     doc.status = "Submitted"
     doc.workflow_state = "Submitted"
+    if _has_field(CASE_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-FIX")
+    if _has_field(CASE_DOCTYPE, "source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.submitted_on = now_datetime()
     doc.save(ignore_permissions=True)
 
-    _notify(doc.owner_user, "Fixer case submitted", "Your Fixer case has been submitted.", doc, "the_fixer.submit_case.user")
-    _notify_admins_new_case(doc)
-    _audit("fixer_case_submitted", user, doc, "Fixer case submitted.")
+    _notify_case_submitted(user, doc)
     return _serialize_case(doc)
 
 
@@ -368,6 +432,7 @@ def list_my_cases(user, filters=None):
         filters=query_filters,
         fields=[
             "name",
+            "reference_id",
             "tenant",
             "owner_user",
             "title",
@@ -381,6 +446,7 @@ def list_my_cases(user, filters=None):
             "reviewed_on",
             "resolved_on",
             "closed_on",
+            "source_channel",
             "modified",
         ],
         order_by="modified desc",
@@ -389,6 +455,7 @@ def list_my_cases(user, filters=None):
     if not _is_admin(user):
         rows = [row for row in rows if row.get("owner_user") == user or row.get("assigned_to") == user]
 
+    rows = [{**row, **service_routes("the_fixer", row.get("name"))} for row in rows]
     return {"cases": rows, "count": len(rows)}
 
 
@@ -467,6 +534,12 @@ def admin_update_case_status(user, case_name, status, payload=None):
                 priority="High",
                 notification_type="Success",
             )
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your Fixer case is now {status}.",
+            {**_notification_context(doc), "admin_note": payload.get("notes")},
+        )
 
     _audit("fixer_case_status_updated", user, doc, "Fixer case status updated.", {"from": previous_status, "to": status})
     return _serialize_case(doc)

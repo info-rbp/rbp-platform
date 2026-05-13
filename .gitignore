@@ -49,3 +49,5 @@ tmp/
 .idea/
 .vscode/
 *.swp
+
+.venv-milestone8/

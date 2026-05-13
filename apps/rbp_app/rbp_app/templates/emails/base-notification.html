@@ -1,0 +1,6 @@
+<p>Hi {{ customer_name or "there" }},</p>
+<p>{{ message }}</p>
+<p><strong>Reference:</strong> {{ reference_id or "Not assigned yet" }}</p>
+<p>You can view updates in your RBP portal:</p>
+<p><a href="{{ portal_url or '/portal/dashboard' }}">{{ portal_url or '/portal/dashboard' }}</a></p>
+<p>Regards,<br>Remote Business Partner</p>

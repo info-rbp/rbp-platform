@@ -23,6 +23,15 @@ def create_request(payload=None):
 
 
 @frappe.whitelist()
+def create_order(payload=None):
+    """Compatibility alias for portal NBN order submission."""
+    data = _payload(payload)
+    data["submit"] = True
+    user = require_login()
+    return service.create_request(user, data)
+
+
+@frappe.whitelist()
 def update_draft_request(request_name, payload=None):
     user = require_login()
     return service.update_draft_request(user, request_name, _payload(payload))
@@ -41,9 +50,19 @@ def list_my_requests(filters=None):
 
 
 @frappe.whitelist()
+def list_my_orders(filters=None):
+    return list_my_requests(filters)
+
+
+@frappe.whitelist()
 def get_request(request_name):
     user = require_login()
     return service.get_request(user, request_name)
+
+
+@frappe.whitelist()
+def get_order(order_name):
+    return get_request(order_name)
 
 
 @frappe.whitelist()

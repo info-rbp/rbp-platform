@@ -13,6 +13,7 @@
  "field_order": [
   "tenant",
   "owner_user",
+  "reference_id",
   "business_profile",
   "title",
   "assessment_type",
@@ -24,13 +25,118 @@
   "risk_level",
   "assigned_to",
   "submitted_on",
+  "source_channel",
   "reviewed_on",
   "closed_on",
   "notes"
  ],
  "fields": [
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "label": "Owner User",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "business_profile",
+   "fieldtype": "Link",
+   "label": "Business Profile",
+   "options": "RBP Business Profile"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "assessment_type",
+   "fieldtype": "Select",
+   "label": "Assessment Type",
+   "options": "General\nCompliance\nOperational\nFinancial\nTechnology\nPeople\nStrategic",
+   "default": "General",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "business_area",
+   "fieldtype": "Data",
+   "label": "Business Area",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nSubmitted\nIn Review\nReviewed\nClosed\nCancelled",
+   "default": "Draft",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Data",
+   "label": "Workflow State",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "risk_score",
+   "fieldtype": "Int",
+   "label": "Risk Score",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "risk_level",
+   "fieldtype": "Select",
+   "label": "Risk Level",
+   "options": "Low\nMedium\nHigh\nCritical",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "label": "Assigned To",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "submitted_on",
+   "fieldtype": "Datetime",
+   "label": "Submitted On"
+  },
+  {
+   "fieldname": "reviewed_on",
+   "fieldtype": "Datetime",
+   "label": "Reviewed On"
+  },
+  {
+   "fieldname": "closed_on",
+   "fieldtype": "Datetime",
+   "label": "Closed On"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Long Text",
+   "label": "Notes"
+  }
   {"fieldname": "tenant", "fieldtype": "Link", "label": "Tenant", "options": "RBP Tenant", "reqd": 1, "in_list_view": 1},
   {"fieldname": "owner_user", "fieldtype": "Link", "label": "Owner User", "options": "User", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "reference_id", "fieldtype": "Data", "label": "Reference ID", "read_only": 1, "in_list_view": 1},
   {"fieldname": "business_profile", "fieldtype": "Link", "label": "Business Profile", "options": "RBP Business Profile"},
   {"fieldname": "title", "fieldtype": "Data", "label": "Title", "reqd": 1, "in_list_view": 1},
   {"fieldname": "assessment_type", "fieldtype": "Select", "label": "Assessment Type", "options": "General\nCompliance\nOperational\nFinancial\nTechnology\nPeople\nStrategic", "default": "General", "in_list_view": 1},
@@ -42,6 +148,7 @@
   {"fieldname": "risk_level", "fieldtype": "Select", "label": "Risk Level", "options": "Low\nMedium\nHigh\nCritical", "in_list_view": 1},
   {"fieldname": "assigned_to", "fieldtype": "Link", "label": "Assigned To", "options": "User", "in_list_view": 1},
   {"fieldname": "submitted_on", "fieldtype": "Datetime", "label": "Submitted On"},
+  {"fieldname": "source_channel", "fieldtype": "Data", "label": "Source Channel", "default": "portal", "read_only": 1},
   {"fieldname": "reviewed_on", "fieldtype": "Datetime", "label": "Reviewed On"},
   {"fieldname": "closed_on", "fieldtype": "Datetime", "label": "Closed On"},
   {"fieldname": "notes", "fieldtype": "Long Text", "label": "Notes"}
@@ -57,7 +164,30 @@
  "name": "RBP Risk Advisor Assessment",
  "owner": "Administrator",
  "permissions": [
-  {"create": 1, "delete": 1, "email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1}
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "RBP Admin",
+   "share": 1,
+   "write": 1
+  }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """RBP Application Interest controller."""
 
 from __future__ import annotations
@@ -48,3 +49,10 @@ class RBPApplicationInterest(Document):
                 self.reviewed_by = user
             if not getattr(self, "reviewed_on", None):
                 self.reviewed_on = now_datetime()
+=======
+from frappe.model.document import Document
+
+
+class RBPApplicationInterest(Document):
+    pass
+>>>>>>> origin/codex/implement-admin-operations-for-launch

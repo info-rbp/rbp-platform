@@ -1,0 +1,6 @@
+[
+  {"doctype":"Role","name":"RBP Admin","role_name":"RBP Admin","desk_access":1},
+  {"doctype":"Role","name":"RBP Support","role_name":"RBP Support","desk_access":1},
+  {"doctype":"Role","name":"RBP Billing Admin","role_name":"RBP Billing Admin","desk_access":1},
+  {"doctype":"Role","name":"RBP Membership Admin","role_name":"RBP Membership Admin","desk_access":1}
+]
