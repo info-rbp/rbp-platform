@@ -78,8 +78,46 @@ class TestAdminOperations(FrappeTestCase):
         self.assertIn("RBP Billing", names)
 
     def test_workspace_fixture_can_instantiate_docs(self):
+        """Validate workspace fixture records without inserting Workspace docs directly.
+
+        Frappe imports Workspace fixtures through fixture sync during migrate.
+        Directly inserting Workspace documents in tests exercises Frappe naming
+        internals differently from fixture import, so this test validates the
+        fixture contract instead.
+        """
         with WORKSPACE_FIXTURE.open("r", encoding="utf-8") as f:
             fixtures = json.load(f)
+
+        self.assertGreaterEqual(len(fixtures), 8)
+
+        expected_names = {
+            "RBP Operations",
+            "RBP Membership",
+            "RBP Billing",
+            "RBP Applications",
+            "RBP Notifications",
+            "RBP Marketplace",
+            "RBP Services",
+            "RBP Support",
+        }
+
+        fixture_names = {entry.get("name") for entry in fixtures}
+        self.assertTrue(expected_names.issubset(fixture_names))
+
+        for entry in fixtures:
+            self.assertEqual(entry.get("doctype"), "Workspace")
+            self.assertTrue(entry.get("name"))
+            self.assertTrue(entry.get("label"))
+            self.assertTrue(entry.get("title"))
+            self.assertTrue(entry.get("type"))
+            self.assertTrue(entry.get("module"))
+            self.assertIn("content", entry)
+            self.assertIsInstance(entry.get("shortcuts", []), list)
+            self.assertIsInstance(entry.get("links", []), list)
+
+            doc = frappe.get_doc(entry)
+            self.assertEqual(doc.doctype, "Workspace")
+            self.assertEqual(doc.label, entry["label"])
 
         for entry in fixtures:
             doc = frappe.get_doc({
