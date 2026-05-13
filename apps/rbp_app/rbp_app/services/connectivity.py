@@ -7,7 +7,7 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.notifications import create_notification, emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -213,6 +213,22 @@ def _admin_recipients():
     return sorted(recipients)
 
 
+def _emit_notification_event(event_type, doc, message, context):
+    try:
+        emit_event_notification(
+            event_type=event_type,
+            user=None,
+            tenant=getattr(doc, "tenant", None),
+            customer_email=getattr(doc, "owner_user", None),
+            related_doctype=getattr(doc, "doctype", None) or REQUEST_DOCTYPE,
+            related_name=doc.name,
+            message=message,
+            context=context,
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP connectivity notification hook failed")
+
+
 def _serialize_request(doc, quotes=None):
     return {
         "name": doc.name,
@@ -371,6 +387,17 @@ def submit_request(user, request_name):
             "connectivity.submit_request.admin",
             priority="High",
         )
+    _emit_notification_event(
+        "connectivity.nbn_order_submitted",
+        doc,
+        "Your connectivity order has been received.",
+        {
+            "reference_id": doc.name,
+            "service_name": getattr(doc, "service_type", None) or "Connectivity",
+            "status": doc.status,
+            "portal_url": "/portal/services/nbn/start",
+        },
+    )
     _audit("connectivity_request_submitted", user, doc, "Connectivity request submitted.")
     return _serialize_request(doc)
 
@@ -471,6 +498,18 @@ def admin_update_status(user, request_name, status, payload=None):
     _notify(doc.owner_user, "Connectivity status changed", f"Your connectivity request is now {status}.", doc, "connectivity.admin_update_status")
     if getattr(doc, "assigned_to", None):
         _notify(doc.assigned_to, "Connectivity status changed", f"Connectivity request {doc.name} is now {status}.", doc, "connectivity.admin_update_status")
+    _emit_notification_event(
+        "admin.status_updated",
+        doc,
+        f"Your connectivity request is now {status}.",
+        {
+            "reference_id": doc.name,
+            "service_name": getattr(doc, "service_type", None) or "Connectivity",
+            "status": status,
+            "admin_note": payload.get("notes"),
+            "portal_url": "/portal/services/nbn/start",
+        },
+    )
     _audit("connectivity_status_updated", user, doc, "Connectivity status updated.", {"from_status": current_status, "to_status": status})
     return _serialize_request(doc)
 

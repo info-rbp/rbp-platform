@@ -8,7 +8,7 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.notifications import create_notification, emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -193,6 +193,22 @@ def _notify(user, title, message, doc, trigger_source, *, priority="Normal", not
         trigger_source=trigger_source,
         created_by_workflow="marketplace",
     )
+
+
+def _emit_notification_event(event_type, doc, message, context, *, customer_email=None):
+    try:
+        emit_event_notification(
+            event_type=event_type,
+            user=None,
+            tenant=getattr(doc, "tenant", None),
+            customer_email=customer_email or getattr(doc, "owner_user", None),
+            related_doctype=getattr(doc, "doctype", None),
+            related_name=doc.name,
+            message=message,
+            context=context,
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP marketplace notification hook failed")
 
 
 def _serialize_vendor(doc):
@@ -422,6 +438,19 @@ def create_listing(user, payload):
     doc.insert(ignore_permissions=True)
 
     _notify(vendor.owner_user, "Marketplace listing created", "A marketplace listing was created.", doc, "marketplace.create_listing")
+    _emit_notification_event(
+        "marketplace.listing_submitted",
+        doc,
+        "Your marketplace listing has been received.",
+        {
+            "reference_id": doc.name,
+            "marketplace_item": getattr(doc, "title", None),
+            "business_name": getattr(vendor, "vendor_name", None),
+            "status": getattr(doc, "status", None),
+            "portal_url": "/portal/marketplace/listings/new",
+        },
+        customer_email=vendor.owner_user,
+    )
     _audit("marketplace_listing_created", user, doc, "Marketplace listing created.")
     return _serialize_listing(doc)
 
@@ -531,6 +560,19 @@ def create_order(user, listing_name, payload):
     doc.insert(ignore_permissions=True)
 
     _notify(vendor.owner_user, "Marketplace order requested", "A marketplace order was requested.", doc, "marketplace.create_order", priority="High")
+    _emit_notification_event(
+        "marketplace.enquiry_submitted",
+        doc,
+        "Your marketplace enquiry has been received.",
+        {
+            "reference_id": doc.name,
+            "marketplace_item": getattr(listing, "title", None),
+            "business_name": getattr(vendor, "vendor_name", None),
+            "status": getattr(doc, "status", None),
+            "portal_url": "/portal/marketplace/offers/new",
+        },
+        customer_email=user,
+    )
     _audit("marketplace_order_created", user, doc, "Marketplace order created.")
     return _serialize_order(doc)
 

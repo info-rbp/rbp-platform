@@ -85,9 +85,10 @@ def _list(value: object) -> list[str]:
     seen: set[str] = set()
     for item in items:
         normalized = str(item).strip()
-        if not normalized or normalized in seen:
+        seen_key = normalized.lower()
+        if not normalized or seen_key in seen:
             continue
-        seen.add(normalized)
+        seen.add(seen_key)
         out.append(normalized)
     return out
 
@@ -128,7 +129,7 @@ def apply_sandbox_recipient_policy(recipients: Iterable[object] | None) -> list[
 
 
 def build_subject(event_type: str, subject: str | None = None) -> str:
-    base = (subject if subject is not None else get_trigger(event_type).default_subject).strip()
+    base = str(subject if subject is not None else get_trigger(event_type).default_subject).strip()
     if not email_sandbox_enabled():
         return base
     prefix = qa_subject_prefix()
@@ -161,6 +162,20 @@ def summarize_delivery_results(results: Iterable[EmailDeliveryResult]) -> str:
     if all(status == "blocked" for status in statuses):
         return "blocked"
     return "partial"
+
+
+def summarize_delivery_dicts(results: Iterable[dict[str, object]]) -> str:
+    return summarize_delivery_results(
+        EmailDeliveryResult(
+            status=str(row.get("status") or "skipped"),
+            recipient_email=str(row.get("recipient_email") or ""),
+            subject=str(row.get("subject") or ""),
+            provider_message_id=row.get("provider_message_id") if isinstance(row.get("provider_message_id"), str) else None,
+            error_message=row.get("error_message") if isinstance(row.get("error_message"), str) else None,
+            sandboxed=bool(row.get("sandboxed", True)),
+        )
+        for row in results
+    )
 
 
 def _result(**kwargs: Any) -> EmailDeliveryResult:
