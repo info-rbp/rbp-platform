@@ -5,7 +5,7 @@ import frappe
 from frappe.tests.utils import FrappeTestCase
 
 
-APP_ROOT = Path(__file__).resolve().parents[2]
+APP_ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE_FIXTURE = APP_ROOT / "fixtures" / "workspace.json"
 ROLE_FIXTURE = APP_ROOT / "fixtures" / "role.json"
 
