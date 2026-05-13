@@ -136,6 +136,10 @@ PYTHONPATH=apps/rbp_app uv run --with pytest python -m pytest apps/rbp_app/rbp_a
 PYTHONPATH=apps/rbp_app uv run --with pytest python -m pytest apps/rbp_app/rbp_app/tests/test_milestone8_entitlements.py
 ```
 
+## Regression Coverage
+
+The final closeout keeps focused regression coverage for billing payment success/failure notification emission, subscription status-change notification gating, entitlement grant/suspend notification gating, and fail-open billing and entitlement notification behavior.
+
 ## Known Limitations
 
 - DocuShare brief submission is deferred until a real brief-submission flow exists.
