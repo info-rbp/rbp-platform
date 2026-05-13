@@ -144,3 +144,9 @@ export_python_type_annotations = True
 #    See ADMIN_APPROACH.md for details.
 # 4. Dynamic routes are commented out until business logic phase.
 # 5. Framework-core changes are minimized to zero where possible.
+
+
+fixtures = [
+    {"dt": "Role", "filters": [["name", "in", ["RBP Admin", "RBP Support", "RBP Billing Admin", "RBP Membership Admin"]]]},
+    {"dt": "Workspace", "filters": [["name", "in", ["RBP Operations", "RBP Membership", "RBP Billing", "RBP Applications", "RBP Notifications", "RBP Marketplace", "RBP Services", "RBP Support"]]]},
+]

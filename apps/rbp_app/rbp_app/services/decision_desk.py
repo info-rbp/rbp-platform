@@ -7,7 +7,9 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import ensure_reference_id as _ensure_reference_id, generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
+from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -53,6 +55,10 @@ OPTION_FIELDS = {
 }
 
 
+def ensure_reference_id(doc, doctype, prefix):
+    return _ensure_reference_id(doc, doctype, prefix, generator=generate_reference_id)
+
+
 def _safe_payload(payload):
     if payload is None:
         return {}
@@ -80,6 +86,13 @@ def _get_doc(doctype, name):
     return frappe.get_doc(doctype, name)
 
 
+def _has_field(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return True
+
+
 def _is_admin(user):
     return is_admin_user(user)
 
@@ -87,6 +100,7 @@ def _is_admin(user):
 def _serialize_request(doc, options=None):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "business_profile": getattr(doc, "business_profile", None),
@@ -108,6 +122,7 @@ def _serialize_request(doc, options=None):
         "supporting_file_reference": getattr(doc, "supporting_file_reference", None),
         "notes": getattr(doc, "notes", None),
         "options": options or [],
+        **service_routes("decision_desk", doc.name),
     }
 
 
@@ -179,19 +194,23 @@ def _audit(event_type, user, doc, message=None, metadata=None):
 def _notify(user, title, message, doc, trigger_source, *, priority="Normal", notification_type="Info"):
     if not user:
         return None
-    return create_notification(
-        user=user,
-        tenant=getattr(doc, "tenant", None),
-        title=title,
-        message=message,
-        priority=priority,
-        notification_type=notification_type,
-        route=f"/portal/decision-desk/{doc.name}",
-        related_doctype=REQUEST_DOCTYPE,
-        related_name=doc.name,
-        trigger_source=trigger_source,
-        created_by_workflow="decision_desk",
-    )
+    try:
+        return create_notification(
+            user=user,
+            tenant=getattr(doc, "tenant", None),
+            title=title,
+            message=message,
+            priority=priority,
+            notification_type=notification_type,
+            route=service_routes("decision_desk", doc.name)["portal_route"],
+            related_doctype=REQUEST_DOCTYPE,
+            related_name=doc.name,
+            trigger_source=trigger_source,
+            created_by_workflow="decision_desk",
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP Decision Desk notification failed")
+        return None
 
 
 def _admin_recipients():
@@ -216,6 +235,50 @@ def _notify_admins_new_request(doc):
         )
 
 
+def _emit_notification_event(event_type, doc, message, context):
+    return safe_emit_event_notification(
+        log_title="RBP service request notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=getattr(doc, "owner_user", None),
+        related_doctype=getattr(doc, "doctype", None) or REQUEST_DOCTYPE,
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
+
+
+def _notification_context(doc):
+    routes = service_routes("decision_desk", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": "Decision Desk",
+        "status": doc.status,
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
+
+
+def _notify_submitted(user, doc):
+    _notify(
+        doc.owner_user,
+        "Decision Desk request submitted",
+        "Your Decision Desk request has been submitted.",
+        doc,
+        "decision_desk.submit_request.user",
+    )
+    _notify_admins_new_request(doc)
+    _emit_notification_event(
+        "service.request_submitted",
+        doc,
+        "Your service request has been received.",
+        _notification_context(doc),
+    )
+    _audit("decision_desk_request_submitted", user, doc, "Decision Desk request submitted.")
+
+
 def create_request(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -232,13 +295,24 @@ def create_request(user, payload):
             "status": "Draft",
             "workflow_state": "Draft",
             "urgency": "Normal",
-            "source_channel": payload.get("source_channel") or "portal",
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, DRAFT_FIELDS)
+    doc.source_channel = "portal"
+    ensure_reference_id(doc, REQUEST_DOCTYPE, "RBP-DD")
+    if _has_field(REQUEST_DOCTYPE, "source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
+    if payload.get("submit"):
+        doc.status = "Submitted"
+        doc.workflow_state = "Submitted"
+        if _has_field(REQUEST_DOCTYPE, "submitted_on"):
+            doc.submitted_on = now_datetime()
     doc.insert(ignore_permissions=True)
 
     _audit("decision_desk_request_created", user, doc, "Decision Desk request created.")
+    if payload.get("submit"):
+        _notify_submitted(user, doc)
     return _serialize_request(doc)
 
 
@@ -272,15 +346,7 @@ def submit_request(user, request_name):
     doc.submitted_on = now_datetime()
     doc.save(ignore_permissions=True)
 
-    _notify(
-        doc.owner_user,
-        "Decision Desk request submitted",
-        "Your Decision Desk request has been submitted.",
-        doc,
-        "decision_desk.submit_request.user",
-    )
-    _notify_admins_new_request(doc)
-    _audit("decision_desk_request_submitted", user, doc, "Decision Desk request submitted.")
+    _notify_submitted(user, doc)
     return _serialize_request(doc)
 
 
@@ -304,6 +370,7 @@ def list_my_requests(user, filters=None):
         filters=query_filters,
         fields=[
             "name",
+            "reference_id",
             "tenant",
             "owner_user",
             "title",
@@ -315,6 +382,7 @@ def list_my_requests(user, filters=None):
             "submitted_on",
             "reviewed_on",
             "closed_on",
+            "source_channel",
             "modified",
         ],
         order_by="modified desc",
@@ -323,6 +391,7 @@ def list_my_requests(user, filters=None):
     if not _is_admin(user):
         rows = [row for row in rows if row.get("owner_user") == user or row.get("assigned_to") == user]
 
+    rows = [{**row, **service_routes("decision_desk", row.get("name"))} for row in rows]
     return {"requests": rows, "count": len(rows)}
 
 
@@ -429,6 +498,19 @@ def admin_update_status(user, request_name, status, payload=None):
                 priority="High",
                 notification_type="Success",
             )
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your Decision Desk request is now {status}.",
+            {
+                "reference_id": getattr(doc, "reference_id", None) or doc.name,
+                "service_name": "Decision Desk",
+                "status": status,
+                "admin_note": payload.get("notes"),
+                "portal_url": service_routes("decision_desk", doc.name)["portal_route"],
+                "admin_url": service_routes("decision_desk", doc.name)["admin_route"],
+            },
+        )
 
     _audit(
         "decision_desk_status_updated",
