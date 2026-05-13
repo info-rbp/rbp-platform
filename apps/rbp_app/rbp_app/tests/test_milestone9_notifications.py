@@ -1,10 +1,22 @@
 import sys, types
+
 frappe=types.SimpleNamespace(conf={},session=types.SimpleNamespace(user="qa@test.com"),log_error=lambda *a,**k:None,get_traceback=lambda:"",get_all=lambda *a,**k:[],db=types.SimpleNamespace(count=lambda *a,**k:0,set_value=lambda *a,**k:None),get_doc=lambda *a,**k:None,sendmail=lambda **k:None)
 mod=types.ModuleType("frappe")
 for k,v in frappe.__dict__.items(): setattr(mod,k,v)
 utils=types.ModuleType("frappe.utils"); utils.now_datetime=lambda: None
 sys.modules.setdefault("frappe",mod); sys.modules.setdefault("frappe.utils",utils)
-from rbp_app.services.notification_triggers import get_trigger, list_trigger_keys
+
+from rbp_app.services.notification_triggers import (
+    DISALLOWED_CONTEXT_KEYS,
+    SAFE_CONTEXT_KEYS,
+    assert_valid_trigger_catalog,
+    get_admin_enabled_triggers,
+    get_customer_enabled_triggers,
+    get_trigger,
+    get_triggers_by_category,
+    list_notification_triggers,
+    list_trigger_keys,
+)
 from rbp_app.services.email_templates import render_template
 from rbp_app.services import email_notifications as en
 from rbp_app.services import notifications as n
@@ -17,6 +29,54 @@ def test_trigger_catalog_contains_required_events():
 def test_unknown_trigger_raises_value_error():
     import pytest
     with pytest.raises(ValueError): get_trigger("nope")
+
+def test_trigger_catalog_validates_cleanly():
+    assert_valid_trigger_catalog()
+
+def test_list_notification_triggers_returns_safe_dicts():
+    required_keys={"event_type","template_key","default_subject","customer_enabled","admin_enabled","portal_enabled","email_enabled","category","default_portal_url","required_context_keys","optional_context_keys","delivery_channels","sensitivity"}
+    rows=list_notification_triggers()
+    assert rows
+    for row in rows:
+        assert isinstance(row, dict)
+        assert required_keys.issubset(set(row.keys()))
+        assert type(row).__name__ != "NotificationTrigger"
+
+def test_required_context_keys_are_safe():
+    for trigger in list_notification_triggers():
+        required_set=set(trigger["required_context_keys"])
+        optional_set=set(trigger["optional_context_keys"])
+        assert required_set.issubset(SAFE_CONTEXT_KEYS)
+        assert optional_set.issubset(SAFE_CONTEXT_KEYS)
+        assert not (required_set & DISALLOWED_CONTEXT_KEYS)
+        assert not (optional_set & DISALLOWED_CONTEXT_KEYS)
+
+def test_trigger_category_filters_are_sorted():
+    service_triggers=get_triggers_by_category("service")
+    assert all(t.category=="service" for t in service_triggers)
+    assert [t.event_type for t in service_triggers]==sorted(t.event_type for t in service_triggers)
+
+def test_admin_enabled_triggers_match_expected_events():
+    expected={"membership.payment_succeeded","membership.payment_failed","subscription.status_changed","entitlement.suspended","service.request_submitted","docushare.brief_submitted","connectivity.nbn_order_submitted","risk_advisor.assessment_submitted","fixer.request_submitted","marketplace.listing_submitted","marketplace.enquiry_submitted","application.interest_submitted"}
+    actual={t.event_type for t in get_admin_enabled_triggers()}
+    assert expected.issubset(actual)
+    assert "account.created" not in actual
+    assert "entitlement.granted" not in actual
+    assert "admin.status_updated" not in actual
+
+def test_customer_enabled_triggers_include_all_customer_events():
+    customer=get_customer_enabled_triggers()
+    assert len(customer)==len(list_trigger_keys())
+    assert all(t.customer_enabled is True for t in customer)
+
+def test_billing_triggers_use_billing_sensitivity():
+    for key in ("membership.payment_succeeded","membership.payment_failed","subscription.status_changed"):
+        assert get_trigger(key).sensitivity=="billing"
+
+def test_application_provisioning_event_not_present():
+    keys=list_trigger_keys()
+    assert "applications.provisioning_requested" not in keys
+    assert all("applications_provisioning" not in key for key in keys)
 
 def test_template_rendering_fields():
     body=render_template("membership_payment_succeeded",{"reference_id":"REF1","portal_url":"/portal/dashboard","amount":"10.00","currency":"AUD"})
