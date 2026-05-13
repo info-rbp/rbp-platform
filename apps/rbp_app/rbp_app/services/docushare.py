@@ -8,6 +8,7 @@ from frappe.utils import now_datetime
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import generate_reference_id
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -129,6 +130,7 @@ def _serialize_folder(doc):
 def _serialize_document(doc):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "folder": getattr(doc, "folder", None),
@@ -412,6 +414,12 @@ def create_document(user, payload):
         }
     )
     _set_fields(doc, payload, DOCUMENT_FIELDS)
+    if frappe.get_meta(DOCUMENT_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-DOC")
+    if frappe.get_meta(DOCUMENT_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
+        doc.submitted_on = now_datetime()
+    if frappe.get_meta(DOCUMENT_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.insert(ignore_permissions=True)
 
     _audit("docushare_document_created", user, doc, "DocuShare document created.")

@@ -8,6 +8,8 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
+from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import generate_reference_id
 from rbp_app.services.notifications import create_notification, emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
@@ -435,6 +437,12 @@ def create_listing(user, payload):
         }
     )
     _set_fields(doc, payload, LISTING_FIELDS)
+    if frappe.get_meta(LISTING_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-MKT")
+    if frappe.get_meta(LISTING_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
+        doc.submitted_on = now_datetime()
+    if frappe.get_meta(LISTING_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.insert(ignore_permissions=True)
 
     _notify(vendor.owner_user, "Marketplace listing created", "A marketplace listing was created.", doc, "marketplace.create_listing")
@@ -557,6 +565,12 @@ def create_order(user, listing_name, payload):
         }
     )
     _set_fields(doc, payload, ORDER_FIELDS)
+    if frappe.get_meta(ORDER_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-MKT-ENQ")
+    if frappe.get_meta(ORDER_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
+        doc.submitted_on = now_datetime()
+    if frappe.get_meta(ORDER_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.insert(ignore_permissions=True)
 
     _notify(vendor.owner_user, "Marketplace order requested", "A marketplace order was requested.", doc, "marketplace.create_order", priority="High")

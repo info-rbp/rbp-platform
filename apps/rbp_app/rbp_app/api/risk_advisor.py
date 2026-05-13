@@ -59,6 +59,11 @@ def admin_update_assessment_status(assessment_name, status, payload=None):
 
 
 @frappe.whitelist()
+def admin_update_status(assessment_name, status, payload=None):
+    return admin_update_assessment_status(assessment_name, status, payload)
+
+
+@frappe.whitelist()
 def create_risk(assessment_name, payload=None):
     user = require_login()
     return service.create_risk(user, assessment_name, _payload(payload))

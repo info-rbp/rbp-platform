@@ -47,6 +47,11 @@ def create_document(payload=None):
 
 
 @frappe.whitelist()
+def create_brief(payload=None):
+    return create_document(payload)
+
+
+@frappe.whitelist()
 def update_document(document_name, payload=None):
     user = require_login()
     return service.update_document(user, document_name, _payload(payload))
@@ -59,9 +64,26 @@ def list_documents(filters=None):
 
 
 @frappe.whitelist()
+def list_my_briefs(filters=None):
+    return list_documents(filters)
+
+
+@frappe.whitelist()
 def get_document(document_name):
     user = require_login()
     return service.get_document(user, document_name)
+
+
+@frappe.whitelist()
+def get_brief(brief_name):
+    return get_document(brief_name)
+
+
+@frappe.whitelist()
+def admin_update_status(brief_name, status, payload=None):
+    data = _payload(payload)
+    data["status"] = status
+    return update_document(brief_name, data)
 
 
 @frappe.whitelist()
