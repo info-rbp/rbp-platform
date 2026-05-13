@@ -104,6 +104,9 @@ class MarketplaceTestCase(TestCase):
             patch.object(service, "get_current_tenant_name", side_effect=lambda user=None: self.tenants.get(user)),
             patch.object(service, "is_admin_user", side_effect=lambda user=None: user == "manager@example.com"),
             patch.object(service, "now_datetime", return_value="2026-05-08 11:00:00"),
+            patch.object(service, "_has_field", return_value=True),
+            patch.object(service, "generate_reference_id", side_effect=lambda prefix: f"{prefix}-2026-0001"),
+            patch.object(service, "emit_event_notification", return_value=None),
             patch.object(
                 service,
                 "record_audit_event",
@@ -131,11 +134,18 @@ class MarketplaceTestCase(TestCase):
             "vendor": vendor["name"],
             "title": "Bookkeeping setup",
             "price": 120,
-            "status": "Active",
             "visibility": "Tenant",
         }
         data.update(payload or {})
-        return service.create_listing(user, data)
+        listing = service.create_listing(user, data)
+        doc = self.store.docs[service.LISTING_DOCTYPE][listing["name"]]
+        doc.status = "Active"
+        doc.workflow_state = "Active"
+        doc.visibility = "Tenant"
+        listing["status"] = "Active"
+        listing["workflow_state"] = "Active"
+        listing["visibility"] = "Tenant"
+        return listing
 
     def create_order(self, buyer="buyer@example.com", listing=None, payload=None):
         listing = listing or self.create_listing()
@@ -166,6 +176,7 @@ class TestMarketplaceDoctypes(TestCase):
             "tenant",
             "vendor",
             "owner_user",
+            "reference_id",
             "title",
             "category",
             "description",
@@ -173,7 +184,13 @@ class TestMarketplaceDoctypes(TestCase):
             "currency",
             "billing_model",
             "status",
+            "workflow_state",
             "visibility",
+            "submitted_on",
+            "source_channel",
+            "assigned_to",
+            "reviewed_on",
+            "closed_on",
             "notes",
         }:
             self.assertIn(field, listing_fields)
@@ -183,14 +200,21 @@ class TestMarketplaceDoctypes(TestCase):
             "listing",
             "vendor",
             "buyer_user",
+            "reference_id",
             "status",
+            "workflow_state",
             "quantity",
             "total_amount",
             "currency",
             "requested_on",
+            "submitted_on",
+            "source_channel",
+            "assigned_to",
+            "reviewed_on",
             "approved_on",
             "fulfilled_on",
             "cancelled_on",
+            "closed_on",
             "notes",
         }:
             self.assertIn(field, order_fields)
@@ -226,7 +250,7 @@ class TestMarketplaceService(MarketplaceTestCase):
         self.assertEqual({row["name"] for row in listed["listings"]}, {listing["name"]})
         self.assertEqual(detail["title"], "Updated listing")
         self.assertEqual(self.audit_events[-1][0], "marketplace_listing_updated")
-        self.assertEqual(self.notifications[-1]["title"], "Marketplace listing created")
+        self.assertEqual(self.notifications[-1]["title"], "Marketplace listing submitted")
 
     def test_create_order_update_status_list_and_get_order(self):
         order = self.create_order(payload={"quantity": 3, "notes": "Please confirm timing"})
@@ -246,7 +270,7 @@ class TestMarketplaceService(MarketplaceTestCase):
         self.assertEqual(detail["name"], order["name"])
         self.assertEqual(self.audit_events[-2][0], "marketplace_order_created")
         self.assertEqual(self.audit_events[-1][0], "marketplace_order_status_updated")
-        self.assertIn("Marketplace order requested", [notification["title"] for notification in self.notifications])
+        self.assertIn("Marketplace enquiry submitted", [notification["title"] for notification in self.notifications])
         self.assertIn("Marketplace order status changed", [notification["title"] for notification in self.notifications])
 
     def test_owner_vendor_buyer_and_admin_access_paths(self):
@@ -314,8 +338,11 @@ class TestMarketplaceService(MarketplaceTestCase):
         self.assertEqual(
             [
                 "Marketplace vendor created",
-                "Marketplace listing created",
-                "Marketplace order requested",
+                "Marketplace listing submitted",
+                "Marketplace listing submitted",
+                "Marketplace enquiry submitted",
+                "Marketplace enquiry received",
+                "Marketplace enquiry submitted",
                 "Marketplace order status changed",
                 "Marketplace order status changed",
             ],

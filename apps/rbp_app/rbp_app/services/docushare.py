@@ -7,8 +7,9 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
 from rbp_app.services.reference_ids import generate_reference_id
+from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -18,7 +19,7 @@ SHARE_DOCTYPE = "RBP DocuShare Share"
 FILE_REFERENCE_DOCTYPE = "RBP File Reference"
 
 FOLDER_STATUSES = {"Active", "Archived"}
-DOCUMENT_STATUSES = {"Draft", "Active", "Archived", "Deleted"}
+DOCUMENT_STATUSES = {"Draft", "Submitted", "Active", "Archived", "Deleted"}
 SHARE_STATUSES = {"Active", "Revoked", "Expired"}
 VISIBILITY_VALUES = {"Private", "Tenant", "Shared"}
 ACCESS_LEVELS = {"View", "Comment", "Manage"}
@@ -70,6 +71,13 @@ def _get_doc(doctype, name):
     return frappe.get_doc(doctype, name)
 
 
+def _has_field(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return True
+
+
 def _set_fields(doc, payload, fields):
     for field in fields:
         if field in payload:
@@ -97,19 +105,23 @@ def _notify(user, title, message, related_doc, trigger_source, *, priority="Norm
     if not user:
         return None
 
-    return create_notification(
-        user=user,
-        tenant=getattr(related_doc, "tenant", None),
-        title=title,
-        message=message,
-        priority=priority,
-        notification_type="Info",
-        route=f"/portal/docushare/{related_doc.name}",
-        related_doctype=getattr(related_doc, "doctype", None),
-        related_name=related_doc.name,
-        trigger_source=trigger_source,
-        created_by_workflow="docushare",
-    )
+    try:
+        return create_notification(
+            user=user,
+            tenant=getattr(related_doc, "tenant", None),
+            title=title,
+            message=message,
+            priority=priority,
+            notification_type="Info",
+            route=service_routes("docushare", related_doc.name)["portal_route"],
+            related_doctype=getattr(related_doc, "doctype", None),
+            related_name=related_doc.name,
+            trigger_source=trigger_source,
+            created_by_workflow="docushare",
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP DocuShare notification failed")
+        return None
 
 
 def _serialize_folder(doc):
@@ -139,10 +151,16 @@ def _serialize_document(doc):
         "file_reference": getattr(doc, "file_reference", None),
         "document_type": getattr(doc, "document_type", None),
         "status": getattr(doc, "status", None),
+        "workflow_state": getattr(doc, "workflow_state", None),
         "visibility": getattr(doc, "visibility", None),
         "version": getattr(doc, "version", None),
+        "submitted_on": getattr(doc, "submitted_on", None),
         "source_channel": getattr(doc, "source_channel", None),
+        "assigned_to": getattr(doc, "assigned_to", None),
+        "reviewed_on": getattr(doc, "reviewed_on", None),
+        "closed_on": getattr(doc, "closed_on", None),
         "notes": getattr(doc, "notes", None),
+        **service_routes("docushare", doc.name),
     }
 
 
@@ -269,6 +287,82 @@ def _validate_document_folder(folder_name, tenant):
     return folder
 
 
+def _admin_recipients():
+    recipients = {"Administrator"}
+    try:
+        rows = frappe.get_all("Has Role", filters={"role": "System Manager"}, fields=["parent"])
+        recipients.update(row.get("parent") for row in rows if row.get("parent"))
+    except Exception:
+        pass
+    return sorted(recipients)
+
+
+def _emit_notification_event(event_type, doc, message, context):
+    return safe_emit_event_notification(
+        log_title="RBP DocuShare notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=getattr(doc, "owner_user", None),
+        related_doctype=DOCUMENT_DOCTYPE,
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
+
+
+def _notification_context(doc):
+    routes = service_routes("docushare", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": "DocuShare",
+        "status": getattr(doc, "status", None),
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
+
+
+def _notify_admins_submitted(doc):
+    for recipient in _admin_recipients():
+        _notify(
+            recipient,
+            "DocuShare brief submitted",
+            f"{doc.owner_user} submitted a DocuShare brief.",
+            doc,
+            "docushare.submit_document.admin",
+            priority="High",
+        )
+
+
+def _notify_document_submitted(user, doc):
+    _notify(
+        doc.owner_user,
+        "DocuShare brief submitted",
+        "Your DocuShare brief has been submitted.",
+        doc,
+        "docushare.submit_document.user",
+    )
+    _notify_admins_submitted(doc)
+    _emit_notification_event(
+        "docushare.brief_submitted",
+        doc,
+        "Your DocuShare brief has been received.",
+        _notification_context(doc),
+    )
+    _audit("docushare_document_submitted", user, doc, "DocuShare document submitted.")
+
+
+def _set_status_dates(doc, status):
+    timestamp = now_datetime()
+    if status == "Submitted" and not getattr(doc, "submitted_on", None):
+        doc.submitted_on = timestamp
+    if status == "Active" and not getattr(doc, "reviewed_on", None):
+        doc.reviewed_on = timestamp
+    if status in {"Archived", "Deleted"}:
+        doc.closed_on = timestamp
+
+
 def _validate_file_reference(file_reference, tenant):
     if not file_reference:
         return None
@@ -366,6 +460,7 @@ def list_folders(user, filters=None):
         query_filters,
         [
             "name",
+            "reference_id",
             "tenant",
             "owner_user",
             "folder_name",
@@ -408,21 +503,25 @@ def create_document(user, payload):
             "tenant": tenant,
             "owner_user": user,
             "status": "Draft",
+            "workflow_state": "Draft",
             "visibility": "Private",
             "version": "1",
-            "source_channel": payload.get("source_channel") or "portal",
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, DOCUMENT_FIELDS)
-    if frappe.get_meta(DOCUMENT_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+    doc.source_channel = "portal"
+    if _has_field(DOCUMENT_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
         doc.reference_id = generate_reference_id("RBP-DOC")
-    if frappe.get_meta(DOCUMENT_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
-        doc.submitted_on = now_datetime()
-    if frappe.get_meta(DOCUMENT_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
-        doc.source_channel = "portal"
+    if payload.get("submit"):
+        doc.status = "Submitted"
+        doc.workflow_state = "Submitted"
+        _set_status_dates(doc, "Submitted")
     doc.insert(ignore_permissions=True)
 
     _audit("docushare_document_created", user, doc, "DocuShare document created.")
+    if payload.get("submit"):
+        _notify_document_submitted(user, doc)
     return _serialize_document(doc)
 
 
@@ -438,6 +537,9 @@ def update_document(user, document_name, payload):
     _validate_value(payload.get("visibility"), VISIBILITY_VALUES, "Invalid DocuShare document visibility.")
 
     _set_fields(doc, payload, DOCUMENT_FIELDS)
+    if "status" in payload:
+        doc.workflow_state = doc.status
+        _set_status_dates(doc, doc.status)
     doc.save(ignore_permissions=True)
 
     _audit("docushare_document_updated", user, doc, "DocuShare document updated.")
@@ -471,13 +573,19 @@ def list_documents(user, filters=None):
             "file_reference",
             "document_type",
             "status",
+            "workflow_state",
             "visibility",
             "version",
+            "submitted_on",
             "source_channel",
+            "assigned_to",
+            "reviewed_on",
+            "closed_on",
             "notes",
             "modified",
         ],
     )
+    rows = [{**row, **service_routes("docushare", row.get("name"))} for row in rows]
     return {"documents": rows, "count": len(rows)}
 
 
@@ -485,6 +593,50 @@ def get_document(user, document_name):
     user = _require_user(user)
     doc = _get_doc(DOCUMENT_DOCTYPE, document_name)
     _assert_view_access(user, doc)
+    return _serialize_document(doc)
+
+
+def admin_update_status(user, document_name, status, payload=None):
+    user = _require_user(user)
+    if not _is_admin(user):
+        raise frappe.PermissionError
+    if status not in DOCUMENT_STATUSES:
+        raise frappe.ValidationError("Invalid DocuShare document status.")
+
+    payload = _safe_payload(payload)
+    doc = _get_doc(DOCUMENT_DOCTYPE, document_name)
+    previous_status = getattr(doc, "status", None)
+
+    _set_fields(doc, payload, {"assigned_to", "notes", "visibility"})
+    doc.status = status
+    doc.workflow_state = status
+    _set_status_dates(doc, status)
+    doc.save(ignore_permissions=True)
+
+    if status != previous_status:
+        _notify(
+            doc.owner_user,
+            "DocuShare status changed",
+            f"Your DocuShare brief is now {status}.",
+            doc,
+            "docushare.admin_update_status",
+        )
+        context = _notification_context(doc)
+        context["admin_note"] = payload.get("notes")
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your DocuShare brief is now {status}.",
+            context,
+        )
+
+    _audit(
+        "docushare_document_status_updated",
+        user,
+        doc,
+        "DocuShare document status updated.",
+        {"from": previous_status, "to": status},
+    )
     return _serialize_document(doc)
 
 

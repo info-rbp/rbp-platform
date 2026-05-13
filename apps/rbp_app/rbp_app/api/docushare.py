@@ -4,7 +4,7 @@ import json
 
 import frappe
 
-from rbp_app.permissions import require_login
+from rbp_app.permissions import require_login, require_system_manager
 from rbp_app.services import docushare as service
 
 
@@ -48,7 +48,10 @@ def create_document(payload=None):
 
 @frappe.whitelist()
 def create_brief(payload=None):
-    return create_document(payload)
+    data = _payload(payload)
+    data["submit"] = True
+    user = require_login()
+    return service.create_document(user, data)
 
 
 @frappe.whitelist()
@@ -81,9 +84,8 @@ def get_brief(brief_name):
 
 @frappe.whitelist()
 def admin_update_status(brief_name, status, payload=None):
-    data = _payload(payload)
-    data["status"] = status
-    return update_document(brief_name, data)
+    user = require_system_manager()
+    return service.admin_update_status(user, brief_name, status, _payload(payload))
 
 
 @frappe.whitelist()

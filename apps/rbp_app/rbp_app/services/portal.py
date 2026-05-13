@@ -3,17 +3,81 @@
 import frappe
 
 from rbp_app.permissions import is_admin_user
+from rbp_app.services.service_routes import SERVICE_ROUTES
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
 _ACTIVITY_CONFIG = [
-    ("decision_desk", "Decision Desk", "RBP Decision Desk Request", "title", "/portal/services/decision-desk/{name}", "/app/rbp-decision-desk-request/{name}", ("owner_user", "owner", "customer", "user")),
-    ("docushare", "DocuShare", "RBP DocuShare Document", "title", "/portal/services/docushare/{name}", "/app/rbp-docushare-document/{name}", ("owner_user", "owner", "customer", "user")),
-    ("connectivity", "Connectivity", "RBP Connectivity Request", "location_name", "/portal/services/nbn/{name}", "/app/rbp-connectivity-request/{name}", ("owner_user", "owner", "customer", "user")),
-    ("risk_advisor", "Risk Advisor", "RBP Risk Advisor Assessment", "title", "/portal/services/risk-advisor/{name}", "/app/rbp-risk-advisor-assessment/{name}", ("owner_user", "owner", "customer", "user")),
-    ("fixer", "The Fixer", "RBP Fixer Case", "title", "/portal/services/the-fixer/{name}", "/app/rbp-fixer-case/{name}", ("owner_user", "owner", "customer", "user")),
-    ("marketplace_listing", "Marketplace Listing", "RBP Marketplace Listing", "title", "/portal/marketplace/listings/{name}", "/app/rbp-marketplace-listing/{name}", ("owner_user", "owner", "customer", "user")),
-    ("marketplace_enquiry", "Marketplace Enquiry", "RBP Marketplace Order", "name", "/portal/marketplace/offers/{name}", "/app/rbp-marketplace-order/{name}", ("buyer_user", "owner_user", "owner", "customer", "user")),
+    {
+        "item_type": "decision_desk",
+        "label": "Decision Desk",
+        "doctype": "RBP Decision Desk Request",
+        "title_field": "title",
+        "route_key": "decision_desk",
+        "owner_candidates": ("owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
+    {
+        "item_type": "docushare",
+        "label": "DocuShare",
+        "doctype": "RBP DocuShare Document",
+        "title_field": "title",
+        "route_key": "docushare",
+        "owner_candidates": ("owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
+    {
+        "item_type": "connectivity",
+        "label": "Connectivity",
+        "doctype": "RBP Connectivity Request",
+        "title_field": "location_name",
+        "route_key": "connectivity",
+        "owner_candidates": ("owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
+    {
+        "item_type": "risk_advisor",
+        "label": "Risk Advisor",
+        "doctype": "RBP Risk Advisor Assessment",
+        "title_field": "title",
+        "route_key": "risk_advisor",
+        "owner_candidates": ("owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
+    {
+        "item_type": "fixer",
+        "label": "The Fixer",
+        "doctype": "RBP Fixer Case",
+        "title_field": "title",
+        "route_key": "the_fixer",
+        "owner_candidates": ("owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
+    {
+        "item_type": "marketplace_listing",
+        "label": "Marketplace Listing",
+        "doctype": "RBP Marketplace Listing",
+        "title_field": "title",
+        "route_key": "marketplace_listing",
+        "owner_candidates": ("owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
+    {
+        "item_type": "marketplace_enquiry",
+        "label": "Marketplace Enquiry",
+        "doctype": "RBP Marketplace Order",
+        "title_field": "name",
+        "route_key": "marketplace_enquiry",
+        "owner_candidates": ("buyer_user", "owner_user", "owner", "customer", "user"),
+        "requires_tenant_for_customer": True,
+        "allow_owner_only_without_tenant": False,
+    },
 ]
 
 
@@ -34,22 +98,39 @@ def get_my_service_activity(user):
         raise frappe.PermissionError
 
     tenant = get_current_tenant_name(user)
+    is_admin = is_admin_user(user)
     rows = []
-    for item_type, label, doctype, title_field, portal_route, admin_route, owner_candidates in _ACTIVITY_CONFIG:
+    for config in _ACTIVITY_CONFIG:
+        item_type = config["item_type"]
+        label = config["label"]
+        doctype = config["doctype"]
         if not doctype_exists(doctype):
             continue
         existing_fields = _existing_fields(doctype)
+        has_tenant = "tenant" in existing_fields
+        if not is_admin:
+            if config.get("requires_tenant_for_customer") and not has_tenant:
+                continue
+            if has_tenant and not tenant:
+                continue
+            if not has_tenant and not config.get("allow_owner_only_without_tenant"):
+                continue
+
+        owner_candidates = config["owner_candidates"]
         owner_field = _first_present(owner_candidates, existing_fields)
         assigned_field = _first_present(("assigned_to",), existing_fields)
+        if not is_admin and not owner_field and not assigned_field:
+            continue
+
         submitted_field = _first_present(("submitted_on", "created_on", "creation", "modified"), existing_fields)
         reference_field = _first_present(("reference_id",), existing_fields)
         status_field = _first_present(("status", "workflow_state"), existing_fields)
         workflow_field = _first_present(("workflow_state", "status"), existing_fields)
-        resolved_title_field = title_field if title_field in existing_fields else "name"
+        resolved_title_field = config["title_field"] if config["title_field"] in existing_fields else "name"
 
         filters = {}
-        if not is_admin_user(user) and tenant and "tenant" in existing_fields:
-                filters["tenant"] = tenant
+        if not is_admin and has_tenant:
+            filters["tenant"] = tenant
         fields = ["name", "modified", resolved_title_field]
         for optional_field in [owner_field, assigned_field, submitted_field, reference_field, status_field, workflow_field]:
             if optional_field and optional_field not in fields:
@@ -64,8 +145,9 @@ def get_my_service_activity(user):
         for row in result:
             owner_value = row.get(owner_field) if owner_field else None
             assigned_value = row.get(assigned_field) if assigned_field else None
-            if not is_admin_user(user) and owner_value != user and assigned_value != user:
+            if not is_admin and owner_value != user and assigned_value != user:
                 continue
+            portal_route, admin_route = SERVICE_ROUTES[config["route_key"]]
             rows.append({
                 "type": item_type,
                 "label": label,

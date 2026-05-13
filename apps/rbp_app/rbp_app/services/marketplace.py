@@ -8,9 +8,9 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
-from rbp_app.services.reference_ids import generate_reference_id
-from rbp_app.services.notifications import create_notification, emit_event_notification
+from rbp_app.services.reference_ids import ensure_reference_id as _ensure_reference_id, generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
+from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -20,7 +20,7 @@ ORDER_DOCTYPE = "RBP Marketplace Order"
 
 VENDOR_STATUSES = {"Draft", "Active", "Suspended", "Archived"}
 VERIFICATION_STATUSES = {"Unverified", "Pending", "Verified", "Rejected"}
-LISTING_STATUSES = {"Draft", "Active", "Paused", "Archived"}
+LISTING_STATUSES = {"Draft", "Submitted", "Under Review", "Active", "Paused", "Archived", "Rejected"}
 VISIBILITY_VALUES = {"Private", "Tenant", "Public"}
 BILLING_MODELS = {"One-off", "Recurring", "Quote"}
 ORDER_STATUSES = {"Requested", "Approved", "In Progress", "Fulfilled", "Cancelled", "Rejected"}
@@ -57,6 +57,10 @@ LISTING_FIELDS = {
 ORDER_FIELDS = {"quantity", "notes"}
 
 
+def ensure_reference_id(doc, doctype, prefix):
+    return _ensure_reference_id(doc, doctype, prefix, generator=generate_reference_id)
+
+
 def _safe_payload(payload):
     if payload is None:
         return {}
@@ -86,6 +90,13 @@ def _get_doc(doctype, name):
     if not doctype_exists(doctype):
         raise frappe.DoesNotExistError
     return frappe.get_doc(doctype, name)
+
+
+def _has_field(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return True
 
 
 def _set_fields(doc, payload, fields):
@@ -182,40 +193,45 @@ def _notify(user, title, message, doc, trigger_source, *, priority="Normal", not
     if not user:
         return None
 
-    return create_notification(
-        user=user,
-        tenant=getattr(doc, "tenant", None),
-        title=title,
-        message=message,
-        priority=priority,
-        notification_type=notification_type,
-        route=f"/portal/marketplace/{doc.name}",
-        related_doctype=getattr(doc, "doctype", None),
-        related_name=doc.name,
-        trigger_source=trigger_source,
-        created_by_workflow="marketplace",
-    )
+    route_key = "marketplace_enquiry" if getattr(doc, "doctype", None) == ORDER_DOCTYPE else "marketplace_listing"
+    try:
+        return create_notification(
+            user=user,
+            tenant=getattr(doc, "tenant", None),
+            title=title,
+            message=message,
+            priority=priority,
+            notification_type=notification_type,
+            route=service_routes(route_key, doc.name)["portal_route"],
+            related_doctype=getattr(doc, "doctype", None),
+            related_name=doc.name,
+            trigger_source=trigger_source,
+            created_by_workflow="marketplace",
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP marketplace notification failed")
+        return None
 
 
 def _emit_notification_event(event_type, doc, message, context, *, customer_email=None):
-    try:
-        emit_event_notification(
-            event_type=event_type,
-            user=None,
-            tenant=getattr(doc, "tenant", None),
-            customer_email=customer_email or getattr(doc, "owner_user", None),
-            related_doctype=getattr(doc, "doctype", None),
-            related_name=doc.name,
-            message=message,
-            context=context,
-        )
-    except Exception:
-        frappe.log_error(frappe.get_traceback(), "RBP marketplace notification hook failed")
+    return safe_emit_event_notification(
+        log_title="RBP marketplace notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=customer_email or getattr(doc, "owner_user", None),
+        related_doctype=getattr(doc, "doctype", None),
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
 
 
 def _serialize_vendor(doc):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "vendor_name": getattr(doc, "vendor_name", None),
@@ -232,6 +248,7 @@ def _serialize_vendor(doc):
 def _serialize_listing(doc):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "vendor": doc.vendor,
         "owner_user": doc.owner_user,
@@ -242,27 +259,43 @@ def _serialize_listing(doc):
         "currency": getattr(doc, "currency", None),
         "billing_model": getattr(doc, "billing_model", None),
         "status": getattr(doc, "status", None),
+        "workflow_state": getattr(doc, "workflow_state", None),
         "visibility": getattr(doc, "visibility", None),
+        "submitted_on": getattr(doc, "submitted_on", None),
+        "source_channel": getattr(doc, "source_channel", None),
+        "assigned_to": getattr(doc, "assigned_to", None),
+        "reviewed_on": getattr(doc, "reviewed_on", None),
+        "closed_on": getattr(doc, "closed_on", None),
         "notes": getattr(doc, "notes", None),
+        **service_routes("marketplace_listing", doc.name),
     }
 
 
 def _serialize_order(doc):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "listing": doc.listing,
         "vendor": doc.vendor,
         "buyer_user": doc.buyer_user,
+        "owner_user": doc.buyer_user,
         "status": getattr(doc, "status", None),
+        "workflow_state": getattr(doc, "workflow_state", None),
         "quantity": getattr(doc, "quantity", None),
         "total_amount": getattr(doc, "total_amount", None),
         "currency": getattr(doc, "currency", None),
         "requested_on": getattr(doc, "requested_on", None),
+        "submitted_on": getattr(doc, "submitted_on", None),
+        "source_channel": getattr(doc, "source_channel", None),
+        "assigned_to": getattr(doc, "assigned_to", None),
+        "reviewed_on": getattr(doc, "reviewed_on", None),
         "approved_on": getattr(doc, "approved_on", None),
         "fulfilled_on": getattr(doc, "fulfilled_on", None),
         "cancelled_on": getattr(doc, "cancelled_on", None),
+        "closed_on": getattr(doc, "closed_on", None),
         "notes": getattr(doc, "notes", None),
+        **service_routes("marketplace_enquiry", doc.name),
     }
 
 
@@ -313,12 +346,62 @@ def _calculate_total(price, quantity):
 
 def _set_order_status_dates(order, status):
     timestamp = now_datetime()
+    if status in {"Approved", "In Progress"} and not getattr(order, "reviewed_on", None):
+        order.reviewed_on = timestamp
     if status == "Approved" and not getattr(order, "approved_on", None):
         order.approved_on = timestamp
     if status == "Fulfilled" and not getattr(order, "fulfilled_on", None):
         order.fulfilled_on = timestamp
-    if status == "Cancelled" and not getattr(order, "cancelled_on", None):
+        order.closed_on = timestamp
+    if status in {"Cancelled", "Rejected"} and not getattr(order, "cancelled_on", None):
         order.cancelled_on = timestamp
+        order.closed_on = timestamp
+
+
+def _set_listing_status_dates(listing, status):
+    timestamp = now_datetime()
+    if status in {"Submitted", "Under Review"} and not getattr(listing, "submitted_on", None):
+        listing.submitted_on = timestamp
+    if status in {"Under Review", "Active", "Rejected"} and not getattr(listing, "reviewed_on", None):
+        listing.reviewed_on = timestamp
+    if status in {"Archived", "Rejected"}:
+        listing.closed_on = timestamp
+
+
+def _admin_recipients():
+    recipients = {"Administrator"}
+    try:
+        rows = frappe.get_all("Has Role", filters={"role": "System Manager"}, fields=["parent"])
+        recipients.update(row.get("parent") for row in rows if row.get("parent"))
+    except Exception:
+        pass
+    return sorted(recipients)
+
+
+def _listing_context(doc, vendor=None):
+    routes = service_routes("marketplace_listing", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": "Marketplace Listing",
+        "marketplace_item": getattr(doc, "title", None),
+        "business_name": getattr(vendor, "vendor_name", None),
+        "status": getattr(doc, "status", None),
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
+
+
+def _order_context(doc, listing=None, vendor=None):
+    routes = service_routes("marketplace_enquiry", doc.name)
+    return {
+        "reference_id": getattr(doc, "reference_id", None) or doc.name,
+        "service_name": "Marketplace Enquiry",
+        "marketplace_item": getattr(listing, "title", None),
+        "business_name": getattr(vendor, "vendor_name", None),
+        "status": getattr(doc, "status", None),
+        "portal_url": routes["portal_route"],
+        "admin_url": routes["admin_route"],
+    }
 
 
 def create_vendor(user, payload):
@@ -424,39 +507,48 @@ def create_listing(user, payload):
         raise frappe.ValidationError("Cannot create listings for this vendor.")
 
     _validate_listing_payload(payload)
+    requested_status = payload.get("status")
+    if not _is_admin(user) and requested_status and requested_status not in {"Draft", "Submitted", "Under Review"}:
+        requested_status = "Under Review"
+    status = requested_status or "Under Review"
     doc = frappe.get_doc(
         {
             "doctype": LISTING_DOCTYPE,
             "tenant": tenant,
             "vendor": vendor.name,
             "owner_user": vendor.owner_user,
-            "status": "Draft",
+            "status": status,
+            "workflow_state": status,
             "visibility": "Private",
             "currency": payload.get("currency") or "AUD",
             "billing_model": "One-off",
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, LISTING_FIELDS)
-    if frappe.get_meta(LISTING_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
-        doc.reference_id = generate_reference_id("RBP-MKT")
-    if frappe.get_meta(LISTING_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
-        doc.submitted_on = now_datetime()
-    if frappe.get_meta(LISTING_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
-        doc.source_channel = "portal"
+    doc.status = status
+    doc.workflow_state = status
+    doc.visibility = "Private" if status in {"Submitted", "Under Review"} else getattr(doc, "visibility", None)
+    doc.source_channel = "portal"
+    ensure_reference_id(doc, LISTING_DOCTYPE, "RBP-MKT")
+    _set_listing_status_dates(doc, status)
     doc.insert(ignore_permissions=True)
 
-    _notify(vendor.owner_user, "Marketplace listing created", "A marketplace listing was created.", doc, "marketplace.create_listing")
+    _notify(vendor.owner_user, "Marketplace listing submitted", "Your marketplace listing was submitted for review.", doc, "marketplace.create_listing")
+    for recipient in _admin_recipients():
+        _notify(
+            recipient,
+            "Marketplace listing submitted",
+            f"{vendor.owner_user} submitted a marketplace listing.",
+            doc,
+            "marketplace.create_listing.admin",
+            priority="High",
+        )
     _emit_notification_event(
         "marketplace.listing_submitted",
         doc,
         "Your marketplace listing has been received.",
-        {
-            "reference_id": doc.name,
-            "marketplace_item": getattr(doc, "title", None),
-            "business_name": getattr(vendor, "vendor_name", None),
-            "status": getattr(doc, "status", None),
-            "portal_url": "/portal/marketplace/listings/new",
-        },
+        _listing_context(doc, vendor),
         customer_email=vendor.owner_user,
     )
     _audit("marketplace_listing_created", user, doc, "Marketplace listing created.")
@@ -474,9 +566,56 @@ def update_listing(user, listing_name, payload):
     _validate_listing_payload(payload)
 
     _set_fields(doc, payload, LISTING_FIELDS)
+    doc.workflow_state = doc.status
+    _set_listing_status_dates(doc, doc.status)
     doc.save(ignore_permissions=True)
 
     _audit("marketplace_listing_updated", user, doc, "Marketplace listing updated.")
+    return _serialize_listing(doc)
+
+
+def admin_update_listing_status(user, listing_name, status, payload=None):
+    user = _require_user(user)
+    if not _is_admin(user):
+        raise frappe.PermissionError
+    _validate_value(status, LISTING_STATUSES, "Invalid marketplace listing status.")
+
+    payload = _safe_payload(payload)
+    doc = _get_doc(LISTING_DOCTYPE, listing_name)
+    vendor = _get_doc(VENDOR_DOCTYPE, doc.vendor)
+    previous_status = getattr(doc, "status", None)
+
+    _set_fields(doc, payload, {"assigned_to", "notes", "visibility"})
+    doc.status = status
+    doc.workflow_state = status
+    _set_listing_status_dates(doc, status)
+    doc.save(ignore_permissions=True)
+
+    if status != previous_status:
+        _notify(
+            doc.owner_user,
+            "Marketplace listing status changed",
+            f"Your marketplace listing is now {status}.",
+            doc,
+            "marketplace.admin_update_listing_status",
+        )
+        context = _listing_context(doc, vendor)
+        context["admin_note"] = payload.get("notes")
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your marketplace listing is now {status}.",
+            context,
+            customer_email=doc.owner_user,
+        )
+
+    _audit(
+        "marketplace_listing_status_updated",
+        user,
+        doc,
+        "Marketplace listing status updated.",
+        {"from_status": previous_status, "to_status": status},
+    )
     return _serialize_listing(doc)
 
 
@@ -498,6 +637,7 @@ def list_listings(user, filters=None):
         filters=query_filters,
         fields=[
             "name",
+            "reference_id",
             "tenant",
             "vendor",
             "owner_user",
@@ -508,13 +648,20 @@ def list_listings(user, filters=None):
             "currency",
             "billing_model",
             "status",
+            "workflow_state",
             "visibility",
+            "submitted_on",
+            "source_channel",
+            "assigned_to",
+            "reviewed_on",
+            "closed_on",
             "notes",
             "modified",
         ],
         order_by="modified desc",
     )
     rows = _visible_listings(user, rows)
+    rows = [{**row, **service_routes("marketplace_listing", row.get("name"))} for row in rows]
     return {"listings": rows, "count": len(rows)}
 
 
@@ -558,33 +705,35 @@ def create_order(user, listing_name, payload):
             "vendor": vendor.name,
             "buyer_user": user,
             "status": "Requested",
+            "workflow_state": "Requested",
             "quantity": quantity,
             "total_amount": total,
             "currency": getattr(listing, "currency", None) or "AUD",
             "requested_on": now_datetime(),
+            "submitted_on": now_datetime(),
+            "source_channel": "portal",
         }
     )
     _set_fields(doc, payload, ORDER_FIELDS)
-    if frappe.get_meta(ORDER_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
-        doc.reference_id = generate_reference_id("RBP-MKT-ENQ")
-    if frappe.get_meta(ORDER_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
-        doc.submitted_on = now_datetime()
-    if frappe.get_meta(ORDER_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
-        doc.source_channel = "portal"
+    ensure_reference_id(doc, ORDER_DOCTYPE, "RBP-MKT-ENQ")
     doc.insert(ignore_permissions=True)
 
-    _notify(vendor.owner_user, "Marketplace order requested", "A marketplace order was requested.", doc, "marketplace.create_order", priority="High")
+    _notify(user, "Marketplace enquiry submitted", "Your marketplace enquiry has been submitted.", doc, "marketplace.create_order.customer")
+    _notify(vendor.owner_user, "Marketplace enquiry received", "A marketplace enquiry was submitted.", doc, "marketplace.create_order.vendor", priority="High")
+    for recipient in _admin_recipients():
+        _notify(
+            recipient,
+            "Marketplace enquiry submitted",
+            f"{user} submitted a marketplace enquiry.",
+            doc,
+            "marketplace.create_order.admin",
+            priority="High",
+        )
     _emit_notification_event(
         "marketplace.enquiry_submitted",
         doc,
         "Your marketplace enquiry has been received.",
-        {
-            "reference_id": doc.name,
-            "marketplace_item": getattr(listing, "title", None),
-            "business_name": getattr(vendor, "vendor_name", None),
-            "status": getattr(doc, "status", None),
-            "portal_url": "/portal/marketplace/offers/new",
-        },
+        _order_context(doc, listing, vendor),
         customer_email=user,
     )
     _audit("marketplace_order_created", user, doc, "Marketplace order created.")
@@ -612,6 +761,7 @@ def update_order_status(user, order_name, status, payload=None):
         raise frappe.ValidationError("Invalid marketplace order status transition.")
 
     order.status = status
+    order.workflow_state = status
     if "notes" in payload:
         order.notes = payload.get("notes")
     _set_order_status_dates(order, status)
@@ -636,6 +786,58 @@ def update_order_status(user, order_name, status, payload=None):
     return _serialize_order(order)
 
 
+def admin_update_enquiry_status(user, order_name, status, payload=None):
+    user = _require_user(user)
+    if not _is_admin(user):
+        raise frappe.PermissionError
+    payload = _safe_payload(payload)
+    _validate_value(status, ORDER_STATUSES, "Invalid marketplace order status.")
+
+    order = _get_doc(ORDER_DOCTYPE, order_name)
+    listing = _get_doc(LISTING_DOCTYPE, order.listing)
+    vendor = _get_doc(VENDOR_DOCTYPE, order.vendor)
+    current_status = getattr(order, "status", None) or "Requested"
+    if status != current_status and status not in ORDER_TRANSITIONS.get(current_status, set()):
+        raise frappe.ValidationError("Invalid marketplace order status transition.")
+
+    if "assigned_to" in payload:
+        order.assigned_to = payload.get("assigned_to")
+    if "notes" in payload:
+        order.notes = payload.get("notes")
+    order.status = status
+    order.workflow_state = status
+    _set_order_status_dates(order, status)
+    order.save(ignore_permissions=True)
+
+    if status != current_status:
+        for recipient in {order.buyer_user, vendor.owner_user}:
+            _notify(
+                recipient,
+                "Marketplace enquiry status changed",
+                f"Marketplace enquiry {order.name} is now {status}.",
+                order,
+                "marketplace.admin_update_enquiry_status",
+            )
+        context = _order_context(order, listing, vendor)
+        context["admin_note"] = payload.get("notes")
+        _emit_notification_event(
+            "admin.status_updated",
+            order,
+            f"Your marketplace enquiry is now {status}.",
+            context,
+            customer_email=order.buyer_user,
+        )
+
+    _audit(
+        "marketplace_enquiry_status_updated",
+        user,
+        order,
+        "Marketplace enquiry status updated.",
+        {"from_status": current_status, "to_status": status},
+    )
+    return _serialize_order(order)
+
+
 def list_my_orders(user, filters=None):
     user = _require_user(user)
     filters = _safe_payload(filters)
@@ -654,18 +856,25 @@ def list_my_orders(user, filters=None):
         filters=query_filters,
         fields=[
             "name",
+            "reference_id",
             "tenant",
             "listing",
             "vendor",
             "buyer_user",
             "status",
+            "workflow_state",
             "quantity",
             "total_amount",
             "currency",
             "requested_on",
+            "submitted_on",
+            "source_channel",
+            "assigned_to",
+            "reviewed_on",
             "approved_on",
             "fulfilled_on",
             "cancelled_on",
+            "closed_on",
             "notes",
             "modified",
         ],
@@ -681,6 +890,7 @@ def list_my_orders(user, filters=None):
             for row in rows
             if row.get("buyer_user") == user or row.get("vendor") in vendor_names
         ]
+    rows = [{**row, "owner_user": row.get("buyer_user"), **service_routes("marketplace_enquiry", row.get("name"))} for row in rows]
     return {"orders": rows, "count": len(rows)}
 
 

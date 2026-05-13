@@ -155,3 +155,14 @@ Mock notifications replaced with RBP Notification APIs.
 Mock uploads replaced with RBP File Reference APIs.
 Mock payment states replaced with RBP Payment Event and provider flow.
 ```
+## Milestone 10 Service Persistence Handoff
+
+Replace service submission mocks with these real Frappe methods:
+
+- Decision Desk: `rbp_app.api.decision_desk.create_request`, `rbp_app.api.decision_desk.submit_request`, `rbp_app.api.decision_desk.list_my_requests`, `rbp_app.api.decision_desk.get_request`
+- DocuShare: `rbp_app.api.docushare.create_brief`, `rbp_app.api.docushare.list_my_briefs`, `rbp_app.api.docushare.get_brief`
+- Connectivity: `rbp_app.api.connectivity.create_order`, `rbp_app.api.connectivity.list_my_orders`, `rbp_app.api.connectivity.get_order`
+- Risk Advisor: `rbp_app.api.risk_advisor.create_assessment`, `rbp_app.api.risk_advisor.list_my_assessments`, `rbp_app.api.risk_advisor.get_assessment`
+- The Fixer: `rbp_app.api.the_fixer.create_request`, `rbp_app.api.the_fixer.list_my_requests`, `rbp_app.api.the_fixer.get_request`
+- Marketplace: `rbp_app.api.marketplace.create_listing`, `rbp_app.api.marketplace.create_enquiry`, `rbp_app.api.marketplace.list_my_orders`, `rbp_app.api.marketplace.get_order`
+- Portal activity: `rbp_app.api.portal.get_my_service_activity`

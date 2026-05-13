@@ -215,6 +215,18 @@ def _log_notification_error(message, title):
         pass
 
 
+def safe_emit_event_notification(log_title="RBP service request notification hook failed", emit=None, **kwargs):
+    try:
+        emitter = emit or emit_event_notification
+        return emitter(**kwargs)
+    except Exception:
+        try:
+            _log_notification_error(frappe.get_traceback(), log_title)
+        except Exception:
+            pass
+        return None
+
+
 def _record_delivery_logs(
     *,
     notification_name: str | None,

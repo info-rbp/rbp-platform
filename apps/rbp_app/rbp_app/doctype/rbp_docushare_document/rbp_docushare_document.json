@@ -13,15 +13,21 @@
  "field_order": [
   "tenant",
   "owner_user",
+  "reference_id",
   "folder",
   "title",
   "description",
   "file_reference",
   "document_type",
   "status",
+  "workflow_state",
   "visibility",
   "version",
+  "submitted_on",
   "source_channel",
+  "assigned_to",
+  "reviewed_on",
+  "closed_on",
   "notes"
  ],
  "fields": [
@@ -39,6 +45,13 @@
    "label": "Owner User",
    "options": "User",
    "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "reference_id",
+   "fieldtype": "Data",
+   "label": "Reference ID",
+   "read_only": 1,
    "in_list_view": 1
   },
   {
@@ -76,9 +89,16 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nActive\nArchived\nDeleted",
+   "options": "Draft\nSubmitted\nActive\nArchived\nDeleted",
    "default": "Draft",
    "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Data",
+   "label": "Workflow State",
+   "default": "Draft",
    "in_list_view": 1
   },
   {
@@ -97,9 +117,33 @@
    "default": "1"
   },
   {
+   "fieldname": "submitted_on",
+   "fieldtype": "Datetime",
+   "label": "Submitted On"
+  },
+  {
    "fieldname": "source_channel",
    "fieldtype": "Data",
-   "label": "Source Channel"
+   "label": "Source Channel",
+   "default": "portal",
+   "read_only": 1
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "label": "Assigned To",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "reviewed_on",
+   "fieldtype": "Datetime",
+   "label": "Reviewed On"
+  },
+  {
+   "fieldname": "closed_on",
+   "fieldtype": "Datetime",
+   "label": "Closed On"
   },
   {
    "fieldname": "notes",

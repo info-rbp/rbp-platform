@@ -119,6 +119,9 @@ class DocuShareTestCase(TestCase):
             patch.object(service, "get_current_tenant_name", side_effect=lambda user=None: self.tenants.get(user)),
             patch.object(service, "is_admin_user", side_effect=lambda user=None: user == "manager@example.com"),
             patch.object(service, "now_datetime", return_value="2026-05-08 11:00:00"),
+            patch.object(service, "_has_field", return_value=True),
+            patch.object(service, "generate_reference_id", side_effect=lambda prefix: f"{prefix}-2026-0001"),
+            patch.object(service, "emit_event_notification", return_value=None),
             patch.object(
                 service,
                 "record_audit_event",

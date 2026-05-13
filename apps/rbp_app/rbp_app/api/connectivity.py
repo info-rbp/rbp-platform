@@ -25,7 +25,10 @@ def create_request(payload=None):
 @frappe.whitelist()
 def create_order(payload=None):
     """Compatibility alias for portal NBN order submission."""
-    return create_request(payload)
+    data = _payload(payload)
+    data["submit"] = True
+    user = require_login()
+    return service.create_request(user, data)
 
 
 @frappe.whitelist()
