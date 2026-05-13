@@ -34,8 +34,10 @@
 | --- | --- |
 | Premium checkout submitted | Backend creates a Stripe Checkout Session in test mode. |
 | Successful test card checkout | User returns to confirmation state and payment event is recorded. |
+| Successful subscription webhook | Subscription status updates to active and expected entitlements are granted. |
 | Failed payment test card | Failure state is recorded and notification is queued/sent to QA allowlist only. |
 | Cancel checkout | User returns to checkout without activating paid benefits. |
+| Duplicate webhook delivery | No duplicate payment event or duplicate customer notification is created. |
 
 ## Application Interest Checks
 

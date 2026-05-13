@@ -149,6 +149,16 @@ def handle_stripe_webhook():
 	event_type = event.get("type")
 	if event_type not in EVENT_STATUS:
 		return {"ok": True, "ignored": True, "event_type": event_type}
+	provider_event_id = event.get("id")
+	if provider_event_id and doctype_exists("RBP Payment Event"):
+		existing_event = frappe.db.exists("RBP Payment Event", {"provider_event_id": provider_event_id})
+		if existing_event:
+			return {
+				"ok": True,
+				"duplicate": True,
+				"event_type": event_type,
+				"payment_event": existing_event,
+			}
 
 	obj = _stripe_object(event)
 	subscription_name = _find_subscription(obj)
@@ -156,7 +166,7 @@ def handle_stripe_webhook():
 
 	payment_event = record_payment_event(
 		{
-			"provider_event_id": event.get("id"),
+			"provider_event_id": provider_event_id,
 			"provider_customer_id": obj.get("customer"),
 			"provider_payment_id": obj.get("payment_intent") or obj.get("id"),
 			"related_doctype": "RBP Subscription" if subscription_name else None,
