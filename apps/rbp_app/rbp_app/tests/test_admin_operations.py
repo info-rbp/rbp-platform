@@ -1,7 +1,13 @@
 import json
+from pathlib import Path
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
+
+
+APP_ROOT = Path(__file__).resolve().parents[2]
+WORKSPACE_FIXTURE = APP_ROOT / "fixtures" / "workspace.json"
+ROLE_FIXTURE = APP_ROOT / "fixtures" / "role.json"
 
 
 class TestAdminOperations(FrappeTestCase):
@@ -65,14 +71,14 @@ class TestAdminOperations(FrappeTestCase):
         self.assertIn("application_provisioning_enabled", payload)
 
     def test_workspace_fixture_parses(self):
-        with open("apps/rbp_app/rbp_app/fixtures/workspace.json", "r", encoding="utf-8") as f:
+        with WORKSPACE_FIXTURE.open("r", encoding="utf-8") as f:
             fixtures = json.load(f)
         names = {entry.get("name") for entry in fixtures}
         self.assertIn("RBP Operations", names)
         self.assertIn("RBP Billing", names)
 
     def test_workspace_fixture_can_instantiate_docs(self):
-        with open("apps/rbp_app/rbp_app/fixtures/workspace.json", "r", encoding="utf-8") as f:
+        with WORKSPACE_FIXTURE.open("r", encoding="utf-8") as f:
             fixtures = json.load(f)
 
         for entry in fixtures:
