@@ -25,6 +25,7 @@
     "audit:backend-resources-help-center": "node scripts/audit-backend-resources-help-center.mjs",
     "audit:firebase-auth-security-plan": "node scripts/audit-firebase-auth-security-plan.mjs",
     "audit:phase1": "node scripts/phase1-audit.mjs",
+    "audit:seo": "node scripts/audit-seo.mjs",
     "check:about-ux": "node scripts/check-about-area-ux.cjs"
   },
   "dependencies": {
