@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router";
 
 import { ScrollToHash } from "./components/ScrollToHash";
 import { EnvironmentBanner } from "./components/EnvironmentBanner";
+import { SEO } from "./components/SEO";
 import {
   RequireAccountGate,
   RequireAdminAuth,
@@ -10,8 +11,6 @@ import {
 import { canShowPublicApplications } from "./config/runtime";
 import { useRuntimeConfig } from "./hooks/useRuntimeConfig";
 import type { PortalProductKey } from "./types/portal";
-
-// ── Core public pages ─────────────────────────────────────────────────────────
 
 import { HomePage } from "./pages/HomePage";
 import { AboutPage } from "./pages/AboutPage";
@@ -29,43 +28,25 @@ import {
   CoreServicesLandingPage,
   CoreTheFixerPage,
 } from "./pages/core-services/CorePublicPages";
-
-// ── About pages ───────────────────────────────────────────────────────────────
-
 import { WhatWeDoPage } from "./pages/about/WhatWeDoPage";
 import { OurProcessPage } from "./pages/about/OurProcessPage";
 import { WorkWithUsPage } from "./pages/about/WorkWithUsPage";
 import { WorkForUsPage } from "./pages/about/WorkForUsPage";
 import { DiscoveryCallPage } from "./pages/about/DiscoveryCallPage";
 import { OurPlatformPage } from "./pages/about/OurPlatformPage";
-
-// ── On-Demand pages ───────────────────────────────────────────────────────────
-
 import { OnDemandPage } from "./pages/OnDemandPage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { DocuSharePage } from "./pages/DocuSharePage";
-
-// ── Document Nucleus pages ────────────────────────────────────────────────────
-
 import { DocumentOverviewPage } from "./pages/DocumentOverviewPage";
 import { DocumentCategoryPage } from "./pages/DocumentCategoryPage";
 import { DocumentProductPage } from "./pages/DocumentProductPage";
 import { DocumentProcessPage } from "./pages/document-nucleus/DocumentProcessPage";
 import { DocumentCustomisationPage } from "./pages/document-nucleus/DocumentCustomisationPage";
-
-// ── Managed Services pages ────────────────────────────────────────────────────
-
 import { ManagedServicesPage } from "./pages/ManagedServicesPage";
 import { RealEstatePage } from "./pages/managed-services/RealEstatePage";
 import { HRServicesPage } from "./pages/managed-services/HRServicesPage";
-
-// ── Applications pages ────────────────────────────────────────────────────────
-
 import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { BusinessApplicationsPage } from "./pages/BusinessApplicationsPage";
-
-// ── Operations pages ──────────────────────────────────────────────────────────
-
 import { OperationsCenterPage } from "./pages/OperationsCenterPage";
 import { FinancePage } from "./pages/FinancePage";
 import { FinancialPlanningPage } from "./pages/finance/FinancialPlanningPage";
@@ -77,42 +58,24 @@ import {
   OperationsFinancePage,
   OperationsFinanceReferralPage,
 } from "./pages/operations/OperationsFinancePage";
-
-// ── Marketplace pages ─────────────────────────────────────────────────────────
-
 import { MarketplacePage } from "./pages/MarketplacePage";
-
-// ── Membership pages ──────────────────────────────────────────────────────────
-
 import { MembershipOverviewPage } from "./pages/membership/MembershipOverviewPage";
 import { RemoteBusinessPartnerMembershipPage } from "./pages/membership/RemoteBusinessPartnerMembershipPage";
 import { MembershipInclusionsPage } from "./pages/membership/MembershipInclusionsPage";
 import { MembershipFaqPage } from "./pages/membership/MembershipFaqPage";
 import { MembershipTermsPage } from "./pages/membership/MembershipTermsPage";
 import { MembershipConfirmationPage } from "./pages/confirmation/MembershipConfirmationPage";
-
-// ── Offers and Resources pages ────────────────────────────────────────────────
-
 import { OffersPage } from "./pages/OffersPage";
 import { ResourcesPage } from "./pages/ResourcesPage";
-
-// ── Legal pages ───────────────────────────────────────────────────────────────
-
 import { LegalIndexPage } from "./pages/legal/LegalIndexPage";
 import { PrivacyPolicyPage } from "./pages/legal/PrivacyPolicyPage";
 import { TermsOfUsePage } from "./pages/legal/TermsOfUsePage";
 import { TermsOfEngagementPage } from "./pages/legal/TermsOfEngagementPage";
 import { PaymentPolicyPage } from "./pages/legal/PaymentPolicyPage";
 import { ServicesPolicyPage } from "./pages/legal/ServicesPolicyPage";
-
-// ── Confirmation pages ────────────────────────────────────────────────────────
-
 import { ThankYouPage } from "./pages/confirmation/ThankYouPage";
 import { ContactSuccessPage } from "./pages/confirmation/ContactSuccessPage";
 import { BookingConfirmationPage } from "./pages/confirmation/BookingConfirmationPage";
-
-// ── Member Portal ─────────────────────────────────────────────────────────────
-
 import { PortalLayout } from "./pages/portal/PortalLayout";
 import { PortalDashboard } from "./pages/portal/PortalDashboard";
 import { PortalServices } from "./pages/portal/PortalServices";
@@ -135,9 +98,6 @@ import {
   PortalRiskAdvisorStart,
   PortalTheFixerStart,
 } from "./pages/portal/PortalStartPages";
-
-// ── Admin Portal ──────────────────────────────────────────────────────────────
-
 import { AdminSignInPage } from "./pages/admin/AdminSignInPage";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
@@ -146,6 +106,7 @@ import { AdminCrudPage } from "./pages/admin/AdminCrudPage";
 function Root() {
   return (
     <>
+      <SEO />
       <EnvironmentBanner />
       <ScrollToHash />
       <Outlet />
@@ -232,8 +193,6 @@ export const router = createBrowserRouter([
     path: "/",
     Component: Root,
     children: [
-      // ── Public core ─────────────────────────────────────────────────────────
-
       { index: true, Component: HomePage },
       { path: "about", Component: AboutPage },
       { path: "contact", Component: ContactPage },
@@ -256,9 +215,6 @@ export const router = createBrowserRouter([
           />
         ),
       },
-
-      // ── Core Services ──────────────────────────────────────────────────────
-
       {
         path: "core-services",
         Component: Layout,
@@ -271,9 +227,6 @@ export const router = createBrowserRouter([
           { path: "bid-management", Component: CoreBidManagementPage },
         ],
       },
-
-      // ── About ───────────────────────────────────────────────────────────────
-
       { path: "about/what-we-do", Component: WhatWeDoPage },
       { path: "about/our-process", Component: OurProcessPage },
       { path: "about/process", Component: OurProcessPage },
@@ -281,16 +234,10 @@ export const router = createBrowserRouter([
       { path: "about/discovery-call", Component: DiscoveryCallPage },
       { path: "about/work-for-us", Component: WorkForUsPage },
       { path: "about/work-with-us", Component: WorkWithUsPage },
-
-      // ── Legacy / direct public routes ──────────────────────────────────────
-
       { path: "services", Component: ServicesPage },
       { path: "business-advisor", element: <Navigate to="/core-services/business-advisor" replace /> },
       { path: "docushare", Component: DocuSharePage },
       { path: "applications-legacy", Component: ApplicationsPage },
-
-      // ── Document Nucleus ───────────────────────────────────────────────────
-
       { path: "document-nucleus/overview", Component: DocumentOverviewPage },
       {
         path: "document-nucleus/brief",
@@ -308,9 +255,6 @@ export const router = createBrowserRouter([
       { path: "document-nucleus/category/customisation", element: <Navigate to="/document-nucleus/customisation" replace /> },
       { path: "document-nucleus/category/:id", Component: DocumentCategoryPage },
       { path: "document-nucleus/product/:id", Component: DocumentProductPage },
-
-      // ── On-Demand Services ─────────────────────────────────────────────────
-
       {
         path: "on-demand",
         Component: Layout,
@@ -324,9 +268,6 @@ export const router = createBrowserRouter([
           { path: "risk-advisor", element: <Navigate to="/core-services/risk-advisor" replace /> },
         ],
       },
-
-      // ── Managed Services ───────────────────────────────────────────────────
-
       {
         path: "managed-services",
         Component: Layout,
@@ -337,19 +278,12 @@ export const router = createBrowserRouter([
           { path: "hr-services", Component: HRServicesPage },
         ],
       },
-
-      // ── Applications ───────────────────────────────────────────────────────
-
       { path: "applications", Component: PublicApplicationsGate },
-
-      // ── Operations ─────────────────────────────────────────────────────────
-
       {
         path: "operations",
         Component: Layout,
         children: [
           { index: true, Component: OperationsCenterPage },
-
           {
             path: "finance",
             Component: Layout,
@@ -363,7 +297,6 @@ export const router = createBrowserRouter([
               { path: ":slug", Component: OperationsFinancePage },
             ],
           },
-
           {
             path: "insurance",
             Component: Layout,
@@ -373,11 +306,7 @@ export const router = createBrowserRouter([
             ],
           },
           { path: "calculators", element: <Navigate to="/operations/finance/commercial-loan-calculator" replace /> },
-
-          // Compatibility route retained for existing links.
           { path: "superloop", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
-
-          // Preferred connectivity routes.
           { path: "connectivity", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
           { path: "connectivity/superloop", element: <Navigate to="/operations/connectivity/nbn-phone" replace /> },
           { path: "connectivity/nbn-phone", Component: NbnPhonePage },
@@ -396,13 +325,9 @@ export const router = createBrowserRouter([
             ),
           },
           { path: "connectivity/nbn-phone/faqs", Component: NbnPhonePage },
-
           { path: "coming-soon", Component: OperationsComingSoonPage },
         ],
       },
-
-      // ── Legacy finance routes ──────────────────────────────────────────────
-
       {
         path: "finance",
         Component: Layout,
@@ -414,9 +339,6 @@ export const router = createBrowserRouter([
           { path: "credit-and-funding", Component: CreditFundingPage },
         ],
       },
-
-      // ── Marketplace ────────────────────────────────────────────────────────
-
       {
         path: "marketplace",
         Component: Layout,
@@ -445,9 +367,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
-      // ── Membership ─────────────────────────────────────────────────────────
-
       {
         path: "membership",
         Component: Layout,
@@ -482,14 +401,9 @@ export const router = createBrowserRouter([
           { path: "confirmation", Component: MembershipConfirmationPage },
         ],
       },
-
-      // ── Offers and Resources ───────────────────────────────────────────────
-
       { path: "offers", Component: OffersPage },
       { path: "resources", Component: ResourcesPage },
-
-      // ── Legal ──────────────────────────────────────────────────────────────
-
+      { path: "legal/terms", element: <Navigate to="/legal/terms-of-use" replace /> },
       {
         path: "legal",
         Component: Layout,
@@ -502,13 +416,8 @@ export const router = createBrowserRouter([
           { path: "services-policy", Component: ServicesPolicyPage },
         ],
       },
-
-      // ── Confirmation / success pages ───────────────────────────────────────
-
       { path: "thank-you", Component: ThankYouPage },
       { path: "booking-confirmation", Component: BookingConfirmationPage },
-
-      // Optional compatibility confirmation routes.
       { path: "confirmation/thank-you", Component: ThankYouPage },
       { path: "confirmation/contact-success", Component: ContactSuccessPage },
       { path: "confirmation/booking-confirmation", Component: BookingConfirmationPage },
@@ -516,9 +425,6 @@ export const router = createBrowserRouter([
         path: "confirmation/membership-confirmation",
         Component: MembershipConfirmationPage,
       },
-
-      // ── Member Portal ──────────────────────────────────────────────────────
-
       {
         path: "portal",
         element: (
@@ -555,9 +461,6 @@ export const router = createBrowserRouter([
           { path: "settings", Component: PortalSettings },
         ],
       },
-
-      // ── Admin Portal ───────────────────────────────────────────────────────
-
       {
         path: "admin",
         children: [
@@ -570,8 +473,6 @@ export const router = createBrowserRouter([
             ),
             children: [
               { path: "dashboard", Component: AdminDashboard },
-
-              // Admin dashboard utility routes.
               { path: "content", Component: AdminCrudPage },
               { path: "requests", Component: AdminCrudPage },
               { path: "requests/decision-desk", Component: AdminCrudPage },
@@ -588,15 +489,11 @@ export const router = createBrowserRouter([
               { path: "tasks", Component: AdminCrudPage },
               { path: "discovery-calls", Component: AdminCrudPage },
               { path: "other", Component: AdminCrudPage },
-
-              // Top-level legacy/admin shortcuts.
               { path: "members", Component: AdminCrudPage },
               { path: "services", Component: AdminCrudPage },
               { path: "sessions", Component: AdminCrudPage },
               { path: "documents", Component: AdminCrudPage },
               { path: "the-fixer", Component: AdminCrudPage },
-
-              // Admin CRUD scaffold sections.
               { path: "on-demand", Component: AdminCrudPage },
               { path: "on-demand/*", Component: AdminCrudPage },
               { path: "managed-services", Component: AdminCrudPage },
@@ -619,16 +516,11 @@ export const router = createBrowserRouter([
               { path: "site-content/*", Component: AdminCrudPage },
               { path: "settings", Component: AdminCrudPage },
               { path: "settings/*", Component: AdminCrudPage },
-
-              // Admin fallback.
               { path: "*", Component: AdminCrudPage },
             ],
           },
         ],
       },
-
-      // ── Public fallback ────────────────────────────────────────────────────
-
       { path: "*", Component: NotFoundPage },
     ],
   },
