@@ -1,1 +1,1 @@
-"""Database patches for the RBP platform layer."""
+"""RBP app patch modules."""

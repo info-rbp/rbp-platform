@@ -1,2 +1,3 @@
 rbp_app.patches.set_rbp_home_page
 rbp_app.patches.backfill_service_request_reference_ids
+rbp_app.patches.seed_qa_application_catalog

@@ -1,0 +1,34 @@
+name: Backend Static Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - qa
+      - "launch/**"
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m compileall apps/rbp_app/rbp_app
+
+  method-contract-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify expected backend methods exist
+        run: |
+          grep -RIn "def create_membership_checkout_session" apps/rbp_app/rbp_app
+          grep -RIn "def get_subscription_status" apps/rbp_app/rbp_app
+          grep -RIn "def get_my_payment_summary" apps/rbp_app/rbp_app
+          grep -RIn "def cancel_subscription" apps/rbp_app/rbp_app
+          grep -RIn "def list_public_applications" apps/rbp_app/rbp_app
+          grep -RIn "def list_portal_applications" apps/rbp_app/rbp_app
+          grep -RIn "def register_application_interest" apps/rbp_app/rbp_app
+          grep -RIn "def handle_stripe_webhook" apps/rbp_app/rbp_app

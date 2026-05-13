@@ -115,7 +115,7 @@
    "fieldname": "notes",
    "fieldtype": "Long Text",
    "label": "Notes"
-  }
+  },
   {"fieldname": "tenant", "fieldtype": "Link", "label": "Tenant", "options": "RBP Tenant", "reqd": 1, "in_list_view": 1},
   {"fieldname": "vendor", "fieldtype": "Link", "label": "Vendor", "options": "RBP Marketplace Vendor", "reqd": 1, "in_list_view": 1},
   {"fieldname": "owner_user", "fieldtype": "Link", "label": "Owner User", "options": "User", "reqd": 1, "in_list_view": 1},

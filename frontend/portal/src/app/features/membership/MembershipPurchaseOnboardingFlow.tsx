@@ -25,6 +25,7 @@ import {
   PlanSelectionCard,
 } from "../../components/domain";
 import { StatusBadge } from "../../components/status";
+import { environment } from "../../config/environment";
 import {
   premiumMembershipInclusions,
   premiumMembershipPlan,
@@ -389,6 +390,17 @@ export function MembershipPurchaseOnboardingFlow() {
         selectedPlan: selectedPlan?.name,
       });
       window.location.assign(checkoutUrl);
+      return;
+    }
+
+    if (environment.enableStripeCheckout) {
+      setSubmissionState("error");
+      setErrors({
+        paymentState:
+          checkoutResponse.errors?.[0]?.message ??
+          checkoutResponse.data?.message ??
+          "Stripe Checkout could not be started. Please try again or contact support.",
+      });
       return;
     }
 
