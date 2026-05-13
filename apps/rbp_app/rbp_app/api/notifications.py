@@ -1,34 +1,29 @@
-"""Notification APIs for the RBP portal/frontend."""
-
+from __future__ import annotations
 import frappe
+from rbp_app.services.notification_triggers import list_notification_triggers
+from rbp_app.services.notifications import emit_event_notification
+from rbp_app.services.tenancy import doctype_exists
 
-from rbp_app.permissions import require_login
-from rbp_app.services.notifications import (
-    get_notifications as get_notifications_service,
-    mark_all_notifications_read as mark_all_notifications_read_service,
-    mark_notification_read as mark_notification_read_service,
-)
-
-
-@frappe.whitelist()
-def get_notifications():
-    """Return portal notifications for the current user."""
-
-    user = require_login()
-    return get_notifications_service(user)
-
+def _require_system_manager():
+    if "System Manager" not in frappe.get_roles():
+        frappe.throw("Not permitted", frappe.PermissionError)
 
 @frappe.whitelist()
-def mark_notification_read(name):
-    """Mark a single notification as read."""
-
-    user = require_login()
-    return mark_notification_read_service(name, user)
-
+def list_triggers():
+    return {"triggers": list_notification_triggers()}
 
 @frappe.whitelist()
-def mark_all_notifications_read():
-    """Mark all current-user notifications as read."""
+def send_test_notification(event_type: str = "account.created", recipient_email: str | None = None):
+    _require_system_manager()
+    return emit_event_notification(event_type=event_type, user=frappe.session.user, customer_email=recipient_email or frappe.session.user, context={"customer_name":"QA Tester","business_name":"Remote Business Partner QA","reference_id":"RBP-QA-NOTIFICATION","portal_url":"/portal/dashboard","status":"qa-test"})
 
-    user = require_login()
-    return mark_all_notifications_read_service(user)
+@frappe.whitelist()
+def admin_list_notification_events(limit: int = 50):
+    _require_system_manager()
+    limit=max(1,min(int(limit or 50),200))
+    events=[]; deliveries=[]
+    if doctype_exists("RBP Notification"):
+        events=frappe.get_all("RBP Notification", fields=["name","creation","modified","user","title","status","delivery_channel","related_doctype","related_name","trigger_source","created_by_workflow"], order_by="modified desc", limit_page_length=limit)
+    if doctype_exists("RBP Notification Delivery"):
+        deliveries=frappe.get_all("RBP Notification Delivery", fields=["name","creation","notification","recipient_email","status","sandboxed"], order_by="creation desc", limit_page_length=limit)
+    return {"events":events, "deliveries":deliveries}

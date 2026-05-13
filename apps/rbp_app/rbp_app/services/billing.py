@@ -199,6 +199,7 @@ def update_subscription_from_payment_event(event):
 		return None
 
 	subscription = frappe.get_doc("RBP Subscription", event.related_name)
+	previous_status = getattr(subscription, "status", None)
 	subscription.payment_status = event.status
 	subscription.provider_customer_id = event.provider_customer_id or subscription.provider_customer_id
 	subscription.provider_payment_id = event.provider_payment_id
@@ -234,8 +235,9 @@ def update_subscription_from_payment_event(event):
 			message="Your membership payment failed and needs attention.",
 		)
 
-	emit_event_notification(
-		event_type="subscription.status_changed",
+	if subscription.status != previous_status:
+		emit_event_notification(
+			event_type="subscription.status_changed",
 		user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
 		tenant=getattr(subscription, "tenant", None),
 		related_doctype="RBP Subscription",

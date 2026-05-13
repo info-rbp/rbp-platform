@@ -561,8 +561,9 @@ def sync_subscription_entitlements(subscription) -> dict[str, object]:
 
 	if should_grant:
 		granted = grant_membership_entitlements(subscription=subscription)
-		emit_event_notification(
-			event_type="entitlement.granted",
+		if granted:
+			emit_event_notification(
+				event_type="entitlement.granted",
 			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
 			tenant=getattr(subscription, "tenant", None),
 			related_doctype="RBP Subscription",
@@ -580,7 +581,8 @@ def sync_subscription_entitlements(subscription) -> dict[str, object]:
 		inactive_status = "Cancelled"
 
 	suspended = suspend_membership_entitlements(subscription=subscription, status=inactive_status)
-	emit_event_notification(
+	if suspended:
+		emit_event_notification(
 		event_type="entitlement.suspended",
 		user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
 		tenant=getattr(subscription, "tenant", None),
