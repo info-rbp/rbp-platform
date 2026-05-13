@@ -7,6 +7,7 @@ from frappe.utils import getdate, nowdate
 
 from rbp_app.permissions import get_user_roles, is_admin_user, require_system_manager
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
+from rbp_app.services.notifications import emit_event_notification
 
 
 ACTIVE_STATUSES = {"Active"}
@@ -560,6 +561,14 @@ def sync_subscription_entitlements(subscription) -> dict[str, object]:
 
 	if should_grant:
 		granted = grant_membership_entitlements(subscription=subscription)
+		emit_event_notification(
+			event_type="entitlement.granted",
+			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+			tenant=getattr(subscription, "tenant", None),
+			related_doctype="RBP Subscription",
+			related_name=getattr(subscription, "name", None),
+			message="Membership entitlements have been granted.",
+		)
 		return {"action": "granted", "entitlements": granted}
 
 	inactive_status = "Suspended"
@@ -571,6 +580,14 @@ def sync_subscription_entitlements(subscription) -> dict[str, object]:
 		inactive_status = "Cancelled"
 
 	suspended = suspend_membership_entitlements(subscription=subscription, status=inactive_status)
+	emit_event_notification(
+		event_type="entitlement.suspended",
+		user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+		tenant=getattr(subscription, "tenant", None),
+		related_doctype="RBP Subscription",
+		related_name=getattr(subscription, "name", None),
+		message=f"Membership entitlements were updated to {inactive_status}.",
+	)
 
 	return {"action": "suspended", "entitlements": suspended}
 

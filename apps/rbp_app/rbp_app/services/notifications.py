@@ -183,3 +183,71 @@ def get_notifications_payload():
     """Backward-compatible alias for the notification payload."""
 
     return get_notifications()
+
+
+def emit_event_notification(
+    *,
+    event_type: str,
+    user: str | None = None,
+    tenant: str | None = None,
+    subject: str | None = None,
+    message: str | None = None,
+    related_doctype: str | None = None,
+    related_name: str | None = None,
+    metadata: dict | None = None,
+):
+    """Best-effort backend-owned notification hook for Milestone 9 events."""
+
+    from rbp_app.services.notification_triggers import get_trigger
+
+    try:
+        trigger = get_trigger(event_type)
+    except Exception:
+        frappe.log_error(f"Unknown notification trigger: {event_type}", "RBP notification trigger")
+        return {"ok": False, "reason": "unknown_trigger"}
+
+    title = subject or trigger.default_subject
+    body = message or f"Event {event_type} occurred."
+
+    try:
+        portal_doc = create_notification(
+            user=user,
+            tenant=tenant,
+            title=title,
+            message=body,
+            delivery_channel="Portal",
+            related_doctype=related_doctype,
+            related_name=related_name,
+            trigger_source=event_type,
+            created_by_workflow=trigger.template_key,
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP notification portal delivery failed")
+        portal_doc = None
+
+    runtime = get_runtime_settings()
+    email_result = "disabled"
+
+    if runtime.enable_email_notifications and trigger.customer_enabled and user:
+        email_recipient = user
+        sandbox_recipient = getattr(getattr(frappe, "conf", {}), "get", lambda *_: None)("rbp_email_sandbox_recipient")
+        if runtime.email_sandbox_mode and sandbox_recipient:
+            email_recipient = sandbox_recipient
+            email_result = "sandbox"
+
+        if runtime.email_sandbox_mode and not sandbox_recipient:
+            email_result = "sandbox_no_recipient"
+        else:
+            try:
+                frappe.sendmail(
+                    recipients=[email_recipient],
+                    subject=title,
+                    message=body,
+                    delayed=False,
+                )
+                email_result = "sent"
+            except Exception:
+                frappe.log_error(frappe.get_traceback(), "RBP notification email send failed")
+                email_result = "failed"
+
+    return {"ok": True, "portal": getattr(portal_doc, "name", None), "email": email_result, "metadata": metadata or {}}
