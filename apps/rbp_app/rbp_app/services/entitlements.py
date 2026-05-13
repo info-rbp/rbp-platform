@@ -313,7 +313,12 @@ def _entitlement_rows(
 
 
 def _serialize_entitlement_doc(doc) -> dict[str, object]:
-	row = doc.as_dict() if hasattr(doc, "as_dict") else dict(doc)
+	if hasattr(doc, "as_dict"):
+		row = doc.as_dict()
+	elif isinstance(doc, dict):
+		row = doc
+	else:
+		row = vars(doc)
 	app_key = _normalize_entitlement_key(row.get("app_key"))
 	catalog = _catalog_entry(app_key)
 
@@ -466,7 +471,7 @@ def grant_entitlement(
 		source_subscription=source_subscription,
 	)
 
-	if existing_name:
+	if isinstance(existing_name, str) and existing_name.strip():
 		doc = frappe.get_doc("RBP App Entitlement", existing_name)
 	else:
 		doc = frappe.get_doc({"doctype": "RBP App Entitlement"})
@@ -494,7 +499,7 @@ def grant_entitlement(
 	_set_if_supported(doc, "plan_required", plan_required)
 	_set_if_supported(doc, "notes", notes)
 
-	if existing_name:
+	if isinstance(existing_name, str) and existing_name.strip():
 		doc.save(ignore_permissions=True)
 	else:
 		doc.insert(ignore_permissions=True)

@@ -43,7 +43,7 @@ class RBPApplicationInterest(Document):
 
         application_name = getattr(self, "application", None)
         if application_name:
-            self._validate_catalog_application(application_name)
+            RBPApplicationInterest._validate_catalog_application(self, application_name)
 
         if self.status != "new" and self.status not in {"Received"}:
             user = getattr(getattr(frappe, "session", None), "user", None) or "Guest"
