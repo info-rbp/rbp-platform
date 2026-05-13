@@ -7,7 +7,7 @@ from frappe.utils import getdate, nowdate
 
 from rbp_app.permissions import get_user_roles, is_admin_user, require_system_manager
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
-from rbp_app.services.notifications import emit_event_notification
+from rbp_app.services.notifications import safe_emit_event_notification
 
 
 ACTIVE_STATUSES = {"Active"}
@@ -125,11 +125,8 @@ ENTITLEMENT_CATALOG = {
 
 
 def _safe_emit_entitlement_notification(**kwargs):
-	try:
-		return emit_event_notification(**kwargs)
-	except Exception:
-		frappe.log_error(frappe.get_traceback(), "RBP entitlement notification hook failed")
-		return {"ok": False, "reason": "notification_failed"}
+	result = safe_emit_event_notification(log_title="RBP entitlement notification hook failed", **kwargs)
+	return result or {"ok": False, "reason": "notification_failed"}
 
 
 def _changed_entitlement_count(result) -> int:

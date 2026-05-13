@@ -8,8 +8,8 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.reference_ids import generate_reference_id
-from rbp_app.services.notifications import create_notification, emit_event_notification
+from rbp_app.services.reference_ids import ensure_reference_id as _ensure_reference_id, generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
 from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
@@ -55,6 +55,10 @@ LISTING_FIELDS = {
     "notes",
 }
 ORDER_FIELDS = {"quantity", "notes"}
+
+
+def ensure_reference_id(doc, doctype, prefix):
+    return _ensure_reference_id(doc, doctype, prefix, generator=generate_reference_id)
 
 
 def _safe_payload(payload):
@@ -210,19 +214,18 @@ def _notify(user, title, message, doc, trigger_source, *, priority="Normal", not
 
 
 def _emit_notification_event(event_type, doc, message, context, *, customer_email=None):
-    try:
-        emit_event_notification(
-            event_type=event_type,
-            user=None,
-            tenant=getattr(doc, "tenant", None),
-            customer_email=customer_email or getattr(doc, "owner_user", None),
-            related_doctype=getattr(doc, "doctype", None),
-            related_name=doc.name,
-            message=message,
-            context=context,
-        )
-    except Exception:
-        frappe.log_error(frappe.get_traceback(), "RBP marketplace notification hook failed")
+    return safe_emit_event_notification(
+        log_title="RBP marketplace notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=customer_email or getattr(doc, "owner_user", None),
+        related_doctype=getattr(doc, "doctype", None),
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
 
 
 def _serialize_vendor(doc):
@@ -245,6 +248,7 @@ def _serialize_vendor(doc):
 def _serialize_listing(doc):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "vendor": doc.vendor,
         "owner_user": doc.owner_user,
@@ -526,8 +530,7 @@ def create_listing(user, payload):
     doc.workflow_state = status
     doc.visibility = "Private" if status in {"Submitted", "Under Review"} else getattr(doc, "visibility", None)
     doc.source_channel = "portal"
-    if _has_field(LISTING_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
-        doc.reference_id = generate_reference_id("RBP-MKT")
+    ensure_reference_id(doc, LISTING_DOCTYPE, "RBP-MKT")
     _set_listing_status_dates(doc, status)
     doc.insert(ignore_permissions=True)
 
@@ -712,8 +715,7 @@ def create_order(user, listing_name, payload):
         }
     )
     _set_fields(doc, payload, ORDER_FIELDS)
-    if _has_field(ORDER_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
-        doc.reference_id = generate_reference_id("RBP-MKT-ENQ")
+    ensure_reference_id(doc, ORDER_DOCTYPE, "RBP-MKT-ENQ")
     doc.insert(ignore_permissions=True)
 
     _notify(user, "Marketplace enquiry submitted", "Your marketplace enquiry has been submitted.", doc, "marketplace.create_order.customer")

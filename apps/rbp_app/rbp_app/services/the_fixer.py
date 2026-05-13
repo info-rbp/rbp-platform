@@ -8,7 +8,7 @@ from frappe.utils import now_datetime
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.reference_ids import generate_reference_id
-from rbp_app.services.notifications import create_notification, emit_event_notification
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
 from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
@@ -299,19 +299,18 @@ def _notify_admins_new_case(doc):
 
 
 def _emit_notification_event(event_type, doc, message, context):
-    try:
-        emit_event_notification(
-            event_type=event_type,
-            user=None,
-            tenant=getattr(doc, "tenant", None),
-            customer_email=getattr(doc, "owner_user", None),
-            related_doctype=CASE_DOCTYPE,
-            related_name=doc.name,
-            message=message,
-            context=context,
-        )
-    except Exception:
-        frappe.log_error(frappe.get_traceback(), "RBP fixer notification hook failed")
+    return safe_emit_event_notification(
+        log_title="RBP fixer notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=getattr(doc, "owner_user", None),
+        related_doctype=CASE_DOCTYPE,
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
 
 
 def _notification_context(doc):
