@@ -124,6 +124,52 @@ ENTITLEMENT_CATALOG = {
 }
 
 
+def _safe_emit_entitlement_notification(**kwargs):
+	try:
+		return emit_event_notification(**kwargs)
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "RBP entitlement notification hook failed")
+		return {"ok": False, "reason": "notification_failed"}
+
+
+def _changed_entitlement_count(result) -> int:
+	if not result:
+		return 0
+	if isinstance(result, (list, tuple, set)):
+		return len(result)
+	if isinstance(result, dict):
+		for key in ("changed", "created", "updated", "reactivated"):
+			value = result.get(key)
+			if isinstance(value, (list, tuple, set)):
+				return len(value)
+		value = result.get("entitlements")
+		if isinstance(value, (list, tuple, set)):
+			return len(value)
+	return 0
+
+
+def _has_changed_entitlements(result) -> bool:
+	return _changed_entitlement_count(result) > 0
+
+
+def _build_entitlement_notification_context(
+	*,
+	subscription,
+	status: str,
+	action: str,
+	changed_count: int = 0,
+) -> dict[str, object]:
+	return {
+		"reference_id": getattr(subscription, "name", None),
+		"status": status,
+		"action": action,
+		"changed_count": changed_count,
+		"portal_url": "/portal/dashboard",
+		"plan_name": getattr(subscription, "plan", None),
+		"business_name": getattr(subscription, "business_name", None),
+	}
+
+
 def _parse_roles(value: object) -> set[str]:
 	if not value:
 		return set()
@@ -561,15 +607,21 @@ def sync_subscription_entitlements(subscription) -> dict[str, object]:
 
 	if should_grant:
 		granted = grant_membership_entitlements(subscription=subscription)
-		if granted:
-			emit_event_notification(
+		if _has_changed_entitlements(granted):
+			_safe_emit_entitlement_notification(
 				event_type="entitlement.granted",
-			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
-			tenant=getattr(subscription, "tenant", None),
-			related_doctype="RBP Subscription",
-			related_name=getattr(subscription, "name", None),
-			message="Membership entitlements have been granted.",
-		)
+				user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+				tenant=getattr(subscription, "tenant", None),
+				related_doctype="RBP Subscription",
+				related_name=getattr(subscription, "name", None),
+				message="Membership entitlements have been granted.",
+				context=_build_entitlement_notification_context(
+					subscription=subscription,
+					status="active",
+					action="granted",
+					changed_count=_changed_entitlement_count(granted),
+				),
+			)
 		return {"action": "granted", "entitlements": granted}
 
 	inactive_status = "Suspended"
@@ -581,15 +633,21 @@ def sync_subscription_entitlements(subscription) -> dict[str, object]:
 		inactive_status = "Cancelled"
 
 	suspended = suspend_membership_entitlements(subscription=subscription, status=inactive_status)
-	if suspended:
-		emit_event_notification(
-		event_type="entitlement.suspended",
-		user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
-		tenant=getattr(subscription, "tenant", None),
-		related_doctype="RBP Subscription",
-		related_name=getattr(subscription, "name", None),
-		message=f"Membership entitlements were updated to {inactive_status}.",
-	)
+	if _has_changed_entitlements(suspended):
+		_safe_emit_entitlement_notification(
+			event_type="entitlement.suspended",
+			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+			tenant=getattr(subscription, "tenant", None),
+			related_doctype="RBP Subscription",
+			related_name=getattr(subscription, "name", None),
+			message=f"Membership entitlements were updated to {inactive_status}.",
+			context=_build_entitlement_notification_context(
+				subscription=subscription,
+				status=inactive_status,
+				action="suspended",
+				changed_count=_changed_entitlement_count(suspended),
+			),
+		)
 
 	return {"action": "suspended", "entitlements": suspended}
 
