@@ -6,6 +6,8 @@ import type {
   PortalCustomerAuthUser,
 } from "../../types/portal";
 import { mockFailure, mockSuccess } from "./mockClient";
+import { environment } from "../../config/environment";
+import { authApi } from "../api/authApi";
 
 const CUSTOMER_AUTH_KEY = "rbp_customer_auth";
 const ADMIN_AUTH_KEY = "rbp_admin_auth_user";
@@ -106,6 +108,17 @@ export const mockAuthService: AuthService = {
       ]);
     }
 
+    const apiResponse = await authApi.signIn(payload);
+
+    if (apiResponse.ok && apiResponse.data) {
+      writeJson(CUSTOMER_AUTH_KEY, apiResponse.data);
+      return apiResponse;
+    }
+
+    if (!environment.features.mock_auth) {
+      return apiResponse;
+    }
+
     const user = {
       ...DEMO_CUSTOMER,
       email,
@@ -113,7 +126,7 @@ export const mockAuthService: AuthService = {
     };
 
     writeJson(CUSTOMER_AUTH_KEY, user);
-    return mockSuccess("/mock/auth/signin", user, "Mock customer signed in.");
+    return mockSuccess("/mock/auth/signin", user, "Mock customer signed in after backend fallback.");
   },
 
   async signUp(payload) {
@@ -124,6 +137,17 @@ export const mockAuthService: AuthService = {
       ]);
     }
 
+    const apiResponse = await authApi.signUp(payload);
+
+    if (apiResponse.ok && apiResponse.data) {
+      writeJson(CUSTOMER_AUTH_KEY, apiResponse.data);
+      return apiResponse;
+    }
+
+    if (!environment.features.mock_auth) {
+      return apiResponse;
+    }
+
     const user: PortalCustomerAuthUser = {
       id: `cust-${Date.now()}`,
       name: payload.name,
@@ -132,12 +156,13 @@ export const mockAuthService: AuthService = {
     };
 
     writeJson(CUSTOMER_AUTH_KEY, user);
-    return mockSuccess("/mock/auth/signup", user, "Mock customer account created.");
+    return mockSuccess("/mock/auth/signup", user, "Mock customer account created after backend fallback.");
   },
 
   async signOut() {
+    await authApi.signOut();
     window.localStorage.removeItem(CUSTOMER_AUTH_KEY);
-    return mockSuccess("/mock/auth/signout", { signedOut: true }, "Mock customer signed out.");
+    return mockSuccess("/mock/auth/signout", { signedOut: true }, "Customer signed out.");
   },
 
   isAuthenticated() {

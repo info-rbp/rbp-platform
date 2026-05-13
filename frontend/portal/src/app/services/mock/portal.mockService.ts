@@ -18,6 +18,7 @@ import type {
 } from "../../types/portal";
 import { mockAuthService } from "./auth.mockService";
 import { mockGet, mockSuccess } from "./mockClient";
+import { portalApi, servicesApi } from "../api";
 
 const PORTAL_STATE_KEY = "rbp.mockPortalState";
 
@@ -137,12 +138,19 @@ export async function recordMockPortalActivity(
     updatedAt?: string;
   }
 ) {
+  const apiResponse = await servicesApi.createAndSubmitRequest(payload.product, payload as unknown as Record<string, unknown>);
   const state = readPortalState();
-  const activity: PortalProductActivity = {
-    ...payload,
-    id: payload.id ?? `${payload.product}-${Date.now()}`,
-    updatedAt: payload.updatedAt ?? nowLabel(),
-  };
+  const activity: PortalProductActivity = apiResponse.ok && apiResponse.data
+    ? {
+        ...apiResponse.data,
+        href: apiResponse.data.href || payload.href,
+        adminHref: payload.adminHref,
+      }
+    : {
+        ...payload,
+        id: payload.id ?? `${payload.product}-${Date.now()}`,
+        updatedAt: payload.updatedAt ?? nowLabel(),
+      };
   const nextActivities = [
     activity,
     ...state.activities.filter((item) => item.id !== activity.id),
@@ -191,11 +199,18 @@ export function getMockPortalDashboard() {
 }
 
 export const mockPortalService: PortalService = {
-  getDashboard() {
+  async getDashboard() {
+    const response = await portalApi.getDashboardState();
+
+    if (response.ok && response.data) {
+      writePortalState(response.data);
+      return response;
+    }
+
     return mockGet(
       "/mock/portal/state",
       readPortalState(),
-      "Mock shared portal state returned."
+      "Mock shared portal state returned after backend fallback."
     );
   },
 
