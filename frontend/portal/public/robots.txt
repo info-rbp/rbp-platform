@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /portal/
+Disallow: /admin/
+Disallow: /signin
+Disallow: /signup
+Disallow: /signout
+
+Sitemap: https://qa.remotebusinesspartner.com.au/sitemap.xml
