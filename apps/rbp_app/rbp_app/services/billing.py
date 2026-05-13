@@ -8,6 +8,7 @@ from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.entitlements import sync_subscription_entitlements
 from rbp_app.services.environment import get_runtime_settings, is_stripe_enabled
+from rbp_app.services.notifications import emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_rbp_tenant_for_user
 
 
@@ -213,6 +214,34 @@ def update_subscription_from_payment_event(event):
 		subscription.status = "Cancelled"
 
 	subscription.save(ignore_permissions=True)
+
+	if event.status == "Paid":
+		emit_event_notification(
+			event_type="membership.payment_succeeded",
+			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+			tenant=getattr(subscription, "tenant", None),
+			related_doctype="RBP Subscription",
+			related_name=subscription.name,
+			message="Your membership payment was successful.",
+		)
+	elif event.status in {"Failed", "Disputed"}:
+		emit_event_notification(
+			event_type="membership.payment_failed",
+			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+			tenant=getattr(subscription, "tenant", None),
+			related_doctype="RBP Subscription",
+			related_name=subscription.name,
+			message="Your membership payment failed and needs attention.",
+		)
+
+	emit_event_notification(
+		event_type="subscription.status_changed",
+		user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
+		tenant=getattr(subscription, "tenant", None),
+		related_doctype="RBP Subscription",
+		related_name=subscription.name,
+		message=f"Subscription status is now {subscription.status}.",
+	)
 
 	try:
 		sync_subscription_entitlements(subscription)
