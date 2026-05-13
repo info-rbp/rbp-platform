@@ -4,7 +4,7 @@ import json
 
 import frappe
 
-from rbp_app.permissions import require_login
+from rbp_app.permissions import require_login, require_system_manager
 from rbp_app.services import marketplace as service
 
 
@@ -87,14 +87,14 @@ def update_order_status(order_name, status, payload=None):
 
 @frappe.whitelist()
 def admin_update_listing_status(listing_name, status, payload=None):
-    data = _payload(payload)
-    data["status"] = status
-    return update_listing(listing_name, data)
+    user = require_system_manager()
+    return service.admin_update_listing_status(user, listing_name, status, _payload(payload))
 
 
 @frappe.whitelist()
 def admin_update_enquiry_status(enquiry_name, status, payload=None):
-    return update_order_status(enquiry_name, status, payload)
+    user = require_system_manager()
+    return service.admin_update_enquiry_status(user, enquiry_name, status, _payload(payload))
 
 
 @frappe.whitelist()
