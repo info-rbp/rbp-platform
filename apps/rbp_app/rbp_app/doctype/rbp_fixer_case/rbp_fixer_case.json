@@ -54,6 +54,13 @@
    "in_list_view": 1
   },
   {
+   "fieldname": "reference_id",
+   "fieldtype": "Data",
+   "label": "Reference ID",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
    "fieldname": "business_profile",
    "fieldtype": "Link",
    "label": "Business Profile",
@@ -144,7 +151,9 @@
   {
    "fieldname": "source_channel",
    "fieldtype": "Data",
-   "label": "Source Channel"
+   "label": "Source Channel",
+   "default": "portal",
+   "read_only": 1
   },
   {
    "fieldname": "related_decision_request",
@@ -181,30 +190,6 @@
    "fieldtype": "Long Text",
    "label": "Notes"
   }
-  {"fieldname": "tenant", "fieldtype": "Link", "label": "Tenant", "options": "RBP Tenant", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "owner_user", "fieldtype": "Link", "label": "Owner User", "options": "User", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "reference_id", "fieldtype": "Data", "label": "Reference ID", "read_only": 1, "in_list_view": 1},
-  {"fieldname": "business_profile", "fieldtype": "Link", "label": "Business Profile", "options": "RBP Business Profile"},
-  {"fieldname": "title", "fieldtype": "Data", "label": "Title", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "category", "fieldtype": "Select", "label": "Category", "options": "General\nFinance\nOperations\nPeople\nTechnology\nCompliance\nGrowth\nEmergency", "in_list_view": 1},
-  {"fieldname": "issue_summary", "fieldtype": "Small Text", "label": "Issue Summary"},
-  {"fieldname": "issue_details", "fieldtype": "Long Text", "label": "Issue Details"},
-  {"fieldname": "urgency", "fieldtype": "Select", "label": "Urgency", "options": "Low\nMedium\nHigh\nCritical", "default": "Medium", "in_list_view": 1},
-  {"fieldname": "impact", "fieldtype": "Select", "label": "Impact", "options": "Low\nMedium\nHigh\nBusiness Critical", "default": "Medium", "in_list_view": 1},
-  {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nSubmitted\nTriage\nAssigned\nIn Progress\nWaiting on Customer\nResolved\nClosed\nCancelled", "default": "Draft", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "workflow_state", "fieldtype": "Data", "label": "Workflow State", "in_list_view": 1},
-  {"fieldname": "assigned_to", "fieldtype": "Link", "label": "Assigned To", "options": "User", "in_list_view": 1},
-  {"fieldname": "submitted_on", "fieldtype": "Datetime", "label": "Submitted On"},
-  {"fieldname": "reviewed_on", "fieldtype": "Datetime", "label": "Reviewed On"},
-  {"fieldname": "resolved_on", "fieldtype": "Datetime", "label": "Resolved On"},
-  {"fieldname": "closed_on", "fieldtype": "Datetime", "label": "Closed On"},
-  {"fieldname": "source_channel", "fieldtype": "Data", "label": "Source Channel", "default": "portal", "read_only": 1},
-  {"fieldname": "related_decision_request", "fieldtype": "Link", "label": "Related Decision Request", "options": "RBP Decision Desk Request"},
-  {"fieldname": "related_docushare_document", "fieldtype": "Link", "label": "Related DocuShare Document", "options": "RBP DocuShare Document"},
-  {"fieldname": "related_marketplace_order", "fieldtype": "Link", "label": "Related Marketplace Order", "options": "RBP Marketplace Order"},
-  {"fieldname": "related_connectivity_request", "fieldtype": "Link", "label": "Related Connectivity Request", "options": "RBP Connectivity Request"},
-  {"fieldname": "related_risk_assessment", "fieldtype": "Link", "label": "Related Risk Assessment", "options": "RBP Risk Advisor Assessment"},
-  {"fieldname": "notes", "fieldtype": "Long Text", "label": "Notes"}
  ],
  "has_web_view": 0,
  "hide_heading": 0,

@@ -62,7 +62,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Operations",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -127,7 +129,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Membership",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -182,7 +186,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Billing",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -217,7 +223,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Applications",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -262,7 +270,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Notifications",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -317,7 +327,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Marketplace",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -382,7 +394,9 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Services",
+    "type": "Workspace"
   },
   {
     "doctype": "Workspace",
@@ -437,6 +451,8 @@
       }
     ],
     "for_user": "",
-    "sequence_id": 0.0
+    "sequence_id": 0.0,
+    "label": "RBP Support",
+    "type": "Workspace"
   }
 ]
