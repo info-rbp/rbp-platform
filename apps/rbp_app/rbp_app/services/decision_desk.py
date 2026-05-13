@@ -8,6 +8,7 @@ from frappe.utils import now_datetime
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import generate_reference_id
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -87,6 +88,7 @@ def _is_admin(user):
 def _serialize_request(doc, options=None):
     return {
         "name": doc.name,
+        "reference_id": getattr(doc, "reference_id", None),
         "tenant": doc.tenant,
         "owner_user": doc.owner_user,
         "business_profile": getattr(doc, "business_profile", None),
@@ -236,6 +238,12 @@ def create_request(user, payload):
         }
     )
     _set_fields(doc, payload, DRAFT_FIELDS)
+    if frappe.get_meta(REQUEST_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-DD")
+    if frappe.get_meta(REQUEST_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
+        doc.submitted_on = now_datetime()
+    if frappe.get_meta(REQUEST_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.insert(ignore_permissions=True)
 
     _audit("decision_desk_request_created", user, doc, "Decision Desk request created.")

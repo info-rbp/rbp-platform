@@ -8,6 +8,7 @@ from frappe.utils import now_datetime
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.notifications import create_notification
+from rbp_app.services.reference_ids import generate_reference_id
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -305,6 +306,12 @@ def create_case(user, payload):
         }
     )
     _set_fields(doc, payload, CASE_DRAFT_FIELDS)
+    if frappe.get_meta(CASE_DOCTYPE).has_field("reference_id") and not getattr(doc, "reference_id", None):
+        doc.reference_id = generate_reference_id("RBP-FIX")
+    if frappe.get_meta(CASE_DOCTYPE).has_field("submitted_on") and not getattr(doc, "submitted_on", None):
+        doc.submitted_on = now_datetime()
+    if frappe.get_meta(CASE_DOCTYPE).has_field("source_channel") and not getattr(doc, "source_channel", None):
+        doc.source_channel = "portal"
     doc.insert(ignore_permissions=True)
 
     _audit("fixer_case_created", user, doc, "Fixer case created.")
