@@ -13,7 +13,7 @@ export const billingApi = {
   createMembershipCheckoutSession(payload: Record<string, unknown>) {
     return callFrappeMethod<MembershipCheckoutSession>(
       "rbp_app.api.billing.create_membership_checkout_session",
-      { payload }
+      payload
     );
   },
 
