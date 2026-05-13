@@ -8,7 +8,10 @@ import {
   membershipTiers,
   premiumMembershipTier,
 } from "../../data/membershipTiers";
-import { premiumMembershipPlan, premiumMembershipRoutes } from "../../data/premiumMembership";
+import {
+  premiumMembershipPlan,
+  premiumMembershipRoutes,
+} from "../../data/premiumMembership";
 
 const comparisonPreview = membershipTierComparisonRows.filter((row) =>
   [
@@ -30,7 +33,7 @@ const comparisonPreview = membershipTierComparisonRows.filter((row) =>
 const freeReasons = [
   "Required for online purchases",
   "Helps keep orders, enquiries, and profile details in one place",
-  "Gives access to all member offers",
+  "Gives access to member offers and available benefits",
   "Allows upgrade to Premium at any time",
 ];
 
@@ -60,7 +63,7 @@ export function MembershipOverviewPage() {
               Choose the RBP Membership That Fits How You Use the Platform
             </h1>
             <p className="mt-6 max-w-4xl text-base leading-7 text-slate-200 sm:text-lg">
-              Create a free RBP account to purchase products and services online, or upgrade to RBP Premium Membership for Core Services, Nucleus access, service discounts, credits, marketplace savings, and premium member benefits.
+              Create a free RBP account to purchase products and services online, or upgrade to RBP Premium Membership for Core Services, Nucleus access, service discounts, credits, marketplace savings, and member benefits. Membership checkout is processed securely through Stripe, and QA uses Stripe test mode.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -82,6 +85,10 @@ export function MembershipOverviewPage() {
                 Continue in portal
               </Link>
             </div>
+          </section>
+
+          <section className="rounded-3xl border border-blue-100 bg-blue-50 px-6 py-5 text-sm text-blue-900 shadow-sm">
+            Stripe handles membership checkout. In QA, Stripe runs in test mode, and benefits remain linked to membership status rather than instant activation claims.
           </section>
 
           <section className="grid gap-6 lg:grid-cols-2">
@@ -109,7 +116,10 @@ export function MembershipOverviewPage() {
                 ) : null}
                 <p className="mt-4 text-sm leading-6 text-slate-600">{tier.description}</p>
                 <p className="mt-5 text-sm font-bold text-slate-900">
-                  Best for: {tier.code === "free" ? "Creating an account and purchasing online." : "Small business owners who want access, discounts, credits, and ongoing platform benefits."}
+                  Best for:{" "}
+                  {tier.code === "free"
+                    ? "Creating an account and purchasing online."
+                    : "Small business owners who want access, discounts, credits, and ongoing platform benefits."}
                 </p>
                 <ul className="mt-5 space-y-3 text-sm text-slate-700">
                   {tier.highlights.map((highlight) => (
@@ -136,9 +146,11 @@ export function MembershipOverviewPage() {
 
           <section className="grid gap-6 lg:grid-cols-2">
             <article className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-              <h2 className="text-2xl font-black text-slate-950">Why Create a Free RBP Membership?</h2>
+              <h2 className="text-2xl font-black text-slate-950">
+                Why Create a Free RBP Membership?
+              </h2>
               <p className="mt-4 text-sm leading-6 text-slate-600">
-                Free Membership gives users the account access needed to purchase products and services online, save business details, access member offers, and manage basic platform activity.
+                Free Membership gives users the account access needed to purchase products and services online, save business details, review member offers, and manage basic platform activity.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-slate-700">
                 {freeReasons.map((item) => (
@@ -150,7 +162,9 @@ export function MembershipOverviewPage() {
               </ul>
             </article>
             <article className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-              <h2 className="text-2xl font-black text-slate-950">When to Upgrade to RBP Premium Membership</h2>
+              <h2 className="text-2xl font-black text-slate-950">
+                When to Upgrade to RBP Premium Membership
+              </h2>
               <ul className="mt-6 space-y-3 text-sm text-slate-700">
                 {premiumReasons.map((item) => (
                   <li key={item} className="flex gap-3">
@@ -162,12 +176,17 @@ export function MembershipOverviewPage() {
             </article>
           </section>
 
-          <section id="membership-comparison" className="scroll-mt-28 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <section
+            id="membership-comparison"
+            className="scroll-mt-28 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+          >
             <div className="border-b border-slate-200 px-8 py-6">
               <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-blue-700">
                 Comparison Preview
               </p>
-              <h2 className="mt-3 text-2xl font-black text-slate-950">Free vs Premium Membership</h2>
+              <h2 className="mt-3 text-2xl font-black text-slate-950">
+                Free vs Premium Membership
+              </h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
@@ -181,9 +200,13 @@ export function MembershipOverviewPage() {
                 <tbody className="divide-y divide-slate-200 bg-white">
                   {comparisonPreview.map((row) => (
                     <tr key={row.feature}>
-                      <td className="px-6 py-4 font-semibold text-slate-900">{row.feature}</td>
+                      <td className="px-6 py-4 font-semibold text-slate-900">
+                        {row.feature}
+                      </td>
                       <td className="px-6 py-4 text-slate-700">{row.free}</td>
-                      <td className="px-6 py-4 font-semibold text-blue-700">{row.premium}</td>
+                      <td className="px-6 py-4 font-semibold text-blue-700">
+                        {row.premium}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
