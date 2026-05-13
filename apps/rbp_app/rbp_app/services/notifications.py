@@ -1,6 +1,9 @@
 """Notification services for the RBP platform layer."""
 
-import frappe
+try:
+    import frappe
+except Exception:
+    frappe = None
 try:
     from frappe.utils import now_datetime
 except Exception:
@@ -194,52 +197,150 @@ def get_notifications_payload():
 from rbp_app.services.email_notifications import (
     admin_notification_recipients,
     as_dict_rows,
+    normalize_recipients,
     send_event_email,
-    summarize_delivery_results,
+    summarize_delivery_dicts,
 )
 
 
 def _is_email(value: str | None) -> bool:
-    return bool(value and "@" in value and "." in value)
+    return bool(value and "@" in value)
 
 
-def _record_delivery_logs(notification_name, deliveries, related_doctype=None, related_name=None):
-    if not _doctype_exists("RBP Notification Delivery"):
+def _log_notification_error(message, title):
+    try:
+        frappe.log_error(message, title)
+    except Exception:
+        pass
+
+
+def _record_delivery_logs(
+    *,
+    notification_name: str | None,
+    deliveries,
+    event_type: str,
+    related_doctype: str | None = None,
+    related_name: str | None = None,
+) -> None:
+    if frappe is None:
         return
+    try:
+        if not _doctype_exists("RBP Notification Delivery"):
+            return
+    except Exception:
+        return
+
     for row in deliveries:
         try:
-            frappe.get_doc({"doctype":"RBP Notification Delivery","notification":notification_name,"channel":"Email","recipient_email":row.get("recipient_email"),"status":row.get("status"),"provider_message_id":row.get("provider_message_id"),"error_message":row.get("error_message"),"sandboxed":1 if row.get("sandboxed") else 0,"related_doctype":related_doctype,"related_name":related_name}).insert(ignore_permissions=True)
+            frappe.get_doc(
+                {
+                    "doctype": "RBP Notification Delivery",
+                    "notification": notification_name,
+                    "event_type": event_type,
+                    "channel": "Email",
+                    "recipient_email": row.get("recipient_email"),
+                    "status": row.get("status"),
+                    "provider_message_id": row.get("provider_message_id"),
+                    "error_message": row.get("error_message"),
+                    "sandboxed": 1 if row.get("sandboxed") else 0,
+                    "related_doctype": related_doctype,
+                    "related_name": related_name,
+                }
+            ).insert(ignore_permissions=True)
         except Exception:
-            frappe.log_error(frappe.get_traceback(), "RBP notification delivery log failed")
+            _log_notification_error(frappe.get_traceback(), "RBP notification delivery log failed")
 
 
-def emit_event_notification(*,event_type:str,user:str|None=None,tenant:str|None=None,subject:str|None=None,message:str|None=None,related_doctype:str|None=None,related_name:str|None=None,metadata:dict|None=None,customer_email:str|None=None,admin_recipients=None,context:dict|None=None,send_email:bool=True):
+def emit_event_notification(
+    *,
+    event_type: str,
+    user: str | None = None,
+    tenant: str | None = None,
+    subject: str | None = None,
+    message: str | None = None,
+    related_doctype: str | None = None,
+    related_name: str | None = None,
+    metadata: dict | None = None,
+    customer_email: str | None = None,
+    admin_recipients=None,
+    context: dict | None = None,
+    send_email: bool = True,
+):
     from rbp_app.services.notification_triggers import get_trigger
-    metadata = metadata or {}
-    context = {**metadata, **(context or {})}
-    context.setdefault("message", message or f"Event {event_type} occurred.")
-    context.setdefault("reference_id", context.get("reference_id") or related_name)
-    context.setdefault("portal_url", "/portal/dashboard")
+
     try:
         trigger = get_trigger(event_type)
     except Exception:
-        frappe.log_error(f"Unknown notification trigger: {event_type}", "RBP notification trigger")
-        return {"ok":False,"event_type":event_type,"portal":None,"email":"failed","deliveries":[],"metadata":metadata,"reason":"unknown_trigger"}
-    portal_doc=None
-    try:
-        portal_doc=create_notification(user=user,tenant=tenant,title=subject or trigger.default_subject,message=context["message"],delivery_channel="Portal",related_doctype=related_doctype,related_name=related_name,trigger_source=event_type,created_by_workflow=trigger.template_key)
-    except Exception:
-        frappe.log_error(frappe.get_traceback(), "RBP notification portal delivery failed")
-    deliveries=[]
-    if send_email:
-        recipients=[]
+        _log_notification_error(f"Unknown notification trigger: {event_type}", "RBP notification trigger")
+        return {"ok": False, "reason": "unknown_trigger"}
+
+    metadata = metadata or {}
+    context_dict = {**metadata, **(context or {})}
+    context_dict.setdefault("message", message or f"Event {event_type} occurred.")
+    context_dict.setdefault("reference_id", context_dict.get("reference_id") or related_name)
+    context_dict.setdefault("portal_url", trigger.default_portal_url or "/portal/dashboard")
+
+    portal_doc = None
+    if trigger.portal_enabled and user:
+        try:
+            portal_doc = create_notification(
+                user=user,
+                tenant=tenant,
+                title=subject or trigger.default_subject,
+                message=context_dict["message"],
+                delivery_channel="Portal",
+                route=context_dict.get("portal_url"),
+                related_doctype=related_doctype,
+                related_name=related_name,
+                trigger_source=event_type,
+                created_by_workflow=trigger.template_key,
+            )
+        except Exception:
+            _log_notification_error(frappe.get_traceback(), "RBP notification portal delivery failed")
+
+    deliveries = []
+    if send_email and trigger.email_enabled:
+        recipients = []
         if trigger.customer_enabled:
-            c = customer_email or (user if _is_email(user) else None)
-            if c: recipients.append(c)
+            customer_recipient = customer_email or (user if _is_email(user) else None)
+            if customer_recipient:
+                recipients.append(customer_recipient)
         if trigger.admin_enabled:
             recipients.extend(list(admin_recipients or admin_notification_recipients()))
-        recipients=list(dict.fromkeys([r for r in recipients if r]))
-        deliveries=as_dict_rows(send_event_email(event_type=event_type, recipients=recipients, context=context, subject=subject))
-    summary="not_requested" if not send_email else summarize_delivery_results([type("R", (), d)() for d in deliveries])
-    _record_delivery_logs(getattr(portal_doc,"name",None), deliveries, related_doctype, related_name)
-    return {"ok":True,"event_type":event_type,"portal":getattr(portal_doc,"name",None),"email":summary,"deliveries":deliveries,"metadata":metadata}
+        recipients = normalize_recipients(recipients)
+        try:
+            deliveries = as_dict_rows(
+                send_event_email(
+                    event_type=event_type,
+                    recipients=recipients,
+                    context=context_dict,
+                    subject=subject,
+                )
+            )
+        except Exception:
+            _log_notification_error(frappe.get_traceback(), "RBP notification email delivery failed")
+            deliveries = []
+
+    email_summary = "not_requested"
+    if send_email and trigger.email_enabled:
+        email_summary = summarize_delivery_dicts(deliveries)
+
+    try:
+        _record_delivery_logs(
+            notification_name=getattr(portal_doc, "name", None),
+            deliveries=deliveries,
+            event_type=event_type,
+            related_doctype=related_doctype,
+            related_name=related_name,
+        )
+    except Exception:
+        _log_notification_error(frappe.get_traceback(), "RBP notification delivery logging failed")
+
+    return {
+        "ok": True,
+        "event_type": event_type,
+        "portal": getattr(portal_doc, "name", None),
+        "email": email_summary,
+        "deliveries": deliveries,
+        "metadata": context_dict,
+    }

@@ -7,7 +7,7 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.notifications import create_notification
+from rbp_app.services.notifications import create_notification, emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -216,6 +216,22 @@ def _notify_admins_new_request(doc):
         )
 
 
+def _emit_notification_event(event_type, doc, message, context):
+    try:
+        emit_event_notification(
+            event_type=event_type,
+            user=None,
+            tenant=getattr(doc, "tenant", None),
+            customer_email=getattr(doc, "owner_user", None),
+            related_doctype=getattr(doc, "doctype", None) or REQUEST_DOCTYPE,
+            related_name=doc.name,
+            message=message,
+            context=context,
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP service request notification hook failed")
+
+
 def create_request(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -280,6 +296,17 @@ def submit_request(user, request_name):
         "decision_desk.submit_request.user",
     )
     _notify_admins_new_request(doc)
+    _emit_notification_event(
+        "service.request_submitted",
+        doc,
+        "Your service request has been received.",
+        {
+            "reference_id": doc.name,
+            "service_name": "Decision Desk",
+            "status": doc.status,
+            "portal_url": "/portal/services",
+        },
+    )
     _audit("decision_desk_request_submitted", user, doc, "Decision Desk request submitted.")
     return _serialize_request(doc)
 
@@ -429,6 +456,18 @@ def admin_update_status(user, request_name, status, payload=None):
                 priority="High",
                 notification_type="Success",
             )
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your Decision Desk request is now {status}.",
+            {
+                "reference_id": doc.name,
+                "service_name": "Decision Desk",
+                "status": status,
+                "admin_note": payload.get("notes"),
+                "portal_url": "/portal/services",
+            },
+        )
 
     _audit(
         "decision_desk_status_updated",
