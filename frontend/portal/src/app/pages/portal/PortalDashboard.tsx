@@ -1,9 +1,10 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { PortalAdminReference } from "./PortalAdminReference";
 import { PortalStatusCard } from "../../components/domain";
 import { StatusBadge } from "../../components/status";
 import { mockPortalDashboard } from "../../mock";
-import { getCurrentMockPortalState } from "../../services/mock/portal.mockService";
+import { getCurrentMockPortalState, mockPortalService } from "../../services/mock/portal.mockService";
 import {
   Zap, CalendarCheck, FileText, CheckCircle, Tag,
   Star, ArrowRight, ChevronRight, TrendingUp, Clock,
@@ -73,7 +74,21 @@ const healthMetrics = [
 const CONSULTANT_ASSIGNED = true;
 
 export function PortalDashboard() {
-  const portalState = getCurrentMockPortalState();
+  const [portalState, setPortalState] = useState(() => getCurrentMockPortalState());
+
+  useEffect(() => {
+    let mounted = true;
+
+    mockPortalService.getDashboard().then((response) => {
+      if (mounted && response.ok && response.data) {
+        setPortalState(response.data);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
   const activePortalActivities = portalState.activities;
   const memberName = portalState.customer.name;
   const businessName =

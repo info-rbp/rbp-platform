@@ -44,6 +44,7 @@ import {
   type MockMembershipOnboardingResult,
   type MockMembershipSignupResult,
 } from "../../services/mock/membership.mockService";
+import { billingApi, membershipApi } from "../../services/api";
 
 type PaymentState = "idle" | "pending" | "simulated-success" | "simulated-failed";
 type SubmissionState = "idle" | "loading" | "success" | "error";
@@ -182,7 +183,11 @@ export function MembershipPurchaseOnboardingFlow() {
   useEffect(() => {
     let mounted = true;
 
-    getMockMembershipPlans().then((response) => {
+    membershipApi.listMembershipPlans().then(async (response) => {
+      if (!response.ok || !response.data || response.data.length === 0) {
+        response = await getMockMembershipPlans();
+      }
+
       if (!mounted || !response.data) {
         return;
       }
@@ -357,6 +362,36 @@ export function MembershipPurchaseOnboardingFlow() {
     setSubmissionState("loading");
     setErrors({});
 
+    const checkoutResponse = await billingApi.createMembershipCheckoutSession({
+      plan_code: form.selectedPlanId,
+      selected_plan_id: form.selectedPlanId,
+      primary_contact_name: form.primaryContactName,
+      email: form.email,
+      phone: form.phone,
+      business_name: form.businessName,
+      abn_or_identifier: form.abnOrIdentifier,
+      billing_address: form.billingAddress,
+      accepted_terms: form.acceptedTerms,
+      marketing_consent: form.marketingConsent,
+      selected_extras: form.selectedExtras,
+    });
+
+    const checkoutUrl = checkoutResponse.data?.checkout_url ?? checkoutResponse.data?.url;
+
+    if (checkoutResponse.ok && checkoutUrl) {
+      writeMembershipSession({
+        checkoutSessionId: checkoutResponse.data?.checkout_session_id ?? checkoutResponse.data?.session_id,
+        membershipStatus: "pending",
+        paymentStatus: "stripe-checkout-started",
+        onboardingStatus: "pending-payment",
+        businessName: form.businessName,
+        primaryContactName: form.primaryContactName,
+        selectedPlan: selectedPlan?.name,
+      });
+      window.location.assign(checkoutUrl);
+      return;
+    }
+
     const response = await submitMockMembershipSignup({
       selectedPlanId: form.selectedPlanId,
       businessName: form.businessName,
@@ -438,7 +473,7 @@ export function MembershipPurchaseOnboardingFlow() {
     <WizardShell
       eyebrow="RBP Premium Membership Sign-Up"
       title="Start Your Premium Membership"
-      description="Complete your membership details, confirm your inclusions, and preview the onboarding flow for RBP Premium Membership. This frontend preview does not process a real payment or create a live account."
+      description="Complete your membership details, confirm your inclusions, and continue to secure Stripe checkout when the backend checkout endpoint is available."
       steps={flowSteps}
       currentStepId={currentStep.id}
       aside={
@@ -632,7 +667,7 @@ export function MembershipPurchaseOnboardingFlow() {
         {currentStep.id === "payment" ? (
           <FormSection
             title="Payment Preview"
-            description="Review the early bird membership price and preview the payment state. No real payment is processed in this frontend preview."
+            description="Review the early bird membership price. The final review step will request a Stripe checkout session from the backend when available."
           >
             <PaymentSimulationPanel
               title="Payment Preview"
