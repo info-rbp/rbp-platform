@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import frappe
 
+from rbp_app.permissions import require_login
 from rbp_app.services.notification_triggers import list_notification_triggers
-from rbp_app.services.notifications import emit_event_notification
+from rbp_app.services.notifications import emit_event_notification, get_notifications as get_notifications_service
 from rbp_app.services.tenancy import doctype_exists
 
 
@@ -17,6 +18,12 @@ def _limit(value) -> int:
         return max(1, min(int(value or 50), 200))
     except Exception:
         return 50
+
+
+@frappe.whitelist()
+def get_notifications():
+    user = require_login()
+    return get_notifications_service(user)
 
 
 @frappe.whitelist()

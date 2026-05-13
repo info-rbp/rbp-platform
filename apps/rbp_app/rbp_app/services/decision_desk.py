@@ -7,8 +7,8 @@ from frappe.utils import now_datetime
 
 from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
-from rbp_app.services.reference_ids import generate_reference_id
-from rbp_app.services.notifications import create_notification, emit_event_notification
+from rbp_app.services.reference_ids import ensure_reference_id as _ensure_reference_id, generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification, safe_emit_event_notification
 from rbp_app.services.service_routes import service_routes
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
@@ -53,6 +53,10 @@ OPTION_FIELDS = {
     "sort_order",
     "notes",
 }
+
+
+def ensure_reference_id(doc, doctype, prefix):
+    return _ensure_reference_id(doc, doctype, prefix, generator=generate_reference_id)
 
 
 def _safe_payload(payload):
@@ -232,19 +236,18 @@ def _notify_admins_new_request(doc):
 
 
 def _emit_notification_event(event_type, doc, message, context):
-    try:
-        emit_event_notification(
-            event_type=event_type,
-            user=None,
-            tenant=getattr(doc, "tenant", None),
-            customer_email=getattr(doc, "owner_user", None),
-            related_doctype=getattr(doc, "doctype", None) or REQUEST_DOCTYPE,
-            related_name=doc.name,
-            message=message,
-            context=context,
-        )
-    except Exception:
-        frappe.log_error(frappe.get_traceback(), "RBP service request notification hook failed")
+    return safe_emit_event_notification(
+        log_title="RBP service request notification hook failed",
+        emit=emit_event_notification,
+        event_type=event_type,
+        user=None,
+        tenant=getattr(doc, "tenant", None),
+        customer_email=getattr(doc, "owner_user", None),
+        related_doctype=getattr(doc, "doctype", None) or REQUEST_DOCTYPE,
+        related_name=doc.name,
+        message=message,
+        context=context,
+    )
 
 
 def _notification_context(doc):
@@ -297,8 +300,7 @@ def create_request(user, payload):
     )
     _set_fields(doc, payload, DRAFT_FIELDS)
     doc.source_channel = "portal"
-    if _has_field(REQUEST_DOCTYPE, "reference_id") and not getattr(doc, "reference_id", None):
-        doc.reference_id = generate_reference_id("RBP-DD")
+    ensure_reference_id(doc, REQUEST_DOCTYPE, "RBP-DD")
     if _has_field(REQUEST_DOCTYPE, "source_channel") and not getattr(doc, "source_channel", None):
         doc.source_channel = "portal"
     if payload.get("submit"):
