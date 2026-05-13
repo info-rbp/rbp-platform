@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 import {
   ArrowRight,
@@ -132,7 +132,7 @@ export function BusinessApplicationsPage() {
     [applications, selectedKey]
   );
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!selectedApplication || !interestEnabled) {
