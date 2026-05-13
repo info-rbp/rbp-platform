@@ -8,12 +8,7 @@ from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.entitlements import sync_subscription_entitlements
 from rbp_app.services.environment import get_runtime_settings, is_stripe_enabled
-<<<<<<< HEAD
-from rbp_app.services.entitlements import sync_entitlements_for_subscription
-from rbp_app.services.notifications import create_notification
-=======
 from rbp_app.services.notifications import safe_emit_event_notification
->>>>>>> origin/codex/implement-admin-operations-for-launch
 from rbp_app.services.tenancy import doctype_exists, get_rbp_tenant_for_user
 
 
@@ -251,40 +246,6 @@ def update_subscription_from_payment_event(event):
 	if event.status in {"Failed", "Disputed"} and subscription.status == "Active":
 		subscription.status = "Past Due"
 
-<<<<<<< HEAD
-    subscription.save(ignore_permissions=True)
-
-    if subscription.status in {"Active", "Trial"}:
-        sync_entitlements_for_subscription(subscription, active=True)
-        _notify_subscription_member(subscription, "Membership active", "Your RBP membership is active.")
-    elif subscription.status == "Past Due":
-        sync_entitlements_for_subscription(subscription, active=False, status="Suspended")
-        _notify_subscription_member(subscription, "Payment failed", "Your membership payment needs attention.")
-    elif subscription.status in {"Cancelled", "Suspended", "Archived"}:
-        sync_entitlements_for_subscription(subscription, active=False, status="Cancelled")
-        _notify_subscription_member(subscription, "Membership access updated", "Your membership access has changed.")
-
-    return subscription
-
-
-def _notify_subscription_member(subscription, title, message):
-    if not getattr(subscription, "member", None):
-        return None
-    return create_notification(
-        user=subscription.member,
-        title=title,
-        message=message,
-        tenant=getattr(subscription, "tenant", None),
-        route="/portal/billing",
-        related_doctype="RBP Subscription",
-        related_name=subscription.name,
-        trigger_source="billing",
-    )
-
-
-def get_subscription_status_payload():
-    """Backward-compatible alias for the subscription payload."""
-=======
 	if event.status in {"Cancelled", "Refunded"} and subscription.status == "Active":
 		subscription.status = "Cancelled"
 
@@ -338,6 +299,5 @@ def get_subscription_status_payload():
 
 def get_subscription_status_payload() -> dict[str, object]:
 	"""Backward-compatible alias for the subscription payload."""
->>>>>>> origin/codex/implement-admin-operations-for-launch
 
 	return get_subscription_status()
