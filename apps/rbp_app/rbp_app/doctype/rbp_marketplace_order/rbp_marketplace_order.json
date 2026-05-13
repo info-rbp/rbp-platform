@@ -26,19 +26,92 @@
   "notes"
  ],
  "fields": [
-  {"fieldname": "tenant", "fieldtype": "Link", "label": "Tenant", "options": "RBP Tenant", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "listing", "fieldtype": "Link", "label": "Listing", "options": "RBP Marketplace Listing", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "vendor", "fieldtype": "Link", "label": "Vendor", "options": "RBP Marketplace Vendor", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "buyer_user", "fieldtype": "Link", "label": "Buyer User", "options": "User", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Requested\nApproved\nIn Progress\nFulfilled\nCancelled\nRejected", "default": "Requested", "reqd": 1, "in_list_view": 1},
-  {"fieldname": "quantity", "fieldtype": "Int", "label": "Quantity", "default": 1, "reqd": 1},
-  {"fieldname": "total_amount", "fieldtype": "Currency", "label": "Total Amount", "in_list_view": 1},
-  {"fieldname": "currency", "fieldtype": "Data", "label": "Currency", "default": "AUD"},
-  {"fieldname": "requested_on", "fieldtype": "Datetime", "label": "Requested On", "in_list_view": 1},
-  {"fieldname": "approved_on", "fieldtype": "Datetime", "label": "Approved On"},
-  {"fieldname": "fulfilled_on", "fieldtype": "Datetime", "label": "Fulfilled On"},
-  {"fieldname": "cancelled_on", "fieldtype": "Datetime", "label": "Cancelled On"},
-  {"fieldname": "notes", "fieldtype": "Long Text", "label": "Notes"}
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "RBP Tenant",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "listing",
+   "fieldtype": "Link",
+   "label": "Listing",
+   "options": "RBP Marketplace Listing",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "vendor",
+   "fieldtype": "Link",
+   "label": "Vendor",
+   "options": "RBP Marketplace Vendor",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "buyer_user",
+   "fieldtype": "Link",
+   "label": "Buyer User",
+   "options": "User",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Requested\nApproved\nIn Progress\nFulfilled\nCancelled\nRejected",
+   "default": "Requested",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "Quantity",
+   "default": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "Currency",
+   "default": "AUD"
+  },
+  {
+   "fieldname": "requested_on",
+   "fieldtype": "Datetime",
+   "label": "Requested On",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "approved_on",
+   "fieldtype": "Datetime",
+   "label": "Approved On"
+  },
+  {
+   "fieldname": "fulfilled_on",
+   "fieldtype": "Datetime",
+   "label": "Fulfilled On"
+  },
+  {
+   "fieldname": "cancelled_on",
+   "fieldtype": "Datetime",
+   "label": "Cancelled On"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Long Text",
+   "label": "Notes"
+  }
  ],
  "has_web_view": 0,
  "idx": 0,
@@ -52,7 +125,32 @@
  "name": "RBP Marketplace Order",
  "owner": "Administrator",
  "permissions": [
-  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1, "export": 1, "import": 1, "share": 1, "print": 1, "email": 1}
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  },
+  {
+   "role": "RBP Admin",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "import": 1,
+   "share": 1,
+   "print": 1,
+   "email": 1
+  }
  ],
  "quick_entry": 0,
  "read_only": 0,

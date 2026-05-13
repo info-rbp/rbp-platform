@@ -1,0 +1,442 @@
+[
+  {
+    "doctype": "Workspace",
+    "name": "RBP Operations",
+    "title": "RBP Operations",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"ops-shortcuts\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Tenant\",\"col\":4}},{\"id\":\"ops-shortcuts-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Business Profile\",\"col\":4}},{\"id\":\"ops-shortcuts-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Audit Log\",\"col\":4}},{\"id\":\"ops-shortcuts-4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Notification\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Tenant",
+        "label": "RBP Tenant"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Business Profile",
+        "label": "RBP Business Profile"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Decision Desk Request",
+        "label": "RBP Decision Desk Request"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Audit Log",
+        "label": "RBP Audit Log"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Tenant",
+        "label": "RBP Tenant"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Business Profile",
+        "label": "RBP Business Profile"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Decision Desk Request",
+        "label": "RBP Decision Desk Request"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Audit Log",
+        "label": "RBP Audit Log"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Membership",
+    "title": "RBP Membership",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"mem-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Membership Plan\",\"col\":4}},{\"id\":\"mem-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Subscription\",\"col\":4}},{\"id\":\"mem-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP App Entitlement\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Membership Plan",
+        "label": "RBP Membership Plan"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Subscription",
+        "label": "RBP Subscription"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP App Entitlement",
+        "label": "RBP App Entitlement"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Tenant",
+        "label": "RBP Tenant"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Business Profile",
+        "label": "RBP Business Profile"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Membership Plan",
+        "label": "RBP Membership Plan"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Subscription",
+        "label": "RBP Subscription"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP App Entitlement",
+        "label": "RBP App Entitlement"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Tenant",
+        "label": "RBP Tenant"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Business Profile",
+        "label": "RBP Business Profile"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Billing",
+    "title": "RBP Billing",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"bill-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Payment Event\",\"col\":4}},{\"id\":\"bill-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Subscription\",\"col\":4}},{\"id\":\"bill-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Membership Plan\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Payment Event",
+        "label": "RBP Payment Event"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Subscription",
+        "label": "RBP Subscription"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Membership Plan",
+        "label": "RBP Membership Plan"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Payment Event",
+        "label": "RBP Payment Event"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Subscription",
+        "label": "RBP Subscription"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Membership Plan",
+        "label": "RBP Membership Plan"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Applications",
+    "title": "RBP Applications",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"app-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Application Interest\",\"col\":4}},{\"id\":\"app-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP App Entitlement\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Application Interest",
+        "label": "RBP Application Interest"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP App Entitlement",
+        "label": "RBP App Entitlement"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Application Interest",
+        "label": "RBP Application Interest"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP App Entitlement",
+        "label": "RBP App Entitlement"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Notifications",
+    "title": "RBP Notifications",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"noti-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Notification\",\"col\":4}},{\"id\":\"noti-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Notification Delivery\",\"col\":4}},{\"id\":\"noti-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Audit Log\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification Delivery",
+        "label": "RBP Notification Delivery"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Audit Log",
+        "label": "RBP Audit Log"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification Delivery",
+        "label": "RBP Notification Delivery"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Audit Log",
+        "label": "RBP Audit Log"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Marketplace",
+    "title": "RBP Marketplace",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"mkt-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Marketplace Listing\",\"col\":4}},{\"id\":\"mkt-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Marketplace Order\",\"col\":4}},{\"id\":\"mkt-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Marketplace Vendor\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Marketplace Listing",
+        "label": "RBP Marketplace Listing"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Marketplace Order",
+        "label": "RBP Marketplace Order"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Marketplace Vendor",
+        "label": "RBP Marketplace Vendor"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Marketplace Listing",
+        "label": "RBP Marketplace Listing"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Marketplace Order",
+        "label": "RBP Marketplace Order"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Marketplace Vendor",
+        "label": "RBP Marketplace Vendor"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Services",
+    "title": "RBP Services",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"svc-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Decision Desk Request\",\"col\":4}},{\"id\":\"svc-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Connectivity Request\",\"col\":4}},{\"id\":\"svc-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Fixer Task\",\"col\":4}},{\"id\":\"svc-4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Risk Advisor Assessment\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Decision Desk Request",
+        "label": "RBP Decision Desk Request"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Connectivity Request",
+        "label": "RBP Connectivity Request"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Fixer Task",
+        "label": "RBP Fixer Task"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Risk Advisor Assessment",
+        "label": "RBP Risk Advisor Assessment"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Decision Desk Request",
+        "label": "RBP Decision Desk Request"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Connectivity Request",
+        "label": "RBP Connectivity Request"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Fixer Task",
+        "label": "RBP Fixer Task"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Risk Advisor Assessment",
+        "label": "RBP Risk Advisor Assessment"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  },
+  {
+    "doctype": "Workspace",
+    "name": "RBP Support",
+    "title": "RBP Support",
+    "module": "RBP App",
+    "public": 1,
+    "is_hidden": 0,
+    "content": "[{\"id\":\"sup-1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Notification\",\"col\":4}},{\"id\":\"sup-2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Tenant\",\"col\":4}},{\"id\":\"sup-3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RBP Business Profile\",\"col\":4}}]",
+    "shortcuts": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Tenant",
+        "label": "RBP Tenant"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Business Profile",
+        "label": "RBP Business Profile"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Audit Log",
+        "label": "RBP Audit Log"
+      }
+    ],
+    "links": [
+      {
+        "type": "DocType",
+        "link_to": "RBP Notification",
+        "label": "RBP Notification"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Tenant",
+        "label": "RBP Tenant"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Business Profile",
+        "label": "RBP Business Profile"
+      },
+      {
+        "type": "DocType",
+        "link_to": "RBP Audit Log",
+        "label": "RBP Audit Log"
+      }
+    ],
+    "for_user": "",
+    "sequence_id": 0.0
+  }
+]
