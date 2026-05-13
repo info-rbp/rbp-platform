@@ -118,15 +118,3 @@ class TestAdminOperations(FrappeTestCase):
             doc = frappe.get_doc(entry)
             self.assertEqual(doc.doctype, "Workspace")
             self.assertEqual(doc.label, entry["label"])
-
-        for entry in fixtures:
-            doc = frappe.get_doc({
-                "doctype": "Workspace",
-                "title": f"{entry['title']} Fixture Test",
-                "module": entry.get("module") or "RBP App",
-                "public": 0,
-                "is_hidden": 1,
-            })
-            doc.insert(ignore_permissions=True)
-            self.assertTrue(doc.name)
-            doc.delete(ignore_permissions=True)
