@@ -9,6 +9,7 @@ from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.notifications import create_notification
 from rbp_app.services.reference_ids import generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -282,6 +283,22 @@ def _notify_admins_submitted(assessment):
         )
 
 
+def _emit_notification_event(event_type, assessment, message, context):
+    try:
+        emit_event_notification(
+            event_type=event_type,
+            user=None,
+            tenant=getattr(assessment, "tenant", None),
+            customer_email=getattr(assessment, "owner_user", None),
+            related_doctype=ASSESSMENT_DOCTYPE,
+            related_name=assessment.name,
+            message=message,
+            context=context,
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP risk advisor notification hook failed")
+
+
 def create_assessment(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -354,6 +371,17 @@ def submit_assessment(user, assessment_name):
         "risk_advisor.submit_assessment.user",
     )
     _notify_admins_submitted(doc)
+    _emit_notification_event(
+        "risk_advisor.assessment_submitted",
+        doc,
+        "Your Risk Advisor assessment has been received.",
+        {
+            "reference_id": doc.name,
+            "service_name": "Risk Advisor",
+            "status": doc.status,
+            "portal_url": "/portal/services/risk-advisor/start",
+        },
+    )
     _audit("risk_advisor_assessment_submitted", user, doc, "Risk Advisor assessment submitted.")
     return _serialize_assessment(doc)
 
@@ -515,6 +543,18 @@ def admin_update_assessment_status(user, assessment_name, status, payload=None):
             f"Your Risk Advisor assessment is now {status}.",
             doc,
             "risk_advisor.admin_update_assessment_status",
+        )
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your Risk Advisor assessment is now {status}.",
+            {
+                "reference_id": doc.name,
+                "service_name": "Risk Advisor",
+                "status": status,
+                "admin_note": payload.get("notes"),
+                "portal_url": "/portal/services/risk-advisor/start",
+            },
         )
 
     _audit(

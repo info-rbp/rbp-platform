@@ -9,6 +9,7 @@ from rbp_app.permissions import is_admin_user
 from rbp_app.services.audit import record_audit_event
 from rbp_app.services.notifications import create_notification
 from rbp_app.services.reference_ids import generate_reference_id
+from rbp_app.services.notifications import create_notification, emit_event_notification
 from rbp_app.services.tenancy import doctype_exists, get_current_tenant_name
 
 
@@ -284,6 +285,22 @@ def _notify_admins_new_case(doc):
         )
 
 
+def _emit_notification_event(event_type, doc, message, context):
+    try:
+        emit_event_notification(
+            event_type=event_type,
+            user=None,
+            tenant=getattr(doc, "tenant", None),
+            customer_email=getattr(doc, "owner_user", None),
+            related_doctype=CASE_DOCTYPE,
+            related_name=doc.name,
+            message=message,
+            context=context,
+        )
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "RBP fixer notification hook failed")
+
+
 def create_case(user, payload):
     user = _require_user(user)
     payload = _safe_payload(payload)
@@ -351,6 +368,17 @@ def submit_case(user, case_name):
 
     _notify(doc.owner_user, "Fixer case submitted", "Your Fixer case has been submitted.", doc, "the_fixer.submit_case.user")
     _notify_admins_new_case(doc)
+    _emit_notification_event(
+        "fixer.request_submitted",
+        doc,
+        "Your Fixer request has been received.",
+        {
+            "reference_id": doc.name,
+            "service_name": "The Fixer",
+            "status": doc.status,
+            "portal_url": "/portal/services/the-fixer/start",
+        },
+    )
     _audit("fixer_case_submitted", user, doc, "Fixer case submitted.")
     return _serialize_case(doc)
 
@@ -474,6 +502,18 @@ def admin_update_case_status(user, case_name, status, payload=None):
                 priority="High",
                 notification_type="Success",
             )
+        _emit_notification_event(
+            "admin.status_updated",
+            doc,
+            f"Your Fixer case is now {status}.",
+            {
+                "reference_id": doc.name,
+                "service_name": "The Fixer",
+                "status": status,
+                "admin_note": payload.get("notes"),
+                "portal_url": "/portal/services/the-fixer/start",
+            },
+        )
 
     _audit("fixer_case_status_updated", user, doc, "Fixer case status updated.", {"from": previous_status, "to": status})
     return _serialize_case(doc)
