@@ -40,6 +40,7 @@
 - Customer auth can fall back to mock auth if backend auth fails.
 - Admin sign-in uses hardcoded demo credentials in the frontend.
 - Candidate commit has a failing combined status context: `rbp-platform (New project)`.
+- `.github/workflows/backend-static-validation.yml` is missing, so there is no dedicated backend static validation workflow in the active repo.
 
 ## 6. P2 Backlog
 - None recorded during this validation. Reassess after P0 and P1 remediation.
@@ -50,8 +51,9 @@
 3. Align Applications frontend calls with backend method names and confirm list and interest records work through QA.
 4. Replace frontend-only mock service flows with backend-backed submissions, reference IDs, admin visibility, and notification hooks.
 5. Replace the placeholder `deploy-qa.yml` deploy step with the real target deployment method and post-deploy smoke checks.
-6. Provide QA environment access: reachable QA URL, customer/admin credentials, bench access, Stripe test access, and email sandbox evidence.
-7. Run the smoke, security, billing, backup, and UAT runbooks against the live QA environment after remediation.
+6. Add a backend static validation workflow for compile and API-contract checks.
+7. Provide QA environment access: reachable QA URL, customer/admin credentials, bench access, Stripe test access, and email sandbox evidence.
+8. Run the smoke, security, billing, backup, and UAT runbooks against the live QA environment after remediation.
 
 ## 8. Sign-off Recommendation
 **Not ready for QA sign-off**
