@@ -22,6 +22,7 @@ import { PortalAdminReference } from "./PortalAdminReference";
 import { EntitlementBadge } from "../../components/status";
 import { mockPortalApplications, mockPortalIntegrations } from "../../mock";
 import { useRuntimeConfig } from "../../hooks/useRuntimeConfig";
+import { applicationsApi } from "../../services/api";
 
 const iconMap = {
   layers: Layers,
@@ -49,6 +50,7 @@ export function PortalApps() {
   const [activeTab, setActiveTab] = useState<"Applications" | "Integrations">("Applications");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
   const [selectedId, setSelectedId] = useState(mockPortalApplications[0]?.id);
+  const [interestState, setInterestState] = useState<"idle" | "submitting" | "submitted" | "error">("idle");
 
   const selectedApp =
     mockPortalApplications.find((application) => application.id === selectedId) ??
@@ -66,6 +68,19 @@ export function PortalApps() {
       ? "Register Interest"
       : "Requests Disabled";
 
+  async function handleRegisterInterest(applicationKey = selectedApp?.id) {
+    if (!interestEnabled || !applicationKey) return;
+
+    setInterestState("submitting");
+    const response = await applicationsApi.registerInterest({
+      application_key: applicationKey,
+      application_name: selectedApp?.name,
+      source_channel: "portal",
+    });
+
+    setInterestState(response.ok ? "submitted" : "error");
+  }
+
   return (
     <div className="px-4 sm:px-6 py-6 space-y-6">
       <PortalAdminReference
@@ -82,12 +97,14 @@ export function PortalApps() {
           </p>
         </div>
         {interestEnabled || provisioningEnabled ? (
-          <Link
-            to="/portal/support"
-            className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
+          <button
+            type="button"
+            onClick={() => handleRegisterInterest()}
+            disabled={!interestEnabled || interestState === "submitting"}
+            className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
           >
-            {requestActionLabel} <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+            {interestState === "submitted" ? "Interest Registered" : requestActionLabel} <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         ) : (
           <span className="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-500">
             {requestActionLabel}
@@ -261,12 +278,14 @@ export function PortalApps() {
                   </div>
                 </div>
                 {provisioningEnabled || interestEnabled ? (
-                  <Link
-                    to="/portal/support"
-                    className="w-full inline-flex items-center justify-center gap-2 font-bold text-sm py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white transition-all"
+                  <button
+                    type="button"
+                    onClick={() => handleRegisterInterest(selectedApp.id)}
+                    disabled={!interestEnabled || interestState === "submitting"}
+                    className="w-full inline-flex items-center justify-center gap-2 font-bold text-sm py-3 rounded-xl bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white transition-all"
                   >
-                    {provisioningEnabled ? "Mock Access Request" : "Register Interest"} <ExternalLink className="w-4 h-4" />
-                  </Link>
+                    {interestState === "submitted" ? "Interest Registered" : provisioningEnabled ? "Mock Access Request" : "Register Interest"} <ExternalLink className="w-4 h-4" />
+                  </button>
                 ) : null}
               </div>
             </aside>
