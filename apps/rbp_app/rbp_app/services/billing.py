@@ -24,6 +24,43 @@ PAYMENT_STATES = {
 }
 
 
+def _subscription_user(subscription) -> str | None:
+	return getattr(subscription, "user", None) or getattr(subscription, "member", None)
+
+
+def _subscription_tenant(subscription) -> str | None:
+	return getattr(subscription, "tenant", None)
+
+
+def _build_subscription_notification_context(
+	*,
+	subscription,
+	event,
+	previous_status: str | None = None,
+	previous_payment_status: str | None = None,
+) -> dict[str, object]:
+	return {
+		"reference_id": getattr(subscription, "name", None),
+		"status": getattr(subscription, "status", None),
+		"payment_status": getattr(event, "status", None),
+		"previous_status": previous_status,
+		"previous_payment_status": previous_payment_status,
+		"portal_url": "/portal/dashboard",
+		"amount": getattr(event, "amount", None),
+		"currency": getattr(event, "currency", None),
+		"plan_name": getattr(subscription, "plan", None),
+		"provider": getattr(event, "payment_provider", None),
+	}
+
+
+def _safe_emit_billing_notification(**kwargs):
+	try:
+		return emit_event_notification(**kwargs)
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "RBP billing notification hook failed")
+		return {"ok": False, "reason": "notification_failed"}
+
+
 def _placeholder() -> dict[str, object]:
 	runtime = get_runtime_settings()
 	return {
@@ -200,6 +237,7 @@ def update_subscription_from_payment_event(event):
 
 	subscription = frappe.get_doc("RBP Subscription", event.related_name)
 	previous_status = getattr(subscription, "status", None)
+	previous_payment_status = getattr(subscription, "payment_status", None)
 	subscription.payment_status = event.status
 	subscription.provider_customer_id = event.provider_customer_id or subscription.provider_customer_id
 	subscription.provider_payment_id = event.provider_payment_id
@@ -215,35 +253,44 @@ def update_subscription_from_payment_event(event):
 		subscription.status = "Cancelled"
 
 	subscription.save(ignore_permissions=True)
+	notification_context = _build_subscription_notification_context(
+		subscription=subscription,
+		event=event,
+		previous_status=previous_status,
+		previous_payment_status=previous_payment_status,
+	)
 
 	if event.status == "Paid":
-		emit_event_notification(
+		_safe_emit_billing_notification(
 			event_type="membership.payment_succeeded",
-			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
-			tenant=getattr(subscription, "tenant", None),
+			user=_subscription_user(subscription),
+			tenant=_subscription_tenant(subscription),
 			related_doctype="RBP Subscription",
 			related_name=subscription.name,
 			message="Your membership payment was successful.",
+			context=notification_context,
 		)
 	elif event.status in {"Failed", "Disputed"}:
-		emit_event_notification(
+		_safe_emit_billing_notification(
 			event_type="membership.payment_failed",
-			user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
-			tenant=getattr(subscription, "tenant", None),
+			user=_subscription_user(subscription),
+			tenant=_subscription_tenant(subscription),
 			related_doctype="RBP Subscription",
 			related_name=subscription.name,
 			message="Your membership payment failed and needs attention.",
+			context=notification_context | {"portal_url": "/portal/membership/checkout"},
 		)
 
 	if subscription.status != previous_status:
-		emit_event_notification(
+		_safe_emit_billing_notification(
 			event_type="subscription.status_changed",
-		user=getattr(subscription, "user", None) or getattr(subscription, "member", None),
-		tenant=getattr(subscription, "tenant", None),
-		related_doctype="RBP Subscription",
-		related_name=subscription.name,
-		message=f"Subscription status is now {subscription.status}.",
-	)
+			user=_subscription_user(subscription),
+			tenant=_subscription_tenant(subscription),
+			related_doctype="RBP Subscription",
+			related_name=subscription.name,
+			message=f"Subscription status is now {subscription.status}.",
+			context=notification_context,
+		)
 
 	try:
 		sync_subscription_entitlements(subscription)
