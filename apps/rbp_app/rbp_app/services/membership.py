@@ -28,36 +28,141 @@ def _safe_json(value):
     return dict(value)
 
 
+
+def _plan_has_column(fieldname):
+    try:
+        return frappe.db.has_column("RBP Membership Plan", fieldname)
+    except Exception:
+        return False
+
+
+def _decode_membership_list(value):
+    if not value:
+        return []
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    if isinstance(value, str):
+        raw = value.strip()
+        if not raw:
+            return []
+        try:
+            decoded = json.loads(raw)
+            if isinstance(decoded, list):
+                return decoded
+        except Exception:
+            pass
+        return [line.strip() for line in raw.replace(",", "\n").splitlines() if line.strip()]
+    return []
+
+
+def _membership_plan_fields():
+    fields = [
+        "name",
+        "plan_code",
+        "plan_name",
+        "description",
+        "billing_cycle",
+        "currency",
+        "stripe_product_id",
+        "stripe_price_id",
+        "is_public",
+        "sort_order",
+        "status",
+    ]
+
+    for optional_field in ["amount", "price", "active", "included_apps", "included_capabilities", "included_entitlements"]:
+        if _plan_has_column(optional_field):
+            fields.append(optional_field)
+
+    return fields
+
+
+def _normalise_membership_plan(plan):
+    if not plan:
+        return None
+
+    price = plan.get("price")
+    if price is None:
+        price = plan.get("amount")
+
+    active = plan.get("active")
+    if active is None:
+        active = 1 if plan.get("status") == "Active" else 0
+
+    included_entitlements = _decode_membership_list(plan.get("included_entitlements"))
+    if not included_entitlements:
+        included_entitlements = _decode_membership_list(plan.get("included_capabilities"))
+
+    payload = dict(plan)
+    payload["price"] = price
+    payload["amount"] = plan.get("amount", price)
+    payload["active"] = 1 if active else 0
+    payload["included_entitlements"] = included_entitlements
+    payload["checkout_ready"] = is_membership_plan_checkout_ready(payload)
+
+    return payload
+
+
+def is_membership_plan_checkout_ready(plan):
+    stripe_price_id = None
+
+    if isinstance(plan, dict):
+        stripe_price_id = plan.get("stripe_price_id")
+        active = plan.get("active")
+        status = plan.get("status")
+    else:
+        stripe_price_id = getattr(plan, "stripe_price_id", None)
+        active = getattr(plan, "active", None)
+        status = getattr(plan, "status", None)
+
+    if active is not None and not int(active):
+        return False
+
+    if status and status != "Active":
+        return False
+
+    if not stripe_price_id:
+        return False
+
+    stripe_price_id = str(stripe_price_id).strip()
+
+    if not stripe_price_id.startswith("price_"):
+        return False
+
+    blocked_tokens = ["REPLACE", "PLACEHOLDER", "TODO", "DUMMY", "FAKE"]
+    if any(token in stripe_price_id.upper() for token in blocked_tokens):
+        return False
+
+    return True
+
+
 def list_membership_plans(user=None, public_only=True):
-    """Return active membership plans."""
+    """Return active membership plans with Stripe mapping fields."""
 
     if not doctype_exists("RBP Membership Plan"):
         return {"plans": [], "count": 0}
 
-    filters = {"status": "Active"}
-    if public_only:
+    filters = {}
+
+    if _plan_has_column("status"):
+        filters["status"] = "Active"
+
+    if _plan_has_column("active"):
+        filters["active"] = 1
+
+    if public_only and _plan_has_column("is_public"):
         filters["is_public"] = 1
 
     plans = frappe.get_all(
         "RBP Membership Plan",
         filters=filters,
-        fields=[
-            "name",
-            "plan_code",
-            "plan_name",
-            "description",
-            "billing_cycle",
-            "amount",
-            "currency",
-            "included_apps",
-            "included_capabilities",
-            "is_public",
-            "sort_order",
-        ],
+        fields=_membership_plan_fields(),
         order_by="sort_order asc, plan_name asc",
     )
 
-    return {"plans": plans, "count": len(plans)}
+    normalised_plans = [_normalise_membership_plan(plan) for plan in plans]
+
+    return {"plans": normalised_plans, "count": len(normalised_plans)}
 
 
 def get_membership_plan(plan_code=None, name=None):
@@ -79,6 +184,26 @@ def get_membership_plan(plan_code=None, name=None):
         return None
 
     return frappe.get_doc("RBP Membership Plan", plan_name)
+
+
+def validate_membership_plan_for_checkout(plan_code=None, name=None):
+    """Return a membership plan only when it is active and has a usable Stripe price ID."""
+
+    plan = get_membership_plan(plan_code=plan_code, name=name)
+
+    if not plan:
+        raise frappe.ValidationError("Membership plan was not found.")
+
+    if hasattr(plan, "status") and plan.status != "Active":
+        raise frappe.ValidationError("Membership plan is not active.")
+
+    if hasattr(plan, "active") and not int(plan.active or 0):
+        raise frappe.ValidationError("Membership plan is not active.")
+
+    if not is_membership_plan_checkout_ready(plan):
+        raise frappe.ValidationError("Membership plan is missing a valid Stripe price ID.")
+
+    return plan
 
 
 def start_onboarding(user=None, plan_code=None, source_channel="portal"):
