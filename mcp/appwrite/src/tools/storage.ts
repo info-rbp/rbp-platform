@@ -1,0 +1,6 @@
+import { z } from "zod";
+import { storage } from "../lib/appwrite.js";
+export const storageTools = {
+  list_buckets: { description: "List buckets", schema: {}, handler: async () => storage.listBuckets() },
+  create_bucket: { description: "Create bucket", schema: { bucketId: z.string(), name: z.string(), permissions: z.array(z.string()).default([]), fileSecurity: z.boolean().default(true), enabled: z.boolean().default(true), maximumFileSize: z.number().int().default(30000000), allowedFileExtensions: z.array(z.string()).default([]), compression: z.enum(["none","gzip","zstd"]).default("none"), encryption: z.boolean().default(true), antivirus: z.boolean().default(true) }, handler: async (a: any) => storage.createBucket(a.bucketId,a.name,a.permissions,a.fileSecurity,a.enabled,a.maximumFileSize,a.allowedFileExtensions,a.compression,a.encryption,a.antivirus) }
+};
