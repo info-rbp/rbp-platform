@@ -1,0 +1,49 @@
+name: Frappe Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_bench_smoke:
+        description: Run bench-based smoke validation
+        required: true
+        default: false
+        type: boolean
+      site_name:
+        description: Bench site name to target when smoke validation is enabled
+        required: false
+        type: string
+
+jobs:
+  frappe-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Skip when bench smoke is disabled
+        if: ${{ inputs.run_bench_smoke != true }}
+        run: echo "Bench smoke validation was skipped because run_bench_smoke=false."
+
+      - name: Require bench when smoke validation is enabled
+        if: ${{ inputs.run_bench_smoke == true }}
+        run: |
+          if ! command -v bench >/dev/null 2>&1; then
+            echo "Bench is not available in this runner. Smoke validation cannot proceed."
+            exit 1
+          fi
+          if [ -z "${{ inputs.site_name }}" ]; then
+            echo "site_name is required when run_bench_smoke=true."
+            exit 1
+          fi
+
+      - name: Run bench migrate
+        if: ${{ inputs.run_bench_smoke == true }}
+        run: bench --site "${{ inputs.site_name }}" migrate
+
+      - name: Run bench clear-cache
+        if: ${{ inputs.run_bench_smoke == true }}
+        run: bench --site "${{ inputs.site_name }}" clear-cache
+
+      - name: Run bench tests
+        if: ${{ inputs.run_bench_smoke == true }}
+        run: bench --site "${{ inputs.site_name }}" run-tests --app rbp_app

@@ -4,7 +4,12 @@ import frappe
 
 from rbp_app.permissions import require_login
 from rbp_app.services.notification_triggers import list_notification_triggers
-from rbp_app.services.notifications import emit_event_notification, get_notifications as get_notifications_service
+from rbp_app.services.notifications import (
+    emit_event_notification,
+    get_notifications as get_notifications_service,
+    mark_all_notifications_read as mark_all_notifications_read_service,
+    mark_notification_read as mark_notification_read_service,
+)
 from rbp_app.services.tenancy import doctype_exists
 
 
@@ -24,6 +29,18 @@ def _limit(value) -> int:
 def get_notifications():
     user = require_login()
     return get_notifications_service(user)
+
+
+@frappe.whitelist()
+def mark_notification_read(name: str):
+    user = require_login()
+    return mark_notification_read_service(name, user=user)
+
+
+@frappe.whitelist()
+def mark_all_notifications_read():
+    user = require_login()
+    return mark_all_notifications_read_service(user=user)
 
 
 @frappe.whitelist()

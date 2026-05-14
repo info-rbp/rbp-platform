@@ -66,7 +66,7 @@ export function PortalNbnStart() {
     <PortalFlowFrame
       eyebrow="Connectivity"
       title="Order business NBN through your account"
-      description="Address availability, plan selection, modem and hardware, business details, review, mock billing, and confirmation."
+      description="Address availability, plan selection, modem and hardware, business details, review, QA-safe billing handoff, and confirmation."
     >
       <ConnectivityOrderFlow embedded />
     </PortalFlowFrame>
@@ -102,7 +102,7 @@ export function PortalMarketplaceListingNew() {
     <PortalFlowFrame
       eyebrow="Marketplace"
       title="Create a marketplace listing"
-      description="Listing type, asset or business questionnaire, media/document upload, preview, fees and terms, mock payment, seller dashboard, admin review, and publication state."
+      description="Listing type, asset or business questionnaire, media and document upload, preview, fees and terms, QA billing confirmation, seller dashboard, admin review, and publication state."
     >
       <MarketplaceEnquiryListingFlow embedded forcedView="seller" />
     </PortalFlowFrame>
@@ -126,7 +126,7 @@ export function PortalMembershipCheckout() {
     <PortalFlowFrame
       eyebrow="Membership"
       title="Membership checkout"
-      description="Plan selection, account details, inclusions, extras, mock payment, review, success, onboarding, and portal handoff."
+      description="Plan selection, account details, inclusions, Stripe test-mode checkout for QA, review, confirmation, onboarding, and portal handoff."
     >
       <MembershipPurchaseOnboardingFlow />
     </PortalFlowFrame>

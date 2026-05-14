@@ -35,9 +35,13 @@ const publicRoutes = [
 const forbiddenApplicationPhrases = [
   "Open app",
   "Launch app",
-  "Request setup",
-  "Available now",
+  "Provision now",
   "Provision instantly",
+  "Activate application",
+  "Available now",
+  "Start using",
+  "Buy now",
+  "Redeem now",
 ];
 
 let failed = false;

@@ -152,7 +152,14 @@ def _get_membership_plan(plan_code: str | None):
 	if not plan_name:
 		raise frappe.ValidationError("Please choose a valid membership plan.")
 
-	return frappe.get_doc("RBP Membership Plan", plan_name)
+	plan = frappe.get_doc("RBP Membership Plan", plan_name)
+	status = getattr(plan, "status", None)
+	active = getattr(plan, "active", None)
+	if status and status != "Active":
+		raise frappe.ValidationError("The selected membership plan is not active.")
+	if active in {0, "0", False}:
+		raise frappe.ValidationError("The selected membership plan is not active.")
+	return plan
 
 
 def _get_or_create_subscription(user: str, plan) -> object | None:
