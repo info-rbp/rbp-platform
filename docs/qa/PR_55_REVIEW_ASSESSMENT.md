@@ -6,9 +6,13 @@
 - Branch: `qa-remediation-review`
 - PR head SHA at review baseline: `de4f7af7f4401faba5709831369823f3234c34b3`
 - Assessment follow-up commit: this document is committed on top of the baseline branch; use PR metadata for the latest branch head.
-- Overall recommendation: BLOCKED BY EXTERNAL CHECK.
+- Overall recommendation: READY FOR HUMAN MERGE REVIEW if GitHub Actions remain passing and no new code blockers are found.
 
-PR #55 is open, ready for review, mergeable from GitHub's PR metadata, and targets `main` from `qa-remediation-review`. The local branch matches `origin/qa-remediation-review` before this assessment follow-up. Do not merge, promote to `qa`, or deploy until the external Appwrite-style failure is resolved or the repository owner formally accepts it as non-blocking.
+PR #55 is open, ready for review, mergeable from GitHub's PR metadata, and targets `main` from `qa-remediation-review`. The local branch matches `origin/qa-remediation-review` before this assessment follow-up.
+
+Per project owner instruction, the external Appwrite status named `rbp-platform (New project)` was created accidentally and is stale/non-blocking for the current QA path. Do not use Appwrite for this QA deployment. Do not configure Appwrite, deploy through Appwrite, or block merge solely because of this status. The relevant repository validation checks are the GitHub Actions checks listed below.
+
+QA deployment should use the configured GitHub Actions `deploy-qa.yml` workflow or the selected manual deployment process after the required external setup is complete. This assessment does not mean live QA has passed.
 
 ## GitHub Status
 
@@ -19,7 +23,7 @@ PR #55 is open, ready for review, mergeable from GitHub's PR metadata, and targe
 | Frontend Validation / `frontend` | Pass | GitHub Actions check run succeeded. |
 | SEO Validation / `seo` | Pass | GitHub Actions check run succeeded. |
 | Phase 4A Foundation Validation / `Validate repository structure` | Pass | GitHub Actions check run succeeded. |
-| External Appwrite-style status: `rbp-platform (New project)` | Fail | External commit status, not a GitHub Actions check run. Target URL points to Appwrite Cloud function console and reports `Build failed.` |
+| External Appwrite-style status: `rbp-platform (New project)` | Ignored / Non-blocking | Accidental stale external status per project owner instruction. Not a GitHub Actions check run and not part of this QA deployment path. |
 
 External status assessment:
 
@@ -29,9 +33,9 @@ External status assessment:
 - Branch protection: GitHub API reports `main` is not protected, and no repository rulesets were visible to the authenticated token.
 - Required status: not shown as required by branch protection from available GitHub API access.
 - Ownership/configuration: Appwrite target logs/configuration require external owner/admin access.
-- Classification: BLOCKED: external status target requires owner/admin access.
+- Classification: NON-BLOCKING: accidental stale external status per project owner instruction.
 
-Recommended external-check action: confirm whether `rbp-platform (New project)` is a stale Appwrite integration, old deployment target, misconfigured deployment check, or legitimate deployment failure. If stale or unrelated, disable the integration or remove it from required checks if branch protection is later enabled. If legitimate, fix the Appwrite build configuration before treating the PR as clean.
+Recommended external-check action: ignore for this QA path and remove or disable the Appwrite integration later after the GitHub Actions/manual QA deployment path is stable.
 
 ## Code Review Findings
 
@@ -122,9 +126,8 @@ QA docs:
 | `bench --site rbp-minimal.localhost clear-cache` | Passed. |
 | `bench --site rbp-minimal.localhost run-tests --app rbp_app` | Passed: 199 tests, 2 skipped. |
 
-## Remaining External Blockers
+## Remaining External Setup
 
-- Resolve or formally waive the external Appwrite-style failing status `rbp-platform (New project)`.
 - Configure GitHub Actions QA deploy secrets: `QA_HOST`, `QA_USER`, `QA_SSH_KEY`, optional `QA_FRONTEND_PATH`.
 - Configure Stripe test product, recurring AUD price, and webhook.
 - Save the Stripe price ID into `RBP Membership Plan`.
@@ -135,6 +138,4 @@ QA docs:
 
 ## Merge Recommendation
 
-Do not merge yet while the external Appwrite-style status is unresolved.
-
-Merge to `main` may be acceptable after human review only if the repository owner confirms `rbp-platform (New project)` is stale, unrelated, or intentionally non-blocking. Do not promote `main` to `qa` until external setup is complete and live QA gates are run.
+PR #55 can proceed to human merge review if GitHub Actions pass and no code blockers are found. The accidental Appwrite status `rbp-platform (New project)` is non-blocking for this decision. Do not promote `main` to `qa` until required external setup is complete and live QA gates are ready to run.

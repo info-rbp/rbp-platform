@@ -2,6 +2,10 @@
 
 Do not promote or deploy QA until these external items are complete.
 
+## Appwrite status
+
+The Appwrite integration/check named `rbp-platform (New project)` was created accidentally and is non-blocking for the current QA path. Do not deploy through Appwrite. Ignore or remove the integration later after QA deployment path is stable.
+
 ## 1. GitHub Actions Secrets Required
 
 - `QA_HOST`
