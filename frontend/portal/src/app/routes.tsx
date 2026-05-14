@@ -197,6 +197,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: HomePage },
       { path: "about", Component: AboutPage },
+      { path: "about-us", element: <Navigate to="/about" replace /> },
       { path: "contact", Component: ContactPage },
       { path: "contact-us", element: <Navigate to="/contact" replace /> },
       { path: "discovery-call", element: <Navigate to="/about/discovery-call" replace /> },
@@ -407,8 +408,14 @@ export const router = createBrowserRouter([
           { path: "confirmation", Component: MembershipConfirmationPage },
         ],
       },
+      { path: "membership/sign-up", element: <Navigate to="/membership/sign-up-now" replace /> },
       { path: "offers", Component: OffersPage },
       { path: "resources", Component: ResourcesPage },
+      { path: "privacy-policy", element: <Navigate to="/legal/privacy-policy" replace /> },
+      { path: "terms-of-use", element: <Navigate to="/legal/terms-of-use" replace /> },
+      { path: "terms-of-engagement", element: <Navigate to="/legal/terms-of-engagement" replace /> },
+      { path: "payment-policy", element: <Navigate to="/legal/payment-policy" replace /> },
+      { path: "services-policy", element: <Navigate to="/legal/services-policy" replace /> },
       { path: "legal/terms", element: <Navigate to="/legal/terms-of-use" replace /> },
       {
         path: "legal",
