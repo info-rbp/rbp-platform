@@ -28,11 +28,13 @@ export function usePublicBackendContent() {
         ]);
 
         if (!cancelled) {
-          setResources(resourceRecords);
-          setHelpArticles(helpRecords);
+          setResources(Array.isArray(resourceRecords) ? resourceRecords : []);
+          setHelpArticles(Array.isArray(helpRecords) ? helpRecords : []);
         }
       } catch (error) {
         if (!cancelled) {
+          setResources([]);
+          setHelpArticles([]);
           setErrorMessage(
             error instanceof Error ? error.message : "Unable to load backend content."
           );
