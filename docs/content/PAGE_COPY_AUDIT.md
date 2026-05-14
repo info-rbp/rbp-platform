@@ -35,3 +35,20 @@ Outstanding copy risks: React admin remains a QA preview surface, and some porta
 | /portal/support | Portal Support | Member | Support pathways | Accurate after QA wording pass | Noindex required | Request support | Low | Frontend | Yes |
 | /admin/signin | Admin Sign In | Admin | Admin access | Copy should make preview/admin boundary clear | Noindex required | Sign in | Medium | Frontend | Yes |
 | /applications | Applications | Public | Public application rollout catalogue | Updated to next-rollout language and interest capture only | Title and description required | Register interest | High | Frontend | Yes |
+
+## Final Milestone 14 QA Copy Review
+
+Status: Complete for QA readiness.
+
+Final checks:
+
+- Applications provisioning remains delayed.
+- Register-interest language is used for Applications.
+- Stripe and payment copy does not imply live production mode during QA.
+- Frappe Desk remains the admin authority.
+- React admin preview and fallback states are noted.
+- Build and SEO audit are the required verification commands for launch copy readiness.
+
+Remaining non-blocking notes:
+
+- Live QA browser review should confirm rendered copy after deployment.
