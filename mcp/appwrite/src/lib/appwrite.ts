@@ -28,6 +28,14 @@ function required(name: string): string {
   return value;
 }
 
+function requiredAny(...names: string[]): string {
+  for (const name of names) {
+    const value = process.env[name];
+    if (value) return value;
+  }
+  throw new Error(`Missing required environment variable: one of ${names.join(", ")}`);
+}
+
 function buildUrl(path: string, search?: URLSearchParams) {
   const base = required("APPWRITE_ENDPOINT").replace(/\/+$/, "");
   const url = new URL(`${base}${path}`);
@@ -72,8 +80,8 @@ export const config = {
   port: Number(process.env.PORT ?? "8787"),
   mcpAuthToken: required("MCP_AUTH_TOKEN"),
   endpoint: required("APPWRITE_ENDPOINT"),
-  projectId: required("APPWRITE_PROJECT_ID"),
-  apiKey: required("APPWRITE_API_KEY"),
+  projectId: requiredAny("APPWRITE_PROJECT_ID", "APPWRITE_FUNCTION_PROJECT_ID"),
+  apiKey: requiredAny("APPWRITE_API_KEY", "APPWRITE_FUNCTION_API_KEY"),
   databaseId: process.env.APPWRITE_DATABASE_ID ?? "rbp_platform",
   collections: {
     products: process.env.APPWRITE_PRODUCTS_COLLECTION_ID ?? "products",
