@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router";
 import { ScrollToHash } from "./components/ScrollToHash";
 import { EnvironmentBanner } from "./components/EnvironmentBanner";
 import { SEO } from "./components/SEO";
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
 import {
   RequireAccountGate,
   RequireAdminAuth,
@@ -192,6 +193,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
+    errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, Component: HomePage },
       { path: "about", Component: AboutPage },
