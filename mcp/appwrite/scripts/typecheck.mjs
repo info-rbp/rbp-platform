@@ -1,5 +1,6 @@
-import { readdir } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
+import { readFile, readdir } from "node:fs/promises";
+import { stripTypeScriptTypes } from "node:module";
 
 async function listFiles(dirUrl, suffixes) {
   const entries = await readdir(dirUrl, { withFileTypes: true });
@@ -15,17 +16,17 @@ async function listFiles(dirUrl, suffixes) {
   return files;
 }
 
-const targets = [
-  ...(await listFiles(new URL("../src/", import.meta.url), [".ts"])),
-  ...(await listFiles(new URL("./", import.meta.url), [".mjs"]))
-];
+const typeScriptTargets = await listFiles(new URL("../src/", import.meta.url), [".ts"]);
+const scriptTargets = await listFiles(new URL("./", import.meta.url), [".mjs"]);
 
-for (const target of targets) {
-  const args = target.pathname.endsWith(".ts")
-    ? ["--check", "--experimental-strip-types", target.pathname]
-    : ["--check", target.pathname];
-  const result = spawnSync(process.execPath, args, { stdio: "inherit" });
+for (const target of typeScriptTargets) {
+  const source = await readFile(target, "utf8");
+  stripTypeScriptTypes(source, { mode: "transform", sourceUrl: target.href });
+}
+
+for (const target of scriptTargets) {
+  const result = spawnSync(process.execPath, ["--check", target.pathname], { stdio: "inherit" });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
-console.log(`Checked ${targets.length} files.`);
+console.log(`Checked ${typeScriptTargets.length + scriptTargets.length} files.`);
