@@ -377,7 +377,3 @@ export function AdminLayout() {
     </div>
   );
 }
-  const navGroups = useMemo(
-    () => getRuntimeNavGroups(config.features.admin_applications),
-    [config.features.admin_applications],
-  );
