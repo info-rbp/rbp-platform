@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router";
 
 import { ScrollToHash } from "./components/ScrollToHash";
 import { EnvironmentBanner } from "./components/EnvironmentBanner";
+import { RouteErrorBoundary } from "./components/RouteErrorBoundary";
 import { SEO } from "./components/SEO";
 import {
   RequireAccountGate,
@@ -192,11 +193,16 @@ export const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
+    errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, Component: HomePage },
       { path: "about", Component: AboutPage },
       { path: "contact", Component: ContactPage },
+      { path: "contact-us", element: <Navigate to="/contact" replace /> },
       { path: "discovery-call", element: <Navigate to="/about/discovery-call" replace /> },
+      { path: "our-platform", element: <Navigate to="/about/our-platform" replace /> },
+      { path: "work-for-us", element: <Navigate to="/about/work-for-us" replace /> },
+      { path: "work-with-us", element: <Navigate to="/about/work-with-us" replace /> },
       { path: "contact/success", Component: ContactSuccessPage },
       { path: "help", Component: HelpCenterPage },
       { path: "sign-in", element: <Navigate to="/signin" replace /> },
