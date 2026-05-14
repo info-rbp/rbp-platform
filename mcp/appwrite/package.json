@@ -2,6 +2,8 @@
   "name": "rbp-appwrite-mcp-server",
   "version": "0.1.1",
   "description": "Initial Appwrite MCP server scaffold for RBP backend QA and operations.",
+  "version": "0.1.0",
+  "description": "MCP server exposing universal Appwrite read/write tools for RBP backend implementation and QA.",
   "type": "module",
   "private": true,
   "scripts": {
@@ -24,5 +26,18 @@
     "@types/node": "^22.15.21",
     "tsx": "^4.20.6",
     "typescript": "^5.8.3"
+    "@modelcontextprotocol/sdk": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "node-appwrite": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/cors": "latest",
+    "@types/express": "latest",
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
   }
 }
