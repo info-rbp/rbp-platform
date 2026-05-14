@@ -38,6 +38,7 @@ export const environment = {
     "http://localhost:5173"
   ),
   apiBaseUrl: readString(import.meta.env.VITE_API_BASE_URL, "http://localhost:8000"),
+  frappeDeskUrl: readString(import.meta.env.VITE_FRAPPE_DESK_URL, ""),
   enableApplications,
   enableApplicationInterest,
   enableApplicationProvisioning,
