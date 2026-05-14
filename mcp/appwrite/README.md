@@ -10,6 +10,8 @@ cp .env.example .env
 npm run dev
 ```
 
+Requires Node 22 or newer because the scaffold uses Node's native TypeScript support for execution and build output.
+
 ## Validate
 ```bash
 npm run typecheck
