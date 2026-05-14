@@ -53,3 +53,7 @@ tmp/
 .venv-milestone8/
 
 mcp/appwrite/.env
+
+mcp/appwrite/.env.*
+
+!mcp/appwrite/.env.example
