@@ -23,6 +23,19 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_QA_ENVIRONMENT: "true"
+          VITE_PUBLIC_SITE_URL: https://qa.remotebusinesspartner.com.au
+          VITE_API_BASE_URL: https://qa-api.remotebusinesspartner.com.au
+          VITE_ENABLE_APPLICATIONS: "false"
+          VITE_ENABLE_APPLICATION_INTEREST: "true"
+          VITE_ENABLE_APPLICATION_PROVISIONING: "false"
+          VITE_ENABLE_ADMIN_APPLICATIONS: "true"
+          VITE_ENABLE_STRIPE_CHECKOUT: "true"
+          VITE_ENABLE_EMAIL_NOTIFICATIONS: "true"
+          VITE_STRIPE_MODE: test
+          VITE_EMAIL_SANDBOX_MODE: "true"
+          VITE_ENABLE_MOCK_AUTH: "false"
       - run: npm run audit:seo
 
       - uses: actions/upload-artifact@v4
@@ -40,6 +53,36 @@ jobs:
           name: frontend-dist
           path: dist
 
-      - name: Deploy placeholder
+      - name: Deploy frontend to QA host
+        env:
+          QA_HOST: ${{ secrets.QA_HOST }}
+          QA_USER: ${{ secrets.QA_USER }}
+          QA_SSH_KEY: ${{ secrets.QA_SSH_KEY }}
+          QA_FRONTEND_PATH: ${{ secrets.QA_FRONTEND_PATH }}
         run: |
-          echo "Deploy dist/ to QA host using rsync, S3, Netlify, Vercel, or the selected host."
+          set -euo pipefail
+
+          : "${QA_HOST:?QA_HOST secret is required}"
+          : "${QA_USER:?QA_USER secret is required}"
+          : "${QA_SSH_KEY:?QA_SSH_KEY secret is required}"
+
+          TARGET_PATH="${QA_FRONTEND_PATH:-/var/www/rbp-frontend/current}"
+          case "$TARGET_PATH" in
+            /var/www/*|/srv/*) ;;
+            *) echo "Refusing unsafe QA_FRONTEND_PATH: $TARGET_PATH"; exit 1 ;;
+          esac
+          case "$TARGET_PATH" in
+            /|/var|/var/|/var/www|/var/www/|/srv|/srv/) echo "Refusing unsafe QA_FRONTEND_PATH: $TARGET_PATH"; exit 1 ;;
+          esac
+
+          RELEASE_ROOT="$(dirname "$TARGET_PATH")/releases"
+          RELEASE_ID="${GITHUB_SHA}-$(date -u +%Y%m%d%H%M%S)"
+
+          mkdir -p ~/.ssh
+          echo "$QA_SSH_KEY" > ~/.ssh/qa_key
+          chmod 600 ~/.ssh/qa_key
+
+          SSH_CMD="ssh -i ~/.ssh/qa_key -o StrictHostKeyChecking=no"
+          $SSH_CMD "$QA_USER@$QA_HOST" "mkdir -p '$TARGET_PATH' '$RELEASE_ROOT' && if [ -d '$TARGET_PATH' ] && [ \"\$(ls -A '$TARGET_PATH' 2>/dev/null)\" ]; then cp -a '$TARGET_PATH' '$RELEASE_ROOT/$RELEASE_ID'; fi"
+
+          rsync -az --delete -e "$SSH_CMD" dist/ "$QA_USER@$QA_HOST:$TARGET_PATH/"

@@ -1,3 +1,4 @@
+import importlib.util
 from types import SimpleNamespace
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -168,6 +169,8 @@ class TestTenantAccess(TestCase):
 
 class TestSharedBenchAuthAllowlist(TestCase):
     def test_mail_does_not_claim_global_auth_routes(self):
+        if importlib.util.find_spec("mail") is None:
+            self.skipTest("mail app is not installed in this bench")
         from mail import hooks as mail_hooks
 
         redirect_sources = {rule["source"] for rule in mail_hooks.website_redirects}
@@ -175,6 +178,8 @@ class TestSharedBenchAuthAllowlist(TestCase):
         self.assertNotIn("/signup", redirect_sources)
 
     def test_mail_auth_allows_rbp_portal_api_methods(self):
+        if importlib.util.find_spec("mail") is None:
+            self.skipTest("mail app is not installed in this bench")
         from mail import auth as mail_auth
 
         self.assertIn("/api/method/frappe.translate.get_boot_translations", mail_auth.ALLOWED_PATHS)
