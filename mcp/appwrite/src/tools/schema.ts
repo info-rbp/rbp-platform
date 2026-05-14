@@ -1,11 +1,95 @@
-import { z } from "zod";
-import { databases } from "../lib/appwrite.js";
+import { databases } from "../lib/appwrite.ts";
+import { defineTool, v } from "../lib/tooling.ts";
+
 export const schemaTools = {
-  create_string_attribute: { description: "Create string attribute", schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), size: z.number().int().min(1), required: z.boolean().default(false), defaultValue: z.string().optional(), array: z.boolean().default(false) }, handler: async (a: any) => databases.createStringAttribute(a.databaseId,a.collectionId,a.key,a.size,a.required,a.defaultValue,a.array) },
-  create_integer_attribute: { description: "Create integer attribute", schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), required: z.boolean().default(false), min: z.number().optional(), max: z.number().optional(), defaultValue: z.number().optional(), array: z.boolean().default(false) }, handler: async (a: any) => databases.createIntegerAttribute(a.databaseId,a.collectionId,a.key,a.required,a.min,a.max,a.defaultValue,a.array) },
-  create_index: { description: "Create index", schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), type: z.enum(["key","fulltext","unique"]), attributes: z.array(z.string()).min(1), orders: z.array(z.enum(["ASC","DESC"])).optional() }, handler: async (a: any) => databases.createIndex(a.databaseId,a.collectionId,a.key,a.type,a.attributes,a.orders) },
-  delete_attribute: { description: "Delete attribute", annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false }, schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), confirm: z.literal("DELETE_ATTRIBUTE") }, handler: async (a: any) => databases.deleteAttribute(a.databaseId,a.collectionId,a.key) },
-  delete_index: { description: "Delete index", annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false }, schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), confirm: z.literal("DELETE_INDEX") }, handler: async (a: any) => databases.deleteIndex(a.databaseId,a.collectionId,a.key) }
-  delete_attribute: { description: "Delete attribute", schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), confirm: z.literal("DELETE_ATTRIBUTE") }, handler: async (a: any) => databases.deleteAttribute(a.databaseId,a.collectionId,a.key) },
-  delete_index: { description: "Delete index", schema: { databaseId: z.string(), collectionId: z.string(), key: z.string(), confirm: z.literal("DELETE_INDEX") }, handler: async (a: any) => databases.deleteIndex(a.databaseId,a.collectionId,a.key) }
+  create_string_attribute: defineTool({
+    description: "Create string attribute",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      key: v.string(),
+      size: v.number({ integer: true, min: 1 }),
+      required: v.boolean({ defaultValue: false }),
+      defaultValue: v.string({ optional: true }),
+      array: v.boolean({ defaultValue: false })
+    },
+    handler: async (args) =>
+      databases.createStringAttribute(
+        args.databaseId as string,
+        args.collectionId as string,
+        args.key as string,
+        args.size as number,
+        args.required as boolean,
+        args.defaultValue as string | undefined,
+        args.array as boolean
+      )
+  }),
+  create_integer_attribute: defineTool({
+    description: "Create integer attribute",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      key: v.string(),
+      required: v.boolean({ defaultValue: false }),
+      min: v.number({ optional: true }),
+      max: v.number({ optional: true }),
+      defaultValue: v.number({ optional: true }),
+      array: v.boolean({ defaultValue: false })
+    },
+    handler: async (args) =>
+      databases.createIntegerAttribute(
+        args.databaseId as string,
+        args.collectionId as string,
+        args.key as string,
+        args.required as boolean,
+        args.min as number | undefined,
+        args.max as number | undefined,
+        args.defaultValue as number | undefined,
+        args.array as boolean
+      )
+  }),
+  create_index: defineTool({
+    description: "Create index",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      key: v.string(),
+      type: v.enum(["key", "fulltext", "unique"]),
+      attributes: v.array(v.string(), { minItems: 1 }),
+      orders: v.array(v.enum(["ASC", "DESC"]), { optional: true })
+    },
+    handler: async (args) =>
+      databases.createIndex(
+        args.databaseId as string,
+        args.collectionId as string,
+        args.key as string,
+        args.type as string,
+        args.attributes as string[],
+        args.orders as string[] | undefined
+      )
+  }),
+  delete_attribute: defineTool({
+    description: "Delete attribute",
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      key: v.string(),
+      confirm: v.literal("DELETE_ATTRIBUTE")
+    },
+    handler: async (args) =>
+      databases.deleteAttribute(args.databaseId as string, args.collectionId as string, args.key as string)
+  }),
+  delete_index: defineTool({
+    description: "Delete index",
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      key: v.string(),
+      confirm: v.literal("DELETE_INDEX")
+    },
+    handler: async (args) =>
+      databases.deleteIndex(args.databaseId as string, args.collectionId as string, args.key as string)
+  })
 };
