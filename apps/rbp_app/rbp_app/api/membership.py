@@ -16,6 +16,7 @@ from rbp_app.services.membership import (
     start_onboarding as start_onboarding_service,
     submit_onboarding as submit_onboarding_service,
     update_onboarding_step as update_onboarding_step_service,
+    validate_membership_plan_for_checkout as validate_membership_plan_for_checkout_service,
 )
 from rbp_app.services.signup import (
     create_or_update_account_context,
@@ -172,4 +173,25 @@ def admin_complete_onboarding(flow_name):
         "name": flow.name,
         "status": flow.status,
         "completed_on": flow.completed_on,
+    }
+
+
+@frappe.whitelist()
+def validate_membership_plan_checkout(plan_code=None, name=None):
+    """Validate that a membership plan can start Stripe checkout."""
+
+    user = require_login()
+    plan = validate_membership_plan_for_checkout_service(plan_code=plan_code, name=name)
+
+    return {
+        "user": user,
+        "name": plan.name,
+        "plan_code": plan.plan_code,
+        "plan_name": plan.plan_name,
+        "billing_cycle": plan.billing_cycle,
+        "price": getattr(plan, "price", None) if getattr(plan, "price", None) is not None else getattr(plan, "amount", None),
+        "currency": plan.currency,
+        "stripe_product_id": plan.stripe_product_id,
+        "stripe_price_id": plan.stripe_price_id,
+        "checkout_ready": True,
     }
