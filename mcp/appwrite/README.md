@@ -18,6 +18,11 @@ npm run typecheck
 npm run build
 ```
 
+## Appwrite Function deployment
+Configure the Appwrite Function root directory as `mcp/appwrite`, use build commands `npm install && npm run build`, and set the entrypoint to `dist/function.js`.
+
+During Appwrite execution, the function entrypoint will reuse the same MCP request handling and will accept the dynamic Appwrite API key from the function runtime when `APPWRITE_API_KEY` is not set explicitly.
+
 ## Smoke tests
 ```bash
 curl -s http://localhost:8787/health | jq
