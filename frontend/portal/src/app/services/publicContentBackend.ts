@@ -77,8 +77,10 @@ function sortBySortOrderThenTitle<T extends { title?: string; question?: string 
 }
 
 export async function listResourceRecords() {
+  const safeResources = Array.isArray(publicResources) ? publicResources : [];
+
   return sortBySortOrderThenTitle(
-    publicResources.map((resource, index) => ({
+    safeResources.map((resource, index) => ({
       ...resource,
       type: normaliseResourceType(resource.type),
       status: normaliseResourceStatus(resource.status),
@@ -88,8 +90,10 @@ export async function listResourceRecords() {
 }
 
 export async function listHelpArticleRecords() {
+  const safeHelpArticles = Array.isArray(helpArticles) ? helpArticles : [];
+
   return sortBySortOrderThenTitle(
-    helpArticles.map((article, index) => ({
+    safeHelpArticles.map((article, index) => ({
       ...article,
       section: normaliseHelpSection(article.section),
       status: normaliseHelpStatus(article.status),
