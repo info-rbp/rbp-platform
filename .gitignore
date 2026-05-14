@@ -51,3 +51,5 @@ tmp/
 *.swp
 
 .venv-milestone8/
+
+mcp/appwrite/.env
