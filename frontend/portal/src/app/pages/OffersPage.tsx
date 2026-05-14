@@ -8,7 +8,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import { offerCategoryFilters, publicOffers } from "../data/offers";
+import { offerCategoryFilters } from "../data/offers";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { CTABanner } from "../components/CTABanner";
@@ -17,9 +17,30 @@ import { PageHero } from "../components/PageHero";
 const heroImage =
   "https://images.unsplash.com/photo-1758599543152-a73184816eba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxleGNsdXNpdmUlMjBkZWFscyUyMGhhbmRzaGFrZSUyMGJ1c2luZXNzJTIwcGFydG5lcnNoaXB8ZW58MXx8fHwxNzc2OTIzMzA0fDA&ixlib=rb-4.1.0&q=80&w=1080";
 
-const offers = [
+interface OfferCard {
+  id: string;
+  partner: string;
+  categoryId: string;
+  category: string;
+  categoryBg: string;
+  categoryText: string;
+  accentColor: string;
+  offer: string;
+  subOffer: string;
+  saving: string;
+  desc: string;
+  badge: string;
+  badgeColor: string;
+  highlight?: boolean;
+  features?: string[];
+  availability: string;
+}
+
+const offers: OfferCard[] = [
   {
+    id: "xero-member-offer",
     partner: "Xero",
+    categoryId: "admin-finance",
     category: "Accounting & Finance",
     categoryBg: "bg-sky-100",
     categoryText: "text-sky-700",
@@ -39,7 +60,9 @@ const offers = [
     availability: "Available benefit for active RBP clients",
   },
   {
+    id: "employment-hero-member-offer",
     partner: "Employment Hero",
+    categoryId: "human-resources",
     category: "HR & Payroll",
     categoryBg: "bg-violet-100",
     categoryText: "text-violet-700",
@@ -59,7 +82,9 @@ const offers = [
     availability: "Available benefit for RBP members",
   },
   {
+    id: "legalvision-member-offer",
     partner: "LegalVision",
+    categoryId: "other",
     category: "Legal Services",
     categoryBg: "bg-emerald-100",
     categoryText: "text-emerald-700",
@@ -79,7 +104,9 @@ const offers = [
     availability: "Available benefit for new LegalVision clients",
   },
   {
+    id: "microsoft-365-member-offer",
     partner: "Microsoft 365",
+    categoryId: "digital-tech",
     category: "Productivity Suite",
     categoryBg: "bg-blue-100",
     categoryText: "text-blue-700",
@@ -99,7 +126,9 @@ const offers = [
     availability: "Available benefit for new subscriptions",
   },
   {
+    id: "canva-pro-member-offer",
     partner: "Canva Pro",
+    categoryId: "sales-marketing",
     category: "Design & Marketing",
     categoryBg: "bg-pink-100",
     categoryText: "text-pink-700",
@@ -119,7 +148,9 @@ const offers = [
     availability: "Available benefit for new Canva Pro accounts",
   },
   {
+    id: "shopify-member-offer",
     partner: "Shopify",
+    categoryId: "digital-tech",
     category: "eCommerce",
     categoryBg: "bg-emerald-100",
     categoryText: "text-emerald-700",
@@ -147,18 +178,20 @@ const partnerDeals = [
   { partner: "Legal Document Services", deal: "First contract free", category: "Legal" },
 ];
 
+const safeOfferCategoryFilters = Array.isArray(offerCategoryFilters) ? offerCategoryFilters : [];
 const offerCategoryLabels = Object.fromEntries(
-  offerCategoryFilters.map((category) => [category.id, category.label])
+  safeOfferCategoryFilters.map((category) => [category.id, category.label])
 );
 
 export function OffersPage() {
   const [searchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category") ?? "";
   const selectedCategoryLabel = offerCategoryLabels[selectedCategory] ?? "";
+  const safeOffers = Array.isArray(offers) ? offers : [];
 
   const filteredOffers = selectedCategory
-    ? publicOffers.filter((offer) => offer.category === selectedCategory)
-    : publicOffers;
+    ? safeOffers.filter((offer) => offer.categoryId === selectedCategory)
+    : safeOffers;
 
   return (
     <div className="min-h-screen bg-white">
@@ -206,7 +239,7 @@ export function OffersPage() {
                 >
                   All Offers
                 </Link>
-                {offerCategoryFilters.map((category) => (
+                {safeOfferCategoryFilters.map((category) => (
                   <Link
                     key={category.id}
                     to={`/offers?category=${category.id}`}
@@ -233,137 +266,166 @@ export function OffersPage() {
               ) : null}
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredOffers.map((offer) => (
-                <div
-                  key={offer.id}
-                  className={`flex flex-col overflow-hidden rounded-2xl ${
-                    offer.highlight
-                      ? "bg-blue-700 text-white shadow-2xl shadow-blue-200 ring-2 ring-blue-400"
-                      : "border border-slate-200 bg-white text-slate-900 shadow-sm transition-shadow hover:shadow-md"
-                  }`}
-                >
-                  <div className={`h-1.5 w-full ${offer.accentColor}`} />
+            {filteredOffers.length === 0 ? (
+              <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-slate-50 px-6 py-12 text-center shadow-sm">
+                <h3 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                  Member offers are being prepared.
+                </h3>
+                <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600">
+                  Check back soon for partner offers, member benefits, and limited-time opportunities.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center gap-3">
+                  <Link
+                    to="/membership"
+                    className="inline-flex items-center justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800"
+                  >
+                    View membership options
+                  </Link>
+                  <Link
+                    to="/"
+                    className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100"
+                  >
+                    Return home
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredOffers.map((offer) => {
+                  const safeFeatures = Array.isArray(offer.features) ? offer.features : [];
 
-                  <div className="flex grow flex-col p-6">
-                    <div className="mb-4 flex items-start justify-between gap-2">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold ${
-                          offer.highlight
-                            ? "bg-white/20 text-white"
-                            : `${offer.categoryBg} ${offer.categoryText}`
-                        }`}
-                      >
-                        <Tag className="h-3 w-3" />
-                        {offerCategoryLabels[offer.category] || offer.category}
-                      </span>
-                      <span
-                        className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-xs font-bold text-white ${offer.badgeColor}`}
-                      >
-                        {offer.badge}
-                      </span>
-                    </div>
-
-                    <h3
-                      className={`mb-3 text-lg font-extrabold ${
-                        offer.highlight ? "text-white" : "text-slate-900"
-                      }`}
-                    >
-                      {offer.partner}
-                    </h3>
-
+                  return (
                     <div
-                      className={`mb-4 rounded-xl p-3 ${
+                      key={offer.id}
+                      className={`flex flex-col overflow-hidden rounded-2xl ${
                         offer.highlight
-                          ? "bg-white/10"
-                          : "border border-slate-100 bg-slate-50"
+                          ? "bg-blue-700 text-white shadow-2xl shadow-blue-200 ring-2 ring-blue-400"
+                          : "border border-slate-200 bg-white text-slate-900 shadow-sm transition-shadow hover:shadow-md"
                       }`}
                     >
-                      <div
-                        className={`text-2xl font-extrabold ${
-                          offer.highlight ? "text-white" : "text-blue-700"
-                        }`}
-                      >
-                        {offer.offer}
-                      </div>
-                      <div
-                        className={`mt-0.5 text-xs ${
-                          offer.highlight ? "text-blue-100" : "text-slate-500"
-                        }`}
-                      >
-                        {offer.subOffer}
-                      </div>
-                    </div>
+                      <div className={`h-1.5 w-full ${offer.accentColor}`} />
 
-                    <div className="mb-3">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold ${
-                          offer.highlight
-                            ? "bg-emerald-400/20 text-emerald-200"
-                            : "bg-emerald-50 text-emerald-700"
-                        }`}
-                      >
-                        <Zap className="h-3 w-3" />
-                        {offer.saving}
-                      </span>
-                    </div>
-
-                    <p
-                      className={`mb-4 text-sm leading-relaxed ${
-                        offer.highlight ? "text-blue-100" : "text-slate-600"
-                      }`}
-                    >
-                      {offer.desc}
-                    </p>
-
-                    <div className="mb-5 grow space-y-2">
-                      {offer.features.map((feature) => (
-                        <div key={feature} className="flex items-center gap-2">
-                          <CheckCircle
-                            className={`h-3.5 w-3.5 shrink-0 ${
-                              offer.highlight ? "text-blue-200" : "text-emerald-500"
-                            }`}
-                          />
+                      <div className="flex grow flex-col p-6">
+                        <div className="mb-4 flex items-start justify-between gap-2">
                           <span
-                            className={`text-xs ${
-                              offer.highlight ? "text-blue-100" : "text-slate-600"
+                            className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold ${
+                              offer.highlight
+                                ? "bg-white/20 text-white"
+                                : `${offer.categoryBg} ${offer.categoryText}`
                             }`}
                           >
-                            {feature}
+                            <Tag className="h-3 w-3" />
+                            {offerCategoryLabels[offer.categoryId] || offer.category}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-xs font-bold text-white ${offer.badgeColor}`}
+                          >
+                            {offer.badge}
                           </span>
                         </div>
-                      ))}
-                    </div>
 
-                    <div
-                      className={`mb-4 flex items-center gap-1.5 text-xs ${
-                        offer.highlight ? "text-blue-200" : "text-slate-400"
-                      }`}
-                    >
-                      <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
-                      {offer.availability}
-                    </div>
+                        <h3
+                          className={`mb-3 text-lg font-extrabold ${
+                            offer.highlight ? "text-white" : "text-slate-900"
+                          }`}
+                        >
+                          {offer.partner}
+                        </h3>
 
-                    <Link
-                      to="/contact?reason=offer-enquiry"
-                      className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all ${
-                        offer.highlight
-                          ? "bg-white text-blue-700 hover:bg-blue-50"
-                          : "bg-blue-700 text-white hover:bg-blue-800"
-                      }`}
-                    >
-                      Request access <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+                        <div
+                          className={`mb-4 rounded-xl p-3 ${
+                            offer.highlight
+                              ? "bg-white/10"
+                              : "border border-slate-100 bg-slate-50"
+                          }`}
+                        >
+                          <div
+                            className={`text-2xl font-extrabold ${
+                              offer.highlight ? "text-white" : "text-blue-700"
+                            }`}
+                          >
+                            {offer.offer}
+                          </div>
+                          <div
+                            className={`mt-0.5 text-xs ${
+                              offer.highlight ? "text-blue-100" : "text-slate-500"
+                            }`}
+                          >
+                            {offer.subOffer}
+                          </div>
+                        </div>
+
+                        <div className="mb-3">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold ${
+                              offer.highlight
+                                ? "bg-emerald-400/20 text-emerald-200"
+                                : "bg-emerald-50 text-emerald-700"
+                            }`}
+                          >
+                            <Zap className="h-3 w-3" />
+                            {offer.saving}
+                          </span>
+                        </div>
+
+                        <p
+                          className={`mb-4 text-sm leading-relaxed ${
+                            offer.highlight ? "text-blue-100" : "text-slate-600"
+                          }`}
+                        >
+                          {offer.desc}
+                        </p>
+
+                        <div className="mb-5 grow space-y-2">
+                          {safeFeatures.map((feature) => (
+                            <div key={feature} className="flex items-center gap-2">
+                              <CheckCircle
+                                className={`h-3.5 w-3.5 shrink-0 ${
+                                  offer.highlight ? "text-blue-200" : "text-emerald-500"
+                                }`}
+                              />
+                              <span
+                                className={`text-xs ${
+                                  offer.highlight ? "text-blue-100" : "text-slate-600"
+                                }`}
+                              >
+                                {feature}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div
+                          className={`mb-4 flex items-center gap-1.5 text-xs ${
+                            offer.highlight ? "text-blue-200" : "text-slate-400"
+                          }`}
+                        >
+                          <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                          {offer.availability}
+                        </div>
+
+                        <Link
+                          to="/contact?reason=offer-enquiry"
+                          className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all ${
+                            offer.highlight
+                              ? "bg-white text-blue-700 hover:bg-blue-50"
+                              : "bg-blue-700 text-white hover:bg-blue-800"
+                          }`}
+                        >
+                          Request access <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             <p className="mt-10 text-center text-sm text-slate-500">
-              All partner offers are subject to individual partner terms and conditions. 
+              All partner offers are subject to individual partner terms and conditions.
               <Link
                 to="/contact?reason=offer-enquiry"
-                className="font-semibold text-blue-700 hover:underline"
+                className="ml-1 font-semibold text-blue-700 hover:underline"
               >
                 Contact us to request access or more detail.
               </Link>
@@ -403,10 +465,10 @@ export function OffersPage() {
             ))}
           </div>
           <p className="mt-8 text-center text-sm text-slate-500">
-            Partner benefits are listed for active RBP clients and members, subject to the relevant review pathway. 
+            Partner benefits are listed for active RBP clients and members, subject to the relevant review pathway.
             <Link
               to="/contact?reason=offer-enquiry"
-              className="font-semibold text-blue-700 hover:underline"
+              className="ml-1 font-semibold text-blue-700 hover:underline"
             >
               Contact us to learn more.
             </Link>
