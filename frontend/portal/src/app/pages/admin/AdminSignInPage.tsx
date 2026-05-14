@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { Briefcase, Eye, EyeOff, AlertCircle, Lock, Mail } from "lucide-react";
+import { Briefcase, Eye, EyeOff, AlertCircle, Lock, Mail, ArrowRight } from "lucide-react";
 import { mockAdminAuthService } from "../../services/mock/auth.mockService";
 
 export function AdminSignInPage() {
   const navigate = useNavigate();
 
-  const [email,    setEmail]    = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPw,   setShowPw]   = useState(false);
-  const [error,    setError]    = useState("");
-  const [loading,  setLoading]  = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,24 +29,26 @@ export function AdminSignInPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4">
-
-      {/* Card */}
       <div className="w-full max-w-sm">
-
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 bg-blue-700 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
             <Briefcase className="w-6 h-6 text-white" />
           </div>
           <div className="text-white font-extrabold text-lg tracking-tight">Remote Business Partner</div>
-          <div className="text-slate-400 text-xs font-semibold mt-0.5">Admin Portal</div>
+          <div className="text-slate-400 text-xs font-semibold mt-0.5">Admin QA Preview</div>
         </div>
 
-        {/* Form card */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+          <div className="mb-5 rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-xs leading-6 text-amber-100">
+            <p className="font-semibold">Operational administration remains in Frappe Desk.</p>
+            <p>This React admin area is a QA preview surface and must not be treated as the source of truth.</p>
+            <a className="mt-2 inline-flex items-center gap-1 font-semibold underline" href="/desk">
+              Open Frappe Desk <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+          </div>
 
           <h1 className="text-white font-extrabold text-base mb-1">Administrator Sign In</h1>
-          <p className="text-slate-400 text-xs mb-6">Restricted access — authorised personnel only.</p>
+          <p className="text-slate-400 text-xs mb-6">Restricted QA access for authorised personnel.</p>
 
           {error && (
             <div className="flex items-start gap-2 bg-red-950/60 border border-red-800/60 text-red-400 text-xs px-3 py-2.5 rounded-xl mb-4">
@@ -56,8 +58,6 @@ export function AdminSignInPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* Email */}
             <div>
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">Email address</label>
               <div className="relative">
@@ -73,7 +73,6 @@ export function AdminSignInPage() {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-xs font-semibold text-slate-400 mb-1.5">Password</label>
               <div className="relative">
@@ -103,16 +102,9 @@ export function AdminSignInPage() {
             >
               {loading ? (
                 <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : "Sign In to Admin Portal"}
+              ) : "Sign In to Admin Preview"}
             </button>
           </form>
-
-          {/* Test credentials hint */}
-          <div className="mt-5 pt-4 border-t border-slate-800">
-            <p className="text-[10px] text-slate-600 text-center">
-              Test credentials: <span className="text-slate-500 font-mono">admin@remotebusinesspartner.com.au</span> / <span className="text-slate-500 font-mono">Admin2024!</span>
-            </p>
-          </div>
         </div>
 
         <div className="mt-5 text-center">
