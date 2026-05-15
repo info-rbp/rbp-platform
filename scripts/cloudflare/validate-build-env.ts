@@ -14,4 +14,19 @@ if (missing.length) {
   process.exit(1);
 }
 
+if (String(process.env.VITE_BACKEND_PROVIDER).toLowerCase() !== "appwrite") {
+  console.error("Cloudflare builds must use VITE_BACKEND_PROVIDER=appwrite.");
+  process.exit(1);
+}
+
+if (String(process.env.VITE_ENABLE_MOCK_AUTH || "false").toLowerCase() === "true") {
+  console.error("Cloudflare QA builds must not enable mock auth.");
+  process.exit(1);
+}
+
+if (String(process.env.VITE_ENABLE_MOCK_FALLBACK || "false").toLowerCase() === "true") {
+  console.error("Cloudflare QA builds must not enable mock fallback.");
+  process.exit(1);
+}
+
 console.log("Cloudflare build environment variables are present.");
