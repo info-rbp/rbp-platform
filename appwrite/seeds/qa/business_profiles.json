@@ -1,0 +1,4 @@
+[
+  { "tenant_id": "qa-free-tenant", "business_name": "QA Free Business Pty Ltd", "contact_email": "qa.free@remotebusinesspartner.com.au" },
+  { "tenant_id": "qa-premium-tenant", "business_name": "QA Premium Business Pty Ltd", "contact_email": "qa.premium@remotebusinesspartner.com.au" }
+]
