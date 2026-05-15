@@ -1,0 +1,50 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { createAuditEvent, sanitizeAuditPayload } from "../../appwrite/functions/_shared/audit";
+import { buildIdempotencyKey, getStripeConfig, mapStripeEventToStatus } from "../../appwrite/functions/_shared/stripe";
+import { fail, ok, parseJsonBody } from "../../appwrite/functions/_shared/response";
+
+test("response helpers return consistent envelopes", () => {
+  const success = ok({ hello: "world" }, "done", 201);
+  const failure = fail("nope", 422, [{ field: "email" }]);
+
+  assert.equal(success.statusCode, 201);
+  assert.deepEqual(JSON.parse(success.body), { ok: true, message: "done", data: { hello: "world" } });
+  assert.equal(failure.statusCode, 422);
+  assert.equal(JSON.parse(failure.body).ok, false);
+});
+
+test("parseJsonBody accepts strings and objects", () => {
+  assert.deepEqual(parseJsonBody({ req: { body: '{"planCode":"free"}' } }), { planCode: "free" });
+  assert.deepEqual(parseJsonBody({ req: { body: { planCode: "free" } } }), { planCode: "free" });
+});
+
+test("audit sanitization redacts secrets", () => {
+  const payload = sanitizeAuditPayload({
+    password: "secret",
+    nested: { apiKey: "123", safe: true },
+  }) as Record<string, unknown>;
+
+  assert.equal(payload.password, "[redacted]");
+  assert.deepEqual(payload.nested, { apiKey: "[redacted]", safe: true });
+});
+
+test("audit events preserve event names and sanitize payloads", () => {
+  const event = createAuditEvent("stripe_webhook", { webhookSecret: "abc", state: "processed" });
+  assert.equal(event.event_name, undefined);
+  assert.equal((event.payload as Record<string, unknown>).webhookSecret, "[redacted]");
+});
+
+test("stripe helpers expose deterministic idempotency and event mapping", () => {
+  assert.equal(buildIdempotencyKey("evt_123"), "stripe:evt_123");
+  assert.equal(mapStripeEventToStatus("checkout.session.completed"), "active");
+  assert.equal(mapStripeEventToStatus("invoice.payment_failed"), "suspended");
+  assert.equal(mapStripeEventToStatus("customer.subscription.deleted"), "revoked");
+});
+
+test("stripe config reads environment-driven values", () => {
+  process.env.STRIPE_DEFAULT_CURRENCY = "USD";
+  const config = getStripeConfig();
+  assert.equal(config.defaultCurrency, "USD");
+});
