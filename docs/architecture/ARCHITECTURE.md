@@ -101,8 +101,18 @@ Backend responsibilities:
 - functions live in the repository
 - permissions live in the repository
 - seed data lives in the repository
-- deployment and validation happen through scripts/workflows
+- deployment and validation happen through scripts and workflows
 - destructive operations require explicit opt-in
+
+### Admin Runtime Model
+
+The target admin runtime for the Appwrite QA path is:
+
+```text
+React /admin -> Appwrite session -> admin role or team check -> Appwrite Function -> Appwrite server-side writes -> Appwrite collections
+```
+
+Appwrite Console may be used as a technical fallback for inspection or configuration only. Frappe Desk is not the active operational admin backend for the Appwrite QA path.
 
 ## Frontend Architecture
 
@@ -116,7 +126,7 @@ Key frontend responsibilities:
 
 - public site and member portal UI
 - runtime feature-flag evaluation
-- Appwrite auth/session handoff
+- Appwrite auth and session handoff
 - Appwrite-backed portal data loading
 - admin routes backed by Appwrite Functions
 - SEO metadata and Cloudflare routing controls
@@ -146,14 +156,14 @@ docs/api-contracts/
 docs/product-flows/
 ```
 
-They should now be interpreted against Appwrite collections, Appwrite Functions, Cloudflare deployment, and Stripe checkout/webhook flows.
+They should now be interpreted against Appwrite collections, Appwrite Functions, Cloudflare deployment, and Stripe checkout and webhook flows.
 
 ## Infrastructure and Deployment Architecture
 
 Deployment is split cleanly:
 
 - Cloudflare Pages serves the frontend.
-- Appwrite runs backend data/auth/function infrastructure.
+- Appwrite runs backend data, auth, and function infrastructure.
 - Stripe provides payment processing.
 - GitHub Actions validates and deploys repository-defined state.
 
@@ -203,6 +213,11 @@ Expected validation categories:
 - QA seed validation
 - smoke tests for disabled provisioning and QA flows
 
+Foundation limitation:
+
+- repository-side validation assets may exist before they are fully wired into executable local or CI validation
+- stub Functions, dry-run-only scripts, or placeholder smoke definitions are not proof of runtime completion
+
 ## CI/CD Architecture
 
 CI/CD must validate repository-defined state before QA is affected.
@@ -229,4 +244,4 @@ Legacy Frappe assets: preserved as reference only
 
 ## Status
 
-The repository has transitioned from a Frappe-first Phase 5 handoff plan to an Appwrite-first QA implementation model.
+The repository has transitioned from a Frappe-first Phase 5 handoff plan to an Appwrite-first QA foundation model. Follow-up implementation work is still required before the runtime migration can be treated as complete.
