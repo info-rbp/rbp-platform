@@ -1,0 +1,11 @@
+{
+  "id": "fixer_requests",
+  "name": "Fixer Requests",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "service_request_id", "type": "string", "size": 64, "required": true },
+    { "key": "case_title", "type": "string", "size": 255, "required": false },
+    { "key": "case_notes", "type": "string", "size": 4000, "required": false }
+  ]
+}
