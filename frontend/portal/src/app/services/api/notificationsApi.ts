@@ -2,7 +2,8 @@ import { callFrappeMethod } from "./client";
 import { selectApiImplementation } from "./provider";
 import { appwriteNotificationsApi } from "./appwrite/appwriteNotificationsApi";
 
-const legacyNotificationsApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeNotificationsApi = {
   listMyNotifications() {
     return callFrappeMethod("rbp_app.api.notifications.get_notifications", {}, { method: "GET" });
   },
@@ -18,5 +19,5 @@ const legacyNotificationsApi = {
 
 export const notificationsApi = selectApiImplementation({
   appwrite: appwriteNotificationsApi,
-  frappe: legacyNotificationsApi,
+  legacyFrappe: legacyFrappeNotificationsApi,
 });
