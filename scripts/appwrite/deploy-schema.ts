@@ -9,7 +9,11 @@ try {
   process.exit(1);
 }
 
-console.log(apply ? "Applying Appwrite schema changes." : "Dry run only. Pass --apply to perform deployment actions.");
+console.log(
+  apply
+    ? "Foundation scaffold only: emitting planned Appwrite schema apply steps. Full live deployment automation is still required in a follow-up implementation PR."
+    : "Foundation scaffold only: dry run planning output. Pass --apply to emit the same planned steps, but this script does not yet perform live schema mutations."
+);
 for (const filePath of listJsonFiles("appwrite/collections")) {
-  console.log(`${apply ? "apply" : "plan"}: ${filePath}`);
+  console.log(`${apply ? "plan-apply" : "plan"}: ${filePath}`);
 }
