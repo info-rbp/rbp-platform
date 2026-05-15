@@ -26,7 +26,8 @@ function normalisePlan(raw: Record<string, unknown>, index: number): MockMembers
   };
 }
 
-const legacyMembershipApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeMembershipApi = {
   async listMembershipPlans() {
     const response = await callFrappeMethod<unknown[] | { plans?: unknown[] }>(
       "rbp_app.api.membership.list_membership_plans",
@@ -84,5 +85,5 @@ const legacyMembershipApi = {
 
 export const membershipApi = selectApiImplementation({
   appwrite: appwriteMembershipApi,
-  frappe: legacyMembershipApi,
+  legacyFrappe: legacyFrappeMembershipApi,
 });
