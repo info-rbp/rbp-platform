@@ -128,7 +128,7 @@ const offerCategoryLabels = Object.fromEntries(
 ) as Record<OfferCategory, string>;
 
 function createPortalOfferDestination(id: string) {
-  return `/portal/offers/${id}`;
+  return `/portal/offers?offer=${encodeURIComponent(id)}`;
 }
 
 function createPublicOfferDestination(portalOfferDestination: string) {
