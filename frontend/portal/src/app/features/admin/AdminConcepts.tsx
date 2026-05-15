@@ -6,6 +6,7 @@ import {
   CheckCircle,
   ClipboardList,
   FileText,
+  Gift,
   LayoutDashboard,
   ListChecks,
   Lock,
@@ -26,6 +27,7 @@ import {
   mockAdminReviewRecords,
   type MockAdminReviewRecord,
 } from "../../mock";
+import { getOfferCategoryLabel, publicOffers } from "../../data/offers";
 import { submitMockAdminReviewAction } from "../../services/mock/admin.mockService";
 import { AdminReviewQueueCard } from "../../components/domain";
 import { MockSubmissionState, StatusTimeline } from "../../components/flow";
@@ -35,6 +37,7 @@ import { ReviewStatusBadge, StatusBadge } from "../../components/status";
 type AdminView =
   | "dashboard"
   | "content"
+  | "offers"
   | "requests"
   | "decision-desk"
   | "docushare"
@@ -47,6 +50,9 @@ type AdminView =
   | "settings";
 
 type SubmissionState = "idle" | "loading" | "success" | "error";
+type OfferAdminAction = "request-review" | "publish" | "pause" | "archive";
+
+const managedOffers = publicOffers.filter((offer) => offer.memberVisibility !== "admin-only");
 
 const viewConfig: Record<AdminView, { title: string; description: string }> = {
   dashboard: {
@@ -56,6 +62,10 @@ const viewConfig: Record<AdminView, { title: string; description: string }> = {
   content: {
     title: "Content review",
     description: "Review public content, legal placeholders, resources, offers and help centre mock records.",
+  },
+  offers: {
+    title: "Offer management",
+    description: "React mock CRUD management for public offer cards, gated portal detail, approval state, and tracking readiness.",
   },
   requests: {
     title: "Service requests",
@@ -102,6 +112,7 @@ const viewConfig: Record<AdminView, { title: string; description: string }> = {
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", view: "dashboard", icon: LayoutDashboard },
   { href: "/admin/content", label: "Content", view: "content", icon: FileText },
+  { href: "/admin/offers", label: "Offers", view: "offers", icon: Gift },
   { href: "/admin/requests", label: "Requests", view: "requests", icon: ClipboardList },
   { href: "/admin/requests/decision-desk", label: "Decision Desk", view: "decision-desk", icon: MessageSquare },
   { href: "/admin/requests/docushare", label: "DocuShare", view: "docushare", icon: FileText },
@@ -114,8 +125,32 @@ const navItems = [
   { href: "/admin/settings", label: "Settings", view: "settings", icon: Settings },
 ] as const;
 
+const offerAdminActionOptions: Array<{ id: OfferAdminAction; title: string; description: string }> = [
+  {
+    id: "request-review",
+    title: "Request review",
+    description: "Simulate routing an offer back to review before publication.",
+  },
+  {
+    id: "publish",
+    title: "Publish",
+    description: "Simulate publishing a reviewed offer for the public catalogue.",
+  },
+  {
+    id: "pause",
+    title: "Pause",
+    description: "Simulate pausing a live offer while keeping the record visible to admins.",
+  },
+  {
+    id: "archive",
+    title: "Archive",
+    description: "Simulate archiving a completed or retired offer record.",
+  },
+];
+
 function inferView(pathname: string): AdminView {
   if (pathname.includes("/admin/content") || pathname.includes("/admin/site-content")) return "content";
+  if (pathname.includes("/admin/offers")) return "offers";
   if (pathname.includes("/admin/requests/decision-desk")) return "decision-desk";
   if (pathname.includes("/admin/requests/docushare")) return "docushare";
   if (pathname.includes("/admin/requests/connectivity")) return "connectivity";
@@ -309,6 +344,191 @@ function ContentReviewPanel() {
   );
 }
 
+function OfferManagementPanel() {
+  const [submissionState, setSubmissionState] = useState<SubmissionState>("idle");
+  const [selectedOfferId, setSelectedOfferId] = useState(managedOffers[0]?.id ?? "");
+  const [action, setAction] = useState<OfferAdminAction>("request-review");
+  const [notes, setNotes] = useState("");
+  const selectedOffer = managedOffers.find((offer) => offer.id === selectedOfferId) ?? managedOffers[0];
+
+  const publishedOffers = managedOffers.filter((offer) => offer.status === "published").length;
+  const membersOnlyOffers = managedOffers.filter((offer) => offer.memberVisibility === "members-only").length;
+  const appwriteReadyOffers = managedOffers.filter((offer) => offer.trackingMethod === "appwrite-only").length;
+  const impactPreparedOffers = managedOffers.filter(
+    (offer) => offer.trackingMethod === "manual-plus-impact" || offer.trackingMethod === "impact-api"
+  ).length;
+
+  function submitOfferAction() {
+    if (!selectedOfferId || notes.trim().length === 0) {
+      setSubmissionState("error");
+      return;
+    }
+
+    setSubmissionState("success");
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-600">Offers in mock admin</p>
+          <p className="mt-3 text-3xl font-black text-slate-950">{managedOffers.length}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Public cards and portal detail share the same hardcoded offer catalogue.</p>
+        </article>
+        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-600">Published offers</p>
+          <p className="mt-3 text-3xl font-black text-slate-950">{publishedOffers}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Only published offers should render on the public catalogue in this MVP.</p>
+        </article>
+        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-600">Members-only offers</p>
+          <p className="mt-3 text-3xl font-black text-slate-950">{membersOnlyOffers}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Get Offer drives guests into sign-in and returns members to the selected portal offer.</p>
+        </article>
+        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-600">Tracking readiness</p>
+          <p className="mt-3 text-3xl font-black text-slate-950">{appwriteReadyOffers}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Offers already structured for Appwrite-first tracking before any external adapter is required.</p>
+        </article>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-4">
+            <h3 className="text-base font-extrabold text-slate-950">Offer catalogue records</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              React mock CRUD view for the public offer catalogue, portal detail routing, approval state, and tracking structure.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
+              <thead className="bg-slate-50">
+                <tr>
+                  {["Offer", "Category", "Visibility", "Approval", "Tracking", "Preview"].map((header) => (
+                    <th key={header} className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg-white">
+                {managedOffers.map((offer) => (
+                  <tr key={offer.id} className="align-top">
+                    <td className="px-5 py-4">
+                      <p className="text-sm font-semibold text-slate-950">{offer.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{offer.partner} • {offer.publicCtaLabel}</p>
+                    </td>
+                    <td className="px-5 py-4 text-sm text-slate-700">{getOfferCategoryLabel(offer.category)}</td>
+                    <td className="px-5 py-4 text-sm text-slate-700">{offer.memberVisibility}</td>
+                    <td className="px-5 py-4">
+                      <div className="space-y-2">
+                        <StatusBadge status={offer.status} />
+                        <div className="text-xs text-slate-500">{offer.approvalStatus}</div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="text-sm text-slate-700">{offer.trackingMethod}</div>
+                      <div className="mt-1 text-xs text-slate-500">Required: {offer.trackingRequired}</div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex flex-col gap-2 text-sm font-bold">
+                        <Link to="/offers" className="inline-flex items-center gap-2 text-blue-700">
+                          Public page <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                        <Link to={offer.portalOfferDestination} className="inline-flex items-center gap-2 text-slate-700">
+                          Portal detail <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <FormSection
+            title="Mock offer action"
+            description="Simulate offer review and status updates without persistence. This keeps admin offer management in React while the data model stays ready for later Appwrite storage."
+          >
+            <MockSubmissionState
+              state={submissionState}
+              idleMessage="Ready for a mock offer action."
+              loadingMessage="Saving mock offer action..."
+              successMessage="Mock offer action recorded."
+              errorMessage="Select an offer and add review notes before saving."
+            />
+            <SelectField
+              label="Offer"
+              value={selectedOfferId}
+              onChange={(event) => {
+                setSelectedOfferId(event.currentTarget.value);
+                setSubmissionState("idle");
+              }}
+              options={managedOffers.map((offer) => ({
+                label: `${offer.partner} - ${offer.title}`,
+                value: offer.id,
+              }))}
+            />
+            <SelectField
+              label="Action"
+              value={action}
+              onChange={(event) => {
+                setAction(event.currentTarget.value as OfferAdminAction);
+                setSubmissionState("idle");
+              }}
+              options={offerAdminActionOptions.map((option) => ({
+                label: option.title,
+                value: option.id,
+              }))}
+            />
+            <TextAreaField
+              label="Admin notes"
+              value={notes}
+              onChange={(event) => {
+                setNotes(event.currentTarget.value);
+                setSubmissionState("idle");
+              }}
+              helpText="Frontend-only notes for the mock CRUD workflow."
+            />
+            <button
+              type="button"
+              onClick={submitOfferAction}
+              className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white"
+            >
+              Save mock change
+            </button>
+          </FormSection>
+
+          {selectedOffer ? (
+            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">Selected offer</div>
+              <h3 className="mt-2 text-lg font-extrabold text-slate-950">{selectedOffer.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{selectedOffer.summary}</p>
+              <div className="mt-4 space-y-2 text-sm text-slate-600">
+                <div>Partner: {selectedOffer.partner}</div>
+                <div>Status: {selectedOffer.status}</div>
+                <div>Approval: {selectedOffer.approvalStatus}</div>
+                <div>Tracking: {selectedOffer.trackingMethod}</div>
+                <div>Portal route: {selectedOffer.portalOfferDestination}</div>
+              </div>
+            </article>
+          ) : null}
+
+          <article className="rounded-3xl border border-violet-200 bg-violet-50 p-6 shadow-sm">
+            <div className="text-xs font-bold uppercase tracking-[0.18em] text-violet-700">Future adapter</div>
+            <h3 className="mt-2 text-lg font-extrabold text-slate-950">Impact.com stays optional</h3>
+            <p className="mt-3 text-sm leading-7 text-slate-600">
+              {impactPreparedOffers} offers already carry structural placeholders for a later Impact.com adapter, but the launch path remains Appwrite-first tracking until internal click and interest capture is stable.
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AuditReviewPanel() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -463,6 +683,8 @@ export function AdminConcepts() {
             <ContentReviewPanel />
           </>
         ) : null}
+
+        {view === "offers" ? <OfferManagementPanel /> : null}
 
         {[
           "requests",
