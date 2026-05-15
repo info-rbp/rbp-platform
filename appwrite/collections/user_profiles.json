@@ -1,0 +1,17 @@
+{
+  "id": "user_profiles",
+  "name": "User Profiles",
+  "documentSecurity": true,
+  "permissions": {
+    "read": ["team:admins"],
+    "create": ["team:admins"],
+    "update": ["team:admins"],
+    "delete": ["team:admins"]
+  },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "appwrite_user_id", "type": "string", "size": 64, "required": true },
+    { "key": "email", "type": "string", "size": 255, "required": true },
+    { "key": "role", "type": "string", "size": 64, "required": true }
+  ]
+}
