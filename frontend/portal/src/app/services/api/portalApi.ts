@@ -4,6 +4,8 @@ import type {
   PortalProductKey,
 } from "../../types/portal";
 import { apiFailure, apiSuccess, callFrappeMethod } from "./client";
+import { selectApiImplementation } from "./provider";
+import { appwritePortalApi } from "./appwrite/appwritePortalApi";
 
 function productFromKey(value: string): PortalProductKey {
   if (value.includes("decision")) return "decision-desk";
@@ -33,7 +35,7 @@ function activityFromRaw(raw: Record<string, unknown>, index: number): PortalPro
   };
 }
 
-export const portalApi = {
+const legacyPortalApi = {
   async getDashboardState() {
     const response = await callFrappeMethod<Record<string, unknown>>(
       "rbp_app.api.dashboard.get_home",
@@ -86,3 +88,8 @@ export const portalApi = {
     return apiSuccess("/api/method/rbp_app.api.dashboard.get_home", state, "Portal dashboard returned from backend.");
   },
 };
+
+export const portalApi = selectApiImplementation({
+  appwrite: appwritePortalApi,
+  frappe: legacyPortalApi,
+});
