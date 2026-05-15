@@ -10,7 +10,11 @@ try {
   process.exit(1);
 }
 
-console.log(apply ? "Applying Appwrite function deployment." : "Dry run only. Pass --apply to deploy functions.");
+console.log(
+  apply
+    ? "Foundation scaffold only: emitting planned Appwrite Function deploy steps. Full live deployment automation is still required in a follow-up implementation PR."
+    : "Foundation scaffold only: dry run planning output. Pass --apply to emit the same planned steps, but this script does not yet perform live Function deployment."
+);
 for (const dir of listFunctionDirectories()) {
-  console.log(`${apply ? "deploy" : "plan"}: ${path.basename(dir)}`);
+  console.log(`${apply ? "plan-deploy" : "plan"}: ${path.basename(dir)}`);
 }
