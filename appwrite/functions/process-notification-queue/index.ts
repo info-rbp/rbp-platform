@@ -1,5 +1,5 @@
-import { ok } from "../_shared/response";
+import { runNamedHandler } from "../_shared/runtime";
 
-export default async function main() {
-  return ok({ action: "process-notification-queue", processed: 0 });
+export default async function main(context: { req?: { body?: string; headers?: Record<string, string | undefined> } }) {
+  return runNamedHandler("process-notification-queue", context);
 }
