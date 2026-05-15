@@ -1,75 +1,67 @@
 # Appwrite Transition Implementation Report
 
-## Foundation Summary
+## Runtime Completion Summary
 
-This branch is a foundation and scaffolding change set for the Appwrite QA transition. It establishes repository-owned runtime structure and Appwrite-oriented integration seams, but it does not complete or prove the live Appwrite migration end to end.
+This branch no longer stops at transition scaffolding. It now contains:
 
-## What Changed In The Foundation Branch
+- Appwrite SDK-backed validation helpers for connection and inventory checks
+- guarded schema deploy and live drift reporting scripts
+- guarded QA seed and reset scripts
+- real shared Appwrite Function helpers for auth context, responses, audit, entitlements, and Stripe
+- non-stub Function handlers for tenant bootstrap, billing, webhooks, entitlements, service requests, notifications, and admin operations
+- frontend Appwrite Web SDK integration for account, database, function, and storage access
+- executable helper and runtime tests added alongside the existing config, schema, integration, and smoke suites
 
-- backend direction freeze and Appwrite-first architecture documents
-- QA scope and deployment documentation aligned to the Appwrite runtime path
-- Appwrite schema, bucket, seed, template, and Function directories owned by the repository
-- root-level validation and deployment script entry points
-- Cloudflare QA workflow and deployment scaffolding
-- frontend backend-provider configuration and Appwrite-oriented API adapters
+## What Was Implemented
 
-## Files Added
+### Deploy and validation scripts
 
-- Appwrite docs, schema, seed, and function scaffolding
-- Appwrite and Cloudflare validation scripts
-- Appwrite-oriented frontend provider and API adapter files
-- QA deployment docs and CI workflow files
+- `scripts/appwrite/_lib.ts`
+- `scripts/appwrite/validate-connection.ts`
+- `scripts/appwrite/inspect-appwrite.ts`
+- `scripts/appwrite/deploy-schema.ts`
+- `scripts/appwrite/diff-live-schema.ts`
+- `scripts/appwrite/deploy-functions.ts`
+- `scripts/appwrite/seed-qa.ts`
+- `scripts/appwrite/reset-qa-data.ts`
 
-## Files Modified
+These scripts now fail clearly on missing credentials, default to dry-run where required, and provide structured summaries instead of scaffold-only messaging.
 
-- README and architecture, launch, QA, and handoff docs
-- frontend runtime configuration and API provider routing
-- sign-in flow and admin copy
-- documentation to remove active Frappe-as-runtime contradictions
+### Appwrite Functions
 
-## Scripts Added Or Updated
+The shared runtime layer now supports:
 
-- Appwrite inspect, validate, diff, deploy, seed, and mapping checks
-- Cloudflare build-env validation
+- current-user resolution from Appwrite request context
+- admin checks
+- audit persistence with secret redaction
+- entitlement grant and revoke flows
+- Stripe checkout session creation and webhook verification
+- tenant bootstrap and service request persistence
+- notification queue records and admin operations routing
 
-Current foundation limitation:
+The function entrypoints now route into real handler logic instead of echo stubs.
 
-- some deploy scripts are still dry-run planning scaffolds rather than complete live deployment automation
-- those scripts must not be treated as proof of live runtime completion until follow-up work implements real deploy behavior
+### Frontend integration
 
-## Appwrite Resources Defined
+The frontend portal now uses the Appwrite Web SDK for:
 
-- database definition
-- bucket definition
-- collection JSON files
-- Function folders and shared helpers
-- QA seed data files
+- account creation and session handling
+- database access
+- function execution
+- storage preview URLs
 
-Current foundation limitation:
+This keeps the active runtime path on Appwrite instead of a thin handcrafted REST wrapper.
 
-- Function folders exist, but several handlers are still scaffolds or placeholders rather than complete business-logic implementations
+## Validation Status
 
-## Cloudflare Configuration Required
+### Implemented but not executed in this session
 
-- build in `frontend/portal`
-- output `dist`
-- Appwrite VITE variables
-- protected-route headers and SPA redirects
+The following command surfaces were updated for executable use, but they were not run from a local checkout in this session because GitHub clone access was blocked in the workspace:
 
-## Validation Run
-
-Repository-side validation assets were added and reviewed from the GitHub branch, but local execution could not be completed in this session because a local checkout was unavailable in the workspace and direct cloning from GitHub was blocked by network policy.
-
-## Verified In This Session
-
-- repository metadata and base branch
-- PR #71 branch, head, and changed-file scope
-- documentation contradictions around Frappe Desk as QA source of truth
-- provider-layer contradiction that still allowed active legacy Frappe fallback
-- repository presence of Appwrite, Cloudflare, script, and frontend transition surfaces
-
-## Not Run In This Session
-
+- `npm test`
+- `npm run test:unit`
+- `npm run test:integration`
+- `npm run test:smoke:dry-run`
 - `npm run appwrite:schema:validate`
 - `npm run appwrite:permissions:validate`
 - `npm run appwrite:functions:validate`
@@ -77,32 +69,26 @@ Repository-side validation assets were added and reviewed from the GitHub branch
 - `npm run appwrite:stripe-plan-mapping:validate`
 - `npm run cloudflare:env:validate`
 - frontend build and SEO audit commands
-- live Appwrite, Stripe, or Cloudflare validation
 
-## Failed Or Blocked
+### Live validation still blocked
 
-- local checkout creation through direct Git clone was blocked by network policy in this workspace
-- live Appwrite connection validation remains blocked without credentials and runnable checkout
-- live schema deploy and function deploy remain blocked without credentials and runnable checkout
-- live Stripe checkout and webhook verification remain blocked without credentials and runnable checkout
-- live Cloudflare QA deployment validation remains blocked without credentials and runnable checkout
+Live Appwrite, Stripe, and Cloudflare validation still depend on:
 
-## What Remains For Follow-Up Implementation PRs
+- QA credentials and secrets
+- a runnable checkout or CI job with those secrets
+- Appwrite Function packaging/deployment execution beyond manifest generation
 
-- complete real Appwrite Function business logic
-- replace dry-run-only deploy scaffolds with real deployment automation
-- convert placeholder test definitions into executable tests and smoke checks
-- run local and CI validation
-- run live Appwrite, Stripe test-mode, and Cloudflare QA validation with credentials
+The branch now prepares those commands honestly, but it does not claim they passed.
 
-## Known Limitations
+## Remaining Known Gaps
 
-This branch establishes the repository-owned Appwrite transition structure and redirects the frontend integration seam toward Appwrite. It must be merged and treated as a foundation PR only, not as a claim that the runtime migration is already complete.
+- Function deployment still stops at a generated deployment manifest and a clear failure in `--apply` mode until packaging support is configured.
+- Live Appwrite schema creation, live Stripe checkout, live Stripe webhook delivery, and live Cloudflare QA validation remain blocked until secrets are supplied and the workflows run.
+- This session could not run local tests or the frontend build because direct Git clone access to the repository was blocked by network policy.
 
-## Next Steps For QA Deployment
+## Recommended Next Runtime Checks
 
-1. merge this branch only as an Appwrite transition foundation change
-2. create a follow-up implementation branch from updated `main`
-3. implement real Functions, deploy automation, executable tests, and Appwrite-first runtime completion
-4. run local validation in a real checkout or CI runner
-5. run live QA validation with Appwrite, Stripe test-mode, and Cloudflare credentials
+1. Run the non-live root and frontend validation commands in CI or a local checkout.
+2. Configure QA secrets and execute the guarded Appwrite deploy, seed, and smoke workflows.
+3. Finish automated Function packaging or replace the manifest-only step with a supported deploy archive strategy.
+4. Re-audit milestone status and PR notes after those validations complete.
