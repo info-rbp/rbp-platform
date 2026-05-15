@@ -2,7 +2,7 @@
 
 Source-of-truth repository for the Remote Business Partner platform.
 
-Status: Phase 5 Appwrite transition in progress on top of the consolidated Phase 4 repository.
+Status: Phase 5 Appwrite transition foundation in progress on top of the consolidated Phase 4 repository.
 
 ## Active Runtime Direction
 
@@ -35,10 +35,10 @@ The repository is intended to contain:
 Current phase:
 
 ```text
-Phase 5 - Appwrite transition and QA hardening
+Phase 5 - Appwrite transition foundation and QA hardening
 ```
 
-Delivered in this branch:
+Established in this branch:
 
 - backend direction freeze documentation
 - Appwrite QA scope and baseline structure
@@ -47,12 +47,14 @@ Delivered in this branch:
 - Appwrite-oriented frontend API integration seam
 - Cloudflare QA and CI/CD documentation/workflow scaffolding
 
-Still dependent on environment-specific credentials or deployment targets:
+Still not proven in this branch alone:
 
 - live Appwrite inspection and deployment
 - live Cloudflare QA validation
 - live Stripe test checkout and webhook execution
 - live QA seeding and smoke execution
+- fully implemented Appwrite Function business logic
+- executable end-to-end tests for the migration path
 
 ## Runtime Boundaries
 
@@ -68,6 +70,14 @@ Appwrite is the active backend runtime for:
 - notification and email integration where applicable
 
 Appwrite resources must be defined and validated from this repository.
+
+Target operational admin path for the Appwrite QA release:
+
+```text
+React /admin -> Appwrite session -> admin role or team check -> Appwrite Function -> Appwrite server-side writes
+```
+
+Appwrite Console may be used as a technical fallback for inspection or configuration only. It is not the primary operational admin surface for the QA release path.
 
 ### Cloudflare
 
@@ -128,6 +138,7 @@ rbp-platform/
 - Keep mock behavior behind explicit feature flags only.
 - Keep customer-facing application provisioning disabled for QA.
 - Use repository-defined scripts and workflows instead of undocumented manual runtime changes.
+- Do not treat scaffolding, placeholder tests, or dry-run-only scripts as proof of live runtime completion.
 
 ## Historical Sources
 
