@@ -264,6 +264,14 @@ export const mockAdminContentRecords: MockAdminContentRecord[] = [
     lastUpdated: "2026-05-07",
     owner: "Marketplace",
   },
+  {
+    id: "content-005",
+    title: "Offers catalogue and tracking configuration",
+    section: "Offers",
+    status: "in-review",
+    lastUpdated: "2026-05-15",
+    owner: "Offers",
+  },
 ];
 
 export const mockAdminAuditTrail: MockTimelineItem[] = [
