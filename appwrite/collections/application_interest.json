@@ -1,0 +1,18 @@
+{
+  "id": "application_interest",
+  "name": "Application Interest",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": false },
+    { "key": "user_id", "type": "string", "size": 64, "required": false },
+    { "key": "application_id", "type": "string", "size": 64, "required": true },
+    { "key": "business_name", "type": "string", "size": 255, "required": false },
+    { "key": "contact_name", "type": "string", "size": 255, "required": false },
+    { "key": "email", "type": "string", "size": 255, "required": false },
+    { "key": "phone", "type": "string", "size": 64, "required": false },
+    { "key": "interest_notes", "type": "string", "size": 4000, "required": false },
+    { "key": "status", "type": "string", "size": 32, "required": true },
+    { "key": "source_channel", "type": "string", "size": 64, "required": false }
+  ]
+}
