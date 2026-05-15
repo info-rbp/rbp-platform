@@ -1,0 +1,11 @@
+{
+  "id": "application_categories",
+  "name": "Application Categories",
+  "documentSecurity": true,
+  "permissions": { "read": ["role:users", "team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "category_name", "type": "string", "size": 255, "required": true },
+    { "key": "category_key", "type": "string", "size": 128, "required": true },
+    { "key": "sort_order", "type": "integer", "required": false }
+  ]
+}
