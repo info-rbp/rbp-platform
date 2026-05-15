@@ -6,6 +6,7 @@ on:
 jobs:
   smoke:
     runs-on: ubuntu-latest
+    environment: qa
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -14,3 +15,9 @@ jobs:
       - run: npm ci
       - run: npm run appwrite:seed:validate
       - run: npm run test:smoke:dry-run
+      - run: npm run smoke:qa:auth
+      - run: npm run smoke:qa:billing
+      - run: npm run smoke:qa:stripe-webhook
+      - run: npm run smoke:qa:service-requests
+      - run: npm run smoke:qa:admin
+      - run: npm run smoke:qa:permissions
