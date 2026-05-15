@@ -41,13 +41,14 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Sign-in form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signupFirstName, setSignupFirstName] = useState("");
   const [signupLastName, setSignupLastName] = useState("");
   const [signupBusinessName, setSignupBusinessName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -69,6 +70,12 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (signupPassword !== signupConfirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
     const name = `${signupFirstName} ${signupLastName}`.trim();
@@ -76,6 +83,7 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
       name,
       email: signupEmail,
       businessName: signupBusinessName,
+      password: signupPassword,
     });
 
     if (response.ok) {
@@ -89,7 +97,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Minimal header */}
       <header className="bg-white border-b border-slate-100 px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
           <div className="w-7 h-7 bg-blue-700 rounded-lg flex items-center justify-center">
@@ -107,11 +114,8 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
         </Link>
       </header>
 
-      {/* Main content */}
       <div className="flex-1 flex items-stretch">
-        {/* Left panel — brand / benefits */}
         <div className="hidden lg:flex lg:w-[42%] xl:w-[45%] bg-blue-700 flex-col justify-between p-10 xl:p-14 relative overflow-hidden">
-          {/* Background decoration */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-600 rounded-full opacity-40" />
             <div className="absolute -bottom-32 -right-20 w-[28rem] h-[28rem] bg-blue-800 rounded-full opacity-50" />
@@ -138,29 +142,11 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                 <span className="text-sm text-blue-100 leading-snug">{b}</span>
               </div>
             ))}
-
-            {/* Testimonial */}
-            <div className="mt-8 bg-blue-600/40 rounded-2xl p-5 border border-blue-500/30">
-              <p className="text-sm text-blue-100 italic leading-relaxed mb-3">
-                "RBP gave our small team access to the kind of strategic advisory that used to be reserved for large corporates. Game-changer."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-400/40 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-blue-100" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-white">Sarah M.</div>
-                  <div className="text-xs text-blue-300">Founder, Coastal Trades Pty Ltd</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Right panel — form */}
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-10 lg:py-16">
           <div className="w-full max-w-md">
-            {/* Tabs */}
             <div className="flex bg-slate-100 rounded-xl p-1 mb-8">
               <button
                 onClick={() => setTab("signin")}
@@ -184,7 +170,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
               </button>
             </div>
 
-            {/* ── SIGN IN FORM ── */}
             {tab === "signin" && (
               <div>
                 <div className="mb-6">
@@ -194,38 +179,15 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                   </p>
                 </div>
 
-                {/* Social logins */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <button className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                    <GoogleIcon /> Google
-                  </button>
-                  <button className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                    <Linkedin className="w-4 h-4 text-[#0077B5]" /> LinkedIn
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-xs text-slate-400 font-medium">or sign in with email</span>
-                  <div className="flex-1 h-px bg-slate-200" />
-                </div>
-
                 <form className="space-y-4" onSubmit={handleSignIn}>
-                  {/* Error message */}
                   {error && (
                     <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3">
-                      <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
                       <span className="text-xs font-medium">{error}</span>
                     </div>
                   )}
 
-                  {/* Email */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                      Email address
-                    </label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Email address</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
@@ -239,13 +201,9 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* Password */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-bold text-slate-700">Password</label>
-                      <button type="button" className="text-xs font-semibold text-blue-700 hover:underline">
-                        Forgot password?
-                      </button>
                     </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -267,7 +225,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* Remember me */}
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
@@ -286,54 +243,17 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     disabled={loading}
                     className="w-full inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all mt-2"
                   >
-                    {loading ? (
-                      <>
-                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                        </svg>
-                        Signing in…
-                      </>
-                    ) : (
-                      <>Sign In <ArrowRight className="w-4 h-4" /></>
-                    )}
+                    {loading ? "Signing in..." : "Sign In"} <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
-
-                <p className="text-center text-xs text-slate-500 mt-6">
-                  Don't have an account?{" "}
-                  <button
-                    onClick={() => setTab("signup")}
-                    className="text-blue-700 font-bold hover:underline"
-                  >
-                    Create one free
-                  </button>
-                </p>
               </div>
             )}
 
-            {/* ── CREATE ACCOUNT FORM ── */}
             {tab === "signup" && (
               <div>
                 <div className="mb-6">
                   <h2 className="text-2xl font-extrabold text-slate-900 mb-1">Create your account</h2>
-                  <p className="text-slate-500 text-sm">Join thousands of Australian small businesses supported by RBP.</p>
-                </div>
-
-                {/* Social logins */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <button className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                    <GoogleIcon /> Google
-                  </button>
-                  <button className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                    <Linkedin className="w-4 h-4 text-[#0077B5]" /> LinkedIn
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-xs text-slate-400 font-medium">or register with email</span>
-                  <div className="flex-1 h-px bg-slate-200" />
+                  <p className="text-slate-500 text-sm">Create an Appwrite-backed account to continue into the member portal.</p>
                 </div>
 
                 <form className="space-y-4" onSubmit={handleSignUp}>
@@ -343,7 +263,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   )}
 
-                  {/* Name row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1.5">First name</label>
@@ -372,7 +291,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* Business name */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">Business name</label>
                     <div className="relative">
@@ -387,7 +305,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* Email */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">Email address</label>
                     <div className="relative">
@@ -403,13 +320,14 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* Password */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type={showPassword ? "text" : "password"}
+                        value={signupPassword}
+                        onChange={(event) => setSignupPassword(event.currentTarget.value)}
                         placeholder="Create a strong password"
                         required
                         className="w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -424,13 +342,14 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* Confirm password */}
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1.5">Confirm password</label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         type={showConfirmPassword ? "text" : "password"}
+                        value={signupConfirmPassword}
+                        onChange={(event) => setSignupConfirmPassword(event.currentTarget.value)}
                         placeholder="Repeat your password"
                         required
                         className="w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
@@ -445,14 +364,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     </div>
                   </div>
 
-                  {/* T&Cs */}
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    By creating an account you agree to our{" "}
-                    <a href="#" className="text-blue-700 font-semibold hover:underline">Terms of Service</a>{" "}
-                    and{" "}
-                    <a href="#" className="text-blue-700 font-semibold hover:underline">Privacy Policy</a>.
-                  </p>
-
                   <button
                     type="submit"
                     disabled={loading}
@@ -461,16 +372,6 @@ export function SignInPage({ initialTab = "signin" }: { initialTab?: Tab }) {
                     {loading ? "Creating account..." : "Create Account"} <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
-
-                <p className="text-center text-xs text-slate-500 mt-6">
-                  Already have an account?{" "}
-                  <button
-                    onClick={() => setTab("signin")}
-                    className="text-blue-700 font-bold hover:underline"
-                  >
-                    Sign in here
-                  </button>
-                </p>
               </div>
             )}
           </div>
