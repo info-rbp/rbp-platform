@@ -1,0 +1,14 @@
+/portal/*
+  X-Robots-Tag: noindex, nofollow
+
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+
+/signin
+  X-Robots-Tag: noindex, nofollow
+
+/signup
+  X-Robots-Tag: noindex, nofollow
+
+/signout
+  X-Robots-Tag: noindex, nofollow
