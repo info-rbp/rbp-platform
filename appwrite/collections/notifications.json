@@ -1,0 +1,14 @@
+{
+  "id": "notifications",
+  "name": "Notifications",
+  "documentSecurity": true,
+  "permissions": { "read": ["role:users", "team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": false },
+    { "key": "user_id", "type": "string", "size": 64, "required": false },
+    { "key": "title", "type": "string", "size": 255, "required": true },
+    { "key": "message", "type": "string", "size": 4000, "required": true },
+    { "key": "status", "type": "string", "size": 32, "required": true },
+    { "key": "channel", "type": "string", "size": 32, "required": true }
+  ]
+}
