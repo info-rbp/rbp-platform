@@ -1,34 +1,94 @@
 # Email QA Sandbox
 
+Date: 2026-05-15
+Scope: Milestone 9 email notification QA proof
+
 ## Purpose
 
-Email notifications must be QA-safe before deployment.
+Email notifications must be QA-safe before deployment. Milestone 9 is not complete just because notification code and docs exist. It is complete only after sandbox configuration, focused tests, allowlisted delivery or fake-send proof, blocked-recipient proof, and fail-open logging are recorded on the QA bench/site. Astonishingly, emails still need somewhere safe to go.
 
 ## Required QA settings
 
-- `RBP_ENABLE_EMAIL_NOTIFICATIONS=true`
-- `RBP_EMAIL_SANDBOX_MODE=true`
-- `RBP_QA_EMAIL_RECIPIENTS=<allowlisted QA emails>`
-- `RBP_ADMIN_NOTIFICATION_RECIPIENTS=<admin QA emails>`
+Set these values in the QA site configuration or server environment. Do not commit real values.
 
-## Required server setup
+```bash
+RBP_ENABLE_EMAIL_NOTIFICATIONS=true
+RBP_EMAIL_SANDBOX_MODE=true
+RBP_QA_EMAIL_RECIPIENTS=<allowlisted QA emails>
+RBP_ADMIN_NOTIFICATION_RECIPIENTS=<admin QA emails>
+```
 
-Configure either:
+## Frappe Email Account / SMTP setup checklist
 
-- Frappe Email Account, or
-- SMTP provider credentials through server environment or site config.
+Record the configured values in the private deployment runbook, not in Git.
 
-Do not commit SMTP usernames, passwords, or tokens.
+- SMTP host: required
+- SMTP port: required
+- SMTP username: required, stored outside Git
+- SMTP password/token: required, stored outside Git
+- Sender email: required
+- Reply-to email: required
+- Sandbox recipient allowlist: required
+- Admin/support notification recipients: required
+- Blocked-recipient test case: required
+- Delivery log location: required, for example Frappe Email Queue, Email Log, Notification Log, or the provider sandbox log
+- Rollback/disable switch: set `RBP_ENABLE_EMAIL_NOTIFICATIONS=false` or `RBP_EMAIL_SANDBOX_MODE=true` with an empty allowlist, depending on the incident
 
-## Validation checklist
+## Source-of-truth alignment check
 
-- Account-created notification can be fake-sent or sandbox-sent.
-- Payment success notification can be fake-sent or sandbox-sent.
-- Payment failed notification can be fake-sent or sandbox-sent.
-- Application interest notification can be fake-sent or sandbox-sent.
-- Blocked non-allowlisted recipient produces a safe delivery result.
-- Delivery logs are visible to admin.
+Before marking Milestone 9 as validated, confirm whether the notification implementation is in the backend source-of-truth repo used by the QA bench. If notification services exist only in `info-rbp/rbp-platform`, carry the required backend pieces into `info-rbp/frappe-project` or document why the QA backend is intentionally using the platform repo app source.
+
+Required implementation evidence:
+
+- Notification trigger catalog exists.
+- `emit_event_notification` or equivalent event service exists.
+- Portal/admin notification logging exists.
+- Sandbox recipient routing exists.
+- Billing hooks emit email-safe notifications.
+- Entitlement hooks emit email-safe notifications.
+- Notification failures are logged and fail open.
+- Tests cover allowlisted recipient, blocked recipient, and failure paths.
+
+## Required automated validation
+
+Run from the QA bench/site after configuration is present:
+
+```bash
+python3 -m compileall rbp_app/rbp_app
+bench --site hrms.localhost migrate
+bench --site hrms.localhost clear-cache
+bench --site hrms.localhost run-tests --app rbp_app --module rbp_app.tests.test_milestone9_notifications
+bench --site hrms.localhost run-tests --app rbp_app
+```
+
+If `hrms.localhost` is not the QA site, run `bench list-sites` and record the actual site used. If the focused module name differs, record the replacement module and command.
+
+## Manual QA proof required
+
+Record evidence for each item:
+
+1. Send or fake-send a notification to an allowlisted QA recipient.
+2. Attempt a notification to a non-allowlisted recipient.
+3. Confirm the non-allowlisted recipient did not receive email.
+4. Confirm a notification log record exists for the allowed delivery/fake-send.
+5. Confirm a notification log record exists for the blocked recipient.
+6. Confirm an email delivery failure does not break billing, entitlement, service request, or application-interest flow.
+7. Confirm no SMTP usernames, passwords, API tokens, webhook secrets, or `.env` values are committed.
+
+## Current status
+
+Status: BLOCKED for environment proof.
+
+The repository contains notification documentation and Milestone 9 implementation references, but this environment cannot run a real Frappe bench, cannot configure the QA Email Account, and cannot prove SMTP delivery or blocked-recipient behavior. The remaining work must run from the QA bench machine with SMTP sandbox access.
 
 ## Completion criteria
 
-Milestone 9 is complete when QA sandbox email settings are configured, email tests pass, and at least one sandbox or fake-send delivery is recorded.
+Milestone 9 can move to PASS only when:
+
+- QA email settings are configured.
+- Focused and full backend tests pass.
+- Allowlisted send or fake-send proof is recorded.
+- Blocked-recipient proof is recorded.
+- Notification failure is proven fail-open.
+- The backend source-of-truth alignment is confirmed.
+- No secrets are committed.
