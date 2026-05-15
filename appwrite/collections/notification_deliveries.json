@@ -1,0 +1,12 @@
+{
+  "id": "notification_deliveries",
+  "name": "Notification Deliveries",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "notification_id", "type": "string", "size": 64, "required": true },
+    { "key": "delivery_type", "type": "string", "size": 32, "required": true },
+    { "key": "status", "type": "string", "size": 32, "required": true },
+    { "key": "recipient", "type": "string", "size": 255, "required": false }
+  ]
+}
