@@ -5,7 +5,8 @@ import {
   type MembershipCheckoutSession,
 } from "./appwrite/appwriteBillingApi";
 
-const legacyBillingApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeBillingApi = {
   createMembershipCheckoutSession(payload: Record<string, unknown>) {
     return callFrappeMethod<MembershipCheckoutSession>(
       "rbp_app.api.billing.create_membership_checkout_session",
@@ -28,5 +29,5 @@ const legacyBillingApi = {
 
 export const billingApi = selectApiImplementation({
   appwrite: appwriteBillingApi,
-  frappe: legacyBillingApi,
+  legacyFrappe: legacyFrappeBillingApi,
 });
