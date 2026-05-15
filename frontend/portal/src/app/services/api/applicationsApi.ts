@@ -5,7 +5,8 @@ import {
   type RbpApplication,
 } from "./appwrite/appwriteApplicationsApi";
 
-const legacyApplicationsApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeApplicationsApi = {
   async listPublicApplications() {
     return callFrappeMethod<RbpApplication[]>(
       "rbp_app.api.applications.list_public_applications",
@@ -49,7 +50,7 @@ const legacyApplicationsApi = {
 
 export const applicationsApi = selectApiImplementation({
   appwrite: appwriteApplicationsApi,
-  frappe: legacyApplicationsApi,
+  legacyFrappe: legacyFrappeApplicationsApi,
 });
 
 export type { RbpApplication } from "./appwrite/appwriteApplicationsApi";
