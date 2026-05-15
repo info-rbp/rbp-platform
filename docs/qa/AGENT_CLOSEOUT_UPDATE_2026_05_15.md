@@ -9,59 +9,46 @@ This appendix records repository-side closeout work completed after `docs/qa/FIN
 | Item | Result |
 | --- | --- |
 | PR #65 | Reviewed as docs-only and merged into `main`. |
-| PR #54 | Commented and closed as superseded. Useful runbooks were extracted into PR #66. |
+| PR #66 | Reviewed as docs-only and merged into `main`; remaining QA smoke, security, and UAT runbooks are now landed. |
+| PR #67 | Reviewed and merged into `main`; `/offers` and `/resources` route hardening is now landed. |
+| PR #68 | Reviewed and merged into `main`; launch-draft legal/policy pages are now landed. Final human legal review remains required. |
+| PR #54 | Commented and closed as superseded by PR #65 and PR #66. |
+| PR #58 | Commented and closed as superseded by merged PR #67. |
 | PR #64 | Commented as non-QA-critical and isolated to `mcp/appwrite`. Recommended separate review/defer. |
-| PR #58 | Replacement PR #67 opened for `/offers` and `/resources` route stability. PR #58 commented as superseded after #67 merges. |
-| Legal placeholders | Replacement PR #68 opened with launch-draft legal/policy pages. |
 | frappe-project PR #42 | Commented and closed as superseded. |
 | frappe-project PR #11 | Commented and closed as superseded. |
 | frappe-project PR #48 | Scope triaged and validation-required comment added. Do not merge until real bench output is posted. |
 
-## Active follow-up PRs
+## Intentionally open PRs
 
-| PR | Purpose | Human action required |
+| PR | Purpose | Reason left open |
 | --- | --- | --- |
-| #66 | Remaining QA smoke, security, and UAT runbooks | Review and merge if docs are acceptable. |
-| #67 | Public route stability for `/offers` and `/resources` | Resolve mergeability if needed, run frontend validation, then review. |
-| #68 | Launch-draft legal/policy pages | Resolve mergeability if needed, run frontend validation, and complete legal review. |
-| #64 | Appwrite MCP scaffold | Defer or review separately from launch QA closeout. |
-| frappe-project #48 | Milestone 7 signup/tenant/account provisioning | Run backend bench validation before merge. |
+| rbp-platform #64 | Appwrite MCP scaffold | Non-QA-critical; defer or review separately from launch QA closeout. |
+| frappe-project #48 | Milestone 7 signup/tenant/account provisioning | Human bench validation is required before merge. |
 
 ## Human/environment-required work remaining
 
-- Backend bench validation for Milestones 6, 7, 8, and 9.
+- Backend bench validation for PR #48 and Milestones 6, 8, and 9.
 - Stripe test product, price, webhook endpoint, and webhook secret setup outside Git.
 - SMTP/Frappe Email Account sandbox setup and allowlisted/blocked-recipient proof.
 - Frappe Desk admin verification.
-- Frontend `npm ci`, build, and SEO audit from a real checkout.
-- Static launch-boundary searches from a real checkout.
+- Frontend dependency install, build, and SEO audit from a real checkout or CI.
+- Static placeholder, launch-boundary, and secret searches from real checkouts.
 - Live QA smoke testing across public, protected, legal, membership, Applications, marketplace, and portal routes.
 - CI/CD workflow run proof.
 - Backup artifact creation and rollback dry run.
 
 ## Required backend commands
 
-```bash
-python3 -m compileall rbp_app/rbp_app
-bench --site hrms.localhost migrate
-bench --site hrms.localhost clear-cache
-bench --site hrms.localhost run-tests --app rbp_app --module rbp_app.tests.test_signup
-bench --site hrms.localhost run-tests --app rbp_app --module rbp_app.tests.test_milestone6_membership_stripe_mapping
-bench --site hrms.localhost run-tests --app rbp_app --module rbp_app.tests.test_milestone8_entitlements
-bench --site hrms.localhost run-tests --app rbp_app --module rbp_app.tests.test_milestone9_notifications
-bench --site hrms.localhost run-tests --app rbp_app
-```
-
-If `hrms.localhost` is unavailable, run `bench list-sites`, use the correct QA/local site, and record the site name.
+Run the backend compile, migrate, clear-cache, focused signup, Milestone 6, Milestone 8, Milestone 9 notification tests, and full app test suite from the QA bench/site. If `hrms.localhost` is unavailable, run `bench list-sites`, use the correct QA/local site, and record the site name.
 
 ## Required frontend commands
 
-```bash
-cd frontend/portal
-npm ci
-npm run build
-npm run audit:seo
-```
+Run the portal dependency install, production build, and SEO audit from `frontend/portal` in a real checkout or CI runner.
+
+## Required searches
+
+Run placeholder, Application-provisioning-claim, live-payment-claim, marketplace-publishing-claim, and Stripe/webhook secret searches from real repository checkouts before QA sign-off.
 
 ## Manual QA smoke list
 
