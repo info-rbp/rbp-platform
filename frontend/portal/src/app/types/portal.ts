@@ -76,7 +76,7 @@ export interface PendingAccountIntent {
 export interface AuthService {
   getCurrentUser(): PortalCustomerAuthUser | null;
   signIn(payload: { email: string; password: string }): Promise<MockApiResponse<PortalCustomerAuthUser>>;
-  signUp(payload: { name: string; email: string; businessName?: string }): Promise<MockApiResponse<PortalCustomerAuthUser>>;
+  signUp(payload: { name: string; email: string; businessName?: string; password?: string }): Promise<MockApiResponse<PortalCustomerAuthUser>>;
   signOut(): Promise<MockApiResponse<{ signedOut: true }>>;
   isAuthenticated(): boolean;
 }
