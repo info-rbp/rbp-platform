@@ -1,5 +1,7 @@
 import type { MockMembershipPlan } from "../../mock";
 import { apiFailure, apiSuccess, callFrappeMethod } from "./client";
+import { selectApiImplementation } from "./provider";
+import { appwriteMembershipApi } from "./appwrite/appwriteMembershipApi";
 
 function normalisePlan(raw: Record<string, unknown>, index: number): MockMembershipPlan {
   const id = String(raw.plan_code ?? raw.name ?? raw.id ?? `membership-plan-${index + 1}`);
@@ -24,7 +26,7 @@ function normalisePlan(raw: Record<string, unknown>, index: number): MockMembers
   };
 }
 
-export const membershipApi = {
+const legacyMembershipApi = {
   async listMembershipPlans() {
     const response = await callFrappeMethod<unknown[] | { plans?: unknown[] }>(
       "rbp_app.api.membership.list_membership_plans",
@@ -79,3 +81,8 @@ export const membershipApi = {
     });
   },
 };
+
+export const membershipApi = selectApiImplementation({
+  appwrite: appwriteMembershipApi,
+  frappe: legacyMembershipApi,
+});
