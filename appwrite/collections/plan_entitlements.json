@@ -1,0 +1,16 @@
+{
+  "id": "plan_entitlements",
+  "name": "Plan Entitlements",
+  "documentSecurity": true,
+  "permissions": {
+    "read": ["team:admins", "role:users"],
+    "create": ["team:admins"],
+    "update": ["team:admins"],
+    "delete": ["team:admins"]
+  },
+  "attributes": [
+    { "key": "plan_code", "type": "string", "size": 64, "required": true },
+    { "key": "entitlement_key", "type": "string", "size": 64, "required": true },
+    { "key": "enabled", "type": "boolean", "required": true }
+  ]
+}
