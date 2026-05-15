@@ -90,7 +90,25 @@ type HelpDraft = Pick<
 
 type OfferDraft = Pick<
   PublicOffer,
-  "title" | "partner" | "summary" | "category" | "offerType" | "href" | "status"
+  | "title"
+  | "partnerId"
+  | "partner"
+  | "summary"
+  | "category"
+  | "offerType"
+  | "eligibility"
+  | "memberVisibility"
+  | "status"
+  | "redemptionMethod"
+  | "approvalStatus"
+  | "trackingRequired"
+  | "trackingMethod"
+  | "terms"
+  | "publicCtaDestination"
+  | "portalOfferDestination"
+  | "badge"
+  | "saving"
+  | "availability"
 >;
 
 type MarketplaceListingType =
@@ -223,13 +241,33 @@ function createHelpDraft(): HelpDraft {
 function createOfferDraft(): OfferDraft {
   return {
     title: "",
+    partnerId: "",
     partner: "",
     summary: "",
-    category: "operations",
+    category: "operations-advisory",
     offerType: "standard",
-    href: "/offers",
-    status: "ready",
+    eligibility: "",
+    memberVisibility: "members-only",
+    status: "draft",
+    redemptionMethod: "request-access",
+    approvalStatus: "draft",
+    trackingRequired: "yes",
+    trackingMethod: "appwrite-only",
+    terms: "",
+    publicCtaDestination: "",
+    portalOfferDestination: "",
+    badge: "",
+    saving: "",
+    availability: "",
   };
+}
+
+function createMockPortalOfferDestination(id: string) {
+  return `/portal/offers?offer=${encodeURIComponent(id)}`;
+}
+
+function createMockPublicOfferDestination(portalOfferDestination: string) {
+  return `/signin?returnTo=${encodeURIComponent(portalOfferDestination)}`;
 }
 
 function createMarketplaceDraft(): MarketplaceDraft {
@@ -1605,20 +1643,86 @@ function OfferMockCrud() {
     createDraft: createOfferDraft,
     toDraft: (record) => ({
       title: record.title,
+      partnerId: record.partnerId,
       partner: record.partner,
       summary: record.summary,
       category: record.category,
       offerType: record.offerType,
-      href: record.href,
+      eligibility: record.eligibility,
+      memberVisibility: record.memberVisibility,
       status: record.status,
+      redemptionMethod: record.redemptionMethod,
+      approvalStatus: record.approvalStatus,
+      trackingRequired: record.trackingRequired,
+      trackingMethod: record.trackingMethod,
+      terms: record.terms,
+      publicCtaDestination: record.publicCtaDestination,
+      portalOfferDestination: record.portalOfferDestination,
+      badge: record.badge ?? "",
+      saving: record.saving ?? "",
+      availability: record.availability ?? "",
     }),
-    fromDraft: (currentDraft, existingRecord) => ({
-      id: existingRecord?.id ?? createMockRecordId("offer", currentDraft.title),
-      ...currentDraft,
-      href: withFallbackHref(currentDraft.href, "/offers"),
-    }),
+    fromDraft: (currentDraft, existingRecord) => {
+      const id = existingRecord?.id ?? createMockRecordId("offer", currentDraft.title);
+      const partnerId = currentDraft.partnerId.trim() || slugify(currentDraft.partner);
+      const portalOfferDestination = withFallbackHref(
+        currentDraft.portalOfferDestination,
+        createMockPortalOfferDestination(id)
+      );
+      const publicCtaDestination = withFallbackHref(
+        currentDraft.publicCtaDestination,
+        createMockPublicOfferDestination(portalOfferDestination)
+      );
+      const createdAt = existingRecord?.audit?.createdAt ?? new Date().toISOString();
+      const createdBy = existingRecord?.audit?.createdBy ?? "admin-mock-crud";
+
+      return {
+        ...existingRecord,
+        id,
+        partnerId,
+        title: currentDraft.title,
+        partner: currentDraft.partner,
+        summary: currentDraft.summary,
+        category: currentDraft.category,
+        offerType: currentDraft.offerType,
+        eligibility: currentDraft.eligibility,
+        memberVisibility: currentDraft.memberVisibility,
+        status: currentDraft.status,
+        redemptionMethod: currentDraft.redemptionMethod,
+        publicCtaLabel: "Get Offer",
+        publicCtaDestination,
+        portalOfferDestination,
+        terms: currentDraft.terms,
+        approvalStatus: currentDraft.approvalStatus,
+        trackingRequired: currentDraft.trackingRequired,
+        trackingMethod: currentDraft.trackingMethod,
+        tracking: {
+          required: currentDraft.trackingRequired,
+          method: currentDraft.trackingMethod,
+        },
+        audit: {
+          createdBy,
+          createdAt,
+          updatedBy: "admin-mock-crud",
+          updatedAt: new Date().toISOString(),
+        },
+        badge: currentDraft.badge || undefined,
+        saving: currentDraft.saving || undefined,
+        availability: currentDraft.availability || undefined,
+        features: existingRecord?.features ?? [],
+        logo: existingRecord?.logo,
+        highlight: existingRecord?.highlight,
+        accentClassName: existingRecord?.accentClassName,
+      };
+    },
     validateDraft: (currentDraft) =>
-      hasRequiredTextFields(currentDraft.title, currentDraft.partner, currentDraft.summary),
+      hasRequiredTextFields(
+        currentDraft.title,
+        currentDraft.partner,
+        currentDraft.summary,
+        currentDraft.eligibility,
+        currentDraft.terms
+      ),
   });
 
   const table = useMockTableControls(records);
@@ -1648,6 +1752,11 @@ function OfferMockCrud() {
       key: "offerType",
       header: "Type",
       render: (row) => <AdminStatusBadge label={row.offerType} status={row.offerType} />,
+    },
+    {
+      key: "approvalStatus",
+      header: "Approval",
+      render: (row) => <AdminStatusBadge label={row.approvalStatus} status={row.approvalStatus} />,
     },
     {
       key: "status",
@@ -1684,7 +1793,7 @@ function OfferMockCrud() {
         <div className="px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-extrabold text-slate-900">Mock Offer Records</h2>
           <p className="text-xs text-slate-500 mt-1">
-            Create, edit, and delete offer records in local component state.
+            Create, edit, and delete offer records in local component state with the richer member-gated MVP schema.
           </p>
         </div>
         <AdminTableControls controls={table} />
@@ -1693,7 +1802,7 @@ function OfferMockCrud() {
 
       <AdminFormShell
         title={editingRecord ? "Edit Offer" : "Create Offer"}
-        description="Local mock form for partner offers, categories, and offer visibility. Redemption tracking and commercial approval come later."
+        description="Local mock form for partner offers, member visibility, approval state, and Appwrite-ready tracking structure. Impact.com stays a future adapter, not a launch dependency."
         footer={
           <div className="flex items-center gap-2">
             <button
@@ -1725,14 +1834,25 @@ function OfferMockCrud() {
           />
         </Field>
 
-        <Field label="Partner">
-          <input
-            className={inputClass}
-            value={draft.partner}
-            onChange={(event) => updateDraft({ partner: event.target.value })}
-            placeholder="Example Partner"
-          />
-        </Field>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Partner">
+            <input
+              className={inputClass}
+              value={draft.partner}
+              onChange={(event) => updateDraft({ partner: event.target.value })}
+              placeholder="Example Partner"
+            />
+          </Field>
+
+          <Field label="Partner ID">
+            <input
+              className={inputClass}
+              value={draft.partnerId}
+              onChange={(event) => updateDraft({ partnerId: event.target.value })}
+              placeholder="example-partner"
+            />
+          </Field>
+        </div>
 
         <Field label="Summary">
           <textarea
@@ -1744,7 +1864,17 @@ function OfferMockCrud() {
           />
         </Field>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field label="Eligibility">
+          <textarea
+            className={inputClass}
+            value={draft.eligibility}
+            onChange={(event) => updateDraft({ eligibility: event.target.value })}
+            placeholder="Who is eligible for this offer?"
+            rows={3}
+          />
+        </Field>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Category">
             <select
               className={inputClass}
@@ -1774,27 +1904,160 @@ function OfferMockCrud() {
           </Field>
         </div>
 
-        <Field label="Public Link">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Member Visibility">
+            <select
+              className={inputClass}
+              value={draft.memberVisibility}
+              onChange={(event) =>
+                updateDraft({ memberVisibility: event.target.value as OfferDraft["memberVisibility"] })
+              }
+            >
+              <option value="public">Public</option>
+              <option value="members-only">Members Only</option>
+              <option value="admin-only">Admin Only</option>
+            </select>
+          </Field>
+
+          <Field label="Redemption Method">
+            <select
+              className={inputClass}
+              value={draft.redemptionMethod}
+              onChange={(event) =>
+                updateDraft({ redemptionMethod: event.target.value as OfferDraft["redemptionMethod"] })
+              }
+            >
+              <option value="portal-gated-link">Portal Gated Link</option>
+              <option value="request-access">Request Access</option>
+              <option value="impact-link">Impact Link</option>
+              <option value="manual-code">Manual Code</option>
+              <option value="api-generated-link">API Generated Link</option>
+            </select>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Offer Status">
+            <select
+              className={inputClass}
+              value={draft.status}
+              onChange={(event) => updateDraft({ status: event.target.value as OfferDraft["status"] })}
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="paused">Paused</option>
+              <option value="expired">Expired</option>
+              <option value="archived">Archived</option>
+            </select>
+          </Field>
+
+          <Field label="Approval Status">
+            <select
+              className={inputClass}
+              value={draft.approvalStatus}
+              onChange={(event) =>
+                updateDraft({ approvalStatus: event.target.value as OfferDraft["approvalStatus"] })
+              }
+            >
+              <option value="draft">Draft</option>
+              <option value="to-review">To Review</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="legal-review">Legal Review</option>
+            </select>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Tracking Required">
+            <select
+              className={inputClass}
+              value={draft.trackingRequired}
+              onChange={(event) =>
+                updateDraft({ trackingRequired: event.target.value as OfferDraft["trackingRequired"] })
+              }
+            >
+              <option value="yes">Yes</option>
+              <option value="optional">Optional</option>
+              <option value="no">No</option>
+            </select>
+          </Field>
+
+          <Field label="Tracking Method">
+            <select
+              className={inputClass}
+              value={draft.trackingMethod}
+              onChange={(event) =>
+                updateDraft({ trackingMethod: event.target.value as OfferDraft["trackingMethod"] })
+              }
+            >
+              <option value="appwrite-only">Appwrite Only</option>
+              <option value="manual">Manual</option>
+              <option value="manual-plus-impact">Manual Plus Impact</option>
+              <option value="impact-api">Impact API</option>
+              <option value="none">None</option>
+            </select>
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Saving / Benefit">
+            <input
+              className={inputClass}
+              value={draft.saving ?? ""}
+              onChange={(event) => updateDraft({ saving: event.target.value })}
+              placeholder="Save up to $216"
+            />
+          </Field>
+
+          <Field label="Badge">
+            <input
+              className={inputClass}
+              value={draft.badge ?? ""}
+              onChange={(event) => updateDraft({ badge: event.target.value })}
+              placeholder="Most Viewed"
+            />
+          </Field>
+        </div>
+
+        <Field label="Availability">
           <input
             className={inputClass}
-            value={draft.href}
-            onChange={(event) => updateDraft({ href: event.target.value })}
-            placeholder="/offers"
+            value={draft.availability ?? ""}
+            onChange={(event) => updateDraft({ availability: event.target.value })}
+            placeholder="Available to eligible active members"
           />
         </Field>
 
-        <Field label="Status">
-          <select
+        <Field label="Terms">
+          <textarea
             className={inputClass}
-            value={draft.status}
-            onChange={(event) => updateDraft({ status: event.target.value as ContentStatus })}
-          >
-            <option value="ready">Ready</option>
-            <option value="placeholder">Placeholder</option>
-            <option value="content-required">Content Required</option>
-            <option value="backend-later">Backend Later</option>
-          </select>
+            value={draft.terms}
+            onChange={(event) => updateDraft({ terms: event.target.value })}
+            placeholder="Partner terms and gating notes"
+            rows={4}
+          />
         </Field>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Portal Offer Destination">
+            <input
+              className={inputClass}
+              value={draft.portalOfferDestination}
+              onChange={(event) => updateDraft({ portalOfferDestination: event.target.value })}
+              placeholder="/portal/offers?offer=example-offer"
+            />
+          </Field>
+
+          <Field label="Public CTA Destination">
+            <input
+              className={inputClass}
+              value={draft.publicCtaDestination}
+              onChange={(event) => updateDraft({ publicCtaDestination: event.target.value })}
+              placeholder="/signin?returnTo=%2Fportal%2Foffers%3Foffer%3Dexample-offer"
+            />
+          </Field>
+        </div>
       </AdminFormShell>
     </section>
   );
