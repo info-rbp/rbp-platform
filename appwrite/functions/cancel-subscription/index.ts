@@ -1,5 +1,5 @@
-import { ok } from "../_shared/response";
+import { runNamedHandler } from "../_shared/runtime";
 
-export default async function main() {
-  return ok({ action: "cancel-subscription", cancelled: false, note: "Implementation requires live Stripe and Appwrite credentials." });
+export default async function main(context: { req?: { body?: string; headers?: Record<string, string | undefined> } }) {
+  return runNamedHandler("cancel-subscription", context);
 }
