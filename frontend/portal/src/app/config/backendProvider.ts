@@ -1,13 +1,17 @@
 import { environment, type RuntimeEnvironment } from "./environment";
 
-export type BackendProvider = "appwrite" | "frappe" | "mock";
+export type BackendProvider = "appwrite" | "mock";
 
 export function getBackendProvider(
   config: Pick<RuntimeEnvironment, "backendProvider"> = environment
 ): BackendProvider {
   const raw = String(config.backendProvider || "appwrite").toLowerCase();
-  if (raw === "frappe") return "frappe";
+
   if (raw === "mock") return "mock";
+
+  // Frappe is intentionally not an active QA or production backend provider.
+  // Historical Frappe assets may remain for migration/reference only, but runtime
+  // traffic must resolve to Appwrite unless explicit mock mode is enabled.
   return "appwrite";
 }
 
