@@ -1,0 +1,11 @@
+{
+  "id": "audit_events",
+  "name": "Audit Events",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": false },
+    { "key": "event_name", "type": "string", "size": 128, "required": true },
+    { "key": "actor_id", "type": "string", "size": 64, "required": false }
+  ]
+}
