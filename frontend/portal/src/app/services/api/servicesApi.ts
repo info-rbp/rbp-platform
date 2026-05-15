@@ -69,7 +69,8 @@ const endpointMap: Partial<Record<PortalProductKey, {
   },
 };
 
-const legacyServicesApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeServicesApi = {
   async createAndSubmitRequest(product: PortalProductKey, payload: Record<string, unknown>) {
     const endpoint = endpointMap[product];
 
@@ -106,5 +107,5 @@ const legacyServicesApi = {
 
 export const servicesApi = selectApiImplementation({
   appwrite: appwriteServicesApi,
-  frappe: legacyServicesApi,
+  legacyFrappe: legacyFrappeServicesApi,
 });
