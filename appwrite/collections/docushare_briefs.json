@@ -1,0 +1,11 @@
+{
+  "id": "docushare_briefs",
+  "name": "DocuShare Briefs",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "service_request_id", "type": "string", "size": 64, "required": true },
+    { "key": "brief_title", "type": "string", "size": 255, "required": false },
+    { "key": "brief_notes", "type": "string", "size": 4000, "required": false }
+  ]
+}
