@@ -1,0 +1,12 @@
+[
+  {
+    "tenant_id": "qa-premium-tenant",
+    "user_id": "qa.premium@remotebusinesspartner.com.au",
+    "application_id": "erpnext",
+    "business_name": "QA Premium Business Pty Ltd",
+    "contact_name": "QA Premium",
+    "email": "qa.premium@remotebusinesspartner.com.au",
+    "status": "submitted",
+    "source_channel": "QA Seed"
+  }
+]
