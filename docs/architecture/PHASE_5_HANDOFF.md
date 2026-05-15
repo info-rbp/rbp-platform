@@ -40,6 +40,14 @@ This document defines the Phase 5 implementation handoff after consolidation and
 - Do not rely on undocumented manual clicking in Appwrite or Cloudflare.
 - Do not treat mocked behavior as production-ready unless explicitly feature-flagged.
 
+## Target Admin Path
+
+```text
+React /admin -> Appwrite session -> admin role or team check -> Appwrite Function -> Appwrite server-side writes
+```
+
+Appwrite Console may be used as a technical fallback for inspection or configuration only. Frappe assets remain historical reference only.
+
 ## First Technical Checks
 
 - inspect Appwrite baseline requirements
@@ -50,4 +58,6 @@ This document defines the Phase 5 implementation handoff after consolidation and
 
 ## Handoff Status
 
-Phase 5 proceeds as an Appwrite transition and QA hardening phase. Historical Frappe documents remain useful reference material only.
+Phase 5 proceeds as an Appwrite transition and QA hardening phase.
+
+This foundation stage establishes repository-owned structure, docs, provider seams, and validation entry points. Follow-up implementation work is still required for real Function logic, live deploy automation, executable tests, and end-to-end QA validation.
