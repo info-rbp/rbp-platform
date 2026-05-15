@@ -1,0 +1,11 @@
+{
+  "id": "risk_assessments",
+  "name": "Risk Assessments",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "service_request_id", "type": "string", "size": 64, "required": true },
+    { "key": "risk_area", "type": "string", "size": 128, "required": false },
+    { "key": "assessment_notes", "type": "string", "size": 4000, "required": false }
+  ]
+}

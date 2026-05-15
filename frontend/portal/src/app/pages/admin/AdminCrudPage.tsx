@@ -1,30 +1,32 @@
 export function AdminCrudPage() {
-  const workspaces = [
-    ["RBP Operations", "/app/workspace/rbp-operations"],
-    ["RBP Membership", "/app/workspace/rbp-membership"],
-    ["RBP Billing", "/app/workspace/rbp-billing"],
-    ["RBP Applications", "/app/workspace/rbp-applications"],
-    ["RBP Notifications", "/app/workspace/rbp-notifications"],
-    ["RBP Marketplace", "/app/workspace/rbp-marketplace"],
-    ["RBP Services", "/app/workspace/rbp-services"],
-    ["RBP Support", "/app/workspace/rbp-support"],
+  const modules = [
+    "Tenants",
+    "Users",
+    "Membership Plans",
+    "Subscriptions",
+    "Payment Events",
+    "Entitlements",
+    "Applications",
+    "Application Interest",
+    "Service Requests",
+    "Notifications",
+    "Audit Events",
   ] as const;
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        <p className="font-semibold">Preview only</p>
-        <p>Operational records are managed in Frappe Desk and its RBP workspaces.</p>
-        <a className="underline" href="/desk">Open Frappe Desk</a>
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        <p className="font-semibold">Appwrite admin transition</p>
+        <p>
+          Operational records are moving behind React admin routes backed by Appwrite Functions. This page remains a staging surface while the dedicated admin operations function and schemas are rolled out.
+        </p>
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-white p-4">
-        <h2 className="mb-2 text-sm font-semibold text-slate-900">Authoritative launch workspaces</h2>
+        <h2 className="mb-2 text-sm font-semibold text-slate-900">Authoritative QA admin modules</h2>
         <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
-          {workspaces.map(([label, href]) => (
-            <li key={href}>
-              <a className="underline" href={href}>{label}</a>
-            </li>
+          {modules.map((label) => (
+            <li key={label}>{label}</li>
           ))}
         </ul>
       </div>

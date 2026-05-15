@@ -137,6 +137,12 @@ export const mockAuthService: AuthService = {
       ]);
     }
 
+    if (!payload.password && !environment.features.mock_auth) {
+      return mockFailure("/mock/auth/signup", "Password is required.", [
+        { field: "password", code: "required", message: "Password is required." },
+      ]);
+    }
+
     const apiResponse = await authApi.signUp(payload);
 
     if (apiResponse.ok && apiResponse.data) {

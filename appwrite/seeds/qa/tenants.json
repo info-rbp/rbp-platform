@@ -1,0 +1,4 @@
+[
+  { "tenant_name": "QA Free Tenant", "status": "active", "plan_code": "free" },
+  { "tenant_name": "QA Premium Tenant", "status": "active", "plan_code": "premium" }
+]

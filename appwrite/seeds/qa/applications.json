@@ -1,0 +1,18 @@
+[
+  {
+    "application_name": "ERPNext",
+    "application_key": "erpnext",
+    "category_id": "operations",
+    "short_description": "Business operations suite in next rollout.",
+    "status": "Coming Soon",
+    "visibility": "public",
+    "provider": "appwrite",
+    "public_summary": "Register interest for the next rollout.",
+    "portal_summary": "Interest-only rollout item.",
+    "sort_order": 1,
+    "requires_subscription": true,
+    "requires_manual_approval": true,
+    "interest_enabled": true,
+    "provisioning_enabled": false
+  }
+]

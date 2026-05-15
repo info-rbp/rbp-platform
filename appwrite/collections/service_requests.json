@@ -1,0 +1,13 @@
+{
+  "id": "service_requests",
+  "name": "Service Requests",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": false },
+    { "key": "user_id", "type": "string", "size": 64, "required": false },
+    { "key": "request_type", "type": "string", "size": 64, "required": true },
+    { "key": "reference_id", "type": "string", "size": 64, "required": true },
+    { "key": "status", "type": "string", "size": 32, "required": true }
+  ]
+}

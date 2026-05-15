@@ -1,0 +1,21 @@
+{
+  "id": "membership_plans",
+  "name": "Membership Plans",
+  "documentSecurity": true,
+  "permissions": {
+    "read": ["role:users", "team:admins"],
+    "create": ["team:admins"],
+    "update": ["team:admins"],
+    "delete": ["team:admins"]
+  },
+  "attributes": [
+    { "key": "plan_code", "type": "string", "size": 64, "required": true },
+    { "key": "plan_name", "type": "string", "size": 255, "required": true },
+    { "key": "billing_cycle", "type": "string", "size": 32, "required": true },
+    { "key": "currency", "type": "string", "size": 8, "required": true },
+    { "key": "amount", "type": "integer", "required": true },
+    { "key": "stripe_product_id", "type": "string", "size": 128, "required": false },
+    { "key": "stripe_price_id", "type": "string", "size": 128, "required": false },
+    { "key": "active", "type": "boolean", "required": true }
+  ]
+}

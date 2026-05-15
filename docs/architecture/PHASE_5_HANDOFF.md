@@ -2,55 +2,62 @@
 
 ## Purpose
 
-This document defines what Phase 5 Integration receives from Phase 4 Consolidation.
+This document defines the Phase 5 implementation handoff after consolidation and the backend direction freeze.
 
 ## Phase 5 Starting Point
 
 - Repository: `info-rbp/rbp-platform`
 - Branch: `main`
-- Phase 4 status: complete
+- Runtime direction: Appwrite backend, Cloudflare frontend, Stripe payments
+- Historical backend reference: Frappe archive only
 
 ## Inputs Available
 
 | Area | Path | Status |
 |---|---|---:|
-| Backend custom Frappe app | `apps/rbp_app/` | Available |
-| Frontend React/Vite portal | `frontend/portal/` | Available |
-| API contracts | `contracts/api/` | Available |
-| DocType contracts | `contracts/doctypes/` | Available |
-| Workflow contracts | `contracts/workflows/` | Available |
-| Permission contracts | `contracts/permissions/` | Available |
-| Onboarding handoff specs | `specs/onboarding-flows/phase-2-handoff/` | Available |
-| API supporting docs | `docs/api-contracts/` | Available |
-| Product-flow supporting docs | `docs/product-flows/` | Available |
+| React/Vite frontend portal | `frontend/portal/` | Available |
+| Appwrite runtime definitions | `appwrite/` | Defined in repository |
+| API and workflow contracts | `contracts/` | Available |
+| Supporting specs | `specs/onboarding-flows/` | Available |
+| Architecture and deployment docs | `docs/` | Available |
+| CI/CD workflows | `.github/workflows/` | Expand for QA |
 
 ## Phase 5 Primary Goals
 
-1. Validate backend app installability in a Frappe bench environment.
-2. Validate backend DocTypes, permissions, hooks, and route guards.
-3. Map frontend routes and mock services to real backend endpoints.
-4. Replace or isolate mock data behind real API integration boundaries.
-5. Decide whether frontend remains separately deployed, Frappe-served, or embedded alongside Frappe.
-6. Add CI checks for frontend build, backend syntax/lint, Frappe install smoke, and integration smoke tests.
+1. Freeze Appwrite as the active backend target.
+2. Replace active Frappe-shaped frontend API usage with Appwrite-oriented providers.
+3. Define Appwrite schema, functions, permissions, and seeds in the repository.
+4. Define Cloudflare QA deployment expectations and route controls.
+5. Wire Stripe checkout and webhook handling through Appwrite Functions.
+6. Add repeatable validation and QA deployment workflows.
 
 ## Phase 5 Guardrails
 
-- Do not re-import the source repositories wholesale.
-- Do not copy Frappe framework core.
-- Do not commit local `.env` files or secrets.
-- Do not commit generated build/runtime output.
-- Do not overwrite Phase 2 contracts without documenting the contract change.
-- Do not bypass the consolidated repository structure.
+- Do not re-activate Frappe as the QA backend target.
+- Do not commit secrets or local environment files.
+- Do not give the browser broad admin write permissions.
+- Do not present customer application provisioning as available.
+- Do not rely on undocumented manual clicking in Appwrite or Cloudflare.
+- Do not treat mocked behavior as production-ready unless explicitly feature-flagged.
 
-## Phase 5 First Technical Checks
+## Target Admin Path
 
-- Run frontend install and build from `frontend/portal/`.
-- Run Python syntax check for `apps/rbp_app/rbp_app/`.
-- Attempt Frappe app install in a bench site.
-- Run Frappe migrate smoke test.
-- Compare `contracts/api/11-route-to-endpoint-map.md` with backend API modules.
-- Compare `contracts/api/16-mock-to-real-api-map.md` with frontend mock services.
+```text
+React /admin -> Appwrite session -> admin role or team check -> Appwrite Function -> Appwrite server-side writes
+```
+
+Appwrite Console may be used as a technical fallback for inspection or configuration only. Frappe assets remain historical reference only.
+
+## First Technical Checks
+
+- inspect Appwrite baseline requirements
+- inspect Cloudflare QA environment requirements
+- validate frontend runtime configuration for Appwrite
+- isolate legacy `/api/method/*` usage from the active QA path
+- validate schema, function, permission, and seed definitions from the repository
 
 ## Handoff Status
 
-Phase 5 can begin after this wrap-up document is merged into `main`.
+Phase 5 proceeds as an Appwrite transition and QA hardening phase.
+
+This foundation stage establishes repository-owned structure, docs, provider seams, and validation entry points. Follow-up implementation work is still required for real Function logic, live deploy automation, executable tests, and end-to-end QA validation.

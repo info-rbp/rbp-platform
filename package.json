@@ -1,0 +1,20 @@
+{
+  "name": "rbp-platform",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "appwrite:inspect": "npx --yes tsx scripts/appwrite/inspect-appwrite.ts",
+    "appwrite:connection:validate": "npx --yes tsx scripts/appwrite/validate-connection.ts",
+    "appwrite:schema:validate": "npx --yes tsx scripts/appwrite/validate-schema.ts",
+    "appwrite:schema:diff": "npx --yes tsx scripts/appwrite/diff-live-schema.ts",
+    "appwrite:schema:deploy": "npx --yes tsx scripts/appwrite/deploy-schema.ts",
+    "appwrite:permissions:validate": "npx --yes tsx scripts/appwrite/validate-permissions.ts",
+    "appwrite:functions:validate": "npx --yes tsx scripts/appwrite/validate-functions.ts",
+    "appwrite:functions:deploy": "npx --yes tsx scripts/appwrite/deploy-functions.ts",
+    "appwrite:seed:qa": "npx --yes tsx scripts/appwrite/seed-qa.ts",
+    "appwrite:seed:validate": "npx --yes tsx scripts/appwrite/validate-qa-seed.ts",
+    "appwrite:stripe-plan-mapping:validate": "npx --yes tsx scripts/appwrite/validate-stripe-plan-mapping.ts",
+    "cloudflare:env:validate": "npx --yes tsx scripts/cloudflare/validate-build-env.ts"
+  }
+}

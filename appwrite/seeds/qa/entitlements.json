@@ -1,0 +1,6 @@
+[
+  { "entitlement_key": "membership", "label": "Membership", "enabled_by_default": true },
+  { "entitlement_key": "portal", "label": "Portal", "enabled_by_default": true },
+  { "entitlement_key": "applications_interest", "label": "Applications Interest", "enabled_by_default": true },
+  { "entitlement_key": "applications_provisioning", "label": "Applications Provisioning", "enabled_by_default": false }
+]

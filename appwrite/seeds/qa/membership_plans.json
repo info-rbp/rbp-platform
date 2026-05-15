@@ -1,0 +1,28 @@
+[
+  {
+    "plan_code": "free",
+    "plan_name": "RBP Free",
+    "billing_cycle": "monthly",
+    "currency": "AUD",
+    "amount": 0,
+    "stripe_product_id": "prod_test_free",
+    "stripe_price_id": "price_test_free",
+    "included_entitlements": ["membership", "portal", "applications_interest"],
+    "description": "Free QA plan",
+    "sort_order": 1,
+    "active": true
+  },
+  {
+    "plan_code": "premium",
+    "plan_name": "RBP Premium",
+    "billing_cycle": "monthly",
+    "currency": "AUD",
+    "amount": 149,
+    "stripe_product_id": "prod_test_premium",
+    "stripe_price_id": "price_test_premium",
+    "included_entitlements": ["membership", "portal", "billing", "notifications", "applications_interest"],
+    "description": "Premium QA plan",
+    "sort_order": 2,
+    "active": true
+  }
+]

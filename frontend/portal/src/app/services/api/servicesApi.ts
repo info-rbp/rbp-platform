@@ -3,6 +3,8 @@ import type {
   PortalProductKey,
 } from "../../types/portal";
 import { apiFailure, apiSuccess, callFrappeMethod } from "./client";
+import { selectApiImplementation } from "./provider";
+import { appwriteServicesApi } from "./appwrite/appwriteServicesApi";
 
 function extractName(data: unknown) {
   const record = data as Record<string, unknown>;
@@ -67,7 +69,8 @@ const endpointMap: Partial<Record<PortalProductKey, {
   },
 };
 
-export const servicesApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeServicesApi = {
   async createAndSubmitRequest(product: PortalProductKey, payload: Record<string, unknown>) {
     const endpoint = endpointMap[product];
 
@@ -101,3 +104,8 @@ export const servicesApi = {
     );
   },
 };
+
+export const servicesApi = selectApiImplementation({
+  appwrite: appwriteServicesApi,
+  legacyFrappe: legacyFrappeServicesApi,
+});

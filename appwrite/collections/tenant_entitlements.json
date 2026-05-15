@@ -1,0 +1,11 @@
+{
+  "id": "tenant_entitlements",
+  "name": "Tenant Entitlements",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "entitlement_key", "type": "string", "size": 64, "required": true },
+    { "key": "enabled", "type": "boolean", "required": true }
+  ]
+}

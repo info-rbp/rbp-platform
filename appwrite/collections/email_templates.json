@@ -1,0 +1,11 @@
+{
+  "id": "email_templates",
+  "name": "Email Templates",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "template_key", "type": "string", "size": 128, "required": true },
+    { "key": "subject", "type": "string", "size": 255, "required": true },
+    { "key": "html_path", "type": "string", "size": 255, "required": true }
+  ]
+}

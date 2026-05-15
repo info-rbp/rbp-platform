@@ -1,0 +1,6 @@
+[
+  { "email": "qa.free@remotebusinesspartner.com.au", "role": "member", "plan_code": "free" },
+  { "email": "qa.premium@remotebusinesspartner.com.au", "role": "member", "plan_code": "premium" },
+  { "email": "qa.admin@remotebusinesspartner.com.au", "role": "admin", "plan_code": "premium" },
+  { "email": "qa.support@remotebusinesspartner.com.au", "role": "support", "plan_code": "premium" }
+]

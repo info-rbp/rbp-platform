@@ -1,0 +1,16 @@
+{
+  "id": "business_profiles",
+  "name": "Business Profiles",
+  "documentSecurity": true,
+  "permissions": {
+    "read": ["team:admins"],
+    "create": ["team:admins"],
+    "update": ["team:admins"],
+    "delete": ["team:admins"]
+  },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "business_name", "type": "string", "size": 255, "required": true },
+    { "key": "contact_email", "type": "string", "size": 255, "required": false }
+  ]
+}

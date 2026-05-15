@@ -1,0 +1,12 @@
+{
+  "id": "subscriptions",
+  "name": "Subscriptions",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "plan_code", "type": "string", "size": 64, "required": true },
+    { "key": "status", "type": "string", "size": 32, "required": true },
+    { "key": "stripe_subscription_id", "type": "string", "size": 128, "required": false }
+  ]
+}

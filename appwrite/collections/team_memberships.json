@@ -1,0 +1,16 @@
+{
+  "id": "team_memberships",
+  "name": "Team Memberships",
+  "documentSecurity": true,
+  "permissions": {
+    "read": ["team:admins"],
+    "create": ["team:admins"],
+    "update": ["team:admins"],
+    "delete": ["team:admins"]
+  },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "user_profile_id", "type": "string", "size": 64, "required": true },
+    { "key": "team_role", "type": "string", "size": 64, "required": true }
+  ]
+}

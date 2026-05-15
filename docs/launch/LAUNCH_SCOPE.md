@@ -33,7 +33,7 @@ The QA launch scope includes:
 - Service request flows.
 - Marketplace enquiry and listing request flows.
 - Offers, resources, documents, and support.
-- Admin backend through Frappe Desk.
+- React `/admin` operations backed by Appwrite Functions.
 - Admin Applications management.
 - Email notification testing.
 - SEO baseline.
@@ -51,7 +51,7 @@ The following can be live in the QA deployment:
 - Marketplace enquiry and listing request intake.
 - Application interest registration.
 - Offers, resources, documents, and support views.
-- Admin operational workflows in Frappe Desk.
+- Admin operational workflows exposed through React `/admin` where they are backed by Appwrite Functions and persisted Appwrite records.
 - Admin Applications management.
 - QA-safe notification tests.
 - SEO baseline metadata for public routes.
@@ -68,7 +68,7 @@ The following are mocked, sandboxed, seeded, or QA-only:
 - Marketplace listing and enquiry handling before final production moderation and seller operations.
 - Offer discovery and request/interest states before live redemption.
 - Documents and support flows before final production document operations.
-- React `/admin` screens that are not fully connected to backend persistence.
+- React `/admin` screens that are not yet fully connected to backend persistence.
 
 QA-only functionality must be labelled or operated so testers do not confuse it with production capability.
 
@@ -86,7 +86,7 @@ Admin-only launch scope includes:
 - Stripe webhook/payment event inspection.
 - Offer, resource, document, help, support, and site content administration.
 - Email notification configuration and QA verification.
-- Frappe Desk operational review.
+- Appwrite-backed admin operational review.
 
 Customers can register interest in Applications but cannot provision, open, launch, or activate Applications.
 
@@ -125,15 +125,20 @@ The following are delayed and must not be treated as part of the Milestone 0 lau
 - Production email sending outside QA-safe controls.
 - Final production observability, alerting, incident response, and support handover.
 - Full production UAT signoff, load testing, and security certification.
-- React `/admin` as a standalone operational source of truth unless fully connected to backend persistence.
+- React `/admin` as a standalone operational source of truth unless fully connected to Appwrite persistence and Appwrite Functions.
 
 ## Admin Backend Source of Truth
 
-Frappe Desk is the operational admin backend for QA.
+React `/admin` backed by Appwrite Functions is the target operational admin surface for the Appwrite QA path.
 
-For launch-scope purposes, Frappe Desk is the authoritative operational admin backend for persisted QA records and admin review. This includes Applications, Application interest, service requests, marketplace requests, membership/payment records, notification records, and persisted admin-managed content.
+For launch-scope purposes, Appwrite collections are the persisted source of truth for QA records and admin review. React `/admin` may operate on that data only through Appwrite-authenticated access and privileged Appwrite Functions.
 
-React `/admin` is not the only source of truth unless fully connected to backend persistence. A React `/admin` view that is scaffolded, mock-backed, fixture-backed, or only partially connected must be treated as a QA/admin preview surface, not the definitive operational backend.
+Appwrite Console may be used as a technical fallback for inspection or configuration only. Frappe assets are retained only as historical reference and are not the active QA backend.
+
+Foundation note:
+
+- this branch establishes the admin structure and runtime boundary
+- some admin flows may still be scaffolded until follow-up implementation PRs complete the Appwrite Function logic and connected UI behavior
 
 ## Applications Rollout Boundary
 
@@ -143,7 +148,7 @@ Allowed:
 
 - Customers browse Application information where exposed.
 - Customers register interest in Applications.
-- Admins review and manage Applications through the admin backend.
+- Admins review and manage Applications through the Appwrite-backed admin surface.
 - Admins review Application interest and decide follow-up outside customer self-provisioning.
 
 Not allowed:
@@ -167,7 +172,7 @@ Go for QA launch requires:
 - Marketplace enquiry and listing request flows can be submitted and reviewed.
 - Customers can register Application interest but cannot provision, open, launch, or activate Applications.
 - Applications management is admin-only.
-- Frappe Desk is available as the operational admin backend for QA.
+- Appwrite-backed admin workflows are available for any capability treated as live in QA.
 - React `/admin` limitations are documented for any unpersisted or partially connected admin views.
 - Offers, resources, documents, and support surfaces are available for QA validation.
 - Email notification testing is constrained to QA-safe controls.
@@ -181,6 +186,6 @@ No-go for QA launch if:
 - Stripe live mode is configured or required for QA.
 - Customers can provision, open, launch, or activate Applications.
 - Application controls are available to non-admin users.
-- Frappe Desk cannot be used for operational admin review.
+- The active QA admin path still depends on Frappe Desk or legacy Frappe endpoints.
 - React `/admin` is presented as authoritative while backed by mocks or unpersisted state.
 - Critical public website, auth, portal, checkout, service request, marketplace request, or admin review flows cannot be validated.

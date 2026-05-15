@@ -1,177 +1,150 @@
 # RBP Platform
 
-Final source-of-truth repository for the Remote Business Partner Platform.
+Source-of-truth repository for the Remote Business Partner platform.
 
-Status: Phase 4 consolidation complete; Phase 5 handoff ready.
+Status: Phase 5 Appwrite transition foundation in progress on top of the consolidated Phase 4 repository.
+
+## Active Runtime Direction
+
+RBP V.4 now treats the repository as the operational source of truth for the launchable QA stack:
+
+- Appwrite is the active backend runtime.
+- Cloudflare is the active frontend deployment/runtime layer.
+- GitHub is the source of truth for schema, functions, permissions, seeds, docs, and deployment workflows.
+- Stripe is the payment runtime for QA and later production mapping.
+- React/Vite remains the frontend application deployed through Cloudflare.
+- Frappe assets remain reference and archive material only.
+
+No new active backend implementation work should continue in Frappe for this QA release path.
 
 ## Purpose
 
-This repository is the consolidation target for the completed Remote Business Partner Platform workstreams.
+This repository defines the RBP QA application and the transition path away from legacy Frappe-shaped APIs, Firebase remnants, and ad hoc mocks.
 
-It is intended to become the structured production repository for:
+The repository is intended to contain:
 
-- the custom Frappe backend app
 - the React/Vite frontend portal
-- Phase 2 API, DocType, workflow, and permission contracts
-- onboarding and product-flow specifications
-- infrastructure and deployment materials
-- architecture and operational documentation
-- backend, frontend, and integration test entry points
+- Appwrite schema, seed, permissions, and function definitions
+- API and workflow contracts
+- launch, QA, deployment, and architecture documentation
+- CI/CD workflows for validation and QA deployment
+- tests and smoke checks for the QA release path
 
 ## Current Phase
 
 Current phase:
 
 ```text
-Phase 4 - Consolidation complete
+Phase 5 - Appwrite transition foundation and QA hardening
 ```
 
-Completed in this branch:
+Established in this branch:
 
-- source repository states confirmed
-- `docs/architecture/ARCHITECTURE.md`
-- `docs/architecture/SOURCE_MANIFEST.md` finalized
-- base repository structure created
-- environment examples added
-- root `.gitignore` added
-- Phase 4A validation workflow added
-- placeholder targets created for future imports
+- backend direction freeze documentation
+- Appwrite QA scope and baseline structure
+- Appwrite provider/runtime configuration
+- Appwrite schema/function/seeding framework scaffolding
+- Appwrite-oriented frontend API integration seam
+- Cloudflare QA and CI/CD documentation/workflow scaffolding
 
-Completed in Phase 4:
+Still not proven in this branch alone:
 
-- frontend migration
-- Phase 2 contract migration
-- `rbp_app` import
+- live Appwrite inspection and deployment
+- live Cloudflare QA validation
+- live Stripe test checkout and webhook execution
+- live QA seeding and smoke execution
+- fully implemented Appwrite Function business logic
+- executable end-to-end tests for the migration path
 
-Not yet performed:
+## Runtime Boundaries
 
-- backend/frontend integration
-- production deployment
-- QA launch validation
+### Appwrite
 
-## Source Repositories
+Appwrite is the active backend runtime for:
 
-### UI/UX and Phase 2 contract source
+- Auth
+- Databases
+- Storage
+- Functions
+- Teams and admin boundaries
+- notification and email integration where applicable
+
+Appwrite resources must be defined and validated from this repository.
+
+Target operational admin path for the Appwrite QA release:
 
 ```text
-info-rbp/Uiuxdesignassistance
+React /admin -> Appwrite session -> admin role or team check -> Appwrite Function -> Appwrite server-side writes
 ```
 
-Current known source commit:
+Appwrite Console may be used as a technical fallback for inspection or configuration only. It is not the primary operational admin surface for the QA release path.
 
-```text
-6165346d4fc29fba6b78ec84e32285159a182c82
-```
+### Cloudflare
 
-Expected future targets:
+Cloudflare is the active frontend deployment/runtime layer for:
 
-- `frontend/portal/`
-- `contracts/`
-- `specs/onboarding-flows/`
-- `docs/product-flows/`
-- `docs/api-contracts/`
+- preview and QA builds
+- SPA routing fallback
+- public route headers and redirects
+- frontend environment variable injection
 
-### Backend source
+### Frappe
 
-```text
-info-rbp/frappe-project
-```
+Frappe code remains in the repository only as reference or archive material imported during consolidation. It is not the active backend target for the QA release path.
 
-Current known source commit:
-
-```text
-bf8dc2c1bb14107c52a4eef9f3743d4580d0e5a1
-```
-
-Expected future target:
-
-```text
-apps/rbp_app/
-```
-
-Only the custom Frappe app `rbp_app/` is eligible for import.
-
-Do not copy:
-
-- `frappe/`
-- `apps/frappe/`
-- Frappe framework core
-- local bench runtime files
-- generated reports
-- secrets
-- local environment files
+Historical Frappe docs are preserved where useful, but active architecture, launch, QA, and deployment documents must now describe Appwrite as the backend target.
 
 ## Repository Structure
 
 ```text
 rbp-platform/
+├── appwrite/
+│   ├── appwrite.config.json
+│   ├── databases/
+│   ├── collections/
+│   ├── buckets/
+│   ├── functions/
+│   ├── seeds/
+│   └── templates/
 ├── apps/
 │   └── rbp_app/
 ├── frontend/
 │   └── portal/
 ├── contracts/
-│   ├── api/
-│   ├── doctypes/
-│   ├── workflows/
-│   └── permissions/
-├── specs/
-│   └── onboarding-flows/
-├── infra/
-│   ├── bench/
-│   ├── docker/
-│   └── deployment/
 ├── docs/
-│   ├── architecture/
-│   ├── api-contracts/
-│   ├── product-flows/
-│   ├── deployment/
-│   ├── qa/
-│   ├── launch/
-│   └── runbook/
+├── scripts/
+│   ├── appwrite/
+│   └── cloudflare/
 ├── tests/
-│   ├── backend/
-│   ├── frontend/
-│   └── integration/
-└── .github/
-    └── workflows/
+└── .github/workflows/
 ```
 
 ## Key Documents
 
-- `docs/architecture/ARCHITECTURE.md`
-- `docs/architecture/SOURCE_MANIFEST.md`
-- `docs/architecture/REPOSITORY_STRATEGY.md`
-- `docs/architecture/PHASE_4A_STATUS.md`
-- `docs/architecture/CONSOLIDATION_CHECKLIST.md`
-- `docs/architecture/PHASE_4_COMPLETION_REPORT.md`
-- `docs/architecture/PHASE_5_HANDOFF.md`
-- `docs/api-contracts/API_CONTRACTS.md`
-- `docs/product-flows/PRODUCT_FLOWS.md`
-- `docs/product-flows/ONBOARDING_FLOWS.md`
-- `docs/architecture/CONSOLIDATED_REPO_VALIDATION.md`
-- `docs/runbook/RUNBOOK.md`
-- `docs/launch/LAUNCH_PLAN.md`
-- `docs/qa/QA_PLAN.md`
-- `docs/deployment/DEPLOYMENT.md`
+- `docs/architecture/BACKEND_FREEZE_DECISION.md`
+- `docs/architecture/APPWRITE_TRANSITION_DECISION.md`
+- `docs/architecture/FRAPPE_DEPRECATION_PLAN.md`
+- `docs/appwrite/APPWRITE_SOURCE_OF_TRUTH.md`
+- `docs/launch/LAUNCH_SCOPE.md`
+- `docs/qa/QA_RELEASE_SCOPE.md`
+- `docs/appwrite/APPWRITE_QA_SCOPE.md`
+- `docs/implementation/APPWRITE_TRANSITION_IMPLEMENTATION_REPORT.md`
 
-## Phase 4A Rule
+## Operating Rules
 
-This phase is structured consolidation.
+- Do not commit secrets.
+- Do not give the browser broad admin write access.
+- Route privileged actions through Appwrite Functions.
+- Keep mock behavior behind explicit feature flags only.
+- Keep customer-facing application provisioning disabled for QA.
+- Use repository-defined scripts and workflows instead of undocumented manual runtime changes.
+- Do not treat scaffolding, placeholder tests, or dry-run-only scripts as proof of live runtime completion.
 
-It is not integration, rewrite, QA, launch, or production deployment.
+## Historical Sources
 
-Do not turn this repository into a junk drawer.
+Reference-only source history:
 
+- `info-rbp/Uiuxdesignassistance`
+- `info-rbp/frappe-project`
 
-## Phase 5 Source Freeze
-
-As of the Phase 5 preparation gate, this repository is the only approved candidate source for Phase 5 Integration.
-
-Previous repositories are reference/source-history only:
-
-- info-rbp/Uiuxdesignassistance
-- info-rbp/frappe-project
-
-See:
-
-    docs/architecture/PHASE_5_SOURCE_FREEZE.md
+See `docs/architecture/PHASE_5_SOURCE_FREEZE.md` and the Appwrite transition documents for the current operating model.

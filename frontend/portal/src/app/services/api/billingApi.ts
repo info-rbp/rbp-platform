@@ -1,15 +1,12 @@
 import { callFrappeMethod } from "./client";
+import { selectApiImplementation } from "./provider";
+import {
+  appwriteBillingApi,
+  type MembershipCheckoutSession,
+} from "./appwrite/appwriteBillingApi";
 
-export interface MembershipCheckoutSession {
-  checkout_url?: string;
-  url?: string;
-  checkout_session_id?: string;
-  session_id?: string;
-  status?: string;
-  message?: string;
-}
-
-export const billingApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeBillingApi = {
   createMembershipCheckoutSession(payload: Record<string, unknown>) {
     return callFrappeMethod<MembershipCheckoutSession>(
       "rbp_app.api.billing.create_membership_checkout_session",
@@ -29,3 +26,8 @@ export const billingApi = {
     return callFrappeMethod("rbp_app.api.billing.cancel_subscription", {});
   },
 };
+
+export const billingApi = selectApiImplementation({
+  appwrite: appwriteBillingApi,
+  legacyFrappe: legacyFrappeBillingApi,
+});

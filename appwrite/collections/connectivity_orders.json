@@ -1,0 +1,11 @@
+{
+  "id": "connectivity_orders",
+  "name": "Connectivity Orders",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "service_request_id", "type": "string", "size": 64, "required": true },
+    { "key": "address", "type": "string", "size": 255, "required": false },
+    { "key": "product_code", "type": "string", "size": 64, "required": false }
+  ]
+}

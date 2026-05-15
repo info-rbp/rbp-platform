@@ -1,0 +1,11 @@
+{
+  "id": "marketplace_enquiries",
+  "name": "Marketplace Enquiries",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "listing_id", "type": "string", "size": 64, "required": true },
+    { "key": "tenant_id", "type": "string", "size": 64, "required": false },
+    { "key": "message", "type": "string", "size": 4000, "required": true }
+  ]
+}

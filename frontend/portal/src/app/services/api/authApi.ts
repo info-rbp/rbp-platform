@@ -1,5 +1,7 @@
 import type { PortalCustomerAuthUser } from "../../types/portal";
 import { apiFailure, apiSuccess, callFrappeMethod } from "./client";
+import { selectApiImplementation } from "./provider";
+import { appwriteAuthApi } from "./appwrite/appwriteAuthApi";
 
 interface FrappeUserPayload {
   user?: string;
@@ -21,7 +23,8 @@ function normaliseUser(payload: FrappeUserPayload): PortalCustomerAuthUser {
   };
 }
 
-export const authApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeAuthApi = {
   async getCurrentUser() {
     const response = await callFrappeMethod<FrappeUserPayload>("rbp_app.api.me.get_current_user", {}, { method: "GET" });
 
@@ -49,7 +52,7 @@ export const authApi = {
     return this.getCurrentUser();
   },
 
-  async signUp(payload: { name: string; email: string; businessName?: string }) {
+  async signUp(payload: { name: string; email: string; businessName?: string; password?: string }) {
     const response = await callFrappeMethod<unknown>("rbp_app.api.membership.create_signup", {
       payload: {
         name: payload.name,
@@ -83,3 +86,8 @@ export const authApi = {
     return apiSuccess("/api/method/logout", { signedOut: true });
   },
 };
+
+export const authApi = selectApiImplementation({
+  appwrite: appwriteAuthApi,
+  legacyFrappe: legacyFrappeAuthApi,
+});

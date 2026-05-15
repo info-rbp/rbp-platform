@@ -1,0 +1,27 @@
+{
+  "project": "rbp-platform",
+  "defaultEnvironment": "qa",
+  "database": {
+    "id": "rbp_platform",
+    "name": "RBP Platform"
+  },
+  "buckets": [
+    "rbp_documents"
+  ],
+  "functions": [
+    "bootstrap-tenant",
+    "create-membership-checkout",
+    "stripe-webhook",
+    "get-subscription-status",
+    "cancel-subscription",
+    "list-my-entitlements",
+    "admin-update-entitlements",
+    "send-notification",
+    "process-notification-queue",
+    "create-service-request",
+    "list-my-service-requests",
+    "admin-list-service-requests",
+    "admin-update-service-status",
+    "admin-operations"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "application_provisioning_requests",
+  "name": "Application Provisioning Requests",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "application_id", "type": "string", "size": 64, "required": true },
+    { "key": "status", "type": "string", "size": 32, "required": true }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "applications",
+  "name": "Applications",
+  "documentSecurity": true,
+  "permissions": { "read": ["role:users", "team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "application_name", "type": "string", "size": 255, "required": true },
+    { "key": "application_key", "type": "string", "size": 128, "required": true },
+    { "key": "category_id", "type": "string", "size": 64, "required": false },
+    { "key": "description", "type": "string", "size": 4000, "required": false },
+    { "key": "short_description", "type": "string", "size": 512, "required": false },
+    { "key": "status", "type": "string", "size": 32, "required": true },
+    { "key": "visibility", "type": "string", "size": 32, "required": true },
+    { "key": "provider", "type": "string", "size": 64, "required": false },
+    { "key": "public_summary", "type": "string", "size": 512, "required": false },
+    { "key": "portal_summary", "type": "string", "size": 512, "required": false },
+    { "key": "sort_order", "type": "integer", "required": false },
+    { "key": "requires_subscription", "type": "boolean", "required": true },
+    { "key": "requires_manual_approval", "type": "boolean", "required": true },
+    { "key": "interest_enabled", "type": "boolean", "required": true },
+    { "key": "provisioning_enabled", "type": "boolean", "required": true }
+  ]
+}
