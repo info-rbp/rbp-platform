@@ -1,7 +1,7 @@
 import path from "node:path";
-import { appwriteRoot, listFunctionDirectories, listJsonFiles, logSection, readJson } from "./_lib";
+import { appwriteRoot, createAdminServices, listFunctionDirectories, listJsonFiles, logSection, readConfig } from "./_lib";
 
-const config = readJson<Record<string, unknown>>(path.join(appwriteRoot, "appwrite.config.json"));
+const config = readConfig();
 
 logSection("Repository baseline");
 console.log(`Project: ${config.project}`);
@@ -10,9 +10,23 @@ console.log(`Collection definitions: ${listJsonFiles("appwrite/collections").len
 console.log(`Bucket definitions: ${listJsonFiles("appwrite/buckets").length}`);
 console.log(`Function directories: ${listFunctionDirectories().length}`);
 
-logSection("Environment");
-console.log(`APPWRITE_ENDPOINT=${process.env.APPWRITE_ENDPOINT ? "set" : "missing"}`);
-console.log(`APPWRITE_PROJECT_ID=${process.env.APPWRITE_PROJECT_ID ? "set" : "missing"}`);
-console.log(`APPWRITE_DATABASE_ID=${process.env.APPWRITE_DATABASE_ID ? "set" : "missing"}`);
-console.log(`APPWRITE_STORAGE_BUCKET_ID=${process.env.APPWRITE_STORAGE_BUCKET_ID ? "set" : "missing"}`);
-console.log(`APPWRITE_API_KEY=${process.env.APPWRITE_API_KEY ? "set" : "missing"}`);
+if (!process.env.APPWRITE_ENDPOINT || !process.env.APPWRITE_PROJECT_ID || !process.env.APPWRITE_API_KEY) {
+  logSection("Environment");
+  console.log("Live Appwrite inspection skipped because APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID, or APPWRITE_API_KEY is missing.");
+  process.exit(0);
+}
+
+const { databases, functions, storage, databaseId, storageBucketId } = createAdminServices();
+
+logSection("Live inventory");
+const liveDatabase = await databases.get(databaseId);
+const liveCollections = await databases.listCollections(databaseId);
+const liveFunctions = await functions.list();
+const liveBucket = await storage.getBucket(storageBucketId);
+
+console.log(JSON.stringify({
+  database: { id: liveDatabase.$id, name: liveDatabase.name },
+  collections: liveCollections.collections.map((collection) => collection.$id),
+  functions: liveFunctions.functions.map((fn) => fn.$id),
+  bucket: { id: liveBucket.$id, name: liveBucket.name },
+}, null, 2));
