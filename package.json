@@ -13,6 +13,7 @@
     "appwrite:functions:validate": "npx --yes tsx scripts/appwrite/validate-functions.ts",
     "appwrite:functions:deploy": "npx --yes tsx scripts/appwrite/deploy-functions.ts",
     "appwrite:seed:qa": "npx --yes tsx scripts/appwrite/seed-qa.ts",
+    "appwrite:reset:qa": "npx --yes tsx scripts/appwrite/reset-qa-data.ts",
     "appwrite:seed:validate": "npx --yes tsx scripts/appwrite/validate-qa-seed.ts",
     "appwrite:stripe-plan-mapping:validate": "npx --yes tsx scripts/appwrite/validate-stripe-plan-mapping.ts",
     "cloudflare:env:validate": "npx --yes tsx scripts/cloudflare/validate-build-env.ts",
@@ -22,9 +23,13 @@
     "smoke:qa:service-requests": "node scripts/smoke/run-smoke-check.mjs service-requests",
     "smoke:qa:admin": "node scripts/smoke/run-smoke-check.mjs admin",
     "smoke:qa:permissions": "node scripts/smoke/run-smoke-check.mjs permissions",
-    "test": "node --test tests/config/*.test.mjs tests/schema/*.test.mjs tests/integration/*.test.mjs tests/smoke/*.test.mjs",
-    "test:unit": "node --test tests/config/*.test.mjs tests/schema/*.test.mjs",
-    "test:integration": "node --test tests/integration/*.test.mjs",
+    "test": "npm run test:unit && npm run test:integration && npm run test:smoke:dry-run",
+    "test:unit": "node --test tests/config/*.test.mjs tests/schema/*.test.mjs && npx --yes tsx --test tests/functions/*.test.ts",
+    "test:integration": "node --test tests/integration/*.test.mjs && npx --yes tsx --test tests/runtime/*.test.ts",
     "test:smoke:dry-run": "node --test tests/smoke/*.test.mjs"
+  },
+  "dependencies": {
+    "node-appwrite": "^15.0.1",
+    "stripe": "^18.3.0"
   }
 }
