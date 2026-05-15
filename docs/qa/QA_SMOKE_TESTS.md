@@ -1,67 +1,135 @@
 # QA Smoke Tests
 
-## Public Route Checks
+This runbook is retained from the superseded QA readiness artifacts because it is useful operational material not covered in full by `docs/qa/FINAL_QA_READINESS_ACTION_REGISTER.md`.
 
-| Route | Expected |
-| --- | --- |
-| `/` | Home loads without console errors. |
-| `/applications` | Applications show coming soon or register interest states. |
-| `/membership` | Membership content loads and Stripe QA/test wording is visible where applicable. |
-| `/offers` | Offers listing loads. |
-| `/help` | Help content loads. |
+Do not mark any item passed unless it was actually executed and evidence was captured.
 
-## Auth Checks
+## Preconditions
 
-| Scenario | Expected |
-| --- | --- |
-| Guest opens portal route | Redirected or blocked by auth gate. |
-| QA free user signs in | Portal dashboard loads with free membership state. |
-| QA premium user signs in | Portal dashboard loads with premium membership state. |
-| Sign out | Session clears and protected routes are blocked. |
+- QA frontend URL is reachable.
+- QA backend site is reachable.
+- Customer test account exists.
+- Admin/Frappe Desk account exists.
+- Stripe test product, price, and webhook are configured.
+- Email sandbox and allowlist are configured.
+- Candidate frontend and backend commits are known.
 
-## Portal Checks
+## Evidence to capture
 
-| Route | Expected |
-| --- | --- |
-| `/portal/dashboard` | Dashboard loads current membership, billing, and service activity. |
-| `/portal/apps` | Applications show next rollout/register interest only. |
-| `/portal/membership/checkout` | Checkout form validates required fields and terms acceptance. |
-| `/portal/notifications` | Notifications list loads for authenticated users. |
+For every test, record:
 
-## Stripe Checkout Checks
+- Date and tester.
+- Route, endpoint, or record.
+- User role.
+- Expected result.
+- Actual result.
+- Status: Pass, Fail, or Blocked.
+- Screenshot, log reference, record ID, or command output.
 
-| Scenario | Expected |
-| --- | --- |
-| Premium checkout submitted | Backend creates a Stripe Checkout Session in test mode. |
-| Successful test card checkout | User returns to confirmation state and payment event is recorded. |
-| Successful subscription webhook | Subscription status updates to active and expected entitlements are granted. |
-| Failed payment test card | Failure state is recorded and notification is queued/sent to QA allowlist only. |
-| Cancel checkout | User returns to checkout without activating paid benefits. |
-| Duplicate webhook delivery | No duplicate payment event or duplicate customer notification is created. |
+## Public route smoke matrix
 
-## Application Interest Checks
+Test as guest:
 
-| Scenario | Expected |
-| --- | --- |
-| Guest registers interest with email | Interest record is created and notification uses sandbox/allowlist controls. |
-| Authenticated user registers interest | Interest record is linked to user and tenant where available. |
-| Duplicate interest review | Admin can identify existing interest before contacting customer. |
+- `/`
+- `/about`
+- `/our-platform`
+- `/discovery-call`
+- `/work-with-us`
+- `/work-for-us`
+- `/contact`
+- `/contact-us`
+- `/offers`
+- `/resources`
+- `/help`
+- `/marketplace`
+- `/membership`
+- `/applications`
+- `/legal/privacy-policy`
+- `/legal/terms`
+- `/legal/terms-of-use`
+- `/legal/services-policy`
+- `/legal/terms-of-engagement`
+- `/legal/payment-policy`
+- `/signin`
+- `/signup`
+- `/robots.txt`
+- `/sitemap.xml`
 
-## Email Checks
+Expected:
 
-| Scenario | Expected |
-| --- | --- |
-| Payment success | QA inbox receives `[RBP QA]` payment success email. |
-| Payment failure | QA inbox receives `[RBP QA]` payment failure email. |
-| Application interest | QA inbox receives `[RBP QA]` application interest email. |
-| Service request | QA inbox receives `[RBP QA]` service request email. |
-| Unapproved recipient | Email is blocked or redirected and logged. |
+- HTTP 200 or intended redirect.
+- No fatal JavaScript error.
+- Page title and metadata present where applicable.
+- No placeholder-only copy.
+- No live payment promise during QA.
+- `/applications` remains delayed/register-interest only.
+- Marketplace remains reviewed, gated, or enquiry-based.
 
-## Admin/Frappe Desk Checks
+## Protected route smoke matrix
 
-| Area | Expected |
-| --- | --- |
-| Applications | Seeded records are visible and provisioning is disabled. |
-| Membership Plan | Premium plan has the Stripe test price ID. |
-| Payment Event | Raw Stripe payload is visible only to admin roles. |
-| Notification Delivery | Delivery attempts and failures are logged. |
+Test as guest:
+
+- `/portal/dashboard`
+- `/admin/dashboard`
+- `/admin/signin`
+
+Expected:
+
+- `/portal/dashboard` redirects or gates access.
+- `/admin/dashboard` is blocked for guests and customers.
+- `/admin/signin` is reachable if React admin sign-in remains in scope.
+- Frappe Desk remains the operational admin backend.
+
+## Membership and Stripe test-mode smoke
+
+Required only after Stripe QA setup exists.
+
+- Select a membership plan.
+- Confirm checkout starts through backend billing API.
+- Confirm Stripe Checkout is in test mode.
+- Complete with Stripe test card.
+- Confirm payment event, subscription, and entitlement records in Frappe.
+- Confirm notification is logged or sandbox-sent.
+
+Do not accept mock success as Stripe proof.
+
+## Applications interest smoke
+
+- Confirm public `/applications` uses coming-soon/register-interest language.
+- Submit public interest if enabled.
+- Sign in and submit portal interest if enabled.
+- Confirm `RBP Application Interest` or equivalent backend record exists.
+- Confirm no provisioning request is created.
+
+## Service and marketplace smoke
+
+Run as authenticated customer/member where applicable:
+
+- Decision Desk.
+- DocuShare.
+- Connectivity/NBN.
+- Risk Advisor.
+- The Fixer.
+- Marketplace listing interest/request.
+- Marketplace enquiry.
+- Support request.
+
+Expected:
+
+- Account gates work where required.
+- Submission creates a backend record.
+- Confirmation shows reference ID where applicable.
+- Frappe Desk/admin can inspect the record.
+- Notification is logged or sandbox-sent if enabled.
+
+## Result table
+
+| Test area | Route or record | Role | Expected | Actual | Status | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| Public smoke | `/applications` | Guest | Interest-only messaging |  | Not Run |  |
+| Auth | `/portal/dashboard` | Guest | Redirect or gate |  | Not Run |  |
+| Billing | Membership checkout | Customer | Stripe test checkout starts |  | Not Run |  |
+| Applications | Application interest record | Guest/customer | Interest record created, no provisioning |  | Not Run |  |
+| Marketplace | Listing/enquiry | Customer/member | Reviewed/gated record flow |  | Not Run |  |
+| Email | Notification delivery/log | Admin | Sandbox-safe delivery/log |  | Not Run |  |
+| Admin | Frappe Desk | Admin | Records inspectable |  | Not Run |  |
