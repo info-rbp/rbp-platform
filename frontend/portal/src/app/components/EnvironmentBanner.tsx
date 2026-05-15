@@ -6,6 +6,7 @@ export function EnvironmentBanner() {
   }
 
   const flags = [
+    `Backend ${environment.backendProvider}`,
     environment.features.stripe_checkout ? "Stripe checkout enabled" : "Stripe checkout disabled",
     environment.features.application_provisioning ? "Applications provisioning enabled" : "Applications provisioning delayed",
     environment.features.email_notifications ? "Email notifications enabled" : "Email notifications disabled",
