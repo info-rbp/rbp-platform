@@ -1,3 +1,5 @@
+// Foundation fixture only. This file documents the intended disabled-provisioning
+// expectations, but it is not yet wired into an executable test runner.
 export function applicationProvisioningDisabledTest() {
   return {
     name: "application provisioning remains disabled",
