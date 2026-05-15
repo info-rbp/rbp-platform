@@ -35,7 +35,8 @@ function activityFromRaw(raw: Record<string, unknown>, index: number): PortalPro
   };
 }
 
-const legacyPortalApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappePortalApi = {
   async getDashboardState() {
     const response = await callFrappeMethod<Record<string, unknown>>(
       "rbp_app.api.dashboard.get_home",
@@ -91,5 +92,5 @@ const legacyPortalApi = {
 
 export const portalApi = selectApiImplementation({
   appwrite: appwritePortalApi,
-  frappe: legacyPortalApi,
+  legacyFrappe: legacyFrappePortalApi,
 });
