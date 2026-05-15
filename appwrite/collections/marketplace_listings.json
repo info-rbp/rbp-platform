@@ -1,0 +1,11 @@
+{
+  "id": "marketplace_listings",
+  "name": "Marketplace Listings",
+  "documentSecurity": true,
+  "permissions": { "read": ["role:users", "team:admins"], "create": ["role:users"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "service_request_id", "type": "string", "size": 64, "required": false },
+    { "key": "listing_title", "type": "string", "size": 255, "required": true },
+    { "key": "status", "type": "string", "size": 32, "required": true }
+  ]
+}
