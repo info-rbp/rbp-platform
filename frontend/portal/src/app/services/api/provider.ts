@@ -7,18 +7,16 @@ export function getActiveBackendProvider(): BackendProvider {
 
 export function selectApiImplementation<T>(implementations: {
   appwrite: T;
-  frappe: T;
   mock?: T;
+  legacyFrappe?: T;
 }): T {
   const provider = getActiveBackendProvider();
-
-  if (provider === "appwrite") {
-    return implementations.appwrite;
-  }
 
   if (provider === "mock" && implementations.mock) {
     return implementations.mock;
   }
 
-  return implementations.frappe;
+  // Legacy Frappe adapters may remain in the codebase for comparison or migration
+  // reference, but active QA and production traffic must resolve to Appwrite.
+  return implementations.appwrite;
 }
