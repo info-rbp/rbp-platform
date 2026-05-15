@@ -32,7 +32,7 @@ test("audit sanitization redacts secrets", () => {
 
 test("audit events preserve event names and sanitize payloads", () => {
   const event = createAuditEvent("stripe_webhook", { webhookSecret: "abc", state: "processed" });
-  assert.equal(event.event_name, undefined);
+  assert.equal(event.event_name, "stripe_webhook");
   assert.equal((event.payload as Record<string, unknown>).webhookSecret, "[redacted]");
 });
 
