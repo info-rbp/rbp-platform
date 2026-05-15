@@ -1,0 +1,10 @@
+{
+  "id": "stripe_customers",
+  "name": "Stripe Customers",
+  "documentSecurity": true,
+  "permissions": { "read": ["team:admins"], "create": ["team:admins"], "update": ["team:admins"], "delete": ["team:admins"] },
+  "attributes": [
+    { "key": "tenant_id", "type": "string", "size": 64, "required": true },
+    { "key": "stripe_customer_id", "type": "string", "size": 128, "required": true }
+  ]
+}
