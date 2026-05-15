@@ -1,6 +1,8 @@
 import { callFrappeMethod } from "./client";
+import { selectApiImplementation } from "./provider";
+import { appwriteNotificationsApi } from "./appwrite/appwriteNotificationsApi";
 
-export const notificationsApi = {
+const legacyNotificationsApi = {
   listMyNotifications() {
     return callFrappeMethod("rbp_app.api.notifications.get_notifications", {}, { method: "GET" });
   },
@@ -13,3 +15,8 @@ export const notificationsApi = {
     return callFrappeMethod("rbp_app.api.notifications.mark_all_notifications_read", {});
   },
 };
+
+export const notificationsApi = selectApiImplementation({
+  appwrite: appwriteNotificationsApi,
+  frappe: legacyNotificationsApi,
+});
