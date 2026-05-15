@@ -23,7 +23,8 @@ function normaliseUser(payload: FrappeUserPayload): PortalCustomerAuthUser {
   };
 }
 
-const legacyAuthApi = {
+// Legacy Frappe reference only. Not used by the Appwrite QA runtime.
+const legacyFrappeAuthApi = {
   async getCurrentUser() {
     const response = await callFrappeMethod<FrappeUserPayload>("rbp_app.api.me.get_current_user", {}, { method: "GET" });
 
@@ -88,5 +89,5 @@ const legacyAuthApi = {
 
 export const authApi = selectApiImplementation({
   appwrite: appwriteAuthApi,
-  frappe: legacyAuthApi,
+  legacyFrappe: legacyFrappeAuthApi,
 });
