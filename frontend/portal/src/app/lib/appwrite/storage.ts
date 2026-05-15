@@ -1,8 +1,9 @@
 import { environment } from "../../config/environment";
-import { buildAppwriteUrl } from "./client";
+import { appwriteStorage } from "./client";
 
 export function getFilePreviewUrl(fileId: string) {
-  return buildAppwriteUrl(
-    `storage/buckets/${environment.appwriteStorageBucketId}/files/${fileId}/preview`
-  );
+  return appwriteStorage.getFilePreview(
+    environment.appwriteStorageBucketId,
+    fileId,
+  ).toString();
 }
