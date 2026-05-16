@@ -38,7 +38,6 @@ export async function createCheckoutSession(input: {
     line_items: [{ price: input.priceId, quantity: 1 }],
     success_url: config.successUrl,
     cancel_url: config.cancelUrl,
-    currency: config.defaultCurrency.toLowerCase(),
     metadata: input.metadata,
   });
 }
@@ -59,13 +58,17 @@ export function buildIdempotencyKey(eventId: string) {
 export function mapStripeEventToStatus(eventType: string) {
   switch (eventType) {
     case "checkout.session.completed":
+    case "customer.subscription.created":
+    case "customer.subscription.updated":
     case "invoice.payment_succeeded":
       return "active";
+    case "checkout.session.async_payment_failed":
     case "invoice.payment_failed":
       return "suspended";
+    case "checkout.session.expired":
     case "customer.subscription.deleted":
       return "revoked";
     default:
-      return "active";
+      return "pending";
   }
 }
