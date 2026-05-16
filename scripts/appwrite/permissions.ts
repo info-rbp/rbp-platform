@@ -6,6 +6,15 @@ export type PermissionOptions = {
   adminTeamId?: string;
 };
 
+export type PermissionComparison = {
+  status: "match" | "drift" | "manual";
+  expected: string[];
+  actual: string[];
+  missing: string[];
+  extra: string[];
+  reason?: string;
+};
+
 const ACTIONS: PermissionAction[] = ["read", "create", "update", "delete"];
 const PERMISSION_EXPRESSION = /^(read|create|update|delete)\("(.+)"\)$/;
 
@@ -111,4 +120,60 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
 
 export function permissionFingerprint(permissions: string[] | PermissionSpec | undefined, options: PermissionOptions = {}) {
   return JSON.stringify(buildPermissions(permissions, options));
+}
+
+export function comparePermissions(
+  expectedPermissions: string[] | PermissionSpec | undefined,
+  actualPermissions: string[] | PermissionSpec | undefined,
+  options: PermissionOptions = {},
+): PermissionComparison {
+  let expected: string[] = [];
+  let actual: string[] = [];
+
+  try {
+    expected = buildPermissions(expectedPermissions, options);
+  } catch (error) {
+    return {
+      status: "manual",
+      expected,
+      actual,
+      missing: [],
+      extra: [],
+      reason: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  try {
+    actual = buildPermissions(actualPermissions, options);
+  } catch (error) {
+    return {
+      status: "manual",
+      expected,
+      actual,
+      missing: [],
+      extra: [],
+      reason: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  const missing = expected.filter((permission) => !actual.includes(permission));
+  const extra = actual.filter((permission) => !expected.includes(permission));
+
+  if (!missing.length && !extra.length) {
+    return {
+      status: "match",
+      expected,
+      actual,
+      missing,
+      extra,
+    };
+  }
+
+  return {
+    status: "drift",
+    expected,
+    actual,
+    missing,
+    extra,
+  };
 }
