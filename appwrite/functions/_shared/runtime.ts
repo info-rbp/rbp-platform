@@ -1,7 +1,7 @@
 import { Query } from "node-appwrite";
 import { createAuditEvent, persistAuditEvent } from "./audit";
 import { collectionIds, createAdminContext, requireAdmin, resolveCurrentUser } from "./appwriteAdmin";
-import { grantTenantEntitlements, listTenantEntitlements, resolvePlanEntitlements, revokeTenantEntitlements } from "./entitlements";
+import { grantTenantEntitlements, listTenantEntitlements, revokeTenantEntitlements } from "./entitlements";
 import { fail, forbidden, notFound, ok, parseJsonBody, unauthorized, validationError } from "./response";
 import { buildIdempotencyKey, createCheckoutSession, getStripeClient, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
 
@@ -44,6 +44,53 @@ function createReference(prefix: string) {
   return `${prefix}-${year}-${suffix}`;
 }
 
+function stripSystemFields(record: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(record).filter(([key]) => !key.startsWith("$")),
+  );
+}
+
+function isTrustedInvocation(context: FunctionContext) {
+  const configuredToken = process.env.APPWRITE_TRUSTED_FUNCTION_TOKEN || process.env.RBP_INTERNAL_FUNCTION_TOKEN;
+  if (!configuredToken) {
+    return false;
+  }
+
+  const presentedToken = readHeader(context, "x-rbp-trusted-invocation") || readHeader(context, "x-rbp-internal-token");
+  return Boolean(presentedToken && presentedToken === configuredToken);
+}
+
+function resolveBootstrapAccountId(context: FunctionContext, payload: Record<string, unknown>) {
+  const headerUserId = readHeader(context, "x-appwrite-user-id") || readHeader(context, "x-user-id");
+  const payloadAccountId = payload.accountId ? String(payload.accountId) : "";
+
+  if (headerUserId && payloadAccountId && headerUserId !== payloadAccountId) {
+    throw new Error("Authenticated Appwrite user context does not match the requested account.");
+  }
+
+  if (headerUserId) {
+    return headerUserId;
+  }
+
+  if (payloadAccountId && isTrustedInvocation(context)) {
+    return payloadAccountId;
+  }
+
+  throw new Error("Authenticated Appwrite user context is required to bootstrap a tenant.");
+}
+
+function toRecord(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {} as Record<string, unknown>;
+  }
+
+  return value as Record<string, unknown>;
+}
+
+function isFreePlan(plan: Record<string, unknown>) {
+  return String(plan.plan_code || "") === "free" || Number(plan.amount ?? 0) <= 0;
+}
+
 async function createNotification(input: {
   tenantId?: string;
   userId?: string;
@@ -66,13 +113,14 @@ async function createNotification(input: {
 async function bootstrapTenant(context: FunctionContext) {
   const admin = createAdminContext();
   const payload = parseJsonBody(context);
-  requireFields(payload, ["accountId", "email", "name"]);
+  requireFields(payload, ["email", "name"]);
 
-  const accountId = String(payload.accountId);
+  const accountId = resolveBootstrapAccountId(context, payload);
   const email = String(payload.email).toLowerCase();
   const name = String(payload.name);
   const businessName = String(payload.businessName || `${name} Business`);
   const planCode = String(payload.planCode || "free");
+  const role = String(payload.role || "member");
 
   const tenantResult = await admin.upsertByQuery(
     collectionIds.tenants,
@@ -90,14 +138,14 @@ async function bootstrapTenant(context: FunctionContext) {
   const userProfileResult = await admin.upsertByQuery(
     collectionIds.userProfiles,
     [Query.equal("appwrite_user_id", [accountId])],
-    { tenant_id: tenantId, appwrite_user_id: accountId, email, role: "member" },
+    { tenant_id: tenantId, appwrite_user_id: accountId, email, role },
   );
   const userProfileId = String((userProfileResult.document as { $id: string }).$id);
 
   await admin.upsertByQuery(
     collectionIds.teamMemberships,
     [Query.equal("user_profile_id", [userProfileId])],
-    { tenant_id: tenantId, user_profile_id: userProfileId, team_role: "owner" },
+    { tenant_id: tenantId, user_profile_id: userProfileId, team_role: role === "admin" ? "admin" : "owner" },
   );
 
   await admin.upsertByQuery(
@@ -107,8 +155,19 @@ async function bootstrapTenant(context: FunctionContext) {
   );
 
   const entitlementSummary = await grantTenantEntitlements(tenantId, planCode);
-  await createNotification({ tenantId, userId: accountId, title: "Welcome to RBP", message: "Your tenant has been provisioned in Appwrite.", status: "sent" });
-  await persistAuditEvent({ eventName: "bootstrap_tenant", actorId: accountId, tenantId, payload });
+  await createNotification({
+    tenantId,
+    userId: accountId,
+    title: "Welcome to RBP",
+    message: "Your tenant has been provisioned in Appwrite.",
+    status: "sent",
+  });
+  await persistAuditEvent({
+    eventName: "bootstrap_tenant",
+    actorId: accountId,
+    tenantId,
+    payload: { accountId, email, businessName, planCode, role },
+  });
 
   return ok({
     tenantId,
@@ -133,6 +192,43 @@ async function createMembershipCheckout(context: FunctionContext) {
     return notFound("Membership plan not found or inactive.");
   }
 
+  if (isFreePlan(plan)) {
+    const subscriptionResult = await admin.upsertByQuery(
+      collectionIds.subscriptions,
+      [Query.equal("tenant_id", [currentUser.tenantId])],
+      {
+        tenant_id: currentUser.tenantId,
+        plan_code: planCode,
+        status: "active",
+        stripe_subscription_id: undefined,
+      },
+    );
+
+    const entitlementSummary = await grantTenantEntitlements(currentUser.tenantId, planCode);
+    await createNotification({
+      tenantId: currentUser.tenantId,
+      userId: currentUser.userId,
+      title: "Free membership activated",
+      message: "Your tenant is now on the free membership plan. No Stripe checkout was required.",
+      status: "sent",
+    });
+    await persistAuditEvent({
+      eventName: "activate_free_membership",
+      actorId: currentUser.userId,
+      tenantId: currentUser.tenantId,
+      payload: { planCode, subscriptionId: String((subscriptionResult.document as { $id: string }).$id) },
+    });
+
+    return ok({
+      requires_checkout: false,
+      checkout_url: null,
+      checkout_session_id: null,
+      plan_code: planCode,
+      status: "active",
+      entitlements: entitlementSummary,
+    }, "Free membership activated.");
+  }
+
   const priceId = String(plan.stripe_price_id || "");
   if (!priceId) {
     return fail("Selected plan is missing a Stripe price id.", 409);
@@ -151,11 +247,14 @@ async function createMembershipCheckout(context: FunctionContext) {
       metadata: { tenant_id: currentUser.tenantId, appwrite_user_id: currentUser.userId },
     });
     customerId = customer.id;
-    await admin.createDocument(collectionIds.stripeCustomers, {
-      tenant_id: currentUser.tenantId,
-      stripe_customer_id: customerId,
-      email: String(currentUser.userProfile.email || ""),
-    });
+    await admin.upsertByQuery(
+      collectionIds.stripeCustomers,
+      [Query.equal("tenant_id", [currentUser.tenantId])],
+      {
+        tenant_id: currentUser.tenantId,
+        stripe_customer_id: customerId,
+      },
+    );
   }
 
   const session = await createCheckoutSession({
@@ -176,9 +275,15 @@ async function createMembershipCheckout(context: FunctionContext) {
     status: "pending",
   });
 
-  await persistAuditEvent({ eventName: "create_membership_checkout", actorId: currentUser.userId, tenantId: currentUser.tenantId, payload: { planCode, checkoutSessionId: session.id } });
+  await persistAuditEvent({
+    eventName: "create_membership_checkout",
+    actorId: currentUser.userId,
+    tenantId: currentUser.tenantId,
+    payload: { planCode, checkoutSessionId: session.id },
+  });
 
   return ok({
+    requires_checkout: true,
     checkout_url: session.url,
     checkout_session_id: session.id,
     status: "pending",
@@ -194,44 +299,79 @@ async function handleStripeWebhook(context: FunctionContext) {
   }
 
   const event = verifyWebhookSignature(rawBody, signature);
-  const idempotencyKey = buildIdempotencyKey(event.id);
-  const existing = await admin.findOne<Record<string, unknown>>(collectionIds.paymentEvents, [Query.equal("stripe_event_id", [idempotencyKey])]);
+  const eventFingerprint = buildIdempotencyKey(event.id);
+  const existing = await admin.findOne<Record<string, unknown>>(collectionIds.paymentEvents, [Query.equal("stripe_event_id", [eventFingerprint])]);
   if (existing) {
     return ok({ received: true, idempotent: true }, "Event already processed.");
   }
 
-  const object = event.data.object as Record<string, unknown>;
-  const tenantId = String(object.metadata?.tenant_id || object.customer_details?.metadata?.tenant_id || "");
+  const object = toRecord(event.data.object);
+  const metadata = toRecord(object.metadata);
+  let tenantId = String(metadata.tenant_id || "");
+  let planCode = String(metadata.plan_code || "");
+  const stripeSubscriptionId = String(object.subscription || "");
+
+  let currentSubscription = stripeSubscriptionId
+    ? await admin.findOne<Record<string, unknown> & { $id: string }>(
+      collectionIds.subscriptions,
+      [Query.equal("stripe_subscription_id", [stripeSubscriptionId])],
+    )
+    : null;
+
+  if (!currentSubscription && tenantId) {
+    currentSubscription = await admin.findOne<Record<string, unknown> & { $id: string }>(
+      collectionIds.subscriptions,
+      [Query.equal("tenant_id", [tenantId])],
+    );
+  }
+
+  if (!tenantId && currentSubscription?.tenant_id) {
+    tenantId = String(currentSubscription.tenant_id);
+  }
+
+  if (!planCode && currentSubscription?.plan_code) {
+    planCode = String(currentSubscription.plan_code);
+  }
+
   const status = mapStripeEventToStatus(event.type);
+  const paymentTenantId = tenantId || String(currentSubscription?.tenant_id || "unassigned");
 
   await admin.createDocument(collectionIds.paymentEvents, {
-    tenant_id: tenantId || undefined,
+    tenant_id: paymentTenantId,
     event_type: event.type,
-    stripe_event_id: idempotencyKey,
+    stripe_event_id: eventFingerprint,
     status,
   });
 
   if (tenantId) {
-    const currentSubscription = await admin.findOne<Record<string, unknown> & { $id: string }>(collectionIds.subscriptions, [Query.equal("tenant_id", [tenantId])]);
     if (currentSubscription && "$id" in currentSubscription) {
       await admin.updateDocument(collectionIds.subscriptions, String(currentSubscription.$id), {
         tenant_id: tenantId,
-        plan_code: String(currentSubscription.plan_code || object.metadata?.plan_code || "free"),
+        plan_code: planCode || String(currentSubscription.plan_code || "free"),
         status,
-        stripe_subscription_id: String(object.subscription || currentSubscription.stripe_subscription_id || ""),
+        stripe_subscription_id: stripeSubscriptionId || String(currentSubscription.stripe_subscription_id || ""),
       });
     }
 
     if (status === "active") {
-      await grantTenantEntitlements(tenantId, String(object.metadata?.plan_code || "free"));
-    } else if (status === "revoked") {
+      await grantTenantEntitlements(tenantId, planCode || "free");
+    } else if (status === "revoked" || status === "suspended") {
       await revokeTenantEntitlements(tenantId);
     }
 
-    await createNotification({ tenantId, title: "Subscription updated", message: `Stripe event ${event.type} was processed.`, status: "sent" });
+    await createNotification({
+      tenantId,
+      title: "Subscription updated",
+      message: `Stripe event ${event.type} was processed.`,
+      status: "sent",
+    });
   }
 
-  await persistAuditEvent({ eventName: "stripe_webhook_processed", tenantId: tenantId || undefined, payload: { eventType: event.type, eventId: event.id } });
+  await persistAuditEvent({
+    eventName: "stripe_webhook_processed",
+    tenantId: tenantId || undefined,
+    payload: { eventType: event.type, eventId: event.id, planCode, status },
+  });
   return ok({ received: true, event: event.type }, "Webhook processed.");
 }
 
@@ -248,6 +388,9 @@ async function getSubscriptionStatus(context: FunctionContext) {
   if (payload.includePayments) {
     const payments = await admin.listDocuments<Record<string, unknown>>(collectionIds.paymentEvents, [Query.equal("tenant_id", [currentUser.tenantId])]);
     response.payments = payments.documents;
+  }
+  if (payload.includeEntitlements) {
+    response.entitlements = await listTenantEntitlements(currentUser.tenantId);
   }
 
   return ok(response, "Subscription returned.");
@@ -273,7 +416,13 @@ async function cancelSubscription(context: FunctionContext) {
     stripe_subscription_id: stripeSubscriptionId || undefined,
   });
   await revokeTenantEntitlements(currentUser.tenantId);
-  await createNotification({ tenantId: currentUser.tenantId, userId: currentUser.userId, title: "Subscription cancellation requested", message: "Your subscription will be cancelled at the end of the billing period.", status: "sent" });
+  await createNotification({
+    tenantId: currentUser.tenantId,
+    userId: currentUser.userId,
+    title: "Subscription cancellation requested",
+    message: "Your subscription will be cancelled at the end of the billing period.",
+    status: "sent",
+  });
   await persistAuditEvent({ eventName: "cancel_subscription", actorId: currentUser.userId, tenantId: currentUser.tenantId });
   return ok({ cancelled: true, status: "suspended" }, "Subscription cancellation scheduled.");
 }
@@ -300,7 +449,12 @@ async function adminUpdateEntitlements(context: FunctionContext) {
     },
   );
 
-  await createNotification({ tenantId: String(payload.tenantId), title: "Entitlements updated", message: `Entitlement ${String(payload.entitlementKey)} was updated.`, status: "sent" });
+  await createNotification({
+    tenantId: String(payload.tenantId),
+    title: "Entitlements updated",
+    message: `Entitlement ${String(payload.entitlementKey)} was updated.`,
+    status: "sent",
+  });
   await persistAuditEvent({ eventName: "admin_update_entitlements", payload });
   return ok({ updated: true }, "Entitlements updated.");
 }
@@ -340,7 +494,13 @@ async function createServiceRequest(context: FunctionContext) {
   }
   await admin.createDocument(config.detailCollection, detailPayload);
 
-  await createNotification({ tenantId: currentUser.tenantId, userId: currentUser.userId, title: "Service request submitted", message: `${serviceType} request ${referenceId} was submitted.`, status: "sent" });
+  await createNotification({
+    tenantId: currentUser.tenantId,
+    userId: currentUser.userId,
+    title: "Service request submitted",
+    message: `${serviceType} request ${referenceId} was submitted.`,
+    status: "sent",
+  });
   await persistAuditEvent({ eventName: "create_service_request", actorId: currentUser.userId, tenantId: currentUser.tenantId, payload: { serviceType, referenceId } });
 
   return ok({
@@ -404,7 +564,12 @@ async function adminUpdateServiceStatus(context: FunctionContext) {
     reference_id: String(existing.reference_id || ""),
     status: String(payload.status),
   });
-  await createNotification({ tenantId: String(existing.tenant_id || ""), title: "Service request updated", message: `Service request ${String(existing.reference_id || payload.serviceRequestId)} is now ${String(payload.status)}.`, status: "sent" });
+  await createNotification({
+    tenantId: String(existing.tenant_id || ""),
+    title: "Service request updated",
+    message: `Service request ${String(existing.reference_id || payload.serviceRequestId)} is now ${String(payload.status)}.`,
+    status: "sent",
+  });
   await persistAuditEvent({ eventName: "admin_update_service_status", payload });
   return ok({ updated: true }, "Service request updated.");
 }
@@ -446,7 +611,10 @@ async function sendNotification(context: FunctionContext) {
     });
   }
 
-  await persistAuditEvent({ eventName: "send_notification", payload: createAuditEvent("send_notification", payload) as unknown as Record<string, unknown> });
+  await persistAuditEvent({
+    eventName: "send_notification",
+    payload: createAuditEvent("send_notification", payload).payload as Record<string, unknown>,
+  });
   return ok({ notificationId: String((notification as { $id: string }).$id), deliveryStatus }, "Notification queued.");
 }
 
@@ -497,8 +665,8 @@ async function adminOperations(context: FunctionContext) {
       requireFields(actionPayload, ["applicationId"]);
       const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.applications, String(actionPayload.applicationId));
       await admin.updateDocument(collectionIds.applications, String(actionPayload.applicationId), {
-        ...existing,
-        ...actionPayload,
+        ...stripSystemFields(existing),
+        ...stripSystemFields(actionPayload),
       });
       return ok({ updated: true });
     }
@@ -507,7 +675,10 @@ async function adminOperations(context: FunctionContext) {
     case "update_application_interest_status": {
       requireFields(actionPayload, ["interestId", "status"]);
       const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.applicationInterest, String(actionPayload.interestId));
-      await admin.updateDocument(collectionIds.applicationInterest, String(actionPayload.interestId), { ...existing, status: String(actionPayload.status) });
+      await admin.updateDocument(collectionIds.applicationInterest, String(actionPayload.interestId), {
+        ...stripSystemFields(existing),
+        status: String(actionPayload.status),
+      });
       return ok({ updated: true });
     }
     case "list_service_requests":
@@ -523,16 +694,26 @@ async function adminOperations(context: FunctionContext) {
       return ok({ items: (await admin.listDocuments(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId])])).documents });
     }
     case "mark_notification_read": {
-      requireFields(actionPayload, ["name"]);
-      const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.notifications, String(actionPayload.name));
-      await admin.updateDocument(collectionIds.notifications, String(actionPayload.name), { ...existing, status: "sent" });
+      const notificationId = String(actionPayload.notificationId || actionPayload.name || "");
+      if (!notificationId) {
+        return validationError([{ field: "notificationId", code: "required", message: "notificationId is required." }]);
+      }
+
+      const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.notifications, notificationId);
+      await admin.updateDocument(collectionIds.notifications, notificationId, {
+        ...stripSystemFields(existing),
+        status: "sent",
+      });
       return ok({ updated: true });
     }
     case "mark_all_notifications_read": {
       const currentUser = await resolveCurrentUser(context);
       const notifications = await admin.listDocuments<Record<string, unknown> & { $id: string }>(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId])]);
       for (const notification of notifications.documents) {
-        await admin.updateDocument(collectionIds.notifications, String(notification.$id), { ...notification, status: "sent" });
+        await admin.updateDocument(collectionIds.notifications, String(notification.$id), {
+          ...stripSystemFields(notification),
+          status: "sent",
+        });
       }
       return ok({ updated: notifications.documents.length });
     }
@@ -624,7 +805,7 @@ export async function runNamedHandler(name: string, context: FunctionContext) {
 
     const message = error instanceof Error ? error.message : String(error);
     if (/Administrator access/.test(message)) return forbidden(message);
-    if (/Missing Appwrite user context|No user profile/.test(message)) return unauthorized(message);
+    if (/Missing Appwrite user context|No user profile|Authenticated Appwrite user context is required/i.test(message)) return unauthorized(message);
     return fail(message, 500);
   }
 }
