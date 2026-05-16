@@ -7,6 +7,13 @@ type FunctionContext = {
   };
 };
 
+export type CurrentUserContext = {
+  userId: string;
+  tenantId: string;
+  role: string;
+  userProfile: Record<string, unknown>;
+};
+
 export const collectionIds = {
   tenants: "tenants",
   businessProfiles: "business_profiles",
@@ -54,13 +61,13 @@ function requireValue(value: string | undefined, label: string) {
   return value;
 }
 
-function getHeader(context: FunctionContext, key: string) {
+export function getHeader(context: FunctionContext, key: string) {
   const headers = context.req?.headers || {};
   const matched = Object.entries(headers).find(([name]) => name.toLowerCase() === key.toLowerCase());
   return matched?.[1] || undefined;
 }
 
-export function createAdminContext() {
+function createRealAdminContext() {
   const env = getRequiredAdminEnv();
   const client = new Client()
     .setEndpoint(requireValue(env.endpoint, "APPWRITE_ENDPOINT"))
@@ -115,7 +122,29 @@ export function createAdminContext() {
   };
 }
 
-export async function resolveCurrentUser(context: FunctionContext) {
+type AdminContext = ReturnType<typeof createRealAdminContext>;
+
+let adminContextFactoryForTests: (() => AdminContext) | null = null;
+
+export function setAdminContextFactoryForTests(factory: (() => AdminContext) | null) {
+  adminContextFactoryForTests = factory;
+}
+
+export function createAdminContext() {
+  return adminContextFactoryForTests ? adminContextFactoryForTests() : createRealAdminContext();
+}
+
+export function isTrustedInternalInvocation(context: FunctionContext) {
+  const configuredToken = process.env.APPWRITE_TRUSTED_FUNCTION_TOKEN || process.env.RBP_INTERNAL_FUNCTION_TOKEN;
+  if (!configuredToken) {
+    return false;
+  }
+
+  const presentedToken = getHeader(context, "x-rbp-trusted-invocation") || getHeader(context, "x-rbp-internal-token");
+  return Boolean(presentedToken && presentedToken === configuredToken);
+}
+
+export async function resolveCurrentUser(context: FunctionContext): Promise<CurrentUserContext> {
   const admin = createAdminContext();
   const userId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
   if (!userId) {
@@ -140,21 +169,40 @@ export async function resolveCurrentUser(context: FunctionContext) {
 }
 
 export async function requireAdmin(context: FunctionContext) {
-  const currentUser = await resolveCurrentUser(context);
-  if (currentUser.role === "admin") {
-    return currentUser;
-  }
-
-  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
-  if (adminTeamId) {
-    const admin = createAdminContext();
-    const memberships = await admin.teams.listMemberships(adminTeamId);
-    const matched = memberships.memberships.find((membership) => membership.userId === currentUser.userId);
-    if (matched) {
-      return currentUser;
+  if (isTrustedInternalInvocation(context)) {
+    try {
+      return await resolveCurrentUser(context);
+    } catch {
+      return {
+        userId: "trusted-internal",
+        tenantId: "",
+        role: "admin",
+        userProfile: {},
+      } satisfies CurrentUserContext;
     }
   }
 
+  const userId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
+  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
+  if (adminTeamId && userId) {
+    const admin = createAdminContext();
+    const memberships = await admin.teams.listMemberships(adminTeamId);
+    const matched = memberships.memberships.find((membership) => membership.userId === userId);
+    if (matched) {
+      try {
+        return await resolveCurrentUser(context);
+      } catch {
+        return {
+          userId,
+          tenantId: "",
+          role: "admin",
+          userProfile: {},
+        } satisfies CurrentUserContext;
+      }
+    }
+  }
+
+  const currentUser = await resolveCurrentUser(context);
   throw new Error("Administrator access is required.");
 }
 

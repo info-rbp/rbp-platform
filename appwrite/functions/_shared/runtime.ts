@@ -1,6 +1,6 @@
 import { Query } from "node-appwrite";
 import { createAuditEvent, persistAuditEvent } from "./audit";
-import { collectionIds, createAdminContext, requireAdmin, resolveCurrentUser } from "./appwriteAdmin";
+import { collectionIds, createAdminContext, getHeader, isTrustedInternalInvocation, requireAdmin, resolveCurrentUser, type CurrentUserContext } from "./appwriteAdmin";
 import { grantTenantEntitlements, listTenantEntitlements, revokeTenantEntitlements } from "./entitlements";
 import { fail, forbidden, notFound, ok, parseJsonBody, unauthorized, validationError } from "./response";
 import { buildIdempotencyKey, createCheckoutSession, getStripeClient, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
@@ -22,11 +22,13 @@ const serviceConfig = {
   "marketplace-enquiry": { detailCollection: collectionIds.marketplaceEnquiries, prefix: "RBP-MKT" },
 } as const;
 
-function readHeader(context: FunctionContext, name: string) {
-  const headers = context.req?.headers || {};
-  const matched = Object.entries(headers).find(([key]) => key.toLowerCase() === name.toLowerCase());
-  return matched?.[1] || undefined;
-}
+const CUSTOMER_NOTIFICATION_ACTIONS = new Set([
+  "list_my_notifications",
+  "mark_notification_read",
+  "mark_all_notifications_read",
+  "get_portal_dashboard",
+  "register_application_interest",
+]);
 
 function requireFields(payload: Record<string, unknown>, fields: string[]) {
   const errors = fields
@@ -50,18 +52,8 @@ function stripSystemFields(record: Record<string, unknown>) {
   );
 }
 
-function isTrustedInvocation(context: FunctionContext) {
-  const configuredToken = process.env.APPWRITE_TRUSTED_FUNCTION_TOKEN || process.env.RBP_INTERNAL_FUNCTION_TOKEN;
-  if (!configuredToken) {
-    return false;
-  }
-
-  const presentedToken = readHeader(context, "x-rbp-trusted-invocation") || readHeader(context, "x-rbp-internal-token");
-  return Boolean(presentedToken && presentedToken === configuredToken);
-}
-
 function resolveBootstrapAccountId(context: FunctionContext, payload: Record<string, unknown>) {
-  const headerUserId = readHeader(context, "x-appwrite-user-id") || readHeader(context, "x-user-id");
+  const headerUserId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
   const payloadAccountId = payload.accountId ? String(payload.accountId) : "";
 
   if (headerUserId && payloadAccountId && headerUserId !== payloadAccountId) {
@@ -72,7 +64,7 @@ function resolveBootstrapAccountId(context: FunctionContext, payload: Record<str
     return headerUserId;
   }
 
-  if (payloadAccountId && isTrustedInvocation(context)) {
+  if (payloadAccountId && isTrustedInternalInvocation(context)) {
     return payloadAccountId;
   }
 
@@ -110,6 +102,21 @@ async function createNotification(input: {
   });
 }
 
+async function resolveTenantName(input: { businessName: string; accountId: string }) {
+  const admin = createAdminContext();
+  const listed = await admin.listDocuments<Record<string, unknown>>(
+    collectionIds.tenants,
+    [Query.equal("tenant_name", [input.businessName]), Query.limit(1)],
+  );
+
+  if (!listed.documents.length) {
+    return input.businessName;
+  }
+
+  const suffix = input.accountId.replace(/[^a-zA-Z0-9]/g, "").slice(-8) || String(Date.now()).slice(-6);
+  return `${input.businessName} (${suffix})`;
+}
+
 async function bootstrapTenant(context: FunctionContext) {
   const admin = createAdminContext();
   const payload = parseJsonBody(context);
@@ -120,14 +127,25 @@ async function bootstrapTenant(context: FunctionContext) {
   const name = String(payload.name);
   const businessName = String(payload.businessName || `${name} Business`);
   const planCode = String(payload.planCode || "free");
-  const role = String(payload.role || "member");
+  const role = "owner";
 
-  const tenantResult = await admin.upsertByQuery(
-    collectionIds.tenants,
-    [Query.equal("tenant_name", [businessName])],
-    { tenant_name: businessName, status: "active", plan_code: planCode },
+  const existingProfile = await admin.findOne<Record<string, unknown> & { $id: string }>(
+    collectionIds.userProfiles,
+    [Query.equal("appwrite_user_id", [accountId])],
   );
-  const tenantId = String((tenantResult.document as { $id: string }).$id);
+
+  let tenantId = String(existingProfile?.tenant_id || "");
+  let userProfileId = existingProfile ? String(existingProfile.$id) : "";
+
+  if (!tenantId) {
+    const tenantName = await resolveTenantName({ businessName, accountId });
+    const tenant = await admin.createDocument(collectionIds.tenants, {
+      tenant_name: tenantName,
+      status: "active",
+      plan_code: planCode,
+    }) as { $id: string };
+    tenantId = String(tenant.$id);
+  }
 
   const businessProfileResult = await admin.upsertByQuery(
     collectionIds.businessProfiles,
@@ -135,17 +153,28 @@ async function bootstrapTenant(context: FunctionContext) {
     { tenant_id: tenantId, business_name: businessName, contact_email: email },
   );
 
-  const userProfileResult = await admin.upsertByQuery(
-    collectionIds.userProfiles,
-    [Query.equal("appwrite_user_id", [accountId])],
-    { tenant_id: tenantId, appwrite_user_id: accountId, email, role },
-  );
-  const userProfileId = String((userProfileResult.document as { $id: string }).$id);
+  if (existingProfile) {
+    await admin.updateDocument(collectionIds.userProfiles, userProfileId, {
+      ...stripSystemFields(existingProfile),
+      tenant_id: tenantId,
+      appwrite_user_id: accountId,
+      email,
+      role: existingProfile.role === "admin" ? "member" : String(existingProfile.role || role),
+    });
+  } else {
+    const userProfile = await admin.createDocument(collectionIds.userProfiles, {
+      tenant_id: tenantId,
+      appwrite_user_id: accountId,
+      email,
+      role,
+    }) as { $id: string };
+    userProfileId = String(userProfile.$id);
+  }
 
   await admin.upsertByQuery(
     collectionIds.teamMemberships,
     [Query.equal("user_profile_id", [userProfileId])],
-    { tenant_id: tenantId, user_profile_id: userProfileId, team_role: role === "admin" ? "admin" : "owner" },
+    { tenant_id: tenantId, user_profile_id: userProfileId, team_role: "owner" },
   );
 
   await admin.upsertByQuery(
@@ -166,7 +195,7 @@ async function bootstrapTenant(context: FunctionContext) {
     eventName: "bootstrap_tenant",
     actorId: accountId,
     tenantId,
-    payload: { accountId, email, businessName, planCode, role },
+    payload: { accountId, email, businessName, planCode, role, requestedRoleIgnored: payload.role !== undefined },
   });
 
   return ok({
@@ -292,7 +321,7 @@ async function createMembershipCheckout(context: FunctionContext) {
 
 async function handleStripeWebhook(context: FunctionContext) {
   const admin = createAdminContext();
-  const signature = readHeader(context, "stripe-signature");
+  const signature = getHeader(context, "stripe-signature");
   const rawBody = typeof context.req?.body === "string" ? context.req.body : JSON.stringify(context.req?.body || {});
   if (!signature) {
     return unauthorized("Missing Stripe signature.");
@@ -608,6 +637,11 @@ async function sendNotification(context: FunctionContext) {
       delivery_type: String(payload.channel || "email"),
       status: deliveryStatus,
       recipient,
+      provider_message_id: deliveryStatus === "pending" ? `fake-${Date.now()}` : undefined,
+      error_message: deliveryStatus === "skipped" ? "Recipient is not on the QA email allowlist." : "",
+      attempt_count: recipient ? 1 : 0,
+      last_attempt_at: new Date().toISOString(),
+      sent_at: "",
     });
   }
 
@@ -630,11 +664,17 @@ async function processNotificationQueue(context: FunctionContext) {
   for (const delivery of listed.documents) {
     const recipient = String(delivery.recipient || "");
     const nextStatus = isAllowedRecipient(recipient) ? "sent" : "skipped";
+    const attemptCount = Number(delivery.attempt_count || 0) + 1;
     await admin.updateDocument(collectionIds.notificationDeliveries, String(delivery.$id), {
       notification_id: String(delivery.notification_id || ""),
       delivery_type: String(delivery.delivery_type || "email"),
       status: nextStatus,
       recipient,
+      provider_message_id: nextStatus === "sent" ? String(delivery.provider_message_id || `fake-${delivery.$id}`) : String(delivery.provider_message_id || ""),
+      error_message: nextStatus === "skipped" ? "Recipient is not on the QA email allowlist." : "",
+      sent_at: nextStatus === "sent" ? new Date().toISOString() : String(delivery.sent_at || ""),
+      attempt_count: attemptCount,
+      last_attempt_at: new Date().toISOString(),
     });
     processed += 1;
   }
@@ -643,12 +683,135 @@ async function processNotificationQueue(context: FunctionContext) {
   return ok({ processed }, "Notification queue processed.");
 }
 
-async function adminOperations(context: FunctionContext) {
-  await requireAdmin(context);
+async function listNotificationsForUser(currentUser: CurrentUserContext) {
   const admin = createAdminContext();
+  const seen = new Set<string>();
+  const items: Array<Record<string, unknown> & { $id?: string }> = [];
+
+  for (const queries of [
+    [Query.equal("user_id", [currentUser.userId])],
+    [Query.equal("tenant_id", [currentUser.tenantId])],
+  ]) {
+    const listed = await admin.listDocuments<Record<string, unknown> & { $id?: string }>(collectionIds.notifications, queries);
+    for (const notification of listed.documents) {
+      const notificationUserId = String(notification.user_id || "");
+      const notificationTenantId = String(notification.tenant_id || "");
+      const canRead = notificationUserId === currentUser.userId
+        || (!notificationUserId && notificationTenantId === currentUser.tenantId);
+      const id = String(notification.$id || `${notificationTenantId}:${notificationUserId}:${notification.title || ""}`);
+      if (canRead && !seen.has(id)) {
+        seen.add(id);
+        items.push(notification);
+      }
+    }
+  }
+
+  return items;
+}
+
+function canAccessNotification(currentUser: CurrentUserContext, notification: Record<string, unknown>) {
+  const notificationUserId = String(notification.user_id || "");
+  const notificationTenantId = String(notification.tenant_id || "");
+  return notificationUserId === currentUser.userId
+    || (!notificationUserId && notificationTenantId === currentUser.tenantId);
+}
+
+async function handleCustomerAdminOperation(context: FunctionContext, action: string, actionPayload: Record<string, unknown>) {
+  const admin = createAdminContext();
+
+  switch (action) {
+    case "list_my_notifications": {
+      const currentUser = await resolveCurrentUser(context);
+      return ok({ items: await listNotificationsForUser(currentUser) });
+    }
+    case "mark_notification_read": {
+      const currentUser = await resolveCurrentUser(context);
+      const notificationId = String(actionPayload.notificationId || actionPayload.name || "");
+      if (!notificationId) {
+        return validationError([{ field: "notificationId", code: "required", message: "notificationId is required." }]);
+      }
+
+      const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.notifications, notificationId);
+      if (!canAccessNotification(currentUser, existing)) {
+        return forbidden("Notification access is scoped to the current user or tenant.");
+      }
+
+      await admin.updateDocument(collectionIds.notifications, notificationId, {
+        ...stripSystemFields(existing),
+        status: "read",
+      });
+      return ok({ updated: true });
+    }
+    case "mark_all_notifications_read": {
+      const currentUser = await resolveCurrentUser(context);
+      const notifications = await listNotificationsForUser(currentUser) as Array<Record<string, unknown> & { $id?: string }>;
+      for (const notification of notifications) {
+        if (!notification.$id) continue;
+        await admin.updateDocument(collectionIds.notifications, String(notification.$id), {
+          ...stripSystemFields(notification),
+          status: "read",
+        });
+      }
+      return ok({ updated: notifications.length });
+    }
+    case "get_portal_dashboard": {
+      const currentUser = await resolveCurrentUser(context);
+      const subscription = await admin.findOne<Record<string, unknown>>(collectionIds.subscriptions, [Query.equal("tenant_id", [currentUser.tenantId])]);
+      const notifications = await listNotificationsForUser(currentUser);
+      const activities = await admin.listDocuments<Record<string, unknown>>(collectionIds.serviceRequests, [Query.equal("tenant_id", [currentUser.tenantId]), Query.limit(10)]);
+      return ok({
+        membershipStatus: String(subscription?.status || "pending"),
+        membershipPlan: String(subscription?.plan_code || "free"),
+        customer: {
+          id: currentUser.userId,
+          name: String(currentUser.userProfile.email || currentUser.userId),
+          email: String(currentUser.userProfile.email || ""),
+          businessName: String(currentUser.userProfile.business_name || currentUser.userProfile.email || "RBP Client"),
+        },
+        activities: activities.documents,
+        notifications,
+      });
+    }
+    case "register_application_interest": {
+      const currentUser = await resolveCurrentUser(context);
+      requireFields(actionPayload, ["application_key"]);
+      const application = await admin.findOne<Record<string, unknown> & { $id: string }>(collectionIds.applications, [Query.equal("application_key", [String(actionPayload.application_key)])]);
+      if (!application) {
+        return notFound("Application not found.");
+      }
+
+      const interest = await admin.createDocument(collectionIds.applicationInterest, {
+        tenant_id: currentUser.tenantId,
+        user_id: currentUser.userId,
+        application_id: String(application.$id),
+        business_name: String(actionPayload.business_name || currentUser.userProfile.business_name || ""),
+        contact_name: String(actionPayload.contact_name || currentUser.userProfile.email || ""),
+        email: String(actionPayload.email || currentUser.userProfile.email || ""),
+        phone: String(actionPayload.phone || ""),
+        interest_notes: String(actionPayload.interest_notes || ""),
+        status: "submitted",
+        source_channel: String(actionPayload.source_channel || "portal"),
+      });
+
+      await persistAuditEvent({ eventName: "register_application_interest", actorId: currentUser.userId, tenantId: currentUser.tenantId, payload: actionPayload });
+      return ok({ ok: true, interest_id: String((interest as { $id: string }).$id), application: String(application.application_name || actionPayload.application_key) });
+    }
+    default:
+      return validationError([{ field: "action", code: "invalid", message: `Unknown customer action: ${action || "<none>"}` }]);
+  }
+}
+
+async function adminOperations(context: FunctionContext) {
   const payload = parseJsonBody(context);
   const action = String(payload.action || "");
   const actionPayload = (payload.payload && typeof payload.payload === "object" ? payload.payload : payload) as Record<string, unknown>;
+
+  if (CUSTOMER_NOTIFICATION_ACTIONS.has(action)) {
+    return handleCustomerAdminOperation(context, action, actionPayload);
+  }
+
+  await requireAdmin(context);
+  const admin = createAdminContext();
 
   switch (action) {
     case "list_tenants":
@@ -687,78 +850,10 @@ async function adminOperations(context: FunctionContext) {
       return adminUpdateServiceStatus({ req: { body: JSON.stringify({ serviceRequestId: actionPayload.serviceRequestId, status: actionPayload.status }), headers: context.req?.headers } });
     case "list_notifications":
       return ok({ items: (await admin.listDocuments(collectionIds.notifications)).documents });
+    case "list_notification_deliveries":
+      return ok({ items: (await admin.listDocuments(collectionIds.notificationDeliveries)).documents });
     case "list_audit_events":
       return ok({ items: (await admin.listDocuments(collectionIds.auditEvents)).documents });
-    case "list_my_notifications": {
-      const currentUser = await resolveCurrentUser(context);
-      return ok({ items: (await admin.listDocuments(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId])])).documents });
-    }
-    case "mark_notification_read": {
-      const notificationId = String(actionPayload.notificationId || actionPayload.name || "");
-      if (!notificationId) {
-        return validationError([{ field: "notificationId", code: "required", message: "notificationId is required." }]);
-      }
-
-      const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.notifications, notificationId);
-      await admin.updateDocument(collectionIds.notifications, notificationId, {
-        ...stripSystemFields(existing),
-        status: "sent",
-      });
-      return ok({ updated: true });
-    }
-    case "mark_all_notifications_read": {
-      const currentUser = await resolveCurrentUser(context);
-      const notifications = await admin.listDocuments<Record<string, unknown> & { $id: string }>(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId])]);
-      for (const notification of notifications.documents) {
-        await admin.updateDocument(collectionIds.notifications, String(notification.$id), {
-          ...stripSystemFields(notification),
-          status: "sent",
-        });
-      }
-      return ok({ updated: notifications.documents.length });
-    }
-    case "get_portal_dashboard": {
-      const currentUser = await resolveCurrentUser(context);
-      const subscription = await admin.findOne<Record<string, unknown>>(collectionIds.subscriptions, [Query.equal("tenant_id", [currentUser.tenantId])]);
-      const notifications = await admin.listDocuments<Record<string, unknown>>(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId]), Query.limit(10)]);
-      const activities = await admin.listDocuments<Record<string, unknown>>(collectionIds.serviceRequests, [Query.equal("tenant_id", [currentUser.tenantId]), Query.limit(10)]);
-      return ok({
-        membershipStatus: String(subscription?.status || "pending"),
-        membershipPlan: String(subscription?.plan_code || "free"),
-        customer: {
-          id: currentUser.userId,
-          name: String(currentUser.userProfile.email || currentUser.userId),
-          email: String(currentUser.userProfile.email || ""),
-          businessName: String(currentUser.userProfile.business_name || currentUser.userProfile.email || "RBP Client"),
-        },
-        activities: activities.documents,
-        notifications: notifications.documents,
-      });
-    }
-    case "register_application_interest": {
-      const currentUser = await resolveCurrentUser(context);
-      requireFields(actionPayload, ["application_key"]);
-      const application = await admin.findOne<Record<string, unknown> & { $id: string }>(collectionIds.applications, [Query.equal("application_key", [String(actionPayload.application_key)])]);
-      if (!application) {
-        return notFound("Application not found.");
-      }
-
-      const interest = await admin.createDocument(collectionIds.applicationInterest, {
-        tenant_id: currentUser.tenantId,
-        user_id: currentUser.userId,
-        application_id: String(application.$id),
-        business_name: String(actionPayload.business_name || currentUser.userProfile.business_name || ""),
-        contact_name: String(actionPayload.contact_name || currentUser.userProfile.email || ""),
-        email: String(actionPayload.email || currentUser.userProfile.email || ""),
-        phone: String(actionPayload.phone || ""),
-        interest_notes: String(actionPayload.interest_notes || ""),
-        status: "submitted",
-        source_channel: String(actionPayload.source_channel || "portal"),
-      });
-
-      await persistAuditEvent({ eventName: "register_application_interest", actorId: currentUser.userId, tenantId: currentUser.tenantId, payload: actionPayload });
-      return ok({ ok: true, interest_id: String((interest as { $id: string }).$id), application: String(application.application_name || actionPayload.application_key) });
-    }
     default:
       return validationError([{ field: "action", code: "invalid", message: `Unknown admin action: ${action || "<none>"}` }]);
   }

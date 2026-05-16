@@ -7,6 +7,11 @@
     { "key": "notification_id", "type": "string", "size": 64, "required": true },
     { "key": "delivery_type", "type": "string", "size": 32, "required": true },
     { "key": "status", "type": "string", "size": 32, "required": true },
-    { "key": "recipient", "type": "string", "size": 255, "required": false }
+    { "key": "recipient", "type": "string", "size": 255, "required": false },
+    { "key": "provider_message_id", "type": "string", "size": 255, "required": false },
+    { "key": "error_message", "type": "string", "size": 1000, "required": false },
+    { "key": "sent_at", "type": "string", "size": 64, "required": false },
+    { "key": "attempt_count", "type": "integer", "required": false, "min": 0 },
+    { "key": "last_attempt_at", "type": "string", "size": 64, "required": false }
   ]
 }

@@ -16,6 +16,9 @@ RBP_ENABLE_EMAIL_NOTIFICATIONS=true
 RBP_EMAIL_SANDBOX_MODE=true
 RBP_QA_EMAIL_RECIPIENTS=<allowlisted QA emails>
 RBP_ADMIN_NOTIFICATION_RECIPIENTS=<admin QA emails>
+QA_EMAIL_ALLOWLIST=<allowlisted QA emails>
+QA_EMAIL_ALLOWED_RECIPIENT=<one allowlisted QA email>
+QA_EMAIL_BLOCKED_RECIPIENT=<non-allowlisted proof email>
 ```
 
 ## Frappe Email Account / SMTP setup checklist
@@ -61,6 +64,15 @@ bench --site hrms.localhost run-tests --app rbp_app --module rbp_app.tests.test_
 bench --site hrms.localhost run-tests --app rbp_app
 ```
 
+For the Appwrite QA runtime, run:
+
+```bash
+npm run test:integration
+npm run smoke:qa:email
+```
+
+`smoke:qa:email` creates one allowlisted notification delivery and one blocked-recipient delivery through Appwrite Functions. If `APPWRITE_TRUSTED_FUNCTION_TOKEN` or `RBP_INTERNAL_FUNCTION_TOKEN` is available, it also processes the notification queue. It never prints the token or SMTP credentials.
+
 If `hrms.localhost` is not the QA site, run `bench list-sites` and record the actual site used. If the focused module name differs, record the replacement module and command.
 
 ## Manual QA proof required
@@ -77,9 +89,9 @@ Record evidence for each item:
 
 ## Current status
 
-Status: BLOCKED for environment proof.
+Status: PARTIALLY AUTOMATED, BLOCKED for live provider proof.
 
-The repository contains notification documentation and Milestone 9 implementation references, but this environment cannot run a real Frappe bench, cannot configure the QA Email Account, and cannot prove SMTP delivery or blocked-recipient behavior. The remaining work must run from the QA bench machine with SMTP sandbox access.
+The repository now contains Appwrite runtime tests for allowlisted and blocked recipients plus a QA live-proof script. This environment still cannot configure the QA Email Account or prove real SMTP/provider delivery. The remaining live provider proof must run from the QA environment with sandbox access.
 
 ## Completion criteria
 
