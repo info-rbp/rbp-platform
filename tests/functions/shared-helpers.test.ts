@@ -20,14 +20,22 @@ test("parseJsonBody accepts strings and objects", () => {
   assert.deepEqual(parseJsonBody({ req: { body: { planCode: "free" } } }), { planCode: "free" });
 });
 
-test("audit sanitization redacts secrets", () => {
+test("audit sanitization redacts secret-like keys across common naming styles", () => {
   const payload = sanitizeAuditPayload({
     password: "secret",
-    nested: { apiKey: "123", safe: true },
+    apiKey: "abc",
+    apikey: "def",
+    api_key: "ghi",
+    clientSecret: "jkl",
+    nested: { authorization_token: "123", safe: true },
   }) as Record<string, unknown>;
 
   assert.equal(payload.password, "[redacted]");
-  assert.deepEqual(payload.nested, { apiKey: "[redacted]", safe: true });
+  assert.equal(payload.apiKey, "[redacted]");
+  assert.equal(payload.apikey, "[redacted]");
+  assert.equal(payload.api_key, "[redacted]");
+  assert.equal(payload.clientSecret, "[redacted]");
+  assert.deepEqual(payload.nested, { authorization_token: "[redacted]", safe: true });
 });
 
 test("audit events preserve event names and sanitize payloads", () => {
