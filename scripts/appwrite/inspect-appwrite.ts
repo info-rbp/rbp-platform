@@ -1,5 +1,6 @@
 import path from "node:path";
-import { appwriteRoot, createAdminServices, listFunctionDirectories, listJsonFiles, logSection, readConfig } from "./_lib";
+import { Query } from "node-appwrite";
+import { collectPaginatedItems, createAdminServices, listFunctionDirectories, listJsonFiles, logSection, readConfig } from "./_lib";
 
 const config = readConfig();
 
@@ -20,13 +21,29 @@ const { databases, functions, storage, databaseId, storageBucketId } = createAdm
 
 logSection("Live inventory");
 const liveDatabase = await databases.get(databaseId);
-const liveCollections = await databases.listCollections(databaseId);
-const liveFunctions = await functions.list();
-const liveBucket = await storage.getBucket(storageBucketId);
+const liveCollections = await collectPaginatedItems<{ $id: string }>(
+  (limit, offset) => databases.listCollections(databaseId, [Query.limit(limit), Query.offset(offset)]),
+  "collections",
+  25,
+);
+const liveFunctions = await collectPaginatedItems<{ $id: string }>(
+  (limit, offset) => functions.list([Query.limit(limit), Query.offset(offset)]),
+  "functions",
+  25,
+);
+const liveBuckets = await collectPaginatedItems<{ $id: string; name: string }>(
+  (limit, offset) => storage.listBuckets([Query.limit(limit), Query.offset(offset)]),
+  "buckets",
+  25,
+);
 
 console.log(JSON.stringify({
   database: { id: liveDatabase.$id, name: liveDatabase.name },
-  collections: liveCollections.collections.map((collection) => collection.$id),
-  functions: liveFunctions.functions.map((fn) => fn.$id),
-  bucket: { id: liveBucket.$id, name: liveBucket.name },
+  collectionCount: liveCollections.length,
+  collections: liveCollections.map((collection) => collection.$id),
+  functionCount: liveFunctions.length,
+  functions: liveFunctions.map((fn) => fn.$id),
+  configuredStorageBucketId: storageBucketId,
+  bucketCount: liveBuckets.length,
+  buckets: liveBuckets.map((bucket) => ({ id: bucket.$id, name: bucket.name })),
 }, null, 2));
