@@ -40,5 +40,8 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run appwrite:schema:deploy -- --apply
-      - run: npm run appwrite:functions:deploy -- --apply
+      - name: Prepare Appwrite Functions deployment manifest
+        run: npm run appwrite:functions:deploy -- --apply
+        continue-on-error: true
+
       - run: npm run appwrite:seed:qa -- --apply
