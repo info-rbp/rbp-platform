@@ -7,6 +7,13 @@ type FunctionContext = {
   };
 };
 
+export type CurrentUserContext = {
+  userId: string;
+  tenantId: string;
+  role: string;
+  userProfile: Record<string, unknown>;
+};
+
 export const collectionIds = {
   tenants: "tenants",
   businessProfiles: "business_profiles",
@@ -54,12 +61,14 @@ function requireValue(value: string | undefined, label: string) {
   return value;
 }
 
+export function getHeader(context: FunctionContext, key: string) {
 function getHeader(context: FunctionContext, key: string) {
   const headers = context.req?.headers || {};
   const matched = Object.entries(headers).find(([name]) => name.toLowerCase() === key.toLowerCase());
   return matched?.[1] || undefined;
 }
 
+function createRealAdminContext() {
 export function createAdminContext() {
   const env = getRequiredAdminEnv();
   const client = new Client()
@@ -112,6 +121,90 @@ export function createAdminContext() {
         document: await this.createDocument<T>(collectionId, data),
       };
     },
+  };
+}
+
+type AdminContext = ReturnType<typeof createRealAdminContext>;
+
+let adminContextFactoryForTests: (() => AdminContext) | null = null;
+
+export function setAdminContextFactoryForTests(factory: (() => AdminContext) | null) {
+  adminContextFactoryForTests = factory;
+}
+
+export function createAdminContext() {
+  return adminContextFactoryForTests ? adminContextFactoryForTests() : createRealAdminContext();
+}
+
+export function isTrustedInternalInvocation(context: FunctionContext) {
+  const configuredToken = process.env.APPWRITE_TRUSTED_FUNCTION_TOKEN || process.env.RBP_INTERNAL_FUNCTION_TOKEN;
+  if (!configuredToken) {
+    return false;
+  }
+
+  const presentedToken = getHeader(context, "x-rbp-trusted-invocation") || getHeader(context, "x-rbp-internal-token");
+  return Boolean(presentedToken && presentedToken === configuredToken);
+}
+
+export async function resolveCurrentUser(context: FunctionContext): Promise<CurrentUserContext> {
+  const admin = createAdminContext();
+  const userId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
+  if (!userId) {
+    throw new Error("Missing Appwrite user context.");
+  }
+
+  const userProfile = await admin.findOne<Record<string, unknown> & { $id: string }>(
+    collectionIds.userProfiles,
+    [Query.equal("appwrite_user_id", [userId])],
+  );
+
+  if (!userProfile) {
+    throw new Error(`No user profile found for Appwrite user ${userId}.`);
+  }
+
+  return {
+    userId,
+    tenantId: String(userProfile.tenant_id || ""),
+    role: String(userProfile.role || "member"),
+    userProfile,
+  };
+}
+
+export async function requireAdmin(context: FunctionContext) {
+  if (isTrustedInternalInvocation(context)) {
+    try {
+      return await resolveCurrentUser(context);
+    } catch {
+      return {
+        userId: "trusted-internal",
+        tenantId: "",
+        role: "admin",
+        userProfile: {},
+      } satisfies CurrentUserContext;
+    }
+  }
+
+  const userId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
+  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
+  if (adminTeamId && userId) {
+    const admin = createAdminContext();
+    const memberships = await admin.teams.listMemberships(adminTeamId);
+    const matched = memberships.memberships.find((membership) => membership.userId === userId);
+    if (matched) {
+      try {
+        return await resolveCurrentUser(context);
+      } catch {
+        return {
+          userId,
+          tenantId: "",
+          role: "admin",
+          userProfile: {},
+        } satisfies CurrentUserContext;
+      }
+    }
+  }
+
+  const currentUser = await resolveCurrentUser(context);
   };
 }
 

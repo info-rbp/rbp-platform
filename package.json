@@ -24,6 +24,7 @@
     "smoke:qa:service-requests": "node scripts/smoke/run-smoke-check.mjs service-requests",
     "smoke:qa:admin": "node scripts/smoke/run-smoke-check.mjs admin",
     "smoke:qa:permissions": "node scripts/smoke/run-smoke-check.mjs permissions",
+    "smoke:qa:email": "node scripts/smoke/run-email-live-proof.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:smoke:dry-run",
     "test:unit": "node --test tests/config/*.test.mjs tests/schema/*.test.mjs && npx --yes tsx --test tests/functions/*.test.ts",
     "test:integration": "node --test tests/integration/*.test.mjs && npx --yes tsx --test tests/runtime/*.test.ts",

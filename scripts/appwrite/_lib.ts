@@ -141,6 +141,44 @@ export function createAdminServices() {
   };
 }
 
+export async function collectPaginatedItems<TItem>(
+  fetchPage: (limit: number, offset: number) => Promise<Record<string, unknown>>,
+  itemsKey: string,
+  pageSize = 25,
+) {
+  const items: TItem[] = [];
+  let offset = 0;
+  let total: number | null = null;
+
+  while (true) {
+    const page = await fetchPage(pageSize, offset);
+    const pageItems = Array.isArray(page[itemsKey]) ? (page[itemsKey] as TItem[]) : [];
+    const pageTotal = typeof page.total === "number" ? page.total : null;
+
+    if (pageTotal !== null) {
+      total = pageTotal;
+    }
+
+    items.push(...pageItems);
+
+    if (pageItems.length === 0) {
+      break;
+    }
+
+    offset += pageItems.length;
+
+    if (total !== null && offset >= total) {
+      break;
+    }
+
+    if (pageItems.length < pageSize) {
+      break;
+    }
+  }
+
+  return items;
+}
+
 export async function listExistingDocuments(
   databases: Databases,
   databaseId: string,

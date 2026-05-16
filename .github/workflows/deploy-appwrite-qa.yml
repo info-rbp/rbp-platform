@@ -22,6 +22,7 @@ jobs:
       STRIPE_DEFAULT_CURRENCY: ${{ vars.STRIPE_DEFAULT_CURRENCY }}
       STRIPE_SUCCESS_URL: ${{ vars.STRIPE_SUCCESS_URL }}
       STRIPE_CANCEL_URL: ${{ vars.STRIPE_CANCEL_URL }}
+      QA_VERIFY_APPWRITE_FUNCTIONS: ${{ vars.QA_VERIFY_APPWRITE_FUNCTIONS }}
 
       VITE_BACKEND_PROVIDER: ${{ vars.VITE_BACKEND_PROVIDER }}
       VITE_APPWRITE_ENDPOINT: ${{ vars.VITE_APPWRITE_ENDPOINT }}
@@ -49,6 +50,10 @@ jobs:
 
       - name: Generate Appwrite Functions deployment manifest
         run: npm run appwrite:functions:deploy
+
+      - name: Verify live Appwrite Functions inventory
+        if: ${{ vars.QA_VERIFY_APPWRITE_FUNCTIONS == 'true' }}
+        run: npm run appwrite:functions:verify
 
       - run: npm run appwrite:seed:qa -- --apply
       

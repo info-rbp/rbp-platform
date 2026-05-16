@@ -40,3 +40,16 @@ test("application interest allows user creation while provisioning stays locked 
   assert.ok(interest.permissions.create.includes("role:users"));
   assert.ok(!interest.permissions.create.includes("team:admins") || interest.permissions.create.length >= 1);
 });
+
+test("notification collections are locked down for direct reads", () => {
+  const notifications = readJson("appwrite/collections/notifications.json");
+  const deliveries = readJson("appwrite/collections/notification_deliveries.json");
+
+  assert.deepEqual(notifications.permissions.read, ["team:admins"]);
+  assert.deepEqual(deliveries.permissions.read, ["team:admins"]);
+  assert.ok(deliveries.attributes.some((attribute) => attribute.key === "provider_message_id"));
+  assert.ok(deliveries.attributes.some((attribute) => attribute.key === "error_message"));
+  assert.ok(deliveries.attributes.some((attribute) => attribute.key === "attempt_count"));
+  assert.ok(deliveries.attributes.some((attribute) => attribute.key === "last_attempt_at"));
+});
+});

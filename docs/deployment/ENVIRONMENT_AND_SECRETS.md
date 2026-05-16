@@ -22,8 +22,13 @@ Frontend examples:
 
 These variables must never be exposed to the frontend bundle:
 
+- `APPWRITE_API_KEY`
+- `APPWRITE_TRUSTED_FUNCTION_TOKEN`
+- `RBP_INTERNAL_FUNCTION_TOKEN`
 - `RBP_STRIPE_SECRET_KEY`
 - `RBP_STRIPE_WEBHOOK_SECRET`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
 - SMTP username/password or Frappe Email Account credentials
 - database credentials
 - deploy SSH keys
@@ -99,12 +104,15 @@ Backend deploy and Frappe site secrets should be configured on the QA server or 
 
 Stripe QA requires:
 
-- test-mode Stripe secret key
-- test-mode Stripe webhook secret
+- test-mode Stripe secret key, `STRIPE_SECRET_KEY`, beginning with `sk_test_`
+- test-mode Stripe webhook secret, `STRIPE_WEBHOOK_SECRET`
 - test product
 - recurring AUD test price
 - webhook endpoint configured for the QA backend
 - subscribed webhook events for checkout, subscription, invoice, payment, refund, and dispute events
+- `STRIPE_SUCCESS_URL` and `STRIPE_CANCEL_URL`
+
+The QA smoke runner refuses live Stripe checks when the configured secret key is not test-mode.
 
 ## Email QA setup
 
@@ -112,9 +120,22 @@ Email QA requires:
 
 - Frappe Email Account or SMTP configuration
 - sandbox mode enabled
-- QA recipient allowlist
+- QA recipient allowlist, `QA_EMAIL_ALLOWLIST` or `APPWRITE_QA_EMAIL_ALLOWLIST`
+- `QA_EMAIL_ALLOWED_RECIPIENT` and `QA_EMAIL_BLOCKED_RECIPIENT` for the live-proof script
 - admin notification recipient list
 - no real customer email delivery unless explicitly approved
+
+## QA smoke execution variables
+
+Prerequisite mode validates required configuration without mutating QA. Real execution is enabled by passing `--execute` or by setting `QA_SMOKE_EXECUTE=true` in the QA Smoke workflow.
+
+Execute mode additionally requires the relevant variables:
+
+- `QA_SMOKE_USER_EMAIL` and `QA_SMOKE_USER_PASSWORD` for auth session proof
+- `QA_SMOKE_USER_ID` for customer-scoped Function calls
+- `QA_SMOKE_ADMIN_USER_ID` or a trusted internal token for admin proof
+- `QA_SMOKE_TENANT_ID` and optionally `QA_SMOKE_PLAN_CODE` for Stripe webhook fixture proof
+- `QA_VERIFY_APPWRITE_FUNCTIONS=true` to run live Function inventory verification after deploy
 
 ## Acceptance criteria
 

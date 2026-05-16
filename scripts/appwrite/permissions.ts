@@ -6,6 +6,17 @@ export type PermissionOptions = {
   adminTeamId?: string;
 };
 
+export type PermissionComparison = {
+  status: "match" | "drift" | "manual";
+  expected: string[];
+  actual: string[];
+  missing: string[];
+  extra: string[];
+  reason?: string;
+};
+
+const ACTIONS: PermissionAction[] = ["read", "create", "update", "delete"];
+const PERMISSION_EXPRESSION = /^(read|create|update|delete)\("(.+)"\)$/;
 const ACTIONS: PermissionAction[] = ["read", "create", "update", "delete"];
 
 function requireAdminTeamId(options: PermissionOptions) {
@@ -56,6 +67,24 @@ export function normalizePermissionTarget(target: string, options: PermissionOpt
   return value;
 }
 
+export function normalizePermissionExpression(permission: string, options: PermissionOptions = {}) {
+  const trimmed = permission.trim();
+  const match = trimmed.match(PERMISSION_EXPRESSION);
+
+  if (!match) {
+    return trimmed;
+  }
+
+  const [, action, target] = match;
+  return buildPermission(action as PermissionAction, target, options);
+}
+
+export function buildPermission(action: PermissionAction, target: string, options: PermissionOptions = {}) {
+  const trimmed = target.trim();
+  const existingExpression = trimmed.match(PERMISSION_EXPRESSION);
+
+  if (existingExpression) {
+    return buildPermission(existingExpression[1] as PermissionAction, existingExpression[2], options);
 export function buildPermission(action: PermissionAction, target: string, options: PermissionOptions = {}) {
   const trimmed = target.trim();
 
@@ -76,6 +105,14 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
 
   if (Array.isArray(spec)) {
     for (const target of spec) {
+      const existingExpression = target.trim().match(PERMISSION_EXPRESSION);
+      permissions.push(
+        existingExpression
+          ? normalizePermissionExpression(target, options)
+          : buildPermission("read", target, options),
+      );
+    }
+    return [...new Set(permissions)].sort((left, right) => left.localeCompare(right));
       permissions.push(buildPermission("read", target, options));
     }
     return [...new Set(permissions)];
@@ -87,5 +124,66 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
     }
   }
 
+  return [...new Set(permissions)].sort((left, right) => left.localeCompare(right));
+}
+
+export function permissionFingerprint(permissions: string[] | PermissionSpec | undefined, options: PermissionOptions = {}) {
+  return JSON.stringify(buildPermissions(permissions, options));
+}
+
+export function comparePermissions(
+  expectedPermissions: string[] | PermissionSpec | undefined,
+  actualPermissions: string[] | PermissionSpec | undefined,
+  options: PermissionOptions = {},
+): PermissionComparison {
+  let expected: string[] = [];
+  let actual: string[] = [];
+
+  try {
+    expected = buildPermissions(expectedPermissions, options);
+  } catch (error) {
+    return {
+      status: "manual",
+      expected,
+      actual,
+      missing: [],
+      extra: [],
+      reason: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  try {
+    actual = buildPermissions(actualPermissions, options);
+  } catch (error) {
+    return {
+      status: "manual",
+      expected,
+      actual,
+      missing: [],
+      extra: [],
+      reason: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  const missing = expected.filter((permission) => !actual.includes(permission));
+  const extra = actual.filter((permission) => !expected.includes(permission));
+
+  if (!missing.length && !extra.length) {
+    return {
+      status: "match",
+      expected,
+      actual,
+      missing,
+      extra,
+    };
+  }
+
+  return {
+    status: "drift",
+    expected,
+    actual,
+    missing,
+    extra,
+  };
   return [...new Set(permissions)];
 }

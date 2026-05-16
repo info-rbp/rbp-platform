@@ -7,12 +7,40 @@ Do not mark any item passed unless it was actually executed and evidence was cap
 ## Preconditions
 
 - QA frontend URL is reachable.
-- QA backend site is reachable.
-- Customer test account exists.
-- Admin/Frappe Desk account exists.
+- Appwrite QA endpoint, project, database, API key, and deployed Functions are reachable.
+- Customer test account exists and has Appwrite user/profile records.
+- Admin account is a member of the Appwrite admin team, or a trusted internal token is configured for QA-only verification.
 - Stripe test product, price, and webhook are configured.
 - Email sandbox and allowlist are configured.
 - Candidate frontend and backend commits are known.
+
+## Automated Appwrite smoke commands
+
+Default mode is prerequisite-only and safe for non-live CI:
+
+```bash
+npm run test:smoke:dry-run
+npm run smoke:qa:auth
+npm run smoke:qa:billing
+npm run smoke:qa:stripe-webhook
+npm run smoke:qa:service-requests
+npm run smoke:qa:admin
+npm run smoke:qa:permissions
+```
+
+Real execution mode requires QA secrets and may create QA records:
+
+```bash
+npm run smoke:qa:auth -- --execute
+npm run smoke:qa:billing -- --execute
+npm run smoke:qa:stripe-webhook -- --execute
+npm run smoke:qa:service-requests -- --execute
+npm run smoke:qa:admin -- --execute
+npm run smoke:qa:permissions -- --execute
+npm run smoke:qa:email
+```
+
+In GitHub Actions, set `QA_SMOKE_EXECUTE=true` to pass `--execute`. Leave it unset or false for prerequisite-only validation.
 
 ## Evidence to capture
 
@@ -84,11 +112,13 @@ Expected:
 
 Required only after Stripe QA setup exists.
 
-- Select a membership plan.
+- Confirm membership plans exist in Appwrite.
+- Confirm at least one free plan and one Stripe-backed paid plan exist.
 - Confirm checkout starts through backend billing API.
 - Confirm Stripe Checkout is in test mode.
-- Complete with Stripe test card.
-- Confirm payment event, subscription, and entitlement records in Frappe.
+- Complete with Stripe test card when dashboard/manual checkout proof is in scope.
+- Execute fixture webhook proof for success, payment failure, subscription deletion, and duplicate replay.
+- Confirm payment event, subscription, and entitlement records in Appwrite.
 - Confirm notification is logged or sandbox-sent.
 
 Do not accept mock success as Stripe proof.

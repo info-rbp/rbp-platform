@@ -82,6 +82,8 @@ Repo-side actions completed in this branch:
 
 - `bootstrap-tenant` now requires authenticated Appwrite user context unless a trusted internal invocation token is supplied
 - runtime handlers persist tenant, business profile, user profile, membership, subscription, notification, and audit records
+- public bootstrap ignores client-supplied role values, never accepts `admin`, and creates duplicate business names as distinct tenant records instead of linking unrelated users by name
+- admin access is granted by Appwrite admin team membership or an explicitly configured trusted internal invocation token, not by user-controlled profile role
 
 Still blocked:
 
@@ -105,6 +107,8 @@ Repo-side actions completed in this branch:
 
 - free plans now activate without creating a fake Stripe checkout session
 - Stripe helper status mapping and webhook handling are less scaffold-like than before
+- fixture tests cover checkout success, payment failure, subscription deletion, and duplicate webhook replay idempotency
+- execute-mode smoke can send signed Stripe test fixtures to the deployed webhook Function when QA Stripe/Appwrite env vars are present
 
 Still blocked:
 
@@ -135,6 +139,14 @@ Still blocked:
 Repo-side actions completed in this branch:
 
 - notification records and queue-processing handlers exist in runtime
+- direct notification reads are admin-only at collection level
+- customer notification list/mark actions are Function-mediated and scoped to the current user/tenant
+- notification delivery records now include provider/message, error, sent time, attempt count, and last-attempt metadata for QA proof
+- allowlist and blocked-recipient behavior has executable runtime coverage plus an Appwrite QA live-proof script
+
+Still blocked:
+
+- live SMTP/provider delivery and email-sandbox validation remain unverified until QA provider secrets and allowlists are configured
 
 Still blocked:
 
@@ -156,6 +168,7 @@ Repo-side actions completed in this branch:
 
 - admin operations handlers exist for applications, notifications, subscriptions, payment events, and service requests
 - safer update flows now strip Appwrite system fields before document updates
+- admin-only operations are denied for non-admin customers in executable runtime coverage
 
 Still blocked:
 

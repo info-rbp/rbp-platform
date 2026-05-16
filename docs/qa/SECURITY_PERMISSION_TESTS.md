@@ -29,6 +29,11 @@ This runbook is retained from the superseded QA readiness artifacts because it g
 | SEC-014 | Customer attempts to read raw payment event/webhook payload. | Raw provider payload is not exposed. |
 | SEC-015 | Runtime config endpoint is inspected. | No secret key, webhook secret, SMTP password, token, or raw `.env` value is exposed. |
 | SEC-016 | Protected route metadata is inspected. | Portal/admin/signin/signup/signout protections and noindex behavior match the SEO/security plan. |
+| SEC-017 | Public bootstrap sends `role=admin`. | Created profile is a customer role only; admin access is denied. |
+| SEC-018 | Two unrelated users bootstrap the same business name. | Distinct tenant records are created; users are not cross-linked. |
+| SEC-019 | Customer reads another user's notification or another tenant's notification. | Access denied or record omitted from Function response. |
+| SEC-020 | Customer reads notification delivery logs directly or through admin operations. | Access denied; delivery logs remain admin-only. |
+| SEC-021 | Admin operation is called by profile role only. | Denied unless the user is in the Appwrite admin team or the trusted internal token is configured and presented. |
 
 ## Evidence template
 
@@ -46,3 +51,4 @@ This runbook is retained from the superseded QA readiness artifacts because it g
 - QA logs or Frappe Desk record IDs for denied/accepted actions.
 - Confirmation that Applications remain delayed/register-interest only.
 - Confirmation that no live payment behavior is enabled in QA.
+- Local proof: `npm run test:integration` covers bootstrap escalation, duplicate tenant names, admin authorization, notification scoping, Stripe replay, and email allowlist behavior.

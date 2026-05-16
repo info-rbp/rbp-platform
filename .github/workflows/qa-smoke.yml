@@ -33,6 +33,17 @@ jobs:
       STRIPE_SUCCESS_URL: ${{ vars.STRIPE_SUCCESS_URL }}
       STRIPE_CANCEL_URL: ${{ vars.STRIPE_CANCEL_URL }}
 
+      QA_SMOKE_EXECUTE: ${{ vars.QA_SMOKE_EXECUTE }}
+      QA_SMOKE_USER_EMAIL: ${{ secrets.QA_SMOKE_USER_EMAIL }}
+      QA_SMOKE_USER_PASSWORD: ${{ secrets.QA_SMOKE_USER_PASSWORD }}
+      QA_SMOKE_USER_ID: ${{ vars.QA_SMOKE_USER_ID }}
+      QA_SMOKE_ADMIN_USER_ID: ${{ vars.QA_SMOKE_ADMIN_USER_ID }}
+      QA_SMOKE_TENANT_ID: ${{ vars.QA_SMOKE_TENANT_ID }}
+      QA_SMOKE_PLAN_CODE: ${{ vars.QA_SMOKE_PLAN_CODE }}
+      QA_SMOKE_SERVICE_TYPE: ${{ vars.QA_SMOKE_SERVICE_TYPE }}
+      RBP_INTERNAL_FUNCTION_TOKEN: ${{ secrets.RBP_INTERNAL_FUNCTION_TOKEN }}
+      APPWRITE_TRUSTED_FUNCTION_TOKEN: ${{ secrets.APPWRITE_TRUSTED_FUNCTION_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -46,6 +57,18 @@ jobs:
 
       - run: npm run test:smoke:dry-run
 
+      - name: Run QA smoke checks
+        run: |
+          args=""
+          if [ "${QA_SMOKE_EXECUTE}" = "true" ]; then
+            args="-- --execute"
+          fi
+          npm run smoke:qa:auth $args
+          npm run smoke:qa:billing $args
+          npm run smoke:qa:stripe-webhook $args
+          npm run smoke:qa:service-requests $args
+          npm run smoke:qa:admin $args
+          npm run smoke:qa:permissions $args
       - run: npm run smoke:qa:auth
 
       - run: npm run smoke:qa:billing
