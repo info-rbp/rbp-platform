@@ -35,13 +35,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: npm ci
+
       - run: npm run appwrite:schema:deploy -- --apply
-      - name: Prepare Appwrite Functions deployment manifest
-        run: npm run appwrite:functions:deploy -- --apply
-        continue-on-error: true
+
+      - name: Validate Appwrite Functions for Git integration
+        run: npm run appwrite:functions:validate
+
+      - name: Generate Appwrite Functions deployment manifest
+        run: npm run appwrite:functions:deploy
 
       - run: npm run appwrite:seed:qa -- --apply
+      
