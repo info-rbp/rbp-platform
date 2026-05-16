@@ -1,6 +1,5 @@
-import { ok } from "../_shared/response";
+import { runNamedHandler } from "../_shared/runtime";
 
-export default async function main(context: { req?: { body?: string } }) {
-  const payload = context.req?.body ? JSON.parse(context.req.body) : {};
-  return ok({ action: "create-service-request", payload, status: "submitted" });
+export default async function main(context: { req?: { body?: string; headers?: Record<string, string | undefined> } }) {
+  return runNamedHandler("create-service-request", context);
 }

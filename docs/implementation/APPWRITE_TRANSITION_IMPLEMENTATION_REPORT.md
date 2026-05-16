@@ -1,108 +1,94 @@
 # Appwrite Transition Implementation Report
 
-## Foundation Summary
+## Runtime Completion Summary
 
-This branch is a foundation and scaffolding change set for the Appwrite QA transition. It establishes repository-owned runtime structure and Appwrite-oriented integration seams, but it does not complete or prove the live Appwrite migration end to end.
+This branch no longer stops at transition scaffolding. It now contains:
 
-## What Changed In The Foundation Branch
+- Appwrite SDK-backed validation helpers for connection and inventory checks
+- guarded schema deploy and live drift reporting scripts
+- guarded QA seed and reset scripts
+- real shared Appwrite Function helpers for auth context, responses, audit, entitlements, and Stripe
+- non-stub Function handlers for tenant bootstrap, billing, webhooks, entitlements, service requests, notifications, and admin operations
+- frontend Appwrite Web SDK integration for account, database, function, and storage access
+- executable helper and runtime tests alongside the existing config, schema, integration, and smoke suites
 
-- backend direction freeze and Appwrite-first architecture documents
-- QA scope and deployment documentation aligned to the Appwrite runtime path
-- Appwrite schema, bucket, seed, template, and Function directories owned by the repository
-- root-level validation and deployment script entry points
-- Cloudflare QA workflow and deployment scaffolding
-- frontend backend-provider configuration and Appwrite-oriented API adapters
+## What Changed In This CI-Fix Pass
 
-## Files Added
+This update focused only on the current non-live CI blockers on PR #72:
 
-- Appwrite docs, schema, seed, and function scaffolding
-- Appwrite and Cloudflare validation scripts
-- Appwrite-oriented frontend provider and API adapter files
-- QA deployment docs and CI workflow files
+- fixed audit sanitization so secret-like keys such as `apiKey`, `apikey`, `api_key`, `clientSecret`, and authorization-style keys are redacted consistently
+- expanded helper tests to cover those redaction cases
+- added safe PR-time `VITE_*` placeholder values to the Cloudflare preview workflow so non-live validation can run without production or QA secrets
 
-## Files Modified
+## Latest Non-Live CI Status
 
-- README and architecture, launch, QA, and handoff docs
-- frontend runtime configuration and API provider routing
-- sign-in flow and admin copy
-- documentation to remove active Frappe-as-runtime contradictions
+Latest validated commit: `0515a4c87b4f3901bc7167b42aafb147ccbabf3b`
 
-## Scripts Added Or Updated
+The current non-live GitHub Actions checks are passing on that commit:
 
-- Appwrite inspect, validate, diff, deploy, seed, and mapping checks
-- Cloudflare build-env validation
+- Repository Tests
+- Cloudflare Preview Validation
+- Frontend Build Validation
+- Frontend Validation
+- SEO Validation
+- Backend Static Validation
+- Appwrite Functions Validation
+- Appwrite Schema Validation
+- Phase 4A Foundation Validation
 
-Current foundation limitation:
+Within the Cloudflare Preview Validation workflow, the following non-live steps passed:
 
-- some deploy scripts are still dry-run planning scaffolds rather than complete live deployment automation
-- those scripts must not be treated as proof of live runtime completion until follow-up work implements real deploy behavior
-
-## Appwrite Resources Defined
-
-- database definition
-- bucket definition
-- collection JSON files
-- Function folders and shared helpers
-- QA seed data files
-
-Current foundation limitation:
-
-- Function folders exist, but several handlers are still scaffolds or placeholders rather than complete business-logic implementations
-
-## Cloudflare Configuration Required
-
-- build in `frontend/portal`
-- output `dist`
-- Appwrite VITE variables
-- protected-route headers and SPA redirects
-
-## Validation Run
-
-Repository-side validation assets were added and reviewed from the GitHub branch, but local execution could not be completed in this session because a local checkout was unavailable in the workspace and direct cloning from GitHub was blocked by network policy.
-
-## Verified In This Session
-
-- repository metadata and base branch
-- PR #71 branch, head, and changed-file scope
-- documentation contradictions around Frappe Desk as QA source of truth
-- provider-layer contradiction that still allowed active legacy Frappe fallback
-- repository presence of Appwrite, Cloudflare, script, and frontend transition surfaces
-
-## Not Run In This Session
-
-- `npm run appwrite:schema:validate`
-- `npm run appwrite:permissions:validate`
-- `npm run appwrite:functions:validate`
-- `npm run appwrite:seed:validate`
-- `npm run appwrite:stripe-plan-mapping:validate`
 - `npm run cloudflare:env:validate`
-- frontend build and SEO audit commands
-- live Appwrite, Stripe, or Cloudflare validation
+- `cd frontend/portal && npm ci && npm run build && npm run audit:seo`
 
-## Failed Or Blocked
+Within Repository Tests, the root `npm test` workflow step passed after the audit redaction fix.
 
-- local checkout creation through direct Git clone was blocked by network policy in this workspace
-- live Appwrite connection validation remains blocked without credentials and runnable checkout
-- live schema deploy and function deploy remain blocked without credentials and runnable checkout
-- live Stripe checkout and webhook verification remain blocked without credentials and runnable checkout
-- live Cloudflare QA deployment validation remains blocked without credentials and runnable checkout
+## Validation Status
 
-## What Remains For Follow-Up Implementation PRs
+### Verified in CI
 
-- complete real Appwrite Function business logic
-- replace dry-run-only deploy scaffolds with real deployment automation
-- convert placeholder test definitions into executable tests and smoke checks
-- run local and CI validation
-- run live Appwrite, Stripe test-mode, and Cloudflare QA validation with credentials
+The following command surfaces were rerun successfully in GitHub Actions on the latest commit:
 
-## Known Limitations
+- `npm test`
+- `npm run cloudflare:env:validate`
+- frontend build and SEO audit within the Cloudflare preview workflow
+- the repository's current non-live validation workflows listed above
 
-This branch establishes the repository-owned Appwrite transition structure and redirects the frontend integration seam toward Appwrite. It must be merged and treated as a foundation PR only, not as a claim that the runtime migration is already complete.
+### Not run locally in this session
 
-## Next Steps For QA Deployment
+These commands were not run from a local checkout in this workspace:
 
-1. merge this branch only as an Appwrite transition foundation change
-2. create a follow-up implementation branch from updated `main`
-3. implement real Functions, deploy automation, executable tests, and Appwrite-first runtime completion
-4. run local validation in a real checkout or CI runner
-5. run live QA validation with Appwrite, Stripe test-mode, and Cloudflare credentials
+- local `npm ci`
+- local `npm test`
+- local root validation scripts
+- local frontend build commands
+
+Why not:
+
+- no usable local checkout was available in this workspace
+- direct Git clone access was blocked by network policy
+- npm registry access from temporary install-validation attempts was blocked by policy
+
+### Live validation still blocked
+
+Live Appwrite, Stripe, and Cloudflare validation still depend on:
+
+- QA credentials and secrets
+- GitHub environments or runners with those secrets configured
+- Appwrite Function deployment execution beyond non-live validation
+
+This branch does not claim that live Appwrite, Stripe, or Cloudflare validation passed.
+
+## Remaining Known Gaps
+
+- real Appwrite schema deployment and live drift remediation remain incomplete
+- real Appwrite Function deployment automation remains incomplete
+- full tenant provisioning, service-request, notification, and admin runtime coverage still needs broader end-to-end proof
+- live Appwrite validation, live Stripe checkout and webhook execution, and live Cloudflare QA validation remain blocked until secrets are configured and workflows run
+
+## Recommended Next Runtime Checks
+
+1. Run the guarded live Appwrite validation and deployment commands once QA credentials are configured.
+2. Execute Stripe test-mode checkout and webhook flows against the current runtime handlers.
+3. Run the Cloudflare QA deployment workflow with the required environment secrets.
+4. Re-audit milestone status and PR notes after those live validations complete.

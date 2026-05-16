@@ -17,6 +17,12 @@
 - STRIPE_SUCCESS_URL
 - STRIPE_CANCEL_URL
 
+## Cloudflare
+
+- CLOUDFLARE_ACCOUNT_ID
+- CLOUDFLARE_PROJECT_NAME
+- CLOUDFLARE_API_TOKEN
+
 ## Frontend
 
 - VITE_BACKEND_PROVIDER=appwrite
@@ -26,3 +32,12 @@
 - VITE_APPWRITE_STORAGE_BUCKET_ID
 - VITE_QA_ENVIRONMENT=true
 - VITE_CLOUDFLARE_ENVIRONMENT=qa
+- VITE_ENABLE_MOCK_AUTH=false
+- VITE_ENABLE_MOCK_FALLBACK=false
+
+## Separation Rules
+
+- QA and production must be configured separately.
+- QA must remain on Appwrite.
+- QA must not enable mock auth or mock fallback.
+- Production payment capture remains blocked until explicitly approved and validated.

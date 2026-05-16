@@ -10,4 +10,16 @@
 
 ## Inventory Status
 
-Live inventory still requires reachable Appwrite credentials. Until those are present, the repository definition is the authoritative desired state.
+Repository inventory: present.
+
+Live inventory validation: not yet recorded in this session.
+
+Outstanding live checks:
+
+- reachable project and database
+- live bucket presence
+- live collection inventory
+- live Function inventory
+- admin team and role configuration
+
+Until reachable Appwrite credentials are available, the repository definition remains the authoritative desired inventory state.

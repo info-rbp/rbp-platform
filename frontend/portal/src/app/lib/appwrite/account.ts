@@ -1,4 +1,5 @@
-import { appwriteRequest } from "./client";
+import { ID } from "appwrite";
+import { appwriteAccount } from "./client";
 
 export type AppwriteSessionUser = {
   $id: string;
@@ -7,22 +8,22 @@ export type AppwriteSessionUser = {
 };
 
 export function createAccount(payload: { userId?: string; email: string; password: string; name: string }) {
-  return appwriteRequest<AppwriteSessionUser>("account", "POST", {
-    userId: payload.userId ?? "unique()",
-    email: payload.email,
-    password: payload.password,
-    name: payload.name,
-  });
+  return appwriteAccount.create<AppwriteSessionUser>(
+    payload.userId ?? ID.unique(),
+    payload.email,
+    payload.password,
+    payload.name,
+  );
 }
 
 export function createEmailPasswordSession(payload: { email: string; password: string }) {
-  return appwriteRequest("account/sessions/email", "POST", payload);
+  return appwriteAccount.createEmailPasswordSession(payload.email, payload.password);
 }
 
 export function getCurrentAccount() {
-  return appwriteRequest<AppwriteSessionUser>("account", "GET");
+  return appwriteAccount.get<AppwriteSessionUser>();
 }
 
 export function deleteCurrentSession() {
-  return appwriteRequest("account/sessions/current", "DELETE");
+  return appwriteAccount.deleteSession("current");
 }

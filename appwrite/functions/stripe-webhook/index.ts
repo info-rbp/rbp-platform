@@ -1,10 +1,5 @@
-import { ok } from "../_shared/response";
-import { getStripeConfig } from "../_shared/stripe";
+import { runNamedHandler } from "../_shared/runtime";
 
-export default async function main() {
-  const stripe = getStripeConfig();
-  return ok({
-    action: "stripe-webhook",
-    webhookConfigured: Boolean(stripe.webhookSecret),
-  });
+export default async function main(context: { req?: { body?: string; headers?: Record<string, string | undefined> } }) {
+  return runNamedHandler("stripe-webhook", context);
 }
