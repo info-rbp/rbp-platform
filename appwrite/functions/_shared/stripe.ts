@@ -72,3 +72,7 @@ export function mapStripeEventToStatus(eventType: string) {
       return "pending";
   }
 }
+
+export function isCheckoutAbandonmentEvent(eventType: string) {
+  return eventType === "checkout.session.expired";
+}

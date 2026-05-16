@@ -1,0 +1,22 @@
+{
+  "rule_key": "support_default",
+  "free": {
+    "channels": ["email"],
+    "target_initial_response_business_hours": 48,
+    "priority": "standard"
+  },
+  "premium": {
+    "channels": ["portal", "email"],
+    "target_initial_response_business_days": 1,
+    "priority": "priority",
+    "escalation_workflow": "premium_admin_support"
+  },
+  "emergency_support": {
+    "included": false,
+    "notes": "Emergency support is not included unless separately agreed."
+  },
+  "advisory_project_custom_work": {
+    "included": false,
+    "handling": "service_request_or_quoted_separately"
+  }
+}

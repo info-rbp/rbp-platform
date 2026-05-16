@@ -1,0 +1,26 @@
+{
+  "rule_key": "document_nucleus_default",
+  "currency": "AUD",
+  "delivery": {
+    "direct_customer_download": false,
+    "output_channel": "email",
+    "timeframe_based_delivery": true,
+    "editing_supported": true,
+    "generation_supported": true
+  },
+  "free": {
+    "access_model": "pay_per_use",
+    "price_basis": "advertised_price",
+    "entitlement_key": "document_nucleus_pay_per_use"
+  },
+  "premium": {
+    "access_model": "unlimited_current_documents",
+    "included_scope": "all_current_document_nucleus_documents",
+    "entitlement_key": "document_nucleus_unlimited",
+    "fair_use_policy": "Premium unlimited access is for ordinary business use only. It excludes resale, bulk extraction, automation, abuse, and other non-ordinary use. Excessive use may be queued, reviewed, or throttled. Custom or bespoke document work is quoted separately."
+  },
+  "custom_documents": {
+    "included": false,
+    "pricing": "quoted_separately"
+  }
+}
