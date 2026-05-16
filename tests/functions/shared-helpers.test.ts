@@ -16,7 +16,7 @@ test("response helpers return consistent envelopes", () => {
 });
 
 test("parseJsonBody accepts strings and objects", () => {
-  assert.deepEqual(parseJsonBody({ req: { body: '{"planCode":"free"}' } }), { planCode: "free" });
+  assert.deepEqual(parseJsonBody({ req: { body: "{\"planCode\":\"free\"}" } }), { planCode: "free" });
   assert.deepEqual(parseJsonBody({ req: { body: { planCode: "free" } } }), { planCode: "free" });
 });
 
@@ -40,7 +40,8 @@ test("stripe helpers expose deterministic idempotency and event mapping", () => 
   assert.equal(buildIdempotencyKey("evt_123"), "stripe:evt_123");
   assert.equal(mapStripeEventToStatus("checkout.session.completed"), "active");
   assert.equal(mapStripeEventToStatus("invoice.payment_failed"), "suspended");
-  assert.equal(mapStripeEventToStatus("customer.subscription.deleted"), "revoked");
+  assert.equal(mapStripeEventToStatus("checkout.session.expired"), "revoked");
+  assert.equal(mapStripeEventToStatus("unknown.event"), "pending");
 });
 
 test("stripe config reads environment-driven values", () => {
