@@ -12,6 +12,7 @@
     "appwrite:permissions:validate": "npx --yes tsx scripts/appwrite/validate-permissions.ts",
     "appwrite:functions:validate": "npx --yes tsx scripts/appwrite/validate-functions.ts",
     "appwrite:functions:deploy": "npx --yes tsx scripts/appwrite/deploy-functions.ts",
+    "appwrite:functions:verify": "npx --yes tsx scripts/appwrite/verify-functions.ts",
     "appwrite:seed:qa": "npx --yes tsx scripts/appwrite/seed-qa.ts",
     "appwrite:reset:qa": "npx --yes tsx scripts/appwrite/reset-qa-data.ts",
     "appwrite:seed:validate": "npx --yes tsx scripts/appwrite/validate-qa-seed.ts",

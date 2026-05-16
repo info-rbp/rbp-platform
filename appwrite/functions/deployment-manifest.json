@@ -1,0 +1,187 @@
+{
+  "generatedAt": "2026-05-16T10:27:18.300Z",
+  "functions": [
+    {
+      "id": "bootstrap-tenant",
+      "name": "bootstrap-tenant",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/bootstrap-tenant/index.ts",
+      "sourceDirectory": "appwrite/functions/bootstrap-tenant"
+    },
+    {
+      "id": "create-membership-checkout",
+      "name": "create-membership-checkout",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/create-membership-checkout/index.ts",
+      "sourceDirectory": "appwrite/functions/create-membership-checkout"
+    },
+    {
+      "id": "stripe-webhook",
+      "name": "stripe-webhook",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "any"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/stripe-webhook/index.ts",
+      "sourceDirectory": "appwrite/functions/stripe-webhook"
+    },
+    {
+      "id": "get-subscription-status",
+      "name": "get-subscription-status",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/get-subscription-status/index.ts",
+      "sourceDirectory": "appwrite/functions/get-subscription-status"
+    },
+    {
+      "id": "cancel-subscription",
+      "name": "cancel-subscription",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/cancel-subscription/index.ts",
+      "sourceDirectory": "appwrite/functions/cancel-subscription"
+    },
+    {
+      "id": "list-my-entitlements",
+      "name": "list-my-entitlements",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/list-my-entitlements/index.ts",
+      "sourceDirectory": "appwrite/functions/list-my-entitlements"
+    },
+    {
+      "id": "admin-update-entitlements",
+      "name": "admin-update-entitlements",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/admin-update-entitlements/index.ts",
+      "sourceDirectory": "appwrite/functions/admin-update-entitlements"
+    },
+    {
+      "id": "send-notification",
+      "name": "send-notification",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/send-notification/index.ts",
+      "sourceDirectory": "appwrite/functions/send-notification"
+    },
+    {
+      "id": "process-notification-queue",
+      "name": "process-notification-queue",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/process-notification-queue/index.ts",
+      "sourceDirectory": "appwrite/functions/process-notification-queue"
+    },
+    {
+      "id": "create-service-request",
+      "name": "create-service-request",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/create-service-request/index.ts",
+      "sourceDirectory": "appwrite/functions/create-service-request"
+    },
+    {
+      "id": "list-my-service-requests",
+      "name": "list-my-service-requests",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/list-my-service-requests/index.ts",
+      "sourceDirectory": "appwrite/functions/list-my-service-requests"
+    },
+    {
+      "id": "admin-list-service-requests",
+      "name": "admin-list-service-requests",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/admin-list-service-requests/index.ts",
+      "sourceDirectory": "appwrite/functions/admin-list-service-requests"
+    },
+    {
+      "id": "admin-update-service-status",
+      "name": "admin-update-service-status",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/admin-update-service-status/index.ts",
+      "sourceDirectory": "appwrite/functions/admin-update-service-status"
+    },
+    {
+      "id": "admin-operations",
+      "name": "admin-operations",
+      "runtime": "node-22",
+      "entrypoint": "index.js",
+      "commands": "npm install && npm run build",
+      "execute": [
+        "users"
+      ],
+      "timeout": 30,
+      "sourceEntry": "appwrite/functions/admin-operations/index.ts",
+      "sourceDirectory": "appwrite/functions/admin-operations"
+    }
+  ]
+}
