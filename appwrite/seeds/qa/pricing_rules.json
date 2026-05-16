@@ -1,0 +1,48 @@
+[
+  {
+    "rule_key": "on_demand_services_default",
+    "category": "on_demand_services",
+    "currency": "AUD",
+    "gst_treatment": "gst_exclusive",
+    "free": {
+      "price_basis": "advertised_price",
+      "discount_percent": 0
+    },
+    "premium": {
+      "price_basis": "advertised_price",
+      "discount_percent": 25
+    }
+  },
+  {
+    "rule_key": "managed_services_default",
+    "category": "managed_services",
+    "currency": "AUD",
+    "gst_treatment": "gst_exclusive",
+    "free": {
+      "price_basis": "advertised_price",
+      "discount_percent": 0
+    },
+    "premium": {
+      "price_basis": "advertised_price",
+      "discount_percent": 25
+    }
+  },
+  {
+    "rule_key": "marketplace_listing_default",
+    "category": "marketplace_listing",
+    "currency": "AUD",
+    "gst_treatment": "gst_exclusive",
+    "free": {
+      "base_fee": 100,
+      "fee_label": "$100 + GST"
+    },
+    "premium": {
+      "base_fee": 50,
+      "fee_label": "$50 + GST"
+    },
+    "add_ons": {
+      "status": "tbc",
+      "notes": "Marketplace listing add-ons remain draft placeholders until commercially approved."
+    }
+  }
+]

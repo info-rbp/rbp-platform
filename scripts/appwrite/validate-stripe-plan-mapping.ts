@@ -6,6 +6,7 @@ import { getStripeClient } from "../../appwrite/functions/_shared/stripe";
 type MembershipPlan = Record<string, unknown> & {
   plan_code?: string;
   amount?: number;
+  billing_cycle?: string;
   currency?: string;
   stripe_product_id?: string;
   stripe_price_id?: string;
@@ -35,12 +36,20 @@ function validateRequiredPlans(plans: MembershipPlan[], source: string) {
     throw new Error(`${source} must keep the free membership plan at zero cost.`);
   }
 
-  if (!String(free.stripe_price_id ?? "").startsWith("price_test_")) {
-    throw new Error(`${source} must keep the free plan on a Stripe test price id.`);
+  if (free.stripe_price_id) {
+    throw new Error(`${source} must not require a Stripe subscription price id for the free plan.`);
   }
 
-  if (!String(premium.stripe_price_id ?? "").startsWith("price_test_")) {
-    throw new Error(`${source} must keep the premium plan on a Stripe test price id.`);
+  if (String(premium.billing_cycle ?? "") !== "weekly") {
+    throw new Error(`${source} must keep the premium plan on weekly billing.`);
+  }
+
+  if (Number(premium.amount ?? 0) !== 25) {
+    throw new Error(`${source} must keep the premium plan at AUD 25 plus GST.`);
+  }
+
+  if (premium.stripe_price_id !== "price_1TXKGnS9Az4EAUomNJeSfDA1") {
+    throw new Error(`${source} must keep the premium plan on the approved QA Stripe test price id.`);
   }
 
   if (premium.active !== true) {
@@ -77,7 +86,7 @@ async function validateLiveStripe(plan: MembershipPlan) {
 
 try {
   const seedPlans = readSeedPlans();
-  const { free: freeSeedPlan, premium: premiumSeedPlan } = validateRequiredPlans(seedPlans, "QA seed data");
+  const { premium: premiumSeedPlan } = validateRequiredPlans(seedPlans, "QA seed data");
 
   const report: Record<string, unknown> = {
     seed: {
@@ -115,7 +124,10 @@ try {
   if (process.env.STRIPE_SECRET_KEY) {
     report.liveStripe = {
       status: "validated",
-      free: await validateLiveStripe(freeSeedPlan),
+      free: {
+        status: "skipped",
+        message: "Free membership has no subscription checkout price; Stripe is used only for pay-per-use purchases.",
+      },
       premium: await validateLiveStripe(premiumSeedPlan),
     };
   }

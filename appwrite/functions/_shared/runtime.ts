@@ -3,7 +3,7 @@ import { createAuditEvent, persistAuditEvent } from "./audit";
 import { collectionIds, createAdminContext, requireAdmin, resolveCurrentUser } from "./appwriteAdmin";
 import { grantTenantEntitlements, listTenantEntitlements, revokeTenantEntitlements } from "./entitlements";
 import { fail, forbidden, notFound, ok, parseJsonBody, unauthorized, validationError } from "./response";
-import { buildIdempotencyKey, createCheckoutSession, getStripeClient, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
+import { buildIdempotencyKey, createCheckoutSession, getStripeClient, isCheckoutAbandonmentEvent, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
 
 type FunctionContext = {
   req?: {
@@ -119,7 +119,8 @@ async function bootstrapTenant(context: FunctionContext) {
   const email = String(payload.email).toLowerCase();
   const name = String(payload.name);
   const businessName = String(payload.businessName || `${name} Business`);
-  const planCode = String(payload.planCode || "free");
+  const requestedPlanCode = String(payload.planCode || "free");
+  const planCode = "free";
   const role = String(payload.role || "member");
 
   const tenantResult = await admin.upsertByQuery(
@@ -166,7 +167,7 @@ async function bootstrapTenant(context: FunctionContext) {
     eventName: "bootstrap_tenant",
     actorId: accountId,
     tenantId,
-    payload: { accountId, email, businessName, planCode, role },
+    payload: { accountId, email, businessName, planCode, requestedPlanCode, role },
   });
 
   return ok({
@@ -342,6 +343,24 @@ async function handleStripeWebhook(context: FunctionContext) {
     stripe_event_id: eventFingerprint,
     status,
   });
+
+  if (isCheckoutAbandonmentEvent(event.type)) {
+    if (tenantId) {
+      await createNotification({
+        tenantId,
+        title: "Premium checkout expired",
+        message: "Premium checkout was not completed. Your tenant remains on its current membership plan.",
+        status: "sent",
+      });
+    }
+
+    await persistAuditEvent({
+      eventName: "stripe_webhook_processed",
+      tenantId: tenantId || undefined,
+      payload: { eventType: event.type, eventId: event.id, planCode, status, subscriptionUnchanged: true },
+    });
+    return ok({ received: true, event: event.type, subscription_unchanged: true }, "Checkout expired without subscription changes.");
+  }
 
   if (tenantId) {
     if (currentSubscription && "$id" in currentSubscription) {
