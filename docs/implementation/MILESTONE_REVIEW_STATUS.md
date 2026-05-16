@@ -148,6 +148,10 @@ Still blocked:
 
 - live SMTP/provider delivery and email-sandbox validation remain unverified until QA provider secrets and allowlists are configured
 
+Still blocked:
+
+- live notification delivery and email-sandbox validation remain unverified
+
 ## 11. Service request persistence
 
 Repo-side actions completed in this branch:

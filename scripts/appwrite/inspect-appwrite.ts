@@ -1,6 +1,7 @@
 import path from "node:path";
 import { Query } from "node-appwrite";
 import { collectPaginatedItems, createAdminServices, listFunctionDirectories, listJsonFiles, logSection, readConfig } from "./_lib";
+import { appwriteRoot, createAdminServices, listFunctionDirectories, listJsonFiles, logSection, readConfig } from "./_lib";
 
 const config = readConfig();
 
@@ -46,4 +47,13 @@ console.log(JSON.stringify({
   configuredStorageBucketId: storageBucketId,
   bucketCount: liveBuckets.length,
   buckets: liveBuckets.map((bucket) => ({ id: bucket.$id, name: bucket.name })),
+const liveCollections = await databases.listCollections(databaseId);
+const liveFunctions = await functions.list();
+const liveBucket = await storage.getBucket(storageBucketId);
+
+console.log(JSON.stringify({
+  database: { id: liveDatabase.$id, name: liveDatabase.name },
+  collections: liveCollections.collections.map((collection) => collection.$id),
+  functions: liveFunctions.functions.map((fn) => fn.$id),
+  bucket: { id: liveBucket.$id, name: liveBucket.name },
 }, null, 2));

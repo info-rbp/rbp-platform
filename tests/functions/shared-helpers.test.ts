@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { createAuditEvent, sanitizeAuditPayload } from "../../appwrite/functions/_shared/audit";
 import { buildIdempotencyKey, getStripeConfig, mapStripeEventToStatus } from "../../appwrite/functions/_shared/stripe";
+import { buildIdempotencyKey, getStripeConfig, isCheckoutAbandonmentEvent, mapStripeEventToStatus } from "../../appwrite/functions/_shared/stripe";
 import { fail, ok, parseJsonBody } from "../../appwrite/functions/_shared/response";
 
 test("response helpers return consistent envelopes", () => {
@@ -50,6 +51,10 @@ test("stripe helpers expose deterministic idempotency and event mapping", () => 
   assert.equal(mapStripeEventToStatus("invoice.payment_failed"), "suspended");
   assert.equal(mapStripeEventToStatus("checkout.session.expired"), "revoked");
   assert.equal(mapStripeEventToStatus("unknown.event"), "pending");
+  assert.equal(mapStripeEventToStatus("checkout.session.expired"), "expired");
+  assert.equal(mapStripeEventToStatus("unknown.event"), "pending");
+  assert.equal(isCheckoutAbandonmentEvent("checkout.session.expired"), true);
+  assert.equal(isCheckoutAbandonmentEvent("customer.subscription.deleted"), false);
 });
 
 test("stripe config reads environment-driven values", () => {

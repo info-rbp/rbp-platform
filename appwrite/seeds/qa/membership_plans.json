@@ -2,7 +2,7 @@
   {
     "plan_code": "free",
     "plan_name": "RBP Free",
-    "billing_cycle": "monthly",
+    "billing_cycle": "none",
     "currency": "AUD",
     "amount": 0,
     "stripe_product_id": "prod_test_free",
@@ -12,11 +12,12 @@
   {
     "plan_code": "premium",
     "plan_name": "RBP Premium",
-    "billing_cycle": "monthly",
+    "billing_cycle": "weekly",
     "currency": "AUD",
-    "amount": 149,
+    "amount": 25,
     "stripe_product_id": "prod_test_premium",
     "stripe_price_id": "price_test_premium",
+    "stripe_price_id": "price_1TXKGnS9Az4EAUomNJeSfDA1",
     "active": true
   }
 ]

@@ -52,3 +52,4 @@ test("notification collections are locked down for direct reads", () => {
   assert.ok(deliveries.attributes.some((attribute) => attribute.key === "attempt_count"));
   assert.ok(deliveries.attributes.some((attribute) => attribute.key === "last_attempt_at"));
 });
+});

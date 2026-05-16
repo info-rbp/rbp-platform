@@ -11,6 +11,10 @@
 - service request submission writes to Appwrite.
 - admin operations require Appwrite admin team membership or a QA-only trusted internal token.
 - `npm run appwrite:functions:verify` confirms every configured Function exists after deployment.
+- membership plans load from Appwrite.
+- application interest writes to Appwrite.
+- service request submission writes to Appwrite.
+- admin operations require admin role or team checks.
 
 ## Stripe
 
@@ -71,3 +75,7 @@ npm run smoke:qa:email
 ## Session Status In This Run
 
 This checklist was updated to reflect the required QA checks. Live post-deploy Appwrite, Stripe, and email checks still require QA secrets and reachable deployed Functions.
+
+## Session Status In This Run
+
+This checklist was updated to reflect the required QA checks, but the live post-deploy run was not executed in this session because QA credentials and a runnable checkout were unavailable.

@@ -69,3 +69,14 @@ jobs:
           npm run smoke:qa:service-requests $args
           npm run smoke:qa:admin $args
           npm run smoke:qa:permissions $args
+      - run: npm run smoke:qa:auth
+
+      - run: npm run smoke:qa:billing
+
+      - run: npm run smoke:qa:stripe-webhook
+
+      - run: npm run smoke:qa:service-requests
+
+      - run: npm run smoke:qa:admin
+
+      - run: npm run smoke:qa:permissions

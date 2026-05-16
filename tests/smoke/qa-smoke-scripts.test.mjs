@@ -17,6 +17,7 @@ for (const check of checks) {
     assert.equal(payload.status, "failed");
     assert.match(payload.message, new RegExp(`Smoke check "${check}" blocked: missing required environment variables`));
     assert.ok(Array.isArray(payload.missing));
+    assert.match(result.stderr, new RegExp(`Smoke check \\\"${check}\\\" blocked: missing required environment variables`));
   });
 }
 
@@ -40,4 +41,5 @@ test("email live-proof script fails clearly without QA email env", () => {
   const payload = JSON.parse(result.stderr);
   assert.equal(payload.status, "failed");
   assert.match(payload.message, /Email QA live proof blocked: missing required environment variables/);
+});
 });

@@ -56,3 +56,4 @@ jobs:
         run: npm run appwrite:functions:verify
 
       - run: npm run appwrite:seed:qa -- --apply
+      

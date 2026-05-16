@@ -17,6 +17,7 @@ export type PermissionComparison = {
 
 const ACTIONS: PermissionAction[] = ["read", "create", "update", "delete"];
 const PERMISSION_EXPRESSION = /^(read|create|update|delete)\("(.+)"\)$/;
+const ACTIONS: PermissionAction[] = ["read", "create", "update", "delete"];
 
 function requireAdminTeamId(options: PermissionOptions) {
   if (!options.adminTeamId) {
@@ -84,6 +85,11 @@ export function buildPermission(action: PermissionAction, target: string, option
 
   if (existingExpression) {
     return buildPermission(existingExpression[1] as PermissionAction, existingExpression[2], options);
+export function buildPermission(action: PermissionAction, target: string, options: PermissionOptions = {}) {
+  const trimmed = target.trim();
+
+  if (/^(read|create|update|delete)\(".+"\)$/.test(trimmed)) {
+    return trimmed;
   }
 
   const normalizedTarget = normalizePermissionTarget(trimmed, options);
@@ -107,6 +113,9 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
       );
     }
     return [...new Set(permissions)].sort((left, right) => left.localeCompare(right));
+      permissions.push(buildPermission("read", target, options));
+    }
+    return [...new Set(permissions)];
   }
 
   for (const action of ACTIONS) {
@@ -176,4 +185,5 @@ export function comparePermissions(
     missing,
     extra,
   };
+  return [...new Set(permissions)];
 }
