@@ -3,6 +3,23 @@ import { apiFailure, apiSuccess, callFrappeMethod } from "./client";
 import { selectApiImplementation } from "./provider";
 import { appwriteMembershipApi } from "./appwrite/appwriteMembershipApi";
 
+function formatMembershipPrice(amount: number, currency: string, billing: string) {
+  if (amount <= 0) {
+    return currency === "AUD" ? "AUD $0" : `${currency} $0`;
+  }
+
+  const price = currency === "AUD"
+    ? `$${amount.toLocaleString("en-AU")}`
+    : `${currency} $${amount.toLocaleString("en-AU")}`;
+  const normalizedBilling = billing.toLowerCase();
+
+  if (normalizedBilling === "weekly" || normalizedBilling === "week") {
+    return `${price} + GST per week`;
+  }
+
+  return `${price} + GST / ${normalizedBilling}`;
+}
+
 function normalisePlan(raw: Record<string, unknown>, index: number): MockMembershipPlan {
   const id = String(raw.plan_code ?? raw.name ?? raw.id ?? `membership-plan-${index + 1}`);
   const name = String(raw.plan_name ?? raw.name ?? raw.title ?? "RBP Membership");
@@ -16,9 +33,10 @@ function normalisePlan(raw: Record<string, unknown>, index: number): MockMembers
     description: String(raw.description ?? "Remote Business Partner membership plan."),
     price: {
       amount: typeof price === "number" ? price : Number(price) || 0,
-      currency,
+      currency: "AUD",
+      gstIncluded: Number(price) <= 0,
       label: typeof price === "number" || Number(price)
-        ? `${currency} $${Number(price).toLocaleString("en-AU")} / ${billing.toLowerCase()}`
+        ? formatMembershipPrice(Number(price), currency, billing)
         : String(raw.price_label ?? "Pricing available through RBP"),
     },
     status: raw.active === false ? "inactive" : "active",

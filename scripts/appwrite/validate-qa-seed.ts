@@ -160,10 +160,13 @@ requireCondition(
   "QA Premium membership plan must use the approved Stripe test price id.",
 );
 
-const qaSeedText = fs.readFileSync(path.join(root, "membership_plans.json"), "utf8");
+const qaSeedText = fs.readdirSync(root)
+  .filter((name) => name.endsWith(".json"))
+  .map((name) => fs.readFileSync(path.join(root, name), "utf8"))
+  .join("\n");
 requireCondition(
   !qaSeedText.includes("price_1TXcxN0mYebE7B3JIrRnhe4w"),
-  "Live Stripe Premium price id must not be hardcoded into QA membership seed data.",
+  "Live Stripe Premium price id must not be hardcoded into QA seed data.",
 );
 
 const entitlementKeys = new Set(entitlements.map((entitlement) => String(entitlement.entitlement_key)));

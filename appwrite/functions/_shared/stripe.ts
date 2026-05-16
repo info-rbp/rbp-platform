@@ -66,6 +66,7 @@ export function mapStripeEventToStatus(eventType: string) {
     case "invoice.payment_failed":
       return "suspended";
     case "checkout.session.expired":
+      return "expired";
     case "customer.subscription.deleted":
       return "revoked";
     default:

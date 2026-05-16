@@ -10,6 +10,10 @@ QA seed data uses Stripe test price `price_1TXKGnS9Az4EAUomNJeSfDA1` for Premium
 
 All prices in the membership business-rule seeds are GST exclusive unless explicitly marked otherwise.
 
+## Repository Config Artefacts
+
+`pricing_rules.json`, `document_nucleus_rules.json`, and `support_rules.json` are repository config artefacts only until runtime enforcement is implemented. They document the approved commercial rules and are validated by QA seed checks, but they are not yet enforced as live Appwrite collections or customer-facing runtime policy engines.
+
 ## Entitlement Matrix
 
 | Entitlement key | Free | Premium | Notes |

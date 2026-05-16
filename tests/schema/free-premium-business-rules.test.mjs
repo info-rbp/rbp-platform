@@ -10,7 +10,17 @@ const pricingRules = readJson("appwrite/seeds/qa/pricing_rules.json");
 const documentRules = readJson("appwrite/seeds/qa/document_nucleus_rules.json");
 const supportRules = readJson("appwrite/seeds/qa/support_rules.json");
 const membershipSeedRaw = readRepoFile("appwrite/seeds/qa/membership_plans.json");
+const qaSeedFilesRaw = [
+  "appwrite/seeds/qa/document_nucleus_rules.json",
+  "appwrite/seeds/qa/entitlements.json",
+  "appwrite/seeds/qa/membership_plans.json",
+  "appwrite/seeds/qa/plan_entitlements.json",
+  "appwrite/seeds/qa/pricing_rules.json",
+  "appwrite/seeds/qa/support_rules.json",
+].map(readRepoFile).join("\n");
 const runtimeSource = readRepoFile("appwrite/functions/_shared/runtime.ts");
+const stripeSource = readRepoFile("appwrite/functions/_shared/stripe.ts");
+const appwriteMembershipApiSource = readRepoFile("frontend/portal/src/app/services/api/appwrite/appwriteMembershipApi.ts");
 
 const planByCode = (code) => plans.find((plan) => plan.plan_code === code);
 const ruleByKey = (key) => pricingRules.find((rule) => rule.rule_key === key);
@@ -38,6 +48,7 @@ test("QA seed keeps Free active and does not hardcode live subscription checkout
   assert.equal(free.active, true);
   assert.equal(free.stripe_price_id, undefined);
   assert.doesNotMatch(membershipSeedRaw, /price_1TXcxN0mYebE7B3JIrRnhe4w/);
+  assert.doesNotMatch(qaSeedFilesRaw, /price_1TXcxN0mYebE7B3JIrRnhe4w/);
 });
 
 test("account bootstrap defaults tenants to Free before any Premium checkout", () => {
@@ -45,6 +56,13 @@ test("account bootstrap defaults tenants to Free before any Premium checkout", (
   assert.match(runtimeSource, /const planCode = "free";/);
   assert.match(runtimeSource, /isCheckoutAbandonmentEvent\(event\.type\)/);
   assert.match(runtimeSource, /subscription_unchanged: true/);
+  assert.match(stripeSource, /case "checkout\.session\.expired":\n\s+return "expired";/);
+});
+
+test("frontend membership plan labels avoid slash-none billing copy", () => {
+  assert.match(appwriteMembershipApiSource, /return currency === "AUD" \? "AUD \$0" : `\$\{currency\} \$0`;/);
+  assert.match(appwriteMembershipApiSource, /return `\$\{price\} \+ GST per week`;/);
+  assert.doesNotMatch(appwriteMembershipApiSource, /AUD \$\$\{amount\.toLocaleString\("en-AU"\)\} \/ \$\{billing\}/);
 });
 
 test("Free and Premium checkout entitlements match subscription rules", () => {
