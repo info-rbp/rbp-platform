@@ -43,6 +43,8 @@ backups/
 test_reports/
 tmp/
 .cache/
+appwrite/functions/*.tar.gz
+appwrite/functions/**/*.tar.gz
 
 # OS / editor
 .DS_Store
