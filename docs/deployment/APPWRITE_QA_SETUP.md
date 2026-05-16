@@ -16,6 +16,7 @@
 - `npm run appwrite:schema:validate`
 - `npm run appwrite:schema:deploy -- --apply`
 - `npm run appwrite:functions:validate`
+<<<<<<< HEAD
 - `npm run appwrite:functions:deploy`
 - `npm run appwrite:functions:verify` after the Appwrite Git integration has produced live deployments
 - `npm run appwrite:seed:qa -- --apply`
@@ -29,3 +30,12 @@ Some Functions require user context, Stripe signatures, or mutation payloads. Fo
 ## Trusted internal invocation
 
 Trusted internal calls are disabled unless `APPWRITE_TRUSTED_FUNCTION_TOKEN` or `RBP_INTERNAL_FUNCTION_TOKEN` is configured. These values must be stored only in the QA secret manager or GitHub Actions secrets. Do not configure them for customer-facing flows.
+=======
+- `npm run appwrite:functions:deploy -- --apply`
+- `npm run appwrite:functions:verify`
+- `npm run appwrite:seed:qa -- --apply`
+
+`appwrite:functions:deploy -- --apply` uses only `APPWRITE_ENDPOINT`, `APPWRITE_PROJECT_ID`, and `APPWRITE_API_KEY` for deployment access. Function runtime secrets such as Stripe, database, storage, and admin-team values remain managed as Appwrite Function/project environment variables and are not written into generated archives.
+
+The function deployer reads the expected IDs from `appwrite/appwrite.config.json`, requires matching `appwrite/functions/<function-id>/index.ts` source directories, creates or updates those exact Appwrite Function IDs, and uploads a temporary archive deployment for each function. Do not check in generated `.tar.gz` archives.
+>>>>>>> adcdb32 (Test Appwrite function deployment tooling)
