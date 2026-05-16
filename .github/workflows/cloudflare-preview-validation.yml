@@ -7,11 +7,26 @@ on:
 jobs:
   cloudflare:
     runs-on: ubuntu-latest
+
+    env:
+      VITE_BACKEND_PROVIDER: appwrite
+      VITE_APPWRITE_ENDPOINT: https://cloud.appwrite.io/v1
+      VITE_APPWRITE_PROJECT_ID: preview-project-id
+      VITE_APPWRITE_DATABASE_ID: preview-database-id
+      VITE_APPWRITE_STORAGE_BUCKET_ID: preview-storage-bucket-id
+      VITE_QA_ENVIRONMENT: "true"
+      VITE_CLOUDFLARE_ENVIRONMENT: qa
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: npm ci
+
       - run: npm run cloudflare:env:validate
+
       - run: cd frontend/portal && npm ci && npm run build && npm run audit:seo
+      
