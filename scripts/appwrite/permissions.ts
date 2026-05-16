@@ -7,6 +7,7 @@ export type PermissionOptions = {
 };
 
 const ACTIONS: PermissionAction[] = ["read", "create", "update", "delete"];
+const PERMISSION_EXPRESSION = /^(read|create|update|delete)\("(.+)"\)$/;
 
 function requireAdminTeamId(options: PermissionOptions) {
   if (!options.adminTeamId) {
@@ -56,11 +57,24 @@ export function normalizePermissionTarget(target: string, options: PermissionOpt
   return value;
 }
 
+export function normalizePermissionExpression(permission: string, options: PermissionOptions = {}) {
+  const trimmed = permission.trim();
+  const match = trimmed.match(PERMISSION_EXPRESSION);
+
+  if (!match) {
+    return trimmed;
+  }
+
+  const [, action, target] = match;
+  return buildPermission(action as PermissionAction, target, options);
+}
+
 export function buildPermission(action: PermissionAction, target: string, options: PermissionOptions = {}) {
   const trimmed = target.trim();
+  const existingExpression = trimmed.match(PERMISSION_EXPRESSION);
 
-  if (/^(read|create|update|delete)\(".+"\)$/.test(trimmed)) {
-    return trimmed;
+  if (existingExpression) {
+    return buildPermission(existingExpression[1] as PermissionAction, existingExpression[2], options);
   }
 
   const normalizedTarget = normalizePermissionTarget(trimmed, options);
@@ -76,9 +90,14 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
 
   if (Array.isArray(spec)) {
     for (const target of spec) {
-      permissions.push(buildPermission("read", target, options));
+      const existingExpression = target.trim().match(PERMISSION_EXPRESSION);
+      permissions.push(
+        existingExpression
+          ? normalizePermissionExpression(target, options)
+          : buildPermission("read", target, options),
+      );
     }
-    return [...new Set(permissions)];
+    return [...new Set(permissions)].sort((left, right) => left.localeCompare(right));
   }
 
   for (const action of ACTIONS) {
@@ -87,5 +106,9 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
     }
   }
 
-  return [...new Set(permissions)];
+  return [...new Set(permissions)].sort((left, right) => left.localeCompare(right));
+}
+
+export function permissionFingerprint(permissions: string[] | PermissionSpec | undefined, options: PermissionOptions = {}) {
+  return JSON.stringify(buildPermissions(permissions, options));
 }
