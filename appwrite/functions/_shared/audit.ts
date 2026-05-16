@@ -1,6 +1,29 @@
 import { collectionIds, createAdminContext } from "./appwriteAdmin";
 
-const SENSITIVE_KEYS = ["secret", "token", "password", "signature", "webhook", "authorization", "apiKey"];
+const SENSITIVE_KEY_FRAGMENTS = [
+  "secret",
+  "token",
+  "password",
+  "signature",
+  "webhook",
+  "authorization",
+  "apikey",
+  "api_key",
+  "credential",
+  "privatekey",
+  "private_key",
+  "clientsecret",
+  "client_secret",
+];
+
+function normalizeKey(key: string) {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function isSensitiveKey(key: string) {
+  const normalizedKey = normalizeKey(key);
+  return SENSITIVE_KEY_FRAGMENTS.some((fragment) => normalizedKey.includes(normalizeKey(fragment)));
+}
 
 export function sanitizeAuditPayload(value: unknown): unknown {
   if (Array.isArray(value)) {
@@ -14,7 +37,7 @@ export function sanitizeAuditPayload(value: unknown): unknown {
   const record = value as Record<string, unknown>;
   const sanitized: Record<string, unknown> = {};
   for (const [key, entry] of Object.entries(record)) {
-    if (SENSITIVE_KEYS.some((fragment) => key.toLowerCase().includes(fragment))) {
+    if (isSensitiveKey(key)) {
       sanitized[key] = "[redacted]";
       continue;
     }
