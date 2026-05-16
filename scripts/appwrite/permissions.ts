@@ -118,8 +118,18 @@ export function buildPermissions(spec: PermissionSpec | string[] | undefined, op
   return [...new Set(permissions)].sort((left, right) => left.localeCompare(right));
 }
 
+export function normalisePermissions(spec: PermissionSpec | string[] | undefined, options: PermissionOptions = {}) {
+  return buildPermissions(spec, options);
+}
+
+export const normalizePermissions = normalisePermissions;
+
 export function permissionFingerprint(permissions: string[] | PermissionSpec | undefined, options: PermissionOptions = {}) {
   return JSON.stringify(buildPermissions(permissions, options));
+}
+
+export function fingerprintPermissions(permissions: string[] | PermissionSpec | undefined, options: PermissionOptions = {}) {
+  return permissionFingerprint(permissions, options);
 }
 
 export function comparePermissions(
