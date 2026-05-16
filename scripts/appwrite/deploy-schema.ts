@@ -1,4 +1,5 @@
 import { createSummary, isApplyMode, isDestructiveMode, listJsonFiles, printSummary, readConfig, readJson, requireEnv } from "./_lib";
+import { buildPermissions } from "./permissions";
 
 type CollectionDefinition = {
   id: string;
@@ -13,7 +14,7 @@ type CollectionDefinition = {
 type BucketDefinition = {
   id: string;
   name?: string;
-  permissions?: string[];
+  permissions?: Record<string, string[]>;
   fileSecurity?: boolean;
   enabled?: boolean;
   maximumFileSize?: number;
@@ -90,7 +91,7 @@ async function ensureCollection(databaseId: string, definition: CollectionDefini
           name: definition.name,
           documentSecurity: definition.documentSecurity ?? true,
           enabled: definition.enabled ?? true,
-          permissions: definition.permissions?.read ?? [],
+          permissions: buildPermissions(definition.permissions ?? {}, { adminTeamId: process.env.APPWRITE_ADMIN_TEAM_ID }),
         }),
       });
       summary.created.push(`collection:${definition.id}`);
@@ -177,7 +178,7 @@ async function ensureBucket(definition: BucketDefinition, apply: boolean, summar
     body: JSON.stringify({
       bucketId: definition.id,
       name: definition.name || definition.id,
-      permissions: definition.permissions || [],
+      permissions: buildPermissions(definition.permissions ?? {}, { adminTeamId: process.env.APPWRITE_ADMIN_TEAM_ID }),
       fileSecurity: definition.fileSecurity ?? true,
       enabled: definition.enabled ?? true,
       maximumFileSize: definition.maximumFileSize,
@@ -191,7 +192,7 @@ async function ensureBucket(definition: BucketDefinition, apply: boolean, summar
 }
 
 try {
-  requireEnv(["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY", "APPWRITE_DATABASE_ID"]);
+  requireEnv(["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY", "APPWRITE_DATABASE_ID", "APPWRITE_ADMIN_TEAM_ID"]);
 
   const apply = isApplyMode();
   const allowDestructive = isDestructiveMode();
