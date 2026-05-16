@@ -1,15 +1,23 @@
 import path from "node:path";
-import { configPath, listJsonFiles, readConfig, readJson, requireEnv } from "./_lib";
+import { collectPaginatedItems, configPath, listJsonFiles, readConfig, readJson, requireEnv } from "./_lib";
+import { comparePermissions, type PermissionSpec } from "./permissions";
 
 type CollectionDefinition = {
   id: string;
   name: string;
-  permissions?: Record<string, string[]>;
+  permissions?: PermissionSpec;
   attributes?: Array<{ key: string }>;
   indexes?: Array<{ key: string }>;
 };
 
-type BucketDefinition = { id?: string; name?: string };
+type BucketDefinition = { id?: string; name?: string; permissions?: string[] | PermissionSpec };
+
+type WarningEntry = {
+  resource: string;
+  reason: string;
+  expected?: string[];
+  actual?: string[];
+};
 
 type DriftReport = {
   missingDatabase: boolean;
@@ -18,6 +26,24 @@ type DriftReport = {
   missingIndexes: string[];
   missingBuckets: string[];
   permissionMismatches: string[];
+  warnings: WarningEntry[];
+  inventory: {
+    liveCollections: number;
+    liveBuckets: number;
+    liveFunctions: number;
+  };
+};
+
+type LiveCollection = {
+  $id: string;
+  $permissions?: string[];
+  permissions?: string[] | PermissionSpec;
+};
+
+type LiveBucket = {
+  $id: string;
+  $permissions?: string[];
+  permissions?: string[] | PermissionSpec;
 };
 
 function baseHeaders() {
@@ -39,8 +65,21 @@ async function appwriteGet<T>(route: string) {
   return response.json() as Promise<T>;
 }
 
-function toPermissionFingerprint(permissions: Record<string, string[]> | undefined) {
-  return JSON.stringify(permissions || {});
+function buildPaginatedRoute(route: string, limit: number, offset: number) {
+  const query = [
+    `queries[]=${encodeURIComponent(`limit(${limit})`)}`,
+    `queries[]=${encodeURIComponent(`offset(${offset})`)}`,
+  ].join("&");
+
+  return `${route}${route.includes("?") ? "&" : "?"}${query}`;
+}
+
+async function listPaginatedRoute<TItem>(route: string, itemsKey: string, pageSize = 25) {
+  return collectPaginatedItems<TItem>(
+    (limit, offset) => appwriteGet<Record<string, unknown>>(buildPaginatedRoute(route, limit, offset)),
+    itemsKey,
+    pageSize,
+  );
 }
 
 try {
@@ -48,6 +87,7 @@ try {
 
   const config = readConfig();
   const databaseId = process.env.APPWRITE_DATABASE_ID || config.database?.id || "";
+  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
   const collections = listJsonFiles("appwrite/collections").map((filePath) => readJson<CollectionDefinition>(filePath));
   const buckets = listJsonFiles("appwrite/buckets").map((filePath) => readJson<BucketDefinition>(filePath));
   const allowDrift = process.argv.includes("--allow-drift");
@@ -59,6 +99,12 @@ try {
     missingIndexes: [],
     missingBuckets: [],
     permissionMismatches: [],
+    warnings: [],
+    inventory: {
+      liveCollections: 0,
+      liveBuckets: 0,
+      liveFunctions: 0,
+    },
   };
 
   let liveDatabase: { $id: string } | null = null;
@@ -69,8 +115,9 @@ try {
   }
 
   if (liveDatabase) {
-    const liveCollections = await appwriteGet<{ collections: Array<{ $id: string; permissions?: Record<string, string[]> }> }>(`/databases/${databaseId}/collections`);
-    const collectionMap = new Map(liveCollections.collections.map((collection) => [collection.$id, collection]));
+    const liveCollections = await listPaginatedRoute<LiveCollection>(`/databases/${databaseId}/collections`, "collections", 25);
+    report.inventory.liveCollections = liveCollections.length;
+    const collectionMap = new Map(liveCollections.map((collection) => [collection.$id, collection]));
 
     for (const definition of collections) {
       const liveCollection = collectionMap.get(definition.id);
@@ -79,8 +126,21 @@ try {
         continue;
       }
 
-      if (toPermissionFingerprint(liveCollection.permissions) !== toPermissionFingerprint(definition.permissions)) {
+      const permissionComparison = comparePermissions(
+        definition.permissions,
+        liveCollection.$permissions || liveCollection.permissions,
+        { adminTeamId },
+      );
+
+      if (permissionComparison.status === "drift") {
         report.permissionMismatches.push(definition.id);
+      } else if (permissionComparison.status === "manual") {
+        report.warnings.push({
+          resource: `collection:${definition.id}`,
+          reason: permissionComparison.reason || "Permission comparison requires manual verification.",
+          expected: permissionComparison.expected,
+          actual: permissionComparison.actual,
+        });
       }
 
       const liveAttributes = await appwriteGet<{ attributes: Array<{ key: string }> }>(`/databases/${databaseId}/collections/${definition.id}/attributes`);
@@ -102,14 +162,46 @@ try {
   }
 
   if (buckets.length) {
-    const liveBuckets = await appwriteGet<{ buckets: Array<{ $id: string }> }>("/storage/buckets");
-    const liveBucketIds = new Set(liveBuckets.buckets.map((bucket) => bucket.$id));
+    const liveBuckets = await listPaginatedRoute<LiveBucket>("/storage/buckets", "buckets", 25);
+    report.inventory.liveBuckets = liveBuckets.length;
+    const liveBucketMap = new Map(liveBuckets.map((bucket) => [bucket.$id, bucket]));
+
     for (const bucket of buckets) {
       const bucketId = bucket.id || bucket.name;
-      if (bucketId && !liveBucketIds.has(bucketId)) {
+      if (!bucketId) {
+        continue;
+      }
+
+      const liveBucket = liveBucketMap.get(bucketId);
+      if (!liveBucket) {
         report.missingBuckets.push(bucketId);
+        continue;
+      }
+
+      if (bucket.permissions) {
+        const permissionComparison = comparePermissions(bucket.permissions, liveBucket.$permissions || liveBucket.permissions, { adminTeamId });
+        if (permissionComparison.status === "drift") {
+          report.permissionMismatches.push(`bucket:${bucketId}`);
+        } else if (permissionComparison.status === "manual") {
+          report.warnings.push({
+            resource: `bucket:${bucketId}`,
+            reason: permissionComparison.reason || "Bucket permission comparison requires manual verification.",
+            expected: permissionComparison.expected,
+            actual: permissionComparison.actual,
+          });
+        }
       }
     }
+  }
+
+  try {
+    const liveFunctions = await listPaginatedRoute<{ $id: string }>("/functions", "functions", 25);
+    report.inventory.liveFunctions = liveFunctions.length;
+  } catch (error) {
+    report.warnings.push({
+      resource: "functions",
+      reason: error instanceof Error ? error.message : String(error),
+    });
   }
 
   console.log(JSON.stringify({
