@@ -46,11 +46,11 @@ test("builds collection permission payloads from repo shorthand", () => {
       { adminTeamId: "admin-team-id" },
     ),
     [
-      'read("users")',
-      'read("team:admin-team-id")',
       'create("users")',
-      'update("team:admin-team-id")',
       'delete("team:admin-team-id")',
+      'read("team:admin-team-id")',
+      'read("users")',
+      'update("team:admin-team-id")',
     ],
   );
 });
