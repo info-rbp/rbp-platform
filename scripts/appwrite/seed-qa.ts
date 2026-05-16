@@ -1,4 +1,5 @@
 import path from "node:path";
+import { ID, Query } from "node-appwrite";
 import { createAdminServices, createSummary, ensureQaGuard, isApplyMode, printSummary, readJson, upsertByField } from "./_lib";
 
 const apply = isApplyMode();
@@ -34,17 +35,65 @@ async function upsertSeedRecords(
   }
 }
 
+async function upsertSeedRecordsByFields(
+  collectionId: string,
+  fields: string[],
+  rows: Array<Record<string, unknown>>,
+  databaseId: string,
+  dryRun: boolean,
+) {
+  const { databases } = createAdminServices();
+
+  for (const row of rows) {
+    const fingerprint = fields.map((field) => String(row[field] ?? "")).join(":");
+    if (!fields.every((field) => row[field] !== undefined && row[field] !== null && String(row[field]) !== "")) {
+      summary.failed.push(`${collectionId}:missing-composite-key`);
+      continue;
+    }
+
+    if (dryRun) {
+      summary.created.push(`${collectionId}:${fingerprint} (dry-run)`);
+      continue;
+    }
+
+    const existing = await databases.listDocuments(
+      databaseId,
+      collectionId,
+      fields.map((field) => Query.equal(field, [String(row[field])])),
+    );
+    const document = existing.documents?.[0];
+
+    if (document?.$id) {
+      await databases.updateDocument(databaseId, collectionId, document.$id, row);
+      summary.updated.push(`${collectionId}:${fingerprint}`);
+    } else {
+      await databases.createDocument(databaseId, collectionId, ID.unique(), row);
+      summary.created.push(`${collectionId}:${fingerprint}`);
+    }
+  }
+}
+
+function acknowledgeConfigSeed(name: string) {
+  readSeedFile<unknown>(name);
+  summary.skipped.push(`${name}:config-only`);
+}
+
 try {
   ensureQaGuard();
 
   const { databaseId } = createAdminServices();
 
   await upsertSeedRecords("membership_plans", "plan_code", readSeedFile<Array<Record<string, unknown>>>("membership_plans"), databaseId, !apply);
+  await upsertSeedRecords("entitlements", "entitlement_key", readSeedFile<Array<Record<string, unknown>>>("entitlements"), databaseId, !apply);
+  await upsertSeedRecordsByFields("plan_entitlements", ["plan_code", "entitlement_key"], readSeedFile<Array<Record<string, unknown>>>("plan_entitlements"), databaseId, !apply);
   await upsertSeedRecords("tenants", "tenant_name", readSeedFile<Array<Record<string, unknown>>>("tenants"), databaseId, !apply);
   await upsertSeedRecords("applications", "application_key", readSeedFile<Array<Record<string, unknown>>>("applications"), databaseId, !apply);
   await upsertSeedRecords("application_interest", "application_id", readSeedFile<Array<Record<string, unknown>>>("application_interest"), databaseId, !apply);
   await upsertSeedRecords("notifications", "title", readSeedFile<Array<Record<string, unknown>>>("notifications"), databaseId, !apply);
   await upsertSeedRecords("service_requests", "reference_id", readSeedFile<Array<Record<string, unknown>>>("service_requests"), databaseId, !apply);
+  acknowledgeConfigSeed("pricing_rules");
+  acknowledgeConfigSeed("document_nucleus_rules");
+  acknowledgeConfigSeed("support_rules");
 
   const users = readSeedFile<Array<Record<string, unknown>>>("users");
   for (const user of users) {

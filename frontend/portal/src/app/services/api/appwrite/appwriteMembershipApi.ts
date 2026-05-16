@@ -3,6 +3,23 @@ import { apiFailure, apiSuccess } from "../client";
 import { listDocuments } from "../../../lib/appwrite/databases";
 import { invokeAppwriteFunction } from "../../../lib/appwrite/functions";
 
+function formatMembershipPrice(amount: number, currency: string, billing: string) {
+  if (amount <= 0) {
+    return currency === "AUD" ? "AUD $0" : `${currency} $0`;
+  }
+
+  const price = currency === "AUD"
+    ? `$${amount.toLocaleString("en-AU")}`
+    : `${currency} $${amount.toLocaleString("en-AU")}`;
+  const normalizedBilling = billing.toLowerCase();
+
+  if (normalizedBilling === "weekly" || normalizedBilling === "week") {
+    return `${price} + GST per week`;
+  }
+
+  return `${price} + GST / ${normalizedBilling}`;
+}
+
 function normalisePlan(raw: Record<string, unknown>, index: number): MockMembershipPlan {
   const id = String(raw.plan_code ?? raw.$id ?? `membership-plan-${index + 1}`);
   const amount = Number(raw.amount ?? 0);
@@ -15,8 +32,9 @@ function normalisePlan(raw: Record<string, unknown>, index: number): MockMembers
     description: String(raw.description ?? "Remote Business Partner membership plan."),
     price: {
       amount,
-      currency,
-      label: `${currency} $${amount.toLocaleString("en-AU")} / ${billing}`,
+      currency: "AUD",
+      gstIncluded: amount <= 0,
+      label: formatMembershipPrice(amount, currency, billing),
     },
     status: raw.active === false ? "inactive" : "active",
     highlights: Array.isArray(raw.included_entitlements) ? raw.included_entitlements.map(String) : [],

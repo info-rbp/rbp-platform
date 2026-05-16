@@ -1,7 +1,32 @@
 import { Query } from "node-appwrite";
 import { collectionIds, createAdminContext } from "./appwriteAdmin";
 
-export const entitlementKeys = [
+export const businessEntitlementKeys = [
+  "portal_access",
+  "profile_management",
+  "application_interest",
+  "application_setup_request",
+  "customer_application_provisioning",
+  "service_requests_advertised_price",
+  "service_requests_discounted_price",
+  "on_demand_services_advertised_price",
+  "on_demand_services_discounted_price",
+  "managed_services_advertised_price",
+  "managed_services_discounted_price",
+  "document_nucleus_pay_per_use",
+  "document_nucleus_unlimited",
+  "marketplace_listing_standard_fee",
+  "marketplace_listing_discounted_fee",
+  "basic_notifications",
+  "premium_notifications",
+  "email_support_48h",
+  "premium_support",
+  "billing_management",
+  "stripe_subscription_checkout",
+  "pay_per_use_checkout",
+] as const;
+
+export const legacyEntitlementKeys = [
   "membership",
   "portal",
   "billing",
@@ -19,7 +44,15 @@ export const entitlementKeys = [
   "applications_provisioning",
 ] as const;
 
+export const entitlementKeys = [...businessEntitlementKeys, ...legacyEntitlementKeys] as const;
+
+export type EntitlementKey = typeof entitlementKeys[number];
+
 export type EntitlementStatus = "active" | "suspended" | "revoked";
+
+export function isKnownEntitlementKey(value: string): value is EntitlementKey {
+  return (entitlementKeys as readonly string[]).includes(value);
+}
 
 export async function resolvePlanEntitlements(planCode: string) {
   const admin = createAdminContext();
