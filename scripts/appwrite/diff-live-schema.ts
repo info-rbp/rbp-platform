@@ -66,12 +66,11 @@ async function appwriteGet<T>(route: string) {
 }
 
 function buildPaginatedRoute(route: string, limit: number, offset: number) {
-  const query = [
-    `queries[]=${encodeURIComponent(`limit(${limit})`)}`,
-    `queries[]=${encodeURIComponent(`offset(${offset})`)}`,
-  ].join("&");
+  const params = new URLSearchParams();
+  params.append("queries[]", `limit(${limit})`);
+  params.append("queries[]", `offset(${offset})`);
 
-  return `${route}${route.includes("?") ? "&" : "?"}${query}`;
+  return `${route}${route.includes("?") ? "&" : "?"}${params.toString()}`;
 }
 
 async function listPaginatedRoute<TItem>(route: string, itemsKey: string, pageSize = 25) {
