@@ -1,131 +1,105 @@
 # Cloudflare Frontend QA Evidence
 
-Last updated: 2026-05-17 18:24 AWST
+Last updated: 2026-05-17 20:40 AWST
 
 ## Scope
 
-- QA URL tested: `https://rbp-platform.pages.dev/`
+- QA URL tested previously: `https://rbp-platform.pages.dev/`
 - Working branch: `fix/appwrite-permission-reconciliation-clean`
-- Commit tested and deployed: `0e1462b`
-- Browser: Playwright Chromium
-- Verification report: `tmp/qa/cloudflare-root-dashboard-verification.json`
+- Browser evidence currently documented from earlier pass: commit `0e1462b`
+- This document now includes a later remote source-code remediation pass performed against the same branch.
 
-## Build And Deploy
+## Remote Source-Code Remediation Pass
 
-Build environment validation:
+This pass updated repository source and test coverage through remote GitHub patching only. It did not run live Cloudflare, Appwrite, Stripe, or browser commands from the current environment.
 
-- `VITE_BACKEND_PROVIDER`: loaded
-- `VITE_APPWRITE_ENDPOINT`: loaded
-- `VITE_APPWRITE_PROJECT_ID`: loaded
-- `VITE_APPWRITE_DATABASE_ID`: loaded
-- `VITE_APPWRITE_STORAGE_BUCKET_ID`: loaded
-- `VITE_ENABLE_MOCK_FALLBACK`: loaded
-- `VITE_QA_ENVIRONMENT`: loaded
-- `VITE_CLOUDFLARE_ENVIRONMENT`: loaded
-- `npm run cloudflare:env:validate`: PASS
+Files updated in the remote remediation pass:
 
-Local fixed build:
+- `frontend/portal/src/app/lib/appwrite/functions.ts`
+- `frontend/portal/src/app/services/api/appwrite/appwriteBillingApi.ts`
+- `frontend/portal/src/app/components/Navbar.tsx`
+- `frontend/portal/src/app/data/publicNavigation.ts`
+- `frontend/portal/src/app/services/api/appwrite/appwriteApplicationsApi.ts`
+- `frontend/portal/src/app/services/api/appwrite/appwriteNotificationsApi.ts`
+- `frontend/portal/src/app/pages/BusinessApplicationsPage.tsx`
+- `frontend/portal/src/app/pages/portal/PortalLayout.tsx`
+- `frontend/portal/src/app/routes.tsx`
+- `frontend/portal/src/app/types/portal.ts`
+- `frontend/portal/public/sitemap.xml`
+- `tests/runtime/appwrite-function-response.test.ts`
+- `tests/runtime/frontend-qa-remediation.test.ts`
+- `tests/schema/sitemap.test.mjs`
+- `docs/qa/CLOUDFLARE_FRONTEND_QA_DEFECTS.md`
+- `docs/qa/CLOUDFLARE_FRONTEND_QA_EVIDENCE.md`
 
-- Build command: `npm run build` in `frontend/portal`
-- JS asset: `/assets/index-CATcRwLF.js`
-- CSS asset: `/assets/index-1Dz620UT.css`
-- Old root bundle before production deployment: `/assets/index-CjyNwKW7.js`
+## Tests Added Or Updated In Source
 
-Cloudflare production branch:
+Added:
 
-- Project: `rbp-platform`
-- Production branch identified from Cloudflare production deployment history: `main`
-- Previous production deployments listed branch `main`
+- `tests/runtime/appwrite-function-response.test.ts`
+- `tests/runtime/frontend-qa-remediation.test.ts`
+- `tests/schema/sitemap.test.mjs`
 
-Production deployment:
+Covered behaviors:
 
-- Deploy command: `npx wrangler pages deploy dist --project-name rbp-platform --branch main`
-- Immutable deployment URL: `https://b6a3ee55.rbp-platform.pages.dev`
-- Cloudflare environment: Production
-- Cloudflare branch: `main`
-- Cloudflare source: `0e1462b`
+- Appwrite Function raw payload, success envelope, failure envelope, and invalid JSON handling.
+- Navbar authenticated vs guest CTA resolution.
+- Application-interest success/error helper messaging.
+- Operations navigation protected-link regression coverage.
+- Portal notification normalisation and unread counting helpers.
+- Portal identity helper.
+- Sitemap public-route inclusion and protected-route exclusion.
 
-Root bundle verification after deployment:
+## Validation Status
 
-- Root URL: `https://rbp-platform.pages.dev/`
-- Root JS asset after deployment: `/assets/index-CATcRwLF.js`
-- Root no longer serves old bundle `/assets/index-CjyNwKW7.js`
-- Root bundle contains dashboard fallback/storage markers including `RBP Member`, `Your business`, and `rbp.mockPortalState`
-- Function names `normalisePortalDashboardState` and `unwrapPortalDashboardPayload` were not found in the deployed JS, likely due to minification
+Validated in this pass:
 
-## Browser QA Result
+- Repository source updated remotely.
+- Static test coverage added for the source changes listed above.
 
-Target: `https://rbp-platform.pages.dev/`
+Not validated in this pass:
 
-Result: PASS
+- `npm run test:unit`
+- `npm run test:integration`
+- `npm run appwrite:schema:validate`
+- `npm run appwrite:permissions:validate`
+- `npm run appwrite:functions:validate`
+- `npm run appwrite:seed:validate`
+- `npm run appwrite:stripe-plan-mapping:validate`
+- `npm run cloudflare:env:validate`
+- `cd frontend/portal && npm run build`
+- browser QA
+- Stripe checkout redirect
+- Stripe webhook return flow
+- Appwrite live notification reads/writes
+- Cloudflare `/sitemap.xml` HTTP 200 verification
 
-Observed:
+Reason:
+
+- The current environment did not have a runnable local checkout or live QA access for Cloudflare/Appwrite/Stripe execution.
+
+## What Still Requires Live QA
+
+- Premium membership checkout must redirect to Stripe test checkout from deployed QA.
+- Free membership must activate without Stripe when `requires_checkout: false` is returned.
+- Logged-in public header must show `Go to Account` on deployed QA for desktop and mobile.
+- Application-interest registration must create a live Appwrite record, success notification, and admin-visible entry.
+- Portal bell must list live notifications and allow mark-read/mark-all-read actions.
+- `/admin` must be checked in browser for logged-out, customer, and admin states.
+- `/sitemap.xml` must return 200 from Cloudflare QA and match the updated route list.
+
+## Existing Browser Evidence
+
+The earlier root QA evidence below remains historically useful, but it does not cover the new source fixes in this later remote pass:
 
 - Appwrite CORS passed on root.
 - Sign-in completed and redirected to `/portal/dashboard`.
-- The active-session sign-in retest passed.
-- No `Creation of a session is prohibited when a session is active` error was seen.
-- Dashboard remained visible after 10 seconds of async hydration.
-- Refreshing `/portal/dashboard` kept the dashboard stable.
+- Dashboard remained visible after hydration and refresh.
 - Logout redirected to `/signin`.
-- Signing in again after logout returned to `/portal/dashboard`.
 
-Non-blocking browser noise:
+Historical evidence artifacts:
 
-- Two console 401 resource messages were observed during account/session checks.
-- One `net::ERR_ABORTED` Appwrite Function execution request was captured during navigation.
-- These did not block login, dashboard render, hydration, refresh, logout, or sign-in retest.
-
-## Dashboard State Check
-
-State after 10-second hydration:
-
-```json
-{
-  "keys": [
-    "membershipStatus",
-    "membershipPlan",
-    "customer",
-    "activities",
-    "notifications"
-  ],
-  "customer": {
-    "id": "6a080f29488f13d9f923",
-    "name": "info@remotebusinesspartner.com.au",
-    "email": "info@remotebusinesspartner.com.au",
-    "businessName": "info@remotebusinesspartner.com.au"
-  },
-  "activitiesArray": true,
-  "notificationsArray": true,
-  "oldWrapperPresent": false
-}
-```
-
-State after refresh:
-
-```json
-{
-  "keys": [
-    "membershipStatus",
-    "membershipPlan",
-    "customer",
-    "activities",
-    "notifications"
-  ],
-  "customer": {
-    "id": "6a080f29488f13d9f923",
-    "name": "info@remotebusinesspartner.com.au",
-    "email": "info@remotebusinesspartner.com.au",
-    "businessName": "info@remotebusinesspartner.com.au"
-  },
-  "activitiesArray": true,
-  "notificationsArray": true,
-  "oldWrapperPresent": false
-}
-```
-
-## Screenshots
-
+- `tmp/qa/cloudflare-root-dashboard-verification.json`
 - `docs/qa/screenshots/cloudflare-frontend-qa/root-signin.png`
 - `docs/qa/screenshots/cloudflare-frontend-qa/root-dashboard-stable.png`
 - `docs/qa/screenshots/cloudflare-frontend-qa/root-dashboard-state-check.png`
@@ -133,13 +107,6 @@ State after refresh:
 - `docs/qa/screenshots/cloudflare-frontend-qa/root-logout.png`
 - `docs/qa/screenshots/cloudflare-frontend-qa/root-signin-retest.png`
 
-Historical preview-only evidence remains relevant for deployment troubleshooting:
-
-- Preview fixed bundle was available at `https://64907e02.rbp-platform.pages.dev`
-- Preview alias was `https://fix-appwrite-permission-reco-44v1.rbp-platform.pages.dev`
-- Both preview URLs served `/assets/index-CATcRwLF.js`
-- Preview browser QA was blocked by Appwrite CORS because Appwrite did not allow those preview origins
-
 ## Conclusion
 
-The root Cloudflare QA URL now serves the fixed frontend bundle and passes browser auth/dashboard verification. The portal dashboard envelope crash is resolved on root. Active-session sign-in handling is browser-verified on root. Cloudflare frontend QA can proceed to the remaining portal/admin/Stripe UI areas.
+The branch now contains additional source-code remediation and static coverage for several frontend P0/P1 defects, but live QA evidence has not yet been refreshed for these new changes. The application is not ready for QA sign-off or production readiness from this pass alone. It is ready for a targeted QA re-test once the branch is built and deployed to the live QA environment.
