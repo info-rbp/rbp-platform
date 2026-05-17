@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
   Bell,
@@ -10,28 +10,210 @@ import {
   X,
 } from "lucide-react";
 
-import { mockAuthService } from "../../services/mock/auth.mockService";
+import { authApi, notificationsApi } from "../../services/api";
 import {
   getPortalPageTitle,
   isPortalPathActive,
   portalNavigationSections,
 } from "./portalNavigationModel";
+import type {
+  PortalCustomerAuthUser,
+  PortalNotification,
+} from "../../types/portal";
 
-const USER = {
-  name: "Remote Business Partner",
-  email: "info@remotebusinesspartner.com.au",
-  plan: "Growth Partner Programme",
-  initials: "RB",
-};
+const CUSTOMER_AUTH_KEY = "rbp_customer_auth";
+const PENDING_INTENT_KEY = "rbp_pending_account_intent";
+
+function buildInitials(name: string, email: string) {
+  const source = name || email || "RBP Member";
+  const parts = source.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return "RB";
+  }
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return `${parts[0][0] || "R"}${parts[1][0] || "B"}`.toUpperCase();
+}
+
+export function buildPortalIdentity(user: PortalCustomerAuthUser | null) {
+  const name = user?.name || user?.email || "RBP Member";
+  const email = user?.email || "";
+  const plan = user?.businessName || "Member portal";
+
+  return {
+    name,
+    email,
+    plan,
+    initials: buildInitials(name, email),
+  };
+}
+
+function isReadNotification(notification: PortalNotification) {
+  if (notification.read !== undefined) {
+    return notification.read;
+  }
+
+  if (notification.readAt) {
+    return true;
+  }
+
+  return notification.status === "read";
+}
+
+export function normalisePortalNotifications(payload: unknown): PortalNotification[] {
+  if (!Array.isArray(payload)) {
+    return [];
+  }
+
+  return payload.map((item, index) => {
+    const record = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+    const title = typeof record.title === "string" && record.title.length > 0
+      ? record.title
+      : "Notification";
+    const message = typeof record.message === "string" && record.message.length > 0
+      ? record.message
+      : "A new update is available in your portal.";
+    const href = typeof record.href === "string" && record.href.length > 0
+      ? record.href
+      : "/portal/dashboard";
+    const updatedAt = typeof record.updated_at === "string"
+      ? record.updated_at
+      : typeof record.created_at === "string"
+        ? record.created_at
+        : "";
+    const readAt = typeof record.read_at === "string" ? record.read_at : undefined;
+    const status = typeof record.status === "string" && record.status.length > 0
+      ? record.status
+      : readAt
+        ? "read"
+        : "unread";
+    const read = record.read === true || Boolean(readAt) || status === "read";
+
+    return {
+      id:
+        typeof record.$id === "string"
+          ? record.$id
+          : typeof record.id === "string"
+            ? record.id
+            : `notification-${index + 1}`,
+      title,
+      message,
+      status: status as PortalNotification["status"],
+      href,
+      read,
+      readAt,
+      updatedAt,
+    };
+  });
+}
+
+export function getUnreadNotificationCount(notifications: PortalNotification[]) {
+  return notifications.filter((notification) => !isReadNotification(notification)).length;
+}
 
 export function PortalLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<PortalCustomerAuthUser | null>(null);
+  const [notifications, setNotifications] = useState<PortalNotification[]>([]);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsError, setNotificationsError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCurrentUser() {
+      const response = await authApi.getCurrentUser();
+      if (!active) {
+        return;
+      }
+
+      setCurrentUser(response.ok && response.data ? response.data : null);
+    }
+
+    loadCurrentUser();
+    window.addEventListener("rbp-auth-changed", loadCurrentUser);
+
+    return () => {
+      active = false;
+      window.removeEventListener("rbp-auth-changed", loadCurrentUser);
+    };
+  }, []);
+
+  async function loadNotifications() {
+    setNotificationsLoading(true);
+    setNotificationsError("");
+    const response = await notificationsApi.listMyNotifications();
+
+    if (response.ok && response.data) {
+      setNotifications(normalisePortalNotifications(response.data));
+      setNotificationsLoading(false);
+      return;
+    }
+
+    setNotificationsError(response.message || "Unable to load notifications.");
+    setNotificationsLoading(false);
+  }
 
   async function handleSignOut() {
-    await mockAuthService.signOut();
+    await authApi.signOut();
+    window.localStorage.removeItem(CUSTOMER_AUTH_KEY);
+    window.sessionStorage.removeItem(PENDING_INTENT_KEY);
+    window.dispatchEvent(new Event("rbp-auth-changed"));
     navigate("/signin");
+  }
+
+  async function handleToggleNotifications() {
+    const nextOpen = !notificationsOpen;
+    setNotificationsOpen(nextOpen);
+
+    if (nextOpen) {
+      await loadNotifications();
+    }
+  }
+
+  async function handleMarkRead(notificationId: string) {
+    const response = await notificationsApi.markRead(notificationId);
+
+    if (!response.ok) {
+      setNotificationsError(response.message || "Unable to update notification.");
+      return;
+    }
+
+    setNotifications((current) =>
+      current.map((notification) =>
+        notification.id === notificationId
+          ? {
+              ...notification,
+              read: true,
+              readAt: notification.readAt || new Date().toISOString(),
+              status: "read",
+            }
+          : notification,
+      ),
+    );
+  }
+
+  async function handleMarkAllRead() {
+    const response = await notificationsApi.markAllRead();
+
+    if (!response.ok) {
+      setNotificationsError(response.message || "Unable to update notifications.");
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    setNotifications((current) =>
+      current.map((notification) => ({
+        ...notification,
+        read: true,
+        readAt: notification.readAt || timestamp,
+        status: "read",
+      })),
+    );
   }
 
   const today = new Date().toLocaleDateString("en-AU", {
@@ -42,6 +224,8 @@ export function PortalLayout() {
   });
 
   const pageTitle = getPortalPageTitle(location.pathname);
+  const identity = useMemo(() => buildPortalIdentity(currentUser), [currentUser]);
+  const unreadCount = getUnreadNotificationCount(notifications);
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -80,11 +264,11 @@ export function PortalLayout() {
         <div className="border-b border-slate-100 px-4 py-3">
           <div className="flex items-center gap-2.5 rounded-xl bg-slate-50 p-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
-              <span className="text-xs font-black text-white">{USER.initials}</span>
+              <span className="text-xs font-black text-white">{identity.initials}</span>
             </div>
             <div className="min-w-0">
-              <div className="truncate text-xs font-bold text-slate-800">{USER.name}</div>
-              <div className="truncate text-[10px] font-semibold text-blue-700">{USER.plan}</div>
+              <div className="truncate text-xs font-bold text-slate-800">{identity.name}</div>
+              <div className="truncate text-[10px] font-semibold text-blue-700">{identity.plan}</div>
             </div>
           </div>
         </div>
@@ -193,15 +377,98 @@ export function PortalLayout() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-50">
-              <Bell className="h-4 w-4" />
-              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-blue-600" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={handleToggleNotifications}
+                className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-50"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 ? (
+                  <span className="absolute -right-1 -top-1 inline-flex min-w-[18px] items-center justify-center rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {unreadCount}
+                  </span>
+                ) : null}
+              </button>
+
+              {notificationsOpen ? (
+                <div className="absolute right-0 top-11 z-30 w-80 rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-sm font-bold text-slate-900">Notifications</h2>
+                      <p className="text-[11px] text-slate-500">Unread: {unreadCount}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleMarkAllRead}
+                      className="text-[11px] font-semibold text-blue-700 hover:text-blue-800"
+                    >
+                      Mark all read
+                    </button>
+                  </div>
+
+                  {notificationsLoading ? (
+                    <div className="rounded-xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                      Loading notifications...
+                    </div>
+                  ) : notificationsError ? (
+                    <div className="rounded-xl bg-rose-50 px-4 py-4 text-sm font-semibold text-rose-700">
+                      {notificationsError}
+                    </div>
+                  ) : notifications.length === 0 ? (
+                    <div className="rounded-xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+                      No notifications yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {notifications.map((notification) => {
+                        const read = isReadNotification(notification);
+                        return (
+                          <div
+                            key={notification.id}
+                            className={[
+                              "rounded-xl border px-3 py-3",
+                              read ? "border-slate-200 bg-white" : "border-blue-100 bg-blue-50/60",
+                            ].join(" ")}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <Link
+                                  to={notification.href || "/portal/dashboard"}
+                                  className="block text-sm font-bold text-slate-900 hover:text-blue-700"
+                                  onClick={() => setNotificationsOpen(false)}
+                                >
+                                  {notification.title}
+                                </Link>
+                                <p className="mt-1 text-[11px] leading-5 text-slate-600">
+                                  {notification.message}
+                                </p>
+                                {notification.updatedAt ? (
+                                  <p className="mt-2 text-[10px] text-slate-400">{notification.updatedAt}</p>
+                                ) : null}
+                              </div>
+                              {!read ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleMarkRead(notification.id)}
+                                  className="shrink-0 text-[11px] font-semibold text-blue-700 hover:text-blue-800"
+                                >
+                                  Mark read
+                                </button>
+                              ) : null}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
             <Link
               to="/portal/settings"
               className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-700 transition-colors hover:bg-blue-800"
             >
-              <span className="text-xs font-black text-white">{USER.initials}</span>
+              <span className="text-xs font-black text-white">{identity.initials}</span>
             </Link>
           </div>
         </header>
