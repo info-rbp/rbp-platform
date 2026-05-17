@@ -72,3 +72,25 @@ Reason:
 3. Rerun `npm run appwrite:functions:verify`.
 4. If no impact, delete it or leave disabled through one QA cycle.
 5. If it is still needed, migrate it into `appwrite/appwrite.config.json` with a named source directory, or document it as approved external drift.
+
+
+## Disable action
+
+Timestamp: 2026-05-17T04:51:09.221678Z
+
+Action taken:
+
+- Legacy function `69ff594b000beaeee38e` was disabled in AppWrite.
+- No deletion was performed.
+- `npm run appwrite:functions:verify` was rerun after disabling.
+
+Expected post-disable state:
+
+- Configured functions remain present.
+- Configured functions remain deployable/verifiable.
+- Legacy function may still appear as `unexpected` until deleted or explicitly allowlisted.
+
+Current decision:
+
+- Keep disabled through one QA cycle.
+- If no dependency or execution need appears, delete the function and rerun `npm run appwrite:functions:verify`.
