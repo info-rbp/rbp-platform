@@ -11,6 +11,10 @@ import {
 } from "./components/auth/AccountGate";
 import { canShowPublicApplications } from "./config/runtime";
 import { useRuntimeConfig } from "./hooks/useRuntimeConfig";
+import {
+  mockAdminAuthService,
+  mockAuthService,
+} from "./services/mock/auth.mockService";
 import type { PortalProductKey } from "./types/portal";
 
 import { HomePage } from "./pages/HomePage";
@@ -189,6 +193,46 @@ function AccountGateFor({
   );
 }
 
+export type AdminEntryState = {
+  isAdminAuthenticated: boolean;
+  isCustomerAuthenticated: boolean;
+};
+
+export function resolveAdminEntry(state: AdminEntryState) {
+  if (state.isAdminAuthenticated) {
+    return { kind: "redirect" as const, to: "/admin/dashboard" };
+  }
+
+  if (state.isCustomerAuthenticated) {
+    return { kind: "denied" as const };
+  }
+
+  return { kind: "redirect" as const, to: "/admin/signin" };
+}
+
+function AdminEntryRoute() {
+  const resolution = resolveAdminEntry({
+    isAdminAuthenticated: mockAdminAuthService.isAuthenticated(),
+    isCustomerAuthenticated: mockAuthService.isAuthenticated(),
+  });
+
+  if (resolution.kind === "denied") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-white">
+        <div className="max-w-md rounded-2xl border border-red-900/60 bg-slate-900 p-7">
+          <h1 className="text-2xl font-extrabold">Access denied</h1>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            Customer portal access does not grant administrator permissions. Sign out of the customer account or use an administrator account.
+          </p>
+          <Navigate to="/admin/signin" replace />
+        </div>
+      </div>
+    );
+  }
+
+  return <Navigate to={resolution.to} replace />;
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -357,7 +401,7 @@ export const router = createBrowserRouter([
             element: (
               <AccountGateFor
                 returnTo="/portal/marketplace/offers/new"
-                label="Make an offer through your account"
+                label="Make a marketplace offer through your account"
                 product="marketplace-offer"
               />
             ),
@@ -477,6 +521,7 @@ export const router = createBrowserRouter([
       {
         path: "admin",
         children: [
+          { index: true, Component: AdminEntryRoute },
           { path: "signin", Component: AdminSignInPage },
           {
             element: (
@@ -485,6 +530,7 @@ export const router = createBrowserRouter([
               </RequireAdminAuth>
             ),
             children: [
+              { index: true, element: <Navigate to="/admin/dashboard" replace /> },
               { path: "dashboard", Component: AdminDashboard },
               { path: "content", Component: AdminCrudPage },
               { path: "requests", Component: AdminCrudPage },
