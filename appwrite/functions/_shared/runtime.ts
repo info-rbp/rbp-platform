@@ -1,14 +1,6 @@
 import { Query } from "node-appwrite";
 import { createAuditEvent, persistAuditEvent } from "./audit";
-import {
-  collectionIds,
-  createAdminContext,
-  getHeader,
-  isTrustedInternalInvocation,
-  requireAdmin,
-  resolveCurrentUser,
-  type CurrentUserContext,
-} from "./appwriteAdmin";
+import { collectionIds, createAdminContext, getHeader, isTrustedInternalInvocation, requireAdmin, resolveCurrentUser, type CurrentUserContext } from "./appwriteAdmin";
 import { grantTenantEntitlements, listTenantEntitlements, revokeTenantEntitlements } from "./entitlements";
 import { fail, forbidden, notFound, ok, parseJsonBody, unauthorized, validationError } from "./response";
 import { buildIdempotencyKey, createCheckoutSession, getStripeClient, isCheckoutAbandonmentEvent, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
@@ -134,8 +126,9 @@ async function bootstrapTenant(context: FunctionContext) {
   const email = String(payload.email).toLowerCase();
   const name = String(payload.name);
   const businessName = String(payload.businessName || `${name} Business`);
-  const planCode = String(payload.planCode || "free");
   const ownerRole = "owner";
+  const requestedPlanCode = String(payload.planCode || "free");
+  const planCode = "free";
 
   const existingProfile = await admin.findOne<Record<string, unknown> & { $id: string }>(
     collectionIds.userProfiles,
@@ -208,6 +201,7 @@ async function bootstrapTenant(context: FunctionContext) {
       email,
       businessName,
       planCode,
+      requestedPlanCode,
       requestedRoleIgnored: payload.role !== undefined,
     },
   });

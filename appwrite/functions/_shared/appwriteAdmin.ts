@@ -80,6 +80,40 @@ function createRealAdminContext() {
   const teams = new Teams(client);
   const storage = new Storage(client);
   const functions = new Functions(client);
+  const listDocuments = async <T = Record<string, unknown>>(collectionId: string, queries: string[] = []) => {
+    const listed = await databases.listDocuments(databaseId, collectionId, queries);
+    return listed as unknown as { documents: T[]; total?: number };
+  };
+  const getDocument = async <T = Record<string, unknown>>(collectionId: string, documentId: string) => {
+    const document = await databases.getDocument(databaseId, collectionId, documentId);
+    return document as unknown as T;
+  };
+  const createDocument = async <T = Record<string, unknown>>(collectionId: string, data: Record<string, unknown>) => {
+    const document = await databases.createDocument(databaseId, collectionId, ID.unique(), data);
+    return document as unknown as T;
+  };
+  const updateDocument = async <T = Record<string, unknown>>(collectionId: string, documentId: string, data: Record<string, unknown>) => {
+    const document = await databases.updateDocument(databaseId, collectionId, documentId, data);
+    return document as unknown as T;
+  };
+  const findOne = async <T = Record<string, unknown>>(collectionId: string, queries: string[]) => {
+    const listed = await listDocuments<T>(collectionId, [...queries, Query.limit(1)]);
+    return listed.documents?.[0] || null;
+  };
+  const upsertByQuery = async <T = Record<string, unknown>>(collectionId: string, queries: string[], data: Record<string, unknown>) => {
+    const existing = await findOne<T & { $id: string }>(collectionId, queries);
+    if (existing && "$id" in existing) {
+      return {
+        operation: "updated" as const,
+        document: await updateDocument<T>(collectionId, String(existing.$id), data),
+      };
+    }
+
+    return {
+      operation: "created" as const,
+      document: await createDocument<T>(collectionId, data),
+    };
+  };
 
   return {
     client,
@@ -89,36 +123,12 @@ function createRealAdminContext() {
     teams,
     storage,
     functions,
-    async listDocuments<T = Record<string, unknown>>(collectionId: string, queries: string[] = []) {
-      return databases.listDocuments<T>(databaseId, collectionId, queries);
-    },
-    async getDocument<T = Record<string, unknown>>(collectionId: string, documentId: string) {
-      return databases.getDocument<T>(databaseId, collectionId, documentId);
-    },
-    async createDocument<T = Record<string, unknown>>(collectionId: string, data: Record<string, unknown>) {
-      return databases.createDocument<T>(databaseId, collectionId, ID.unique(), data);
-    },
-    async updateDocument<T = Record<string, unknown>>(collectionId: string, documentId: string, data: Record<string, unknown>) {
-      return databases.updateDocument<T>(databaseId, collectionId, documentId, data);
-    },
-    async findOne<T = Record<string, unknown>>(collectionId: string, queries: string[]) {
-      const listed = await databases.listDocuments<T>(databaseId, collectionId, [...queries, Query.limit(1)]);
-      return listed.documents?.[0] || null;
-    },
-    async upsertByQuery<T = Record<string, unknown>>(collectionId: string, queries: string[], data: Record<string, unknown>) {
-      const existing = await this.findOne<T & { $id: string }>(collectionId, queries);
-      if (existing && "$id" in existing) {
-        return {
-          operation: "updated" as const,
-          document: await this.updateDocument<T>(collectionId, String(existing.$id), data),
-        };
-      }
-
-      return {
-        operation: "created" as const,
-        document: await this.createDocument<T>(collectionId, data),
-      };
-    },
+    listDocuments,
+    getDocument,
+    createDocument,
+    updateDocument,
+    findOne,
+    upsertByQuery,
   };
 }
 
@@ -183,27 +193,32 @@ export async function requireAdmin(context: FunctionContext): Promise<CurrentUse
   }
 
   const userId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
-  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
-  if (adminTeamId && userId) {
-    const admin = createAdminContext();
-    const memberships = await admin.teams.listMemberships(adminTeamId);
-    const matched = memberships.memberships.find((membership) => membership.userId === userId);
-    if (matched) {
-      try {
-        return await resolveCurrentUser(context);
-      } catch {
-        return {
-          userId,
-          tenantId: "",
-          role: "admin",
-          userProfile: {},
-        };
-      }
-    }
+  if (!userId) {
+    throw new Error("Missing Appwrite user context.");
   }
 
-  await resolveCurrentUser(context);
-  throw new Error("Administrator access is required.");
+  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
+  if (!adminTeamId) {
+    throw new Error("Administrator access is required.");
+  }
+
+  const admin = createAdminContext();
+  const memberships = await admin.teams.listMemberships(adminTeamId);
+  const matched = memberships.memberships.find((membership) => membership.userId === userId);
+  if (!matched) {
+    throw new Error("Administrator access is required.");
+  }
+
+  try {
+    return await resolveCurrentUser(context);
+  } catch {
+    return {
+      userId,
+      tenantId: "",
+      role: "admin",
+      userProfile: {},
+    };
+  }
 }
 
 export function getDatabaseId() {

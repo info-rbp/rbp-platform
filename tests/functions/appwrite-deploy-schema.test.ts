@@ -106,6 +106,7 @@ test("dry-run reports collection permission drift", async () => {
 test("apply updates collection permissions", async () => {
   let updateCollectionCalled = false;
   let updatedPermissions: string[] = [];
+  let updatedCollectionParams: Parameters<AppwriteDatabasesApi["updateCollection"]>[0] | null = null;
 
   const result = await runDeploySchema({
     apply: true,
@@ -117,9 +118,9 @@ test("apply updates collection permissions", async () => {
       "/databases/rbp_platform": { $id: "rbp_platform" },
       "/databases/rbp_platform/collections/notifications": {
         $id: "notifications",
-        name: "Notifications",
-        documentSecurity: true,
-        enabled: true,
+        name: "Live Notifications",
+        documentSecurity: false,
+        enabled: false,
         $permissions: ['read("users")'],
       },
       "/databases/rbp_platform/collections/notifications/attributes": { attributes: [] },
@@ -130,12 +131,16 @@ test("apply updates collection permissions", async () => {
         async updateCollection(params) {
           updateCollectionCalled = true;
           updatedPermissions = params.permissions || [];
+          updatedCollectionParams = params;
         },
       },
     }),
   });
 
   assert.equal(updateCollectionCalled, true);
+  assert.equal(updatedCollectionParams?.name, "Live Notifications");
+  assert.equal(updatedCollectionParams?.documentSecurity, false);
+  assert.equal(updatedCollectionParams?.enabled, false);
   assert.deepEqual(result.summary.updated, ["permissions:notifications"]);
   assert.ok(updatedPermissions.includes('read("team:team_live_admins")'));
 });
@@ -166,6 +171,7 @@ test("dry-run reports bucket permission drift", async () => {
 
 test("apply updates bucket permissions", async () => {
   let updateBucketCalled = false;
+  let updatedBucketParams: Parameters<AppwriteStorageApi["updateBucket"]>[0] | null = null;
 
   const result = await runDeploySchema({
     apply: true,
@@ -193,13 +199,22 @@ test("apply updates bucket permissions", async () => {
       storage: {
         async updateBucket(params) {
           updateBucketCalled = true;
-          assert.equal(params.transformations, true);
+          updatedBucketParams = params;
         },
       },
     }),
   });
 
   assert.equal(updateBucketCalled, true);
+  assert.equal(updatedBucketParams?.name, "RBP Documents");
+  assert.equal(updatedBucketParams?.fileSecurity, true);
+  assert.equal(updatedBucketParams?.enabled, true);
+  assert.equal(updatedBucketParams?.maximumFileSize, 5000000);
+  assert.deepEqual(updatedBucketParams?.allowedFileExtensions, ["pdf"]);
+  assert.equal(updatedBucketParams?.compression, "gzip");
+  assert.equal(updatedBucketParams?.encryption, true);
+  assert.equal(updatedBucketParams?.antivirus, true);
+  assert.equal(updatedBucketParams?.transformations, true);
   assert.deepEqual(result.summary.updated, ["permissions:bucket:rbp_documents"]);
 });
 

@@ -47,7 +47,6 @@ export const legacyEntitlementKeys = [
 export const entitlementKeys = [...businessEntitlementKeys, ...legacyEntitlementKeys] as const;
 
 export type EntitlementKey = typeof entitlementKeys[number];
-
 export type EntitlementStatus = "active" | "suspended" | "revoked";
 
 export function isKnownEntitlementKey(value: string): value is EntitlementKey {

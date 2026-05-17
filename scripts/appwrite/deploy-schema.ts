@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { createAdminServices, createSummary, isApplyMode, isDestructiveMode, listJsonFiles, printSummary, readConfig, readJson, type AppwriteConfig, type Summary } from "./_lib";
+import { createAdminServices as createRealAdminServices, createSummary, isApplyMode, isDestructiveMode, listJsonFiles, printSummary, readConfig, readJson, type AppwriteConfig, type Summary } from "./_lib";
 import { buildPermissions, comparePermissions, type PermissionSpec } from "./permissions";
 
 type CollectionDefinition = {
@@ -82,6 +82,11 @@ export type AppwriteStorageApi = {
   }): Promise<unknown>;
 };
 
+type DeploySchemaAdminServices = {
+  databases: AppwriteDatabasesApi;
+  storage: AppwriteStorageApi;
+};
+
 export type DeploySchemaOptions = {
   apply: boolean;
   allowDestructive?: boolean;
@@ -91,10 +96,7 @@ export type DeploySchemaOptions = {
   bucketDefinitions?: BucketDefinition[];
   summary?: Summary;
   appwriteRequest?: AppwriteRequest;
-  createAdminServices?: () => {
-    databases: AppwriteDatabasesApi;
-    storage: AppwriteStorageApi;
-  };
+  createAdminServices?: () => DeploySchemaAdminServices;
 };
 
 function baseHeaders(env: DeploySchemaEnv) {
@@ -126,6 +128,41 @@ function createAppwriteRequest(env: DeploySchemaEnv): AppwriteRequest {
     }
 
     return response.json() as Promise<T>;
+  };
+}
+
+function createLiveAdminServices(): DeploySchemaAdminServices {
+  const { databases, storage } = createRealAdminServices();
+
+  return {
+    databases: {
+      updateCollection(params) {
+        return databases.updateCollection(
+          params.databaseId,
+          params.collectionId,
+          params.name || params.collectionId,
+          params.permissions,
+          params.documentSecurity,
+          params.enabled,
+        );
+      },
+    },
+    storage: {
+      updateBucket(params) {
+        return storage.updateBucket(
+          params.bucketId,
+          params.name,
+          params.permissions,
+          params.fileSecurity,
+          params.enabled,
+          params.maximumFileSize,
+          params.allowedFileExtensions,
+          params.compression as never,
+          params.encryption,
+          params.antivirus,
+        );
+      },
+    },
   };
 }
 
@@ -357,7 +394,7 @@ async function reconcileBucketPermissions(
     compression: liveBucket.compression ?? definition.compression,
     encryption: liveBucket.encryption ?? definition.encryption,
     antivirus: liveBucket.antivirus ?? definition.antivirus,
-    transformations: liveBucket.transformations,
+    transformations: liveBucket.transformations ?? definition.transformations,
   });
 
   summary.updated.push(`permissions:bucket:${bucketId}`);
@@ -420,7 +457,7 @@ export async function runDeploySchema(options: DeploySchemaOptions) {
   const appwriteRequest = options.appwriteRequest || createAppwriteRequest(env);
   const adminServices = options.createAdminServices
     ? options.createAdminServices()
-    : createAdminServices();
+    : createLiveAdminServices();
 
   for (const key of ["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY", "APPWRITE_DATABASE_ID"]) {
     if (!env[key]) {

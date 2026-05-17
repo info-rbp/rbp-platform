@@ -36,11 +36,17 @@ export type FunctionDeploymentManifest = {
   functions: FunctionManifestEntry[];
 };
 
-export type AppwriteFunctionsApi = Pick<Functions, "get" | "create" | "update" | "createDeployment">;
+export type AppwriteFunctionsApi = Pick<Functions, "get" | "create" | "update" | "createDeployment">
+  & Partial<Pick<Functions, "listVariables" | "createVariable" | "updateVariable">>;
 
 type ArchiveResult = {
   archivePath: string;
   cleanup?: () => void | Promise<void>;
+};
+
+type RuntimeVariable = {
+  key: string;
+  value: string;
 };
 
 export type DeployFunctionsOptions = {
@@ -54,8 +60,40 @@ export type DeployFunctionsOptions = {
   summary?: Summary;
 };
 
+const requiredRuntimeVariableKeys = [
+  "APPWRITE_ENDPOINT",
+  "APPWRITE_PROJECT_ID",
+  "APPWRITE_API_KEY",
+  "APPWRITE_DATABASE_ID",
+] as const;
+
+const optionalRuntimeVariableKeys = [
+  "APPWRITE_STORAGE_BUCKET_ID",
+  "APPWRITE_ADMIN_TEAM_ID",
+  "APPWRITE_TRUSTED_FUNCTION_TOKEN",
+  "RBP_INTERNAL_FUNCTION_TOKEN",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+  "STRIPE_DEFAULT_CURRENCY",
+  "STRIPE_SUCCESS_URL",
+  "STRIPE_CANCEL_URL",
+  "QA_EMAIL_ALLOWLIST",
+  "APPWRITE_QA_EMAIL_ALLOWLIST",
+] as const;
+
+const runtimeVariableKeys = [
+  ...requiredRuntimeVariableKeys,
+  ...optionalRuntimeVariableKeys,
+] as const;
+
 function readJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
+}
+
+function buildRuntimeVariables(env: NodeJS.ProcessEnv): RuntimeVariable[] {
+  return runtimeVariableKeys
+    .filter((key) => Boolean(env[key]))
+    .map((key) => ({ key, value: String(env[key]) }));
 }
 
 function toRelative(rootDir: string, targetPath: string) {
@@ -274,6 +312,35 @@ async function ensureFunction(
   summary.created.push(`function:${entry.id}`);
 }
 
+async function reconcileFunctionVariables(
+  functions: AppwriteFunctionsApi,
+  entry: FunctionManifestEntry,
+  variables: RuntimeVariable[],
+  summary: Summary,
+) {
+  if (!functions.listVariables || !functions.createVariable || !functions.updateVariable) {
+    summary.manualActionRequired.push(`variables:${entry.id} function variable API unavailable; configure runtime variables manually.`);
+    return;
+  }
+
+  const listed = await functions.listVariables(entry.id) as unknown as {
+    variables?: Array<{ $id: string; key: string }>;
+  };
+  const byKey = new Map((listed.variables || []).map((variable) => [variable.key, variable]));
+
+  for (const variable of variables) {
+    const existing = byKey.get(variable.key);
+    if (existing) {
+      await functions.updateVariable(entry.id, existing.$id, variable.key, variable.value);
+      summary.updated.push(`variable:${entry.id}:${variable.key}`);
+      continue;
+    }
+
+    await functions.createVariable(entry.id, variable.key, variable.value);
+    summary.created.push(`variable:${entry.id}:${variable.key}`);
+  }
+}
+
 async function deployFunctionCode(
   functions: AppwriteFunctionsApi,
   entry: FunctionManifestEntry,
@@ -326,9 +393,15 @@ export async function runDeployFunctions(options: DeployFunctionsOptions) {
 
   const functions = options.functionsApi || options.createFunctionsApi?.() || defaultFunctionsApi(env);
   const archiveFunctionSource = options.archiveFunctionSource || createFunctionArchive;
+  const missingRuntimeVariables = requiredRuntimeVariableKeys.filter((key) => !env[key]);
+  if (missingRuntimeVariables.length) {
+    throw new Error(`Missing required function runtime environment variables: ${missingRuntimeVariables.join(", ")}`);
+  }
+  const runtimeVariables = buildRuntimeVariables(env);
 
   for (const entry of manifest.functions) {
     await ensureFunction(functions, entry, summary);
+    await reconcileFunctionVariables(functions, entry, runtimeVariables, summary);
     await deployFunctionCode(functions, entry, rootDir, archiveFunctionSource, summary);
   }
 
