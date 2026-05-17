@@ -2,12 +2,15 @@ import { apiFailure, apiSuccess } from "../client";
 import { invokeAppwriteFunction } from "../../../lib/appwrite/functions";
 
 export interface MembershipCheckoutSession {
-  checkout_url?: string;
-  url?: string;
-  checkout_session_id?: string;
-  session_id?: string;
+  requires_checkout?: boolean;
+  checkout_url?: string | null;
+  url?: string | null;
+  checkout_session_id?: string | null;
+  session_id?: string | null;
   status?: string;
   message?: string;
+  entitlements?: unknown;
+  plan_code?: string;
 }
 
 export const appwriteBillingApi = {
