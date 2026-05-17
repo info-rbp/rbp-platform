@@ -19,7 +19,7 @@ All requested smoke keys were loaded: `QA_SMOKE_USER_EMAIL`, `QA_SMOKE_USER_PASS
 
 | Command | Result | Evidence |
 | --- | --- | --- |
-| `npm run smoke:qa:auth -- --execute` | FAIL | Appwrite returned `401 user_invalid_credentials`; configured smoke password is invalid. |
+| `npm run smoke:qa:auth -- --execute` | PASS | AppWrite session created successfully for the configured QA smoke user after password reset. |
 | `npm run smoke:qa:billing -- --execute` | BLOCKED | Safety check failed because `STRIPE_SECRET_KEY` is not a Stripe test-mode `sk_test_` key. |
 | `npm run smoke:qa:stripe-webhook -- --execute` | NOT RUN | Blocked by non-test Stripe key; signed webhook proof not attempted. |
 | `npm run smoke:qa:service-requests -- --execute` | PASS | `create-service-request` executed successfully after smoke user bootstrap. |
@@ -29,7 +29,23 @@ All requested smoke keys were loaded: `QA_SMOKE_USER_EMAIL`, `QA_SMOKE_USER_PASS
 
 ## Blockers
 
-- Auth smoke remains blocked until `QA_SMOKE_USER_PASSWORD` is corrected for the configured smoke user.
 - Billing and Stripe webhook smoke remain blocked until QA uses a Stripe test-mode secret key and valid QA tenant fixture.
 - `QA_SMOKE_USER_ID` and `QA_SMOKE_ADMIN_USER_ID` should be distinct for the default admin smoke command to run without a sentinel override.
 - `QA_SMOKE_TENANT_ID` should point at an existing QA tenant before Stripe webhook smoke runs.
+
+
+## Auth smoke rerun
+
+`npm run smoke:qa:auth -- --execute`: PASS.
+
+Evidence:
+
+- AppWrite health endpoint reachable.
+- AppWrite database reachable.
+- Email/password session created for configured QA smoke user.
+- Smoke user ID returned: `6a080f29488f13d9f923`.
+
+Note:
+
+- `.env.qa.local` was updated locally only.
+- The smoke password must not be committed.
