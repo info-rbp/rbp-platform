@@ -1,13 +1,13 @@
 # Cloudflare Frontend QA Evidence
 
-Last updated: 2026-05-17 20:40 AWST
+Last updated: 2026-05-17 21:10 AWST
 
 ## Scope
 
 - QA URL tested previously: `https://rbp-platform.pages.dev/`
 - Working branch: `fix/appwrite-permission-reconciliation-clean`
 - Browser evidence currently documented from earlier pass: commit `0e1462b`
-- This document now includes a later remote source-code remediation pass performed against the same branch.
+- This document now includes a later remote source-code remediation pass performed against the same branch, including a targeted follow-up for membership checkout.
 
 ## Remote Source-Code Remediation Pass
 
@@ -17,6 +17,7 @@ Files updated in the remote remediation pass:
 
 - `frontend/portal/src/app/lib/appwrite/functions.ts`
 - `frontend/portal/src/app/services/api/appwrite/appwriteBillingApi.ts`
+- `frontend/portal/src/app/features/membership/MembershipPurchaseOnboardingFlow.tsx`
 - `frontend/portal/src/app/components/Navbar.tsx`
 - `frontend/portal/src/app/data/publicNavigation.ts`
 - `frontend/portal/src/app/services/api/appwrite/appwriteApplicationsApi.ts`
@@ -28,6 +29,7 @@ Files updated in the remote remediation pass:
 - `frontend/portal/public/sitemap.xml`
 - `tests/runtime/appwrite-function-response.test.ts`
 - `tests/runtime/frontend-qa-remediation.test.ts`
+- `tests/runtime/membership-checkout-flow.test.ts`
 - `tests/schema/sitemap.test.mjs`
 - `docs/qa/CLOUDFLARE_FRONTEND_QA_DEFECTS.md`
 - `docs/qa/CLOUDFLARE_FRONTEND_QA_EVIDENCE.md`
@@ -38,11 +40,16 @@ Added:
 
 - `tests/runtime/appwrite-function-response.test.ts`
 - `tests/runtime/frontend-qa-remediation.test.ts`
+- `tests/runtime/membership-checkout-flow.test.ts`
 - `tests/schema/sitemap.test.mjs`
 
 Covered behaviors:
 
 - Appwrite Function raw payload, success envelope, failure envelope, and invalid JSON handling.
+- Stripe-enabled membership checkout no longer requires simulated payment preview.
+- Membership checkout payload now includes `planCode` and compatibility fields.
+- Stripe-enabled membership checkout redirects to `checkout_url` and surfaces failure messaging.
+- Mock-mode membership flow still uses simulated payment validation.
 - Navbar authenticated vs guest CTA resolution.
 - Application-interest success/error helper messaging.
 - Operations navigation protected-link regression coverage.
@@ -59,6 +66,10 @@ Validated in this pass:
 
 Not validated in this pass:
 
+- `tests/runtime/membership-checkout-flow.test.ts`
+- `tests/runtime/appwrite-function-response.test.ts`
+- `tests/runtime/frontend-qa-remediation.test.ts`
+- `tests/schema/sitemap.test.mjs`
 - `npm run test:unit`
 - `npm run test:integration`
 - `npm run appwrite:schema:validate`
@@ -70,21 +81,31 @@ Not validated in this pass:
 - `cd frontend/portal && npm run build`
 - browser QA
 - Stripe checkout redirect
+- Stripe return URL
 - Stripe webhook return flow
+- subscription activation
+- entitlement grant
+- payment-event creation
+- notification creation
 - Appwrite live notification reads/writes
+- email sandbox delivery
+- admin visibility checks
 - Cloudflare `/sitemap.xml` HTTP 200 verification
 
 Reason:
 
-- The current environment did not have a runnable local checkout or live QA access for Cloudflare/Appwrite/Stripe execution.
+- The current environment did not have a runnable local checkout or live QA access for Cloudflare, Appwrite, and Stripe execution.
 
 ## What Still Requires Live QA
 
-- Premium membership checkout must redirect to Stripe test checkout from deployed QA.
+- Premium membership checkout must redirect to Stripe test checkout from deployed Cloudflare QA.
+- Stripe return URL behavior must be verified after checkout completion or cancellation.
+- Webhook processing must activate the subscription, grant entitlements, and create payment events.
+- Checkout completion must create the expected notification and any sandbox email.
 - Free membership must activate without Stripe when `requires_checkout: false` is returned.
 - Logged-in public header must show `Go to Account` on deployed QA for desktop and mobile.
 - Application-interest registration must create a live Appwrite record, success notification, and admin-visible entry.
-- Portal bell must list live notifications and allow mark-read/mark-all-read actions.
+- Portal bell must list live notifications and allow mark-read and mark-all-read actions.
 - `/admin` must be checked in browser for logged-out, customer, and admin states.
 - `/sitemap.xml` must return 200 from Cloudflare QA and match the updated route list.
 
@@ -109,4 +130,4 @@ Historical evidence artifacts:
 
 ## Conclusion
 
-The branch now contains additional source-code remediation and static coverage for several frontend P0/P1 defects, but live QA evidence has not yet been refreshed for these new changes. The application is not ready for QA sign-off or production readiness from this pass alone. It is ready for a targeted QA re-test once the branch is built and deployed to the live QA environment.
+Source remediation is now complete for the frontend P0/P1 fixes addressed in this branch, including the Stripe-enabled membership checkout flow. This pass did not produce build, deploy, or live QA evidence, so the application is not ready for QA sign-off or production readiness from this pass alone. The branch is ready for build and deploy, followed by a targeted QA re-test in the live QA environment.
