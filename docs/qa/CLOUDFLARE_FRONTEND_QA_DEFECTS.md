@@ -1,6 +1,6 @@
 # Cloudflare Frontend QA Defects
 
-Last updated: 2026-05-17 17:14 AWST
+Last updated: 2026-05-17 18:05 AWST
 
 ## DEFECT: Signup/sign-in fail with Failed to fetch
 
@@ -49,17 +49,17 @@ Expected:
 - CLI access can verify deployed Cloudflare Pages env vars and Appwrite platform/origin settings.
 
 Actual:
-- `npx wrangler pages project list` fails because `CLOUDFLARE_API_TOKEN` is not set.
+- `npx wrangler pages project list` now works and confirms the `rbp-platform` Pages project exists.
 - Appwrite CLI project/platform inspection requires an authenticated Appwrite Console session; the available project API key is not sufficient for platform settings.
 
 Root cause:
-- Required provider console credentials are not available in this terminal session.
+- Required Appwrite Console credentials are not available in this terminal session.
 
 Fix:
 - Provide temporary CLI access or perform the Appwrite Web platform update manually in Appwrite Console.
 
 Retest:
-- FAIL at 2026-05-17 16:29 AWST for CLI verification.
+- PARTIAL at 2026-05-17 18:05 AWST. Cloudflare CLI verification works; Appwrite platform/origin verification remains blocked.
 
 ## DEFECT: Portal dashboard crashes after login because Appwrite envelope is persisted as portal state
 
@@ -91,7 +91,67 @@ Fix:
 
 Retest:
 - PASS in local automated tests at 2026-05-17 17:14 AWST.
-- Deployed browser retest pending after this fix is deployed.
+- Fixed bundle deployed to Cloudflare preview at `https://64907e02.rbp-platform.pages.dev`.
+- Deployed browser dashboard retest is blocked because Appwrite CORS rejects both preview origins before login can complete.
+- Root production retest is pending because `https://rbp-platform.pages.dev/` still serves old bundle `/assets/index-CjyNwKW7.js`.
 
 Evidence:
 - `tests/runtime/portal-dashboard-state.test.ts`
+
+## DEFECT: Cloudflare preview fixed bundle is blocked by Appwrite CORS
+
+Severity: Critical
+
+Route:
+- preview `/signin`
+- preview `/portal/dashboard`
+
+Expected:
+- Browser can sign in against the fixed Cloudflare preview deployment and reach `/portal/dashboard`.
+- Dashboard state can be checked after async hydration.
+
+Actual:
+- Immutable preview `https://64907e02.rbp-platform.pages.dev` serves fixed bundle `/assets/index-CATcRwLF.js`.
+- Alias preview `https://fix-appwrite-permission-reco-44v1.rbp-platform.pages.dev` serves fixed bundle `/assets/index-CATcRwLF.js`.
+- Both preview origins fail before login completes.
+- Browser console reports Appwrite CORS blocking for:
+  - `GET https://syd.cloud.appwrite.io/v1/account`
+  - `POST https://syd.cloud.appwrite.io/v1/account/sessions/email`
+
+Root cause:
+- Appwrite Web platform/origin settings do not allow the Cloudflare preview hostnames.
+
+Fix:
+- Add Appwrite Web platform/origin entries for the preview hostnames, or test on a Cloudflare hostname that is already allowed by Appwrite and serves the fixed bundle.
+
+Retest:
+- FAIL at 2026-05-17 18:05 AWST.
+- `portal.customer`, `activities`, `notifications`, and old-wrapper checks could not run because preview login is blocked before dashboard redirect.
+
+Evidence:
+- `tmp/qa/cloudflare-preview-dashboard-verification.json`
+- `docs/qa/screenshots/cloudflare-frontend-qa/preview-signin.png`
+
+## DEFECT: Root production still serves old Cloudflare bundle
+
+Severity: Critical
+
+Route:
+- `https://rbp-platform.pages.dev/`
+
+Expected:
+- Root production serves the fixed frontend bundle containing dashboard normalisation and active-session sign-in handling.
+
+Actual:
+- Root production still serves `/assets/index-CjyNwKW7.js`.
+- The fixed local/preview build serves `/assets/index-CATcRwLF.js`.
+
+Root cause:
+- The Wrangler deployment created Preview deployments only. The fixed build has not been promoted/deployed to the Cloudflare production/root URL.
+
+Fix:
+- Confirm the configured Cloudflare Pages production branch, then deploy/promote the fixed build to production/root with explicit authorization.
+
+Retest:
+- FAIL at 2026-05-17 18:05 AWST.
+- Do not run dashboard state debugging on root while it still serves `index-CjyNwKW7.js`.

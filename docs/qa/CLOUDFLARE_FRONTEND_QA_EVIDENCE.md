@@ -1,16 +1,86 @@
 # Cloudflare Frontend QA Evidence
 
-Last updated: 2026-05-17 17:14 AWST
+Last updated: 2026-05-17 18:05 AWST
 
 ## Scope
 
 - QA URL tested: `https://rbp-platform.pages.dev/`
-- Working branch: `fix/cloudflare-auth-fetch-failure`
-- Base commit tested before local code changes: `7b0201a`
+- Working branch: `fix/appwrite-permission-reconciliation-clean`
+- Commit tested: `1d93da5`
 - Browser: Playwright Chromium
 - Diagnostic report: `tmp/qa/cloudflare-auth-fetch-diagnostic.json`
 - Console log: `tmp/qa/cloudflare-auth-fetch-console.log`
 - Network log: `tmp/qa/cloudflare-auth-fetch-network.log`
+
+## Cloudflare Deployment Verification - 2026-05-17 18:05 AWST
+
+Build environment validation:
+
+- `VITE_BACKEND_PROVIDER`: loaded
+- `VITE_APPWRITE_ENDPOINT`: loaded
+- `VITE_APPWRITE_PROJECT_ID`: loaded
+- `VITE_APPWRITE_DATABASE_ID`: loaded
+- `VITE_APPWRITE_STORAGE_BUCKET_ID`: loaded
+- `VITE_ENABLE_MOCK_FALLBACK`: loaded
+- `VITE_QA_ENVIRONMENT`: loaded
+- `VITE_CLOUDFLARE_ENVIRONMENT`: loaded
+- `npm run cloudflare:env:validate`: PASS
+
+Local fixed build:
+
+- Build command: `npm run build` in `frontend/portal`
+- JS asset: `/assets/index-CATcRwLF.js`
+- CSS asset: `/assets/index-1Dz620UT.css`
+
+Cloudflare Pages deployment:
+
+- Wrangler command: `npx wrangler pages deploy dist --project-name rbp-platform`
+- Immutable preview URL: `https://64907e02.rbp-platform.pages.dev`
+- Alias URL: `https://fix-appwrite-permission-reco-44v1.rbp-platform.pages.dev`
+- Cloudflare deployment environment: Preview
+- Cloudflare deployment branch: `fix/appwrite-permission-reconciliation-clean`
+- Cloudflare deployment source: `1d93da5`
+
+Bundle checks:
+
+- Immutable preview serves `/assets/index-CATcRwLF.js`.
+- Alias preview serves `/assets/index-CATcRwLF.js`.
+- Root production URL `https://rbp-platform.pages.dev/` still serves `/assets/index-CjyNwKW7.js`.
+- Preview bundle differs from old root production bundle `index-CjyNwKW7.js`.
+- The fixed preview bundle contains dashboard fallback/storage markers including `RBP Member`, `Your business`, and `rbp.mockPortalState`.
+
+Browser preview QA:
+
+- Target tested first: `https://64907e02.rbp-platform.pages.dev`
+- Alias tested second: `https://fix-appwrite-permission-reco-44v1.rbp-platform.pages.dev`
+- Result: FAIL before login completes.
+- Cause: Appwrite CORS blocks both preview origins.
+- Failed immutable preview requests:
+  - `GET https://syd.cloud.appwrite.io/v1/account`
+  - `POST https://syd.cloud.appwrite.io/v1/account/sessions/email`
+- Failed alias preview requests:
+  - `GET https://syd.cloud.appwrite.io/v1/account`
+  - `POST https://syd.cloud.appwrite.io/v1/account/sessions/email`
+- Browser console reports no `Access-Control-Allow-Origin` header for the preview origins.
+- Active-session sign-in handling: not browser-proven on preview, because Appwrite CORS blocks sign-in before the active-session path can complete.
+
+Dashboard state check:
+
+- `portal.customer`: not available, because preview login is blocked by Appwrite CORS before redirect.
+- `activities` array: not available, because preview login is blocked by Appwrite CORS before redirect.
+- `notifications` array: not available, because preview login is blocked by Appwrite CORS before redirect.
+- Old wrapper present: not checkable in preview browser state, because dashboard is not reached.
+
+Screenshot:
+
+- `docs/qa/screenshots/cloudflare-frontend-qa/preview-signin.png`
+
+Current deployment conclusion:
+
+- The fixed code is present in Cloudflare preview.
+- Root production is not fixed because it still serves `index-CjyNwKW7.js`.
+- Preview browser auth/dashboard QA is blocked until Appwrite allows the preview origins.
+- Root browser dashboard QA must not continue until root production serves the fixed bundle.
 
 ## Result
 
@@ -75,19 +145,19 @@ Code changes were applied to improve diagnosability and prevent this class of fa
 
 ## Deployment / Redeploy Evidence
 
-No Cloudflare redeploy was triggered from this session.
+Cloudflare preview deploys were triggered and verified from this session. Cloudflare CLI access is available for Pages listing and preview deployment inspection.
 
-Cloudflare Pages CLI inspection was blocked because `CLOUDFLARE_API_TOKEN` is not set in this non-interactive environment. The deployed bundle was inspected directly with `curl`, which confirmed the live Cloudflare build already contains the expected public Appwrite configuration.
+Appwrite Console/platform inspection is still blocked from this terminal because `appwrite whoami` reports that no Appwrite user is signed in. The available project API key is not sufficient to inspect or update Web platform origin settings.
 
 ## Retest Status
 
-Retest evidence after the Appwrite origin correction:
+Retest evidence after the Appwrite origin correction and dashboard normalisation deployment work:
 
-- Sign-in: PASS, redirects to `/portal/dashboard`.
-- Previous CORS issue: appears resolved.
-- Dashboard: FAIL before this fix, because the persisted portal state was `{ ok, message, data }` instead of the dashboard state.
+- Root sign-in: not retested with the fixed code because root still serves old bundle `/assets/index-CjyNwKW7.js`.
+- Preview sign-in: FAIL, blocked by Appwrite CORS for preview origins.
+- Dashboard: fixed in code and present in preview bundle, but not browser-proven because preview login is blocked before `/portal/dashboard`.
 - Local automated tests for the dashboard normalisation fix: PASS.
-- Deployed dashboard retest after this code ships: pending.
+- Deployed dashboard browser retest: pending.
 
 ## Screenshots
 
@@ -96,11 +166,16 @@ Retest evidence after the Appwrite origin correction:
 
 ## Required Next Action
 
-Deploy the dashboard normalisation fix, then retest:
+Required next actions:
 
-- login succeeds
-- redirect reaches `/portal/dashboard`
-- dashboard appears
-- dashboard stays visible after async hydration
-- refresh `/portal/dashboard`
-- logout works
+- Add Appwrite Web platform/origin entries for the preview hosts if preview browser QA is required:
+  - `64907e02.rbp-platform.pages.dev`
+  - `fix-appwrite-permission-reco-44v1.rbp-platform.pages.dev`
+- Promote or deploy the fixed build to the Cloudflare production/root branch only after confirming the intended production branch.
+- After root serves the fixed bundle, retest `https://rbp-platform.pages.dev/`:
+  - login succeeds
+  - redirect reaches `/portal/dashboard`
+  - dashboard appears
+  - dashboard stays visible after async hydration
+  - refresh `/portal/dashboard`
+  - logout works
