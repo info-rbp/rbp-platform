@@ -132,6 +132,22 @@ async function executeFunction(functionId, body, headers = {}) {
   });
 }
 
+function parseExecutionBody(execution) {
+  try {
+    return JSON.parse(execution.responseBody || execution.response || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function assertExecutionOk(execution, label) {
+  const body = parseExecutionBody(execution);
+  if (body.ok === false) {
+    throw new Error(`${label} failed: ${body.message || "unknown error"}`);
+  }
+  return body;
+}
+
 function queryEqual(attribute, values) {
   return JSON.stringify({ method: "equal", attribute, values: Array.isArray(values) ? values : [values] });
 }
@@ -244,14 +260,15 @@ async function runServiceRequests() {
   const result = await executeFunction("create-service-request", {
     serviceType: process.env.QA_SMOKE_SERVICE_TYPE || "decision-desk",
     summary: `QA smoke service request ${new Date().toISOString()}`,
-  }, { "x-appwrite-user-id": process.env.QA_SMOKE_USER_ID });
+  }, { "x-user-id": process.env.QA_SMOKE_USER_ID });
+  assertExecutionOk(result, "create-service-request");
 
   return { functionId: "create-service-request", executionId: result.$id || result.id || "submitted" };
 }
 
 async function runAdmin() {
   const nonAdmin = await executeFunction("admin-operations", { action: "list_tenants" }, {
-    "x-appwrite-user-id": process.env.QA_SMOKE_USER_ID,
+    "x-user-id": process.env.QA_SMOKE_USER_ID,
   });
   const nonAdminBody = JSON.parse(nonAdmin.responseBody || nonAdmin.response || "{}");
   if (nonAdminBody.ok !== false) {
@@ -260,8 +277,9 @@ async function runAdmin() {
 
   if (process.env.QA_SMOKE_ADMIN_USER_ID) {
     const admin = await executeFunction("admin-operations", { action: "list_tenants" }, {
-      "x-appwrite-user-id": process.env.QA_SMOKE_ADMIN_USER_ID,
+      "x-user-id": process.env.QA_SMOKE_ADMIN_USER_ID,
     });
+    assertExecutionOk(admin, "admin operation");
     return { nonAdminDenied: true, adminVerifiedBy: "APPWRITE_ADMIN_TEAM_ID", adminExecutionId: admin.$id || admin.id || "submitted" };
   }
 
@@ -270,6 +288,7 @@ async function runAdmin() {
     const admin = await executeFunction("admin-operations", { action: "list_tenants" }, {
       "x-rbp-internal-token": token,
     });
+    assertExecutionOk(admin, "trusted admin operation");
     return { nonAdminDenied: true, adminVerifiedBy: "trusted-internal-token", adminExecutionId: admin.$id || admin.id || "submitted" };
   }
 
@@ -284,12 +303,9 @@ async function runPermissions() {
   }
 
   const notifications = await executeFunction("admin-operations", { action: "list_my_notifications" }, {
-    "x-appwrite-user-id": process.env.QA_SMOKE_USER_ID,
+    "x-user-id": process.env.QA_SMOKE_USER_ID,
   });
-  const responseBody = JSON.parse(notifications.responseBody || notifications.response || "{}");
-  if (responseBody.ok === false) {
-    throw new Error(`Customer notification path failed: ${responseBody.message || "unknown error"}`);
-  }
+  assertExecutionOk(notifications, "Customer notification path");
 
   return {
     applicationProvisioningDisabled: true,
@@ -323,64 +339,3 @@ try {
     error: error && typeof error === "object" && "body" in error ? error.body : undefined,
   });
 }
-    description: "Validate Appwrite auth smoke prerequisites.",
-    env: ["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "VITE_APPWRITE_ENDPOINT", "VITE_APPWRITE_PROJECT_ID"],
-  },
-  billing: {
-    description: "Validate Stripe checkout smoke prerequisites.",
-    env: [
-      "APPWRITE_ENDPOINT",
-      "APPWRITE_PROJECT_ID",
-      "APPWRITE_API_KEY",
-      "STRIPE_SECRET_KEY",
-      "STRIPE_SUCCESS_URL",
-      "STRIPE_CANCEL_URL",
-    ],
-  },
-  "stripe-webhook": {
-    description: "Validate Stripe webhook smoke prerequisites.",
-    env: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY"],
-  },
-  "service-requests": {
-    description: "Validate service-request smoke prerequisites.",
-    env: ["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY", "APPWRITE_DATABASE_ID"],
-  },
-  admin: {
-    description: "Validate admin smoke prerequisites.",
-    env: [
-      "APPWRITE_ENDPOINT",
-      "APPWRITE_PROJECT_ID",
-      "APPWRITE_API_KEY",
-      "APPWRITE_DATABASE_ID",
-      "APPWRITE_ADMIN_TEAM_ID",
-    ],
-  },
-  permissions: {
-    description: "Validate permissions smoke prerequisites.",
-    env: ["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY", "APPWRITE_DATABASE_ID"],
-  },
-};
-
-if (!checkName || !(checkName in checks)) {
-  console.error(`Unknown or missing smoke check name: ${checkName ?? "<none>"}`);
-  console.error(`Available checks: ${Object.keys(checks).join(", ")}`);
-  process.exit(1);
-}
-
-const check = checks[checkName];
-const missing = check.env.filter((key) => !process.env[key]);
-
-if (missing.length) {
-  console.error(`Smoke check \"${checkName}\" blocked: missing required environment variables: ${missing.join(", ")}`);
-  process.exit(1);
-}
-
-if (!shouldExecute) {
-  console.log(`Smoke check \"${checkName}\" is configured.`);
-  console.log(`${check.description} Pass --execute once reachable QA services and credentials are available.`);
-  process.exit(0);
-}
-
-console.error(`Smoke check \"${checkName}\" execution is not yet implemented beyond prerequisite validation.`);
-console.error("This repository now fails clearly instead of silently passing, but live smoke execution still needs follow-up implementation.");
-process.exit(1);

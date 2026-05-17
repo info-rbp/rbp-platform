@@ -1,337 +1,218 @@
-import { useState } from "react";
-import { Link } from "react-router";
-import { PortalAdminReference } from "./PortalAdminReference";
-import { mockPortalServiceRequests } from "../../mock";
-import { getCurrentMockPortalState } from "../../services/mock/portal.mockService";
 import {
-  Zap, ArrowRight, ChevronRight, CheckCircle, Clock,
-  AlertCircle, Plus, FileText, Tag, Calculator, BarChart2,
-  Wifi, ShieldAlert, Wrench,
+  ArrowRight,
+  BriefcaseBusiness,
+  Clock3,
+  FileStack,
+  Layers3,
+  Sparkles,
+  Users,
+  Wallet,
+  Wifi,
 } from "lucide-react";
+import { Link } from "react-router";
 
-export type ServiceStatus = "Active" | "In Progress" | "Requested" | "Outcome Ready" | "Completed" | "Available";
+import { PortalAdminReference } from "./PortalAdminReference";
 
-export interface Service {
-  id: string;
-  title: string;
-  category: string;
-  status: ServiceStatus;
+const serviceCards = [
+  {
+    label: "Core Services",
+    href: "/portal/services/request",
+    description: "Decision support and core member service requests start here in the current MVP.",
+    icon: Sparkles,
+    cta: "Request service",
+  },
+  {
+    label: "Nucleus",
+    href: "/portal/documents",
+    description: "Document Nucleus activity, file placeholders, and document-related member follow-up.",
+    icon: FileStack,
+    cta: "Open documents",
+  },
+  {
+    label: "On-Demand",
+    href: "/portal/sessions",
+    description: "Advisory sessions, rapid support pathways, and near-term member help actions.",
+    icon: Clock3,
+    cta: "Open sessions",
+  },
+  {
+    label: "Managed Services",
+    href: "/portal/support",
+    description: "Managed service delivery remains an MVP placeholder, with support used as the safe next step.",
+    icon: Layers3,
+    cta: "Contact support",
+  },
+  {
+    label: "Custom Solutions",
+    href: "/portal/support",
+    description: "Tailored member requests are still routed through support so there are no dead calls to action.",
+    icon: Users,
+    cta: "Start conversation",
+  },
+];
+
+const platformCards = [
+  {
+    label: "Applications",
+    href: "/portal/apps",
+    description: "Application rollout and interest capture already live in the portal.",
+    icon: BriefcaseBusiness,
+  },
+  {
+    label: "Marketplace",
+    href: "/portal/marketplace/listings/new",
+    description: "Marketplace flows remain available through listing and offer entry points.",
+    icon: Wallet,
+  },
+  {
+    label: "Offers",
+    href: "/portal/offers",
+    description: "Member offer detail and next-step access remains available here.",
+    icon: Wallet,
+  },
+  {
+    label: "Resources",
+    href: "/portal/resources",
+    description: "Resource and support references stay reachable through the current resource area.",
+    icon: FileStack,
+  },
+];
+
+const operationsCards = [
+  {
+    label: "Insurance",
+    href: "/portal/support",
+    description: "Insurance is still placeholder-level, so support is the live operational handoff.",
+    icon: Sparkles,
+  },
+  {
+    label: "Finance",
+    href: "/portal/support",
+    description: "Finance guidance remains placeholder-level and routes safely through support.",
+    icon: Wallet,
+  },
+  {
+    label: "NBN",
+    href: "/portal/services/nbn/start",
+    description: "Connectivity ordering is already wired into the authenticated portal flow.",
+    icon: Wifi,
+  },
+  {
+    label: "Coming Soon",
+    href: "/portal/resources",
+    description: "Future operations lanes are visible without exposing broken or dead routes.",
+    icon: Clock3,
+  },
+  {
+    label: "Membership",
+    href: "/portal/membership/checkout",
+    description: "Membership checkout stays reachable as the current live operational membership action.",
+    icon: Users,
+  },
+];
+
+function OverviewCard({
+  label,
+  href,
+  description,
+  icon: Icon,
+  cta,
+}: {
+  label: string;
+  href: string;
   description: string;
-  lastUpdated: string;
-  nextAction: string;
-  buttonLabel: string;
   icon: React.ElementType;
-}
-
-function statusLabel(status: string): ServiceStatus {
-  if (status === "in-review" || status === "in-progress") return "In Progress";
-  if (status === "submitted" || status === "pending") return "Requested";
-  if (status === "outcome-ready") return "Outcome Ready";
-  if (status === "assigned" || status === "active") return "Active";
-  if (status === "closed") return "Completed";
-  return "Available";
-}
-
-const sourceIcon = {
-  "Decision Desk": Zap,
-  DocuShare: FileText,
-  Connectivity: Wifi,
-  "Risk Advisor": ShieldAlert,
-  "The Fixer": Wrench,
-};
-
-const productIcon = {
-  "decision-desk": Zap,
-  docushare: FileText,
-  connectivity: Wifi,
-  "risk-advisor": ShieldAlert,
-  "the-fixer": Wrench,
-  membership: CheckCircle,
-  "marketplace-listing": Tag,
-  "marketplace-offer": Tag,
-};
-
-export const SERVICES: Service[] = [
-  ...mockPortalServiceRequests.map((request) => ({
-    id: request.id,
-    title: request.source,
-    category: request.category,
-    status: statusLabel(request.status),
-    description: request.description,
-    lastUpdated: request.lastUpdated,
-    nextAction: request.nextAction,
-    buttonLabel: request.ctaLabel,
-    icon: sourceIcon[request.source],
-  })),
-  {
-    id: "business-health-snapshot",
-    title: "Business Health Snapshot",
-    category: "Advisory",
-    status: "Active",
-    description: "A structured review of growth, finance and operational priorities.",
-    lastUpdated: "1 May 2026",
-    nextAction: "View snapshot",
-    buttonLabel: "Open",
-    icon: BarChart2,
-  },
-  {
-    id: "finance-calculator-pack",
-    title: "Finance Calculator Pack",
-    category: "Operations Tool",
-    status: "Available",
-    description: "Planning tools for lending, cash flow and business finance.",
-    lastUpdated: "—",
-    nextAction: "Activate when ready",
-    buttonLabel: "Activate",
-    icon: Calculator,
-  },
-  {
-    id: "xero-partner-offer",
-    title: "Xero Partner Offer",
-    category: "Partner Offer",
-    status: "Completed",
-    description: "Partner offer activated through the RBP marketplace.",
-    lastUpdated: "20 Apr 2026",
-    nextAction: "Offer active",
-    buttonLabel: "View Offer",
-    icon: Tag,
-  },
-];
-
-const STATUS_CONFIG: Record<ServiceStatus, { color: string; dot: string }> = {
-  Active:      { color: "bg-emerald-50 text-emerald-700", dot: "bg-emerald-500" },
-  "In Progress": { color: "bg-amber-50 text-amber-700",   dot: "bg-amber-500" },
-  Requested:   { color: "bg-blue-50 text-blue-700",       dot: "bg-blue-500" },
-  "Outcome Ready": { color: "bg-emerald-50 text-emerald-700", dot: "bg-emerald-500" },
-  Completed:   { color: "bg-slate-100 text-slate-600",    dot: "bg-slate-400" },
-  Available:   { color: "bg-violet-50 text-violet-700",   dot: "bg-violet-500" },
-};
-
-const STATUS_TABS: Array<ServiceStatus | "All"> = [
-  "All", "Active", "Requested", "In Progress", "Outcome Ready", "Completed", "Available",
-];
-
-const SUMMARY_COUNTS: Array<{ label: string; key: ServiceStatus | null; color: string }> = [
-  { label: "Active",           key: "Active",      color: "text-emerald-700 bg-emerald-50 border-emerald-100" },
-  { label: "In Progress",      key: "In Progress", color: "text-amber-700 bg-amber-50 border-amber-100" },
-  { label: "Pending Requests", key: "Requested",   color: "text-blue-700 bg-blue-50 border-blue-100" },
-  { label: "Outcome Ready",    key: "Outcome Ready", color: "text-emerald-700 bg-emerald-50 border-emerald-100" },
-];
-
-function getButtonStyle(status: ServiceStatus) {
-  if (status === "Available")  return "bg-blue-700 hover:bg-blue-800 text-white";
-  if (status === "Completed")  return "border border-slate-200 text-slate-600 hover:bg-slate-50";
-  if (status === "Requested")  return "border border-slate-200 text-slate-700 hover:bg-slate-50";
-  return "bg-blue-700 hover:bg-blue-800 text-white";
+  cta?: string;
+}) {
+  return (
+    <Link
+      to={href}
+      className="flex min-h-56 flex-col gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-md"
+    >
+      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50">
+        <Icon className="h-5 w-5 text-blue-700" />
+      </div>
+      <div className="space-y-2">
+        <h3 className="text-sm font-extrabold text-slate-950">{label}</h3>
+        <p className="text-sm leading-6 text-slate-500">{description}</p>
+      </div>
+      <div className="mt-auto text-xs font-bold text-blue-700">{cta ?? "Open section"}</div>
+    </Link>
+  );
 }
 
 export function PortalServices() {
-  const [activeFilter, setActiveFilter] = useState<ServiceStatus | "All">("All");
-  const portalState = getCurrentMockPortalState();
-  const portalServices = portalState.activities.map((activity) => ({
-    id: activity.id,
-    title: activity.title,
-    category: activity.product.replace(/-/g, " "),
-    status: statusLabel(activity.status),
-    description: activity.description,
-    lastUpdated: activity.updatedAt,
-    nextAction: activity.nextAction,
-    buttonLabel: "Open",
-    icon: productIcon[activity.product],
-  }));
-  const services = [
-    ...portalServices,
-    ...SERVICES.filter((service) => !portalServices.some((item) => item.id === service.id)),
-  ];
-
-  const filtered =
-    activeFilter === "All"
-      ? services
-      : services.filter((s) => s.status === activeFilter);
-
   return (
-    <div className="px-4 sm:px-6 py-6 space-y-6">
+    <div className="space-y-6 px-4 py-6 sm:px-6">
       <PortalAdminReference
         portalRoute="/portal/services"
         controlledBy={["Admin On-Demand Services", "Admin Managed Services"]}
       />
 
-      {/* ── Header ── */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-900 mb-1">My Services</h2>
-          <p className="text-sm text-slate-500">
-            Track your requested, active and completed RBP services.
-          </p>
-        </div>
-        <Link
-          to="/portal/services/request"
-          className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all flex-shrink-0"
-        >
-          <Plus className="w-3.5 h-3.5" /> Request a Service
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
-        {[
-          { label: "Start Decision Desk", href: "/portal/services/decision-desk/start" },
-          { label: "Start DocuShare", href: "/portal/services/docushare/start" },
-          { label: "Order Connectivity", href: "/portal/services/nbn/start" },
-          { label: "Run Risk Advisor", href: "/portal/services/risk-advisor/start" },
-          { label: "Request The Fixer", href: "/portal/services/the-fixer/start" },
-        ].map((cta) => (
-          <Link
-            key={cta.href}
-            to={cta.href}
-            className="inline-flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
-          >
-            {cta.label}
-            <ArrowRight className="w-3.5 h-3.5 text-blue-700" />
-          </Link>
-        ))}
-      </div>
-
-      {/* ── Status summary ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {SUMMARY_COUNTS.map((s) => (
-          <button
-            key={s.label}
-            onClick={() => setActiveFilter(s.key as ServiceStatus)}
-            className={`rounded-2xl border p-4 text-left transition-all ${s.color} ${
-              activeFilter === s.key ? "ring-2 ring-offset-1 ring-current" : "hover:opacity-80"
-            }`}
-          >
-            <div className="text-2xl font-extrabold mb-0.5">
-              {services.filter((sv) => sv.status === s.key).length}
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.24em] text-blue-700">
+              <BriefcaseBusiness className="h-3.5 w-3.5" />
+              Services overview
             </div>
-            <div className="text-xs font-semibold">{s.label}</div>
-          </button>
-        ))}
-      </div>
-
-      {/* ── Filter tabs ── */}
-      <div className="flex items-center gap-1.5 flex-wrap">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveFilter(tab)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-              activeFilter === tab
-                ? "bg-blue-700 text-white"
-                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-            }`}
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-950">
+              The portal service area has been simplified into a safe overview
+            </h2>
+            <p className="text-sm leading-7 text-slate-600">
+              This page no longer depends on partially shaped portal activity data or icon lookup tables during render. Each visible card points to a live route or a clearly labelled MVP-safe fallback.
+            </p>
+          </div>
+          <Link
+            to="/portal/services/request"
+            className="inline-flex items-center gap-2 rounded-2xl bg-blue-700 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-800"
           >
-            {tab}
-            {tab !== "All" && (
-              <span className={`ml-1.5 text-[10px] ${activeFilter === tab ? "text-blue-200" : "text-slate-400"}`}>
-                {services.filter((s) => s.status === tab).length}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Service cards ── */}
-      {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filtered.map((svc) => {
-            const cfg = STATUS_CONFIG[svc.status];
-            const Icon = svc.icon;
-            return (
-              <div
-                key={svc.id}
-                className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md transition-shadow"
-              >
-                {/* Top row: icon + badges */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-blue-700" />
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">
-                      {svc.category}
-                    </span>
-                    <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg ${cfg.color}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                      {svc.status}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div>
-                  <div className="text-sm font-extrabold text-slate-900 mb-1">{svc.title}</div>
-                  <p className="text-xs text-slate-500 leading-relaxed">{svc.description}</p>
-                </div>
-
-                {/* Meta row */}
-                <div className="flex items-center gap-4 text-[10px] text-slate-400">
-                  {svc.lastUpdated !== "—" && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> Updated {svc.lastUpdated}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    {svc.status === "Completed" ? (
-                      <CheckCircle className="w-3 h-3 text-emerald-500" />
-                    ) : (
-                      <AlertCircle className="w-3 h-3 text-slate-400" />
-                    )}
-                    {svc.nextAction}
-                  </span>
-                </div>
-
-                {/* Action row */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-50 mt-auto">
-                  <Link
-                    to={`/portal/services/${svc.id}`}
-                    className="text-xs font-bold text-blue-700 hover:underline flex items-center gap-1"
-                  >
-                    View details <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
-                  <Link
-                    to={
-                      svc.status === "Available"
-                        ? "/portal/services/request"
-                        : svc.status === "Completed" && svc.category === "Partner Offer"
-                        ? "/portal/offers"
-                        : `/portal/services/${svc.id}`
-                    }
-                    className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${getButtonStyle(svc.status)}`}
-                  >
-                    {svc.buttonLabel}
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
+            Request a Service <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
-      ) : (
-        /* ── Empty state ── */
-        <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-12 flex flex-col items-center text-center">
-          <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-            <FileText className="w-7 h-7 text-slate-300" />
-          </div>
-          <div className="text-sm font-bold text-slate-700 mb-2">No services yet</div>
-          <p className="text-xs text-slate-400 leading-relaxed mb-5 max-w-xs">
-            Services you request or activate from the RBP website will appear here.
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-4 space-y-1">
+          <h3 className="text-sm font-extrabold text-slate-950">Services</h3>
+          <p className="text-sm leading-6 text-slate-500">
+            These cards align the member experience to the approved service groupings while keeping all CTAs live in the current MVP.
           </p>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/portal/services/request"
-              className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
-            >
-              <Plus className="w-3.5 h-3.5" /> Request a Service
-            </Link>
-            <Link
-              to="/on-demand"
-              className="inline-flex items-center gap-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all"
-            >
-              Explore Services <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
         </div>
-      )}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {serviceCards.map((card) => (
+            <OverviewCard key={card.label} {...card} />
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-4 space-y-1">
+          <h3 className="text-sm font-extrabold text-slate-950">Platform</h3>
+          <p className="text-sm leading-6 text-slate-500">
+            Platform routes remain reachable through the current authenticated pages and flows.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {platformCards.map((card) => (
+            <OverviewCard key={card.label} {...card} />
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-4 space-y-1">
+          <h3 className="text-sm font-extrabold text-slate-950">Operations</h3>
+          <p className="text-sm leading-6 text-slate-500">
+            Operations areas that are not fully built yet are still routed to a valid support or resource destination instead of failing.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {operationsCards.map((card) => (
+            <OverviewCard key={card.label} {...card} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

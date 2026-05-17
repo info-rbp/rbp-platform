@@ -5,6 +5,7 @@ import { PortalStatusCard } from "../../components/domain";
 import { StatusBadge } from "../../components/status";
 import { mockPortalDashboard } from "../../mock";
 import { getCurrentMockPortalState, mockPortalService } from "../../services/mock/portal.mockService";
+import type { PortalDashboardState } from "../../types/portal";
 import {
   Zap, CalendarCheck, FileText, CheckCircle, Tag,
   Star, ArrowRight, ChevronRight, TrendingUp, Clock,
@@ -73,6 +74,27 @@ const healthMetrics = [
 
 const CONSULTANT_ASSIGNED = true;
 
+export function getPortalDashboardViewModel(portalState: Partial<PortalDashboardState>) {
+  const customer = portalState.customer ?? {
+    id: "current-user",
+    name: "RBP Member",
+    email: "",
+    businessName: "Your business",
+  };
+  const memberName = customer.name || customer.email || "RBP Member";
+  const businessName = customer.businessName || "Your business";
+
+  return {
+    customer,
+    memberName,
+    businessName,
+    activePortalActivities: Array.isArray(portalState.activities) ? portalState.activities : [],
+    notifications: Array.isArray(portalState.notifications) ? portalState.notifications : [],
+    membershipPlan: portalState.membershipPlan || "RBP Membership",
+    membershipStatus: portalState.membershipStatus === "active" ? "active" : "pending",
+  };
+}
+
 export function PortalDashboard() {
   const [portalState, setPortalState] = useState(() => getCurrentMockPortalState());
 
@@ -89,12 +111,14 @@ export function PortalDashboard() {
       mounted = false;
     };
   }, []);
-  const activePortalActivities = portalState.activities;
-  const memberName = portalState.customer.name;
-  const businessName =
-    portalState.customer.businessName ??
-    mockPortalDashboard.user.contact.businessName ??
-    "Your business";
+  const {
+    activePortalActivities,
+    businessName,
+    memberName,
+    membershipPlan,
+    membershipStatus,
+    notifications,
+  } = getPortalDashboardViewModel(portalState);
 
   return (
     <div className="px-4 py-6 space-y-6 sm:px-6">
@@ -104,9 +128,9 @@ export function PortalDashboard() {
       />
 
       <PortalStatusCard
-        title={portalState.membershipPlan}
+        title={membershipPlan}
         description={`${memberName} is viewing the authenticated portal for ${businessName}. Product requests, orders, listings, offers, documents, and admin updates are read from the shared mock portal model.`}
-        status={portalState.membershipStatus === "active" ? "active" : "in-progress"}
+        status={membershipStatus === "active" ? "active" : "in-progress"}
         href="/portal/membership/checkout"
       />
 
@@ -137,7 +161,7 @@ export function PortalDashboard() {
             <h2 className="mb-1.5 text-xl font-extrabold text-white">Welcome back, {memberName}.</h2>
             <p className="max-w-lg text-sm text-blue-100">
               {businessName} has <span className="font-bold text-white">{activePortalActivities.length} product activities</span>,{" "}
-              <span className="font-bold text-white">{portalState.notifications.length} notifications</span>, and recommended next actions ready.
+              <span className="font-bold text-white">{notifications.length} notifications</span>, and recommended next actions ready.
             </p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
@@ -243,9 +267,9 @@ export function PortalDashboard() {
           <div className="border-b border-slate-100 px-5 py-4">
             <h3 className="text-sm font-extrabold text-slate-900">Notifications</h3>
           </div>
-          {portalState.notifications.length > 0 ? (
+          {notifications.length > 0 ? (
             <div className="divide-y divide-slate-50">
-              {portalState.notifications.map((notification) => (
+              {notifications.map((notification) => (
                 <Link
                   key={notification.id}
                   to={notification.href ?? "/portal/dashboard"}

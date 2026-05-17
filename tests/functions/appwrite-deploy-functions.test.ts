@@ -38,6 +38,7 @@ const fakeEnv = {
   APPWRITE_ENDPOINT: "https://cloud.appwrite.io/v1",
   APPWRITE_PROJECT_ID: "project",
   APPWRITE_API_KEY: "key",
+  APPWRITE_DATABASE_ID: "rbp_platform",
 };
 
 test("generates a deployment manifest from configured function ids", async () => {
@@ -82,6 +83,10 @@ test("--apply creates missing functions, updates existing functions, and deploys
   const calls: Array<{ method: string; args: unknown[] }> = [];
   const existing = new Set(["existing-function"]);
   const archives: string[] = [];
+  const variables = new Map<string, Array<{ $id: string; key: string }>>([
+    ["existing-function", [{ $id: "var_endpoint", key: "APPWRITE_ENDPOINT" }]],
+    ["new-function", []],
+  ]);
 
   const functionsApi: AppwriteFunctionsApi = {
     async get(functionId: string) {
@@ -102,6 +107,18 @@ test("--apply creates missing functions, updates existing functions, and deploys
     async createDeployment(...args: Parameters<AppwriteFunctionsApi["createDeployment"]>) {
       calls.push({ method: "createDeployment", args });
       return { $id: `${args[0]}-deployment` } as never;
+    },
+    async listVariables(functionId: string) {
+      calls.push({ method: "listVariables", args: [functionId] });
+      return { variables: variables.get(functionId) || [] } as never;
+    },
+    async createVariable(...args: Parameters<NonNullable<AppwriteFunctionsApi["createVariable"]>>) {
+      calls.push({ method: "createVariable", args });
+      return { $id: `${args[0]}-${args[1]}`, key: args[1] } as never;
+    },
+    async updateVariable(...args: Parameters<NonNullable<AppwriteFunctionsApi["updateVariable"]>>) {
+      calls.push({ method: "updateVariable", args });
+      return { $id: args[1], key: args[2] } as never;
     },
   };
 
@@ -131,11 +148,21 @@ test("--apply creates missing functions, updates existing functions, and deploys
       "existing-function",
       "new-function",
     ]);
+    assert.deepEqual(calls.filter((call) => call.method === "listVariables").map((call) => call.args[0]), [
+      "existing-function",
+      "new-function",
+    ]);
+    assert.deepEqual(calls.filter((call) => call.method === "updateVariable").map((call) => call.args.slice(0, 3)), [
+      ["existing-function", "var_endpoint", "APPWRITE_ENDPOINT"],
+    ]);
+    assert.ok(calls.some((call) => call.method === "createVariable" && call.args[0] === "new-function" && call.args[1] === "APPWRITE_DATABASE_ID"));
     assert.deepEqual(archives, ["existing-function", "new-function"]);
     assert.ok(result.summary.updated.includes("function:existing-function"));
     assert.ok(result.summary.created.includes("function:new-function"));
     assert.ok(result.summary.updated.includes("deployment:existing-function"));
     assert.ok(result.summary.updated.includes("deployment:new-function"));
+    assert.ok(result.summary.updated.includes("variable:existing-function:APPWRITE_ENDPOINT"));
+    assert.ok(result.summary.created.includes("variable:new-function:APPWRITE_DATABASE_ID"));
     assert.equal(fs.existsSync(path.join(fixture.rootDir, "existing-function.tar.gz")), false);
     assert.equal(fs.existsSync(path.join(fixture.rootDir, "new-function.tar.gz")), false);
   } finally {
