@@ -39,8 +39,11 @@ export interface PortalNotification {
   id: string;
   title: string;
   message: string;
-  status: PortalActivityStatus;
+  status: PortalActivityStatus | "sent" | "read" | "unread" | "failed" | "pending";
   href: string;
+  read?: boolean;
+  readAt?: string;
+  updatedAt?: string;
 }
 
 export interface PortalCustomerAuthUser {
