@@ -1,7 +1,6 @@
 import { Query } from "node-appwrite";
 import { collectionIds, createAdminContext } from "./appwriteAdmin";
 
-export const entitlementKeys = [
 export const businessEntitlementKeys = [
   "portal_access",
   "profile_management",
@@ -44,8 +43,6 @@ export const legacyEntitlementKeys = [
   "applications_interest",
   "applications_provisioning",
 ] as const;
-
-export type EntitlementStatus = "active" | "suspended" | "revoked";
 
 export const entitlementKeys = [...businessEntitlementKeys, ...legacyEntitlementKeys] as const;
 
