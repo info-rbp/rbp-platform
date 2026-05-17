@@ -13,15 +13,15 @@ All requested smoke keys were loaded: `QA_SMOKE_USER_EMAIL`, `QA_SMOKE_USER_PASS
 - `bootstrap-tenant` was executed for the configured smoke user after `user_profiles` lookup returned 0 matches. Result: PASS.
 - `APPWRITE_ADMIN_TEAM_ID` lookup initially returned 404. The QA admin team and membership for the configured admin smoke user were created. No resources were deleted.
 - `QA_SMOKE_USER_ID` and `QA_SMOKE_ADMIN_USER_ID` were separated after the initial evidence run. Admin smoke now passes without sentinel override.
-- `QA_SMOKE_TENANT_ID` lookup returned 404; Stripe smoke remains blocked until the QA tenant fixture is corrected.
+- `QA_SMOKE_TENANT_ID` was corrected to a live QA tenant fixture before final Stripe smoke execution.
 
 ## Command Results
 
 | Command | Result | Evidence |
 | --- | --- | --- |
 | `npm run smoke:qa:auth -- --execute` | PASS | AppWrite session created successfully for the configured QA smoke user after password reset. |
-| `npm run smoke:qa:billing -- --execute` | BLOCKED | Safety check failed because `STRIPE_SECRET_KEY` is not a Stripe test-mode `sk_test_` key. |
-| `npm run smoke:qa:stripe-webhook -- --execute` | NOT RUN | Blocked by non-test Stripe key; signed webhook proof not attempted. |
+| `npm run smoke:qa:billing -- --execute` | PASS | Stripe test-mode billing smoke passed with one Free plan, one paid Stripe-backed plan, and Stripe mode confirmed as test. |
+| `npm run smoke:qa:stripe-webhook -- --execute` | PASS | Signed Stripe fixture webhooks executed successfully, including duplicate replay check. |
 | `npm run smoke:qa:service-requests -- --execute` | PASS | `create-service-request` executed successfully after smoke user bootstrap. |
 | `npm run smoke:qa:admin -- --execute` | PASS | Non-admin denial passed with distinct `QA_SMOKE_USER_ID`; configured admin user passed through `APPWRITE_ADMIN_TEAM_ID`. |
 | `npm run smoke:qa:permissions -- --execute` | PASS | Application provisioning remained disabled and customer notification path was scoped. |
@@ -29,7 +29,6 @@ All requested smoke keys were loaded: `QA_SMOKE_USER_EMAIL`, `QA_SMOKE_USER_PASS
 
 ## Blockers
 
-- Billing and Stripe webhook smoke remain blocked until QA uses a Stripe test-mode secret key and valid QA tenant fixture.
 
 
 ## Auth smoke rerun
@@ -73,3 +72,41 @@ Note:
 
 - `.env.qa.local` was updated locally only.
 - No secrets were committed.
+
+
+## Stripe smoke rerun
+
+Timestamp: 2026-05-17T05:56:59.494529Z
+
+`npm run appwrite:stripe-plan-mapping:validate`: PASS.
+
+Evidence:
+
+- Live AppWrite Free/Premium membership mapping validates.
+- Free plan does not require Stripe subscription checkout.
+- Premium plan remains AUD 25 + GST weekly.
+- Premium plan uses the QA Stripe test price `price_1TXx7C0mYebE7B3JyCL64COg`.
+- Premium plan maps to Stripe product `prod_UX19mM8SidwDPS`.
+
+`npm run smoke:qa:billing -- --execute`: PASS.
+
+Evidence:
+
+- Stripe secret was confirmed as test-mode locally.
+- Billing smoke found one Free plan and one paid Stripe-backed plan.
+- Stripe mode reported as `test`.
+
+`npm run smoke:qa:stripe-webhook -- --execute`: PASS.
+
+Evidence:
+
+- Signed Stripe fixture webhook events executed.
+- `checkout.session.completed` fixture processed.
+- `invoice.payment_failed` fixture processed.
+- `customer.subscription.deleted` fixture processed.
+- Duplicate replay check completed.
+
+Note:
+
+- Secret values were not printed.
+- `.env.qa.local` was updated locally only.
