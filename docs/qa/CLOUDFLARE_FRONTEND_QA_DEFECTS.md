@@ -1,201 +1,211 @@
 # Cloudflare Frontend QA Defects
 
-Last updated: 2026-05-17 18:24 AWST
+Last updated: 2026-05-17 20:40 AWST
 
-## DEFECT: Signup/sign-in fail with Failed to fetch
+## Current status
 
-Severity: Critical
+This document now separates source-code remediation from live QA proof.
 
-Status: RESOLVED on root QA URL
+Source-code remediation completed in branch `fix/appwrite-permission-reconciliation-clean`:
 
-Route:
-- sign-in
-- signup / Join Now
+- Appwrite Function response handling now unwraps `{ ok, message, data }` envelopes and throws structured failures.
+- Public Operations navigation no longer links directly to `/portal/services/nbn/start`.
+- Application-interest API responses are normalised for `interest_id`, `application`, and duplicate registration handling.
+- Portal notification API adapters are normalised for `list_my_notifications`, `mark_notification_read`, and `mark_all_notifications_read`.
+- Public navbar source is now auth-aware and supports a logged-in `Go to Account` state.
+- Portal layout source now uses live auth API lookups for current user identity and sign-out, and includes a wired notification panel.
+- `/admin` source handling now has explicit index behavior instead of falling through to a blank admin outlet.
+- Sitemap source coverage and static validation have been expanded.
 
-Expected:
-- Browser can create/login Appwrite session against QA Appwrite project.
+Live validation is still required for all Appwrite, Stripe, Cloudflare, and browser behaviors listed below.
 
-Actual:
-- Earlier root testing showed browser `Failed to fetch` and Appwrite CORS failures.
-
-Root cause:
-- Appwrite origin/platform configuration initially did not allow the Cloudflare root origin.
-
-Fix:
-- Appwrite origin/platform configuration was corrected outside this terminal session.
-- Frontend auth diagnostics were also improved to surface Appwrite network/CORS failures clearly.
-
-Retest:
-- PASS at 2026-05-17 18:24 AWST on `https://rbp-platform.pages.dev/`.
-- Login completed and redirected to `/portal/dashboard`.
-
-Evidence:
-- `tmp/qa/cloudflare-root-dashboard-verification.json`
-- `docs/qa/screenshots/cloudflare-frontend-qa/root-signin.png`
-
-## DEFECT: Portal dashboard crashes after login because Appwrite envelope is persisted as portal state
+## DEFECT: Appwrite function envelope handling breaks frontend function-backed flows
 
 Severity: Critical
 
-Status: RESOLVED on root QA URL
+Status: SOURCE FIXED, LIVE QA REQUIRED
 
-Route:
-- `/portal/dashboard`
-
-Expected:
-- After login, the portal dashboard receives or reads a `PortalDashboardState` with `customer`, `activities`, `notifications`, `membershipStatus`, and `membershipPlan`.
-- The dashboard remains visible after async hydration and refresh.
-
-Actual:
-- Earlier browser evidence showed `rbp.mockPortalState` containing `{ ok, message, data }`.
-- `portal.customer`, `portal.activities`, and `portal.notifications` were undefined.
-- `PortalDashboard` crashed when reading `portalState.customer.name`.
+Affected areas:
+- membership checkout
+- application-interest registration
+- notifications actions
+- any Appwrite Function consumer expecting direct payloads
 
 Root cause:
-- `appwritePortalApi.getDashboardState()` / `mockPortalService.getDashboard()` treated the Appwrite function response envelope as the dashboard state and persisted it directly into `rbp.mockPortalState`.
+- The frontend helper returned the full Appwrite envelope instead of the nested `data` payload.
 
-Fix:
-- Added `frontend/portal/src/app/services/api/portalDashboardState.ts` with `unwrapPortalDashboardPayload()` and `normalisePortalDashboardState()`.
-- Handles raw dashboard state, Appwrite `{ ok, message, data }` envelopes, `{ data }`, `{ result }`, and `{ portalState }`.
-- Updated `appwritePortalApi.getDashboardState()` to unwrap function responses before returning dashboard data.
-- Updated `mockPortalService.getDashboard()` and `readPortalState()` to normalise before writing or returning session storage state.
-- Hardened `PortalDashboard` with safe customer, business name, activities, and notifications fallbacks.
+Source fix:
+- `frontend/portal/src/app/lib/appwrite/functions.ts`
+- Added `AppwriteFunctionEnvelope` and `AppwriteFunctionError`.
+- `invokeAppwriteFunction()` now unwraps `{ ok, message, data }` responses, preserves raw payload support, supports direct `data`, and fails clearly on invalid JSON or empty responses.
 
-Retest:
-- PASS in local automated tests.
-- PASS in browser on `https://rbp-platform.pages.dev/` after production/root deployment.
-- Dashboard remained visible after 10 seconds of hydration.
-- Refresh kept `/portal/dashboard` stable.
-- State check showed `customer` present, `activities` array true, `notifications` array true, and old wrapper false.
+Added tests:
+- `tests/runtime/appwrite-function-response.test.ts`
 
-Evidence:
-- `tests/runtime/portal-dashboard-state.test.ts`
-- `tmp/qa/cloudflare-root-dashboard-verification.json`
-- `docs/qa/screenshots/cloudflare-frontend-qa/root-dashboard-stable.png`
-- `docs/qa/screenshots/cloudflare-frontend-qa/root-dashboard-state-check.png`
-- `docs/qa/screenshots/cloudflare-frontend-qa/root-dashboard-refresh.png`
+Still requires live QA validation:
+- Premium checkout receives `checkout_url` and redirects in browser.
+- Application interest confirms success in deployed QA.
+- Notification actions return live Appwrite data in deployed QA.
 
-## DEFECT: Active Appwrite session blocks sign-in
+## DEFECT: Operations menu links directly into a protected portal route
 
-Severity: Critical
+Severity: High
 
-Status: RESOLVED on root QA URL
-
-Route:
-- `/signin`
-
-Expected:
-- If Appwrite already has an active session for the same email, sign-in reuses it.
-- If Appwrite has an active session for a different email, the frontend deletes it before creating the new session.
-
-Actual:
-- Earlier testing could fail with an active-session creation error.
+Status: SOURCE FIXED, LIVE QA REQUIRED
 
 Root cause:
-- The sign-in flow tried to create an Appwrite email/password session without first handling an existing active Appwrite session.
+- Public navigation linked directly to `/portal/services/nbn/start`.
 
-Fix:
-- `appwriteAuthApi.signIn()` now checks the current Appwrite account.
-- It returns success when the active account email matches the submitted email.
-- It deletes a different active session before creating a new one.
+Source fix:
+- `frontend/portal/src/app/data/publicNavigation.ts`
+- Replaced the public Operations CTA with `/operations/connectivity/nbn-phone/connect-now`.
 
-Retest:
-- PASS at 2026-05-17 18:24 AWST on `https://rbp-platform.pages.dev/`.
-- Active-session sign-in retest passed.
-- No `Creation of a session is prohibited when a session is active` error was observed.
+Added tests:
+- `tests/runtime/frontend-qa-remediation.test.ts`
 
-Evidence:
-- `tmp/qa/cloudflare-root-dashboard-verification.json`
-- `docs/qa/screenshots/cloudflare-frontend-qa/root-signin-retest.png`
+Still requires live QA validation:
+- Desktop and mobile Operations menus render the corrected route in Cloudflare QA.
+- Public route smoke confirms no stale deployed menu bundle remains.
 
-## DEFECT: Root production still serves old Cloudflare bundle
+## DEFECT: Logged-in public header still shows Sign In / Join Now
 
-Severity: Critical
+Severity: High
 
-Status: RESOLVED
-
-Route:
-- `https://rbp-platform.pages.dev/`
-
-Expected:
-- Root production serves the fixed frontend bundle containing dashboard normalisation and active-session sign-in handling.
-
-Actual:
-- Earlier root production served `/assets/index-CjyNwKW7.js`.
-- The fixed local/preview build served `/assets/index-CATcRwLF.js`.
+Status: SOURCE FIXED, LIVE QA REQUIRED
 
 Root cause:
-- Initial Wrangler deployments created Preview deployments only; the fixed build had not been deployed to the Cloudflare production/root URL.
+- The public navbar was rendering static guest CTAs without checking the active auth provider.
 
-Fix:
-- Confirmed Cloudflare Pages production branch is `main`.
-- Deployed fixed build with `npx wrangler pages deploy dist --project-name rbp-platform --branch main`.
+Source fix:
+- `frontend/portal/src/app/components/Navbar.tsx`
+- Navbar now checks `authApi.getCurrentUser()`, supports a loading-safe state, and swaps guest CTAs for `Go to Account` / `Portal Dashboard` when a session exists.
 
-Retest:
-- PASS at 2026-05-17 18:24 AWST.
-- Root now serves `/assets/index-CATcRwLF.js`.
-- Root no longer serves old bundle `/assets/index-CjyNwKW7.js`.
+Added tests:
+- `tests/runtime/frontend-qa-remediation.test.ts`
 
-Evidence:
-- `tmp/cloudflare-root-check/index.html`
-- `tmp/cloudflare-root-check/js-assets.txt`
+Still requires live QA validation:
+- Sign in -> return to home -> `Go to Account` visible.
+- Mobile menu shows the same authenticated state.
+- Sign out -> return home -> guest CTAs visible again.
 
-## DEFECT: Cloudflare preview fixed bundle is blocked by Appwrite CORS
+## DEFECT: Application interest confirmation is weak and duplicate intent is not handled well
 
-Severity: Medium
+Severity: High
 
-Status: OPEN, not blocking root QA
-
-Route:
-- preview `/signin`
-- preview `/portal/dashboard`
-
-Expected:
-- Browser can sign in against fixed Cloudflare preview deployments when preview QA is required.
-
-Actual:
-- Immutable preview `https://64907e02.rbp-platform.pages.dev` served fixed bundle `/assets/index-CATcRwLF.js`.
-- Alias preview `https://fix-appwrite-permission-reco-44v1.rbp-platform.pages.dev` served fixed bundle `/assets/index-CATcRwLF.js`.
-- Both preview origins failed before login completed because Appwrite CORS blocked:
-  - `GET https://syd.cloud.appwrite.io/v1/account`
-  - `POST https://syd.cloud.appwrite.io/v1/account/sessions/email`
+Status: SOURCE FIXED, LIVE QA REQUIRED
 
 Root cause:
-- Appwrite Web platform/origin settings do not allow the Cloudflare preview hostnames.
+- The Appwrite response shape was not normalised and the public page did not lock the selected application after success.
 
-Fix:
-- Add Appwrite Web platform/origin entries for preview hostnames if preview browser QA is required.
-- Root QA can proceed because `https://rbp-platform.pages.dev/` now serves the fixed bundle and is accepted by Appwrite.
+Source fix:
+- `frontend/portal/src/app/services/api/appwrite/appwriteApplicationsApi.ts`
+- `frontend/portal/src/app/pages/BusinessApplicationsPage.tsx`
+- Normalised `interest_id`, `application`, and `already_registered` handling.
+- Added user-facing success/error message helpers.
+- Added duplicate-click protection and persistent selected-card success state in-page.
 
-Retest:
-- FAIL for preview at 2026-05-17 18:05 AWST.
-- PASS for root at 2026-05-17 18:24 AWST.
+Added tests:
+- `tests/runtime/frontend-qa-remediation.test.ts`
 
-Evidence:
-- `tmp/qa/cloudflare-preview-dashboard-verification.json`
-- `docs/qa/screenshots/cloudflare-frontend-qa/preview-signin.png`
+Still requires live QA validation:
+- Deployed page shows success message after registration.
+- `application_interest` record exists in Appwrite.
+- Admin list view exposes the created record.
+- Notification is created for the current user or tenant.
 
-## DEFECT: Cloudflare/Appwrite platform verification blocked from terminal
+## DEFECT: Portal bell is inert and notification list is not wired
 
-Severity: Medium
+Severity: High
 
-Status: PARTIAL
-
-Route:
-- Appwrite Console / Cloudflare Pages settings
-
-Expected:
-- CLI access can verify Cloudflare Pages settings and Appwrite platform/origin settings.
-
-Actual:
-- Cloudflare CLI verification works and confirmed the `rbp-platform` Pages project plus production branch `main`.
-- Appwrite CLI project/platform inspection still requires an authenticated Appwrite Console session.
+Status: SOURCE FIXED, LIVE QA REQUIRED
 
 Root cause:
-- Required Appwrite Console credentials are not available in this terminal session.
+- Portal layout showed a static bell without live notification API integration.
 
-Fix:
-- Use Appwrite Console or an authenticated Appwrite CLI session for platform/origin checks.
+Source fix:
+- `frontend/portal/src/app/services/api/appwrite/appwriteNotificationsApi.ts`
+- `frontend/portal/src/app/pages/portal/PortalLayout.tsx`
+- Normalised notification list responses and write actions.
+- Portal header now opens a dropdown panel with loading, empty, error, unread count, mark-read, and mark-all-read states.
 
-Retest:
-- PARTIAL at 2026-05-17 18:24 AWST.
+Added tests:
+- `tests/runtime/frontend-qa-remediation.test.ts`
+
+Still requires live QA validation:
+- Welcome notification appears after signup.
+- Service request notification appears after submission.
+- Application interest notification appears after registration.
+- Stripe success/failure notifications appear after webhook processing.
+
+## DEFECT: Portal layout uses static user identity and mock-only sign-out
+
+Severity: High
+
+Status: SOURCE FIXED, LIVE QA REQUIRED
+
+Root cause:
+- Portal layout used a hardcoded `USER` object and `mockAuthService.signOut()`.
+
+Source fix:
+- `frontend/portal/src/app/pages/portal/PortalLayout.tsx`
+- Current portal identity now comes from `authApi.getCurrentUser()`.
+- Sign-out now calls the active auth API, clears cached customer auth state, clears pending intent, and emits an auth-change event.
+
+Added tests:
+- `tests/runtime/frontend-qa-remediation.test.ts`
+
+Still requires live QA validation:
+- Sign-out removes the Appwrite current session.
+- Protected portal routes redirect after sign-out.
+- Public navbar returns to guest state after sign-out.
+
+## DEFECT: /admin index behavior is unclear
+
+Severity: High
+
+Status: SOURCE FIXED, LIVE QA REQUIRED
+
+Root cause:
+- `/admin` could fall through to an empty admin outlet rather than an explicit index behavior.
+
+Source fix:
+- `frontend/portal/src/app/routes.tsx`
+- Added explicit admin index handling and protected admin dashboard redirect behavior.
+
+Still requires live QA validation:
+- Logged-out `/admin` redirects to `/admin/signin`.
+- Non-admin customer sees a clear denial state.
+- Admin user reaches `/admin/dashboard` from `/admin`.
+
+## DEFECT: sitemap coverage is incomplete and static validation is missing
+
+Severity: High
+
+Status: SOURCE FIXED, LIVE QA REQUIRED
+
+Root cause:
+- Sitemap coverage was narrow and there was no repository check proving protected routes stayed excluded.
+
+Source fix:
+- `frontend/portal/public/sitemap.xml`
+- `tests/schema/sitemap.test.mjs`
+- Expanded public route coverage.
+- Added automated sitemap include/exclude checks.
+
+Still requires live QA validation:
+- `/sitemap.xml` returns HTTP 200 from Cloudflare QA.
+- XML validates in deployed QA.
+- Cloudflare is serving the updated asset rather than a stale bundle or bad gateway path.
+
+## Existing live-only defects still open
+
+The following items remain unresolved until browser and environment validation is completed:
+
+- Premium Stripe checkout redirect and browser proof.
+- Free-plan activation path in deployed QA.
+- Stripe return route, subscription state, webhook effects, entitlements, and notifications.
+- Cloudflare menu bundle freshness across desktop and mobile.
+- Admin browser QA with seeded admin credentials.
+- Email sandbox delivery evidence.
+- Sitemap 200/Cloudflare route verification.
+- Full UAT and QA sign-off.
