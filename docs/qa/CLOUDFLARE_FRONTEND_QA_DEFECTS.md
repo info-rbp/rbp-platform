@@ -1,14 +1,15 @@
 # Cloudflare Frontend QA Defects
 
-Last updated: 2026-05-17 20:40 AWST
+Last updated: 2026-05-17 21:10 AWST
 
 ## Current status
 
-This document now separates source-code remediation from live QA proof.
+This document separates source-code remediation from live QA proof.
 
 Source-code remediation completed in branch `fix/appwrite-permission-reconciliation-clean`:
 
 - Appwrite Function response handling now unwraps `{ ok, message, data }` envelopes and throws structured failures.
+- Membership checkout source now sends `planCode`, supports compatibility `plan_code`, removes simulated payment gating in Stripe-enabled mode, and redirects to Stripe checkout when `checkout_url` or `url` is returned.
 - Public Operations navigation no longer links directly to `/portal/services/nbn/start`.
 - Application-interest API responses are normalised for `interest_id`, `application`, and duplicate registration handling.
 - Portal notification API adapters are normalised for `list_my_notifications`, `mark_notification_read`, and `mark_all_notifications_read`.
@@ -46,6 +47,35 @@ Still requires live QA validation:
 - Premium checkout receives `checkout_url` and redirects in browser.
 - Application interest confirms success in deployed QA.
 - Notification actions return live Appwrite data in deployed QA.
+
+## DEFECT: Stripe-enabled membership checkout still behaves like a mock payment preview
+
+Severity: Critical
+
+Status: SOURCE FIXED, LIVE QA REQUIRED
+
+Root cause:
+- The membership flow still treated simulated payment preview as the primary path even when Stripe checkout was enabled.
+- The checkout payload did not consistently include backend-required `planCode`.
+
+Source fix:
+- `frontend/portal/src/app/features/membership/MembershipPurchaseOnboardingFlow.tsx`
+- Stripe-enabled mode no longer requires `simulatePayment()` before checkout.
+- Stripe-enabled payment copy now points the user to secure Stripe checkout and explains that no card details are stored by RBP.
+- Review submit now calls `billingApi.createMembershipCheckoutSession()` with `planCode`, `plan_code`, membership contact fields, accepted terms, and selected extras.
+- Successful checkout responses now redirect with `window.location.assign()` when `checkout_url` or `url` is returned.
+- Checkout failures now surface a clear message in the payment and review areas.
+- Mock preview controls remain available only when Stripe checkout is disabled.
+
+Added tests:
+- `tests/runtime/membership-checkout-flow.test.ts`
+
+Still requires live QA validation:
+- Stripe test checkout redirect from deployed Cloudflare QA.
+- Stripe return URL behavior after checkout completion or cancellation.
+- Webhook processing, subscription activation, entitlement grant, and payment-event creation.
+- Notification creation after checkout and webhook completion.
+- Email sandbox delivery and admin visibility for the resulting records.
 
 ## DEFECT: Operations menu links directly into a protected portal route
 
@@ -203,7 +233,7 @@ The following items remain unresolved until browser and environment validation i
 
 - Premium Stripe checkout redirect and browser proof.
 - Free-plan activation path in deployed QA.
-- Stripe return route, subscription state, webhook effects, entitlements, and notifications.
+- Stripe return route, subscription state, webhook effects, entitlements, payment events, and notifications.
 - Cloudflare menu bundle freshness across desktop and mobile.
 - Admin browser QA with seeded admin credentials.
 - Email sandbox delivery evidence.
