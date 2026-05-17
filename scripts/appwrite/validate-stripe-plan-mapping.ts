@@ -48,7 +48,7 @@ function validateRequiredPlans(plans: MembershipPlan[], source: string) {
     throw new Error(`${source} must keep the premium plan at AUD 25 plus GST.`);
   }
 
-  if (premium.stripe_price_id !== "price_1TXKGnS9Az4EAUomNJeSfDA1") {
+  if (premium.stripe_price_id !== "price_1TXx7C0mYebE7B3JyCL64COg") {
     throw new Error(`${source} must keep the premium plan on the approved QA Stripe test price id.`);
   }
 

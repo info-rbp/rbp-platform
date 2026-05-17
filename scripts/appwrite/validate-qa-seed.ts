@@ -156,7 +156,7 @@ requireCondition(String(premiumPlan?.billing_cycle) === "weekly", "Premium membe
 requireCondition(String(premiumPlan?.currency) === "AUD", "Premium membership plan must use AUD.");
 requireCondition(Number(premiumPlan?.amount) === 25, "Premium membership plan must be AUD 25 plus GST.");
 requireCondition(
-  premiumPlan?.stripe_price_id === "price_1TXKGnS9Az4EAUomNJeSfDA1",
+  premiumPlan?.stripe_price_id === "price_1TXx7C0mYebE7B3JyCL64COg",
   "QA Premium membership plan must use the approved Stripe test price id.",
 );
 
