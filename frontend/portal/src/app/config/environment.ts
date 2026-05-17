@@ -1,3 +1,5 @@
+import { buildFrontendDiagnostics } from "./frontendDiagnostics";
+
 function readBoolean(value: unknown, fallback: boolean) {
   if (value === undefined || value === null || value === "") return fallback;
   return String(value).toLowerCase() === "true";
@@ -80,3 +82,5 @@ export const environment = {
 } as const;
 
 export type RuntimeEnvironment = typeof environment;
+
+export const frontendDiagnostics = buildFrontendDiagnostics(import.meta.env);
