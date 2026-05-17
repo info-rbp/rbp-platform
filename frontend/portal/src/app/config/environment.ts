@@ -1,5 +1,7 @@
 import { buildFrontendDiagnostics } from "./frontendDiagnostics";
 
+const viteEnv = import.meta.env ?? (typeof process !== "undefined" ? process.env : {});
+
 function readBoolean(value: unknown, fallback: boolean) {
   if (value === undefined || value === null || value === "") return fallback;
   return String(value).toLowerCase() === "true";
@@ -10,47 +12,47 @@ function readString(value: unknown, fallback: string) {
   return String(value);
 }
 
-const enableApplications = readBoolean(import.meta.env.VITE_ENABLE_APPLICATIONS, false);
+const enableApplications = readBoolean(viteEnv.VITE_ENABLE_APPLICATIONS, false);
 const enableApplicationInterest = readBoolean(
-  import.meta.env.VITE_ENABLE_APPLICATION_INTEREST,
+  viteEnv.VITE_ENABLE_APPLICATION_INTEREST,
   true
 );
 const enableApplicationProvisioning = readBoolean(
-  import.meta.env.VITE_ENABLE_APPLICATION_PROVISIONING,
+  viteEnv.VITE_ENABLE_APPLICATION_PROVISIONING,
   false
 );
 const enableAdminApplications = readBoolean(
-  import.meta.env.VITE_ENABLE_ADMIN_APPLICATIONS,
+  viteEnv.VITE_ENABLE_ADMIN_APPLICATIONS,
   true
 );
 const enableStripeCheckout = readBoolean(
-  import.meta.env.VITE_ENABLE_STRIPE_CHECKOUT,
+  viteEnv.VITE_ENABLE_STRIPE_CHECKOUT,
   true
 );
 const enableEmailNotifications = readBoolean(
-  import.meta.env.VITE_ENABLE_EMAIL_NOTIFICATIONS,
+  viteEnv.VITE_ENABLE_EMAIL_NOTIFICATIONS,
   true
 );
-const enableMockAuth = readBoolean(import.meta.env.VITE_ENABLE_MOCK_AUTH, false);
-const enableMockFallback = readBoolean(import.meta.env.VITE_ENABLE_MOCK_FALLBACK, false);
-const enableAppwriteAuth = readBoolean(import.meta.env.VITE_ENABLE_APPWRITE_AUTH, true);
-const enableAppwriteDatabase = readBoolean(import.meta.env.VITE_ENABLE_APPWRITE_DATABASE, true);
-const enableAppwriteStorage = readBoolean(import.meta.env.VITE_ENABLE_APPWRITE_STORAGE, true);
-const enableAppwriteFunctions = readBoolean(import.meta.env.VITE_ENABLE_APPWRITE_FUNCTIONS, true);
+const enableMockAuth = readBoolean(viteEnv.VITE_ENABLE_MOCK_AUTH, false);
+const enableMockFallback = readBoolean(viteEnv.VITE_ENABLE_MOCK_FALLBACK, false);
+const enableAppwriteAuth = readBoolean(viteEnv.VITE_ENABLE_APPWRITE_AUTH, true);
+const enableAppwriteDatabase = readBoolean(viteEnv.VITE_ENABLE_APPWRITE_DATABASE, true);
+const enableAppwriteStorage = readBoolean(viteEnv.VITE_ENABLE_APPWRITE_STORAGE, true);
+const enableAppwriteFunctions = readBoolean(viteEnv.VITE_ENABLE_APPWRITE_FUNCTIONS, true);
 
 export const environment = {
-  backendProvider: readString(import.meta.env.VITE_BACKEND_PROVIDER, "appwrite"),
-  qaEnvironment: readBoolean(import.meta.env.VITE_QA_ENVIRONMENT, true),
-  cloudflareEnvironment: readString(import.meta.env.VITE_CLOUDFLARE_ENVIRONMENT, "qa"),
+  backendProvider: readString(viteEnv.VITE_BACKEND_PROVIDER, "appwrite"),
+  qaEnvironment: readBoolean(viteEnv.VITE_QA_ENVIRONMENT, true),
+  cloudflareEnvironment: readString(viteEnv.VITE_CLOUDFLARE_ENVIRONMENT, "qa"),
   publicSiteUrl: readString(
-    import.meta.env.VITE_PUBLIC_SITE_URL,
+    viteEnv.VITE_PUBLIC_SITE_URL,
     "http://localhost:5173"
   ),
-  apiBaseUrl: readString(import.meta.env.VITE_API_BASE_URL, "http://localhost:8000"),
-  appwriteEndpoint: readString(import.meta.env.VITE_APPWRITE_ENDPOINT, ""),
-  appwriteProjectId: readString(import.meta.env.VITE_APPWRITE_PROJECT_ID, ""),
-  appwriteDatabaseId: readString(import.meta.env.VITE_APPWRITE_DATABASE_ID, ""),
-  appwriteStorageBucketId: readString(import.meta.env.VITE_APPWRITE_STORAGE_BUCKET_ID, ""),
+  apiBaseUrl: readString(viteEnv.VITE_API_BASE_URL, "http://localhost:8000"),
+  appwriteEndpoint: readString(viteEnv.VITE_APPWRITE_ENDPOINT, ""),
+  appwriteProjectId: readString(viteEnv.VITE_APPWRITE_PROJECT_ID, ""),
+  appwriteDatabaseId: readString(viteEnv.VITE_APPWRITE_DATABASE_ID, ""),
+  appwriteStorageBucketId: readString(viteEnv.VITE_APPWRITE_STORAGE_BUCKET_ID, ""),
   enableApplications,
   enableApplicationInterest,
   enableApplicationProvisioning,
@@ -63,8 +65,8 @@ export const environment = {
   enableAppwriteDatabase,
   enableAppwriteStorage,
   enableAppwriteFunctions,
-  stripeMode: readString(import.meta.env.VITE_STRIPE_MODE, "test"),
-  emailSandboxMode: readBoolean(import.meta.env.VITE_EMAIL_SANDBOX_MODE, true),
+  stripeMode: readString(viteEnv.VITE_STRIPE_MODE, "test"),
+  emailSandboxMode: readBoolean(viteEnv.VITE_EMAIL_SANDBOX_MODE, true),
   features: {
     applications: enableApplications,
     application_interest: enableApplicationInterest,
@@ -83,4 +85,4 @@ export const environment = {
 
 export type RuntimeEnvironment = typeof environment;
 
-export const frontendDiagnostics = buildFrontendDiagnostics(import.meta.env);
+export const frontendDiagnostics = buildFrontendDiagnostics(viteEnv);

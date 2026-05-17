@@ -1,6 +1,6 @@
 # Cloudflare Frontend QA Defects
 
-Last updated: 2026-05-17 16:29 AWST
+Last updated: 2026-05-17 17:14 AWST
 
 ## DEFECT: Signup/sign-in fail with Failed to fetch
 
@@ -28,8 +28,8 @@ Fix:
 - Operational fix still required: add or correct the Appwrite Web platform/origin for `rbp-platform.pages.dev` in the QA Appwrite project, then retest the deployed Cloudflare site.
 
 Retest:
-- FAIL at 2026-05-17 16:29 AWST.
-- Sign-in and signup remain blocked until Appwrite platform/CORS is corrected.
+- PASS for sign-in after Appwrite platform/origin correction, based on follow-up browser evidence after login.
+- The next blocker moved to `/portal/dashboard`, where persisted portal state had the wrong shape.
 
 Evidence:
 - `tmp/qa/cloudflare-auth-fetch-diagnostic.json`
@@ -60,3 +60,38 @@ Fix:
 
 Retest:
 - FAIL at 2026-05-17 16:29 AWST for CLI verification.
+
+## DEFECT: Portal dashboard crashes after login because Appwrite envelope is persisted as portal state
+
+Severity: Critical
+
+Route:
+- `/portal/dashboard`
+
+Expected:
+- After login, the portal dashboard receives or reads a `PortalDashboardState` with `customer`, `activities`, `notifications`, `membershipStatus`, and `membershipPlan`.
+- The dashboard remains visible after async hydration and refresh.
+
+Actual:
+- Login succeeds and redirects to `/portal/dashboard`.
+- Browser session storage key `rbp.mockPortalState` contains `{ ok, message, data }`.
+- Console evidence shows top-level keys `["ok", "message", "data"]`.
+- `portal.customer`, `portal.activities`, and `portal.notifications` are undefined.
+- `PortalDashboard` crashes when reading `portalState.customer.name`.
+
+Root cause:
+- `appwritePortalApi.getDashboardState()` / `mockPortalService.getDashboard()` treated the Appwrite function response envelope as the dashboard state and persisted it directly into `rbp.mockPortalState`.
+
+Fix:
+- Added `frontend/portal/src/app/services/api/portalDashboardState.ts` with `unwrapPortalDashboardPayload()` and `normalisePortalDashboardState()`.
+- Handles raw dashboard state, Appwrite `{ ok, message, data }` envelopes, `{ data }`, `{ result }`, and `{ portalState }`.
+- Updated `appwritePortalApi.getDashboardState()` to unwrap function responses before returning dashboard data.
+- Updated `mockPortalService.getDashboard()` and `readPortalState()` to normalise before writing or returning session storage state.
+- Hardened `PortalDashboard` with safe customer, business name, activities, and notifications fallbacks.
+
+Retest:
+- PASS in local automated tests at 2026-05-17 17:14 AWST.
+- Deployed browser retest pending after this fix is deployed.
+
+Evidence:
+- `tests/runtime/portal-dashboard-state.test.ts`

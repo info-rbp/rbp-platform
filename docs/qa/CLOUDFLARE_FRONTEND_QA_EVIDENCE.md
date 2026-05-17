@@ -1,6 +1,6 @@
 # Cloudflare Frontend QA Evidence
 
-Last updated: 2026-05-17 16:29 AWST
+Last updated: 2026-05-17 17:14 AWST
 
 ## Scope
 
@@ -22,6 +22,20 @@ Sign-in and signup both fail before an Appwrite response is available to the bro
 - `POST https://syd.cloud.appwrite.io/v1/account`
 
 Both requests fail as browser `fetch` requests with `net::ERR_FAILED`. The browser console reports that requests from origin `https://rbp-platform.pages.dev` were blocked by CORS because the Appwrite response did not include `Access-Control-Allow-Origin`.
+
+Follow-up browser evidence after the Appwrite platform/origin correction shows login now succeeds and redirects to `/portal/dashboard`. The previous CORS issue appears resolved. The next blocker is a portal dashboard crash after login.
+
+Session storage key `rbp.mockPortalState` contained an Appwrite function response envelope:
+
+```json
+{
+  "ok": true,
+  "message": "ok",
+  "data": {}
+}
+```
+
+The dashboard expected the actual portal state at the top level, for example `portalState.customer.name`, but the persisted top-level keys were `ok`, `message`, and `data`.
 
 ## Deployed Bundle Evidence
 
@@ -45,6 +59,8 @@ The deployed Cloudflare origin is not currently accepted by the Appwrite project
 
 In Appwrite Cloud this is resolved by adding or correcting the Web platform/origin for `rbp-platform.pages.dev` in the Appwrite project settings. This could not be changed from this terminal because the Appwrite CLI project/platform commands require an authenticated Appwrite Console session.
 
+Follow-up root cause for the `/portal/dashboard` crash: `appwritePortalApi.getDashboardState()` and `mockPortalService.getDashboard()` allowed an Appwrite response envelope shaped like `{ ok, message, data }` to be treated as `PortalDashboardState` and persisted directly into `rbp.mockPortalState`.
+
 ## Fix Applied In Code
 
 Code changes were applied to improve diagnosability and prevent this class of failure from being hidden:
@@ -53,6 +69,9 @@ Code changes were applied to improve diagnosability and prevent this class of fa
 - Extended the QA banner with Appwrite endpoint host and loaded/missing booleans for project, database, storage, and mock fallback.
 - Updated Appwrite auth error handling so browser network/CORS failures are surfaced as Appwrite network/CORS diagnostics instead of only `Failed to fetch`.
 - Added runtime tests proving required Appwrite config detection, mock fallback disabled state, secret-safe diagnostics, and Appwrite auth network error messaging.
+- Added portal dashboard payload unwrapping and normalisation for raw dashboard state, `{ data }`, `{ result }`, `{ portalState }`, and Appwrite `{ ok, message, data }` envelopes.
+- Updated Appwrite portal API and mock portal service so only normalised `PortalDashboardState` is written into `rbp.mockPortalState`.
+- Hardened `PortalDashboard` customer, business name, activities, and notifications reads with safe fallbacks.
 
 ## Deployment / Redeploy Evidence
 
@@ -62,11 +81,13 @@ Cloudflare Pages CLI inspection was blocked because `CLOUDFLARE_API_TOKEN` is no
 
 ## Retest Status
 
-Retest against `https://rbp-platform.pages.dev/` still fails until Appwrite allows the Cloudflare Pages origin.
+Retest evidence after the Appwrite origin correction:
 
-- Signup: FAIL, blocked by Appwrite CORS/origin handling.
-- Sign-in: FAIL, blocked by Appwrite CORS/origin handling.
-- Portal/admin/Stripe UI testing: BLOCKED by auth.
+- Sign-in: PASS, redirects to `/portal/dashboard`.
+- Previous CORS issue: appears resolved.
+- Dashboard: FAIL before this fix, because the persisted portal state was `{ ok, message, data }` instead of the dashboard state.
+- Local automated tests for the dashboard normalisation fix: PASS.
+- Deployed dashboard retest after this code ships: pending.
 
 ## Screenshots
 
@@ -75,8 +96,11 @@ Retest against `https://rbp-platform.pages.dev/` still fails until Appwrite allo
 
 ## Required Next Action
 
-In Appwrite Console, confirm the QA project has a Web platform entry for:
+Deploy the dashboard normalisation fix, then retest:
 
-- `rbp-platform.pages.dev`
-
-After saving that platform/origin setting, retest the deployed Cloudflare site. Do not mark frontend QA as PASS until browser sign-in or signup succeeds on `https://rbp-platform.pages.dev/`.
+- login succeeds
+- redirect reaches `/portal/dashboard`
+- dashboard appears
+- dashboard stays visible after async hydration
+- refresh `/portal/dashboard`
+- logout works
