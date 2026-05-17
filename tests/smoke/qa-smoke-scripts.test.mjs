@@ -42,4 +42,3 @@ test("email live-proof script fails clearly without QA email env", () => {
   assert.equal(payload.status, "failed");
   assert.match(payload.message, /Email QA live proof blocked: missing required environment variables/);
 });
-});
