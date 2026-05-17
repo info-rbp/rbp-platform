@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import {
-  Briefcase, LayoutDashboard, FileText, CalendarCheck,
-  Tag, Settings, LogOut, Bell, Zap, MessageSquare,
-  BookOpen, Menu, X, User,
+  Bell,
+  Briefcase,
+  ChevronRight,
+  LogOut,
+  Menu,
+  Settings,
+  X,
 } from "lucide-react";
+
 import { mockAuthService } from "../../services/mock/auth.mockService";
+import {
+  getPortalPageTitle,
+  isPortalPathActive,
+  portalNavigationSections,
+} from "./portalNavigationModel";
 
 const USER = {
   name: "Remote Business Partner",
@@ -13,17 +23,6 @@ const USER = {
   plan: "Growth Partner Programme",
   initials: "RB",
 };
-
-const navItems = [
-  { label: "Dashboard",         icon: LayoutDashboard, href: "/portal/dashboard" },
-  { label: "My Services",       icon: Zap,             href: "/portal/services" },
-  { label: "Advisory Sessions", icon: CalendarCheck,   href: "/portal/sessions" },
-  { label: "Documents",         icon: FileText,        href: "/portal/documents" },
-  { label: "Partner Offers",    icon: Tag,             href: "/portal/offers" },
-  { label: "Applications",      icon: Briefcase,       href: "/portal/apps" },
-  { label: "Resources",         icon: BookOpen,        href: "/portal/resources" },
-  { label: "Support",           icon: MessageSquare,   href: "/portal/support" },
-];
 
 export function PortalLayout() {
   const navigate = useNavigate();
@@ -36,139 +35,177 @@ export function PortalLayout() {
   }
 
   const today = new Date().toLocaleDateString("en-AU", {
-    weekday: "long", year: "numeric", month: "long", day: "numeric",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
-  // Page title derived from the current path
-  const activeItem = navItems.find((n) => location.pathname.startsWith(n.href));
-  const pageTitle = activeItem?.label ?? "Portal";
+  const pageTitle = getPortalPageTitle(location.pathname);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
+    <div className="flex min-h-screen bg-slate-50">
+      {sidebarOpen ? (
         <div
-          className="fixed inset-0 bg-slate-900/40 z-20 lg:hidden"
+          className="fixed inset-0 z-20 bg-slate-900/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
-      )}
+      ) : null}
 
-      {/* ── Sidebar ── */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-30
-        w-60 bg-white border-r border-slate-100
-        flex flex-col
-        transition-transform duration-200
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-      `}>
-        {/* Logo */}
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <aside
+        className={[
+          "fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-slate-100 bg-white transition-transform duration-200 lg:static",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+        ].join(" ")}
+      >
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Briefcase className="w-4 h-4 text-white" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-700">
+              <Briefcase className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xs font-black text-slate-800 tracking-tight leading-tight">
-              Remote Business<br />Partner
+            <span className="text-xs font-black leading-tight tracking-tight text-slate-800">
+              Remote Business
+              <br />
+              Partner
             </span>
           </Link>
           <button
-            className="lg:hidden p-1 text-slate-400"
+            className="p-1 text-slate-400 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* User pill */}
-        <div className="px-4 py-3 border-b border-slate-100">
-          <div className="flex items-center gap-2.5 bg-slate-50 rounded-xl p-2.5">
-            <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="border-b border-slate-100 px-4 py-3">
+          <div className="flex items-center gap-2.5 rounded-xl bg-slate-50 p-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-700">
               <span className="text-xs font-black text-white">{USER.initials}</span>
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-slate-800 truncate">{USER.name}</div>
-              <div className="text-[10px] text-blue-700 font-semibold truncate">{USER.plan}</div>
+              <div className="truncate text-xs font-bold text-slate-800">{USER.name}</div>
+              <div className="truncate text-[10px] font-semibold text-blue-700">{USER.plan}</div>
             </div>
           </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.href);
+        <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+          {portalNavigationSections.map((section) => {
+            const sectionActive =
+              isPortalPathActive(location.pathname, section.href) ||
+              section.children?.some((child) => isPortalPathActive(location.pathname, child.href));
+            const SectionIcon = section.icon;
+
+            if (!section.children?.length && section.href) {
+              return (
+                <Link
+                  key={section.id}
+                  to={section.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={[
+                    "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors",
+                    sectionActive
+                      ? "bg-blue-700 text-white"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                  ].join(" ")}
+                >
+                  <SectionIcon className="h-4 w-4 flex-shrink-0" />
+                  {section.label}
+                </Link>
+              );
+            }
+
             return (
-              <Link
-                key={item.label}
-                to={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
-                  isActive
-                    ? "bg-blue-700 text-white"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                {item.label}
-              </Link>
+              <div key={section.id} className="space-y-1.5">
+                <div
+                  className={[
+                    "flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-[0.16em]",
+                    sectionActive ? "bg-blue-50 text-blue-700" : "text-slate-500",
+                  ].join(" ")}
+                >
+                  <span className="flex items-center gap-2">
+                    <SectionIcon className="h-4 w-4" />
+                    {section.label}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </div>
+                <div className="space-y-1 border-l border-slate-100 pl-3">
+                  {section.children?.map((child) => {
+                    const childActive = isPortalPathActive(location.pathname, child.href);
+                    const ChildIcon = child.icon;
+                    return (
+                      <Link
+                        key={child.id}
+                        to={child.href}
+                        onClick={() => setSidebarOpen(false)}
+                        className={[
+                          "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors",
+                          childActive
+                            ? "bg-blue-700 text-white"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                        ].join(" ")}
+                      >
+                        <ChildIcon className="h-4 w-4 flex-shrink-0" />
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </nav>
 
-        {/* Bottom actions */}
-        <div className="px-3 py-4 border-t border-slate-100 space-y-0.5">
+        <div className="space-y-0.5 border-t border-slate-100 px-3 py-4">
           <Link
             to="/portal/settings"
             onClick={() => setSidebarOpen(false)}
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
-              location.pathname.startsWith("/portal/settings")
+            className={[
+              "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors",
+              isPortalPathActive(location.pathname, "/portal/settings")
                 ? "bg-blue-700 text-white"
-                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-            }`}
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+            ].join(" ")}
           >
-            <Settings className="w-4 h-4" /> Settings
+            <Settings className="h-4 w-4" /> Settings
           </Link>
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-600 transition-colors hover:bg-red-50 hover:text-red-700"
           >
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="h-4 w-4" /> Sign Out
           </button>
         </div>
       </aside>
 
-      {/* ── Main area ── */}
-      <div className="flex-1 flex flex-col min-w-0">
-
-        {/* Top bar */}
-        <header className="bg-white border-b border-slate-100 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <button
-              className="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 lg:hidden"
               onClick={() => setSidebarOpen(true)}
             >
-              <Menu className="w-4 h-4" />
+              <Menu className="h-4 w-4" />
             </button>
             <div>
               <h1 className="text-sm font-extrabold text-slate-900">{pageTitle}</h1>
-              <p className="text-[10px] text-slate-400 hidden sm:block">{today}</p>
+              <p className="hidden text-[10px] text-slate-400 sm:block">{today}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-50 transition-colors">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-600 rounded-full" />
+            <button className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-50">
+              <Bell className="h-4 w-4" />
+              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-blue-600" />
             </button>
             <Link
               to="/portal/settings"
-              className="w-7 h-7 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-800 transition-colors"
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-700 transition-colors hover:bg-blue-800"
             >
               <span className="text-xs font-black text-white">{USER.initials}</span>
             </Link>
           </div>
         </header>
 
-        {/* Routed page content */}
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
