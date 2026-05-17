@@ -1,26 +1,157 @@
-import { z } from "zod";
-import { ID, Query } from "node-appwrite";
-import { databases } from "../lib/appwrite.js";
+import { databases } from "../lib/appwrite.ts";
+import { defineTool, v } from "../lib/tooling.ts";
 
 export const databaseTools = {
-  list_databases: { description: "List Appwrite databases.", annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false }, schema: {}, handler: async () => databases.list() },
-  create_database: { description: "Create an Appwrite database.", annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }, schema: { databaseId: z.string().default(ID.unique()), name: z.string().min(1) }, handler: async ({ databaseId, name }: any) => databases.create(databaseId, name) },
-  get_database: { description: "Get an Appwrite database by ID.", schema: { databaseId: z.string() }, handler: async ({ databaseId }: any) => databases.get(databaseId) },
-  delete_database: { description: "Delete an Appwrite database. Dangerous.", annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false }, schema: { databaseId: z.string(), confirm: z.literal("DELETE_DATABASE") }, handler: async ({ databaseId }: any) => databases.delete(databaseId) },
-  list_databases: { description: "List Appwrite databases.", schema: {}, handler: async () => databases.list() },
-  create_database: { description: "Create an Appwrite database.", schema: { databaseId: z.string().default(ID.unique()), name: z.string().min(1) }, handler: async ({ databaseId, name }: any) => databases.create(databaseId, name) },
-  get_database: { description: "Get an Appwrite database by ID.", schema: { databaseId: z.string() }, handler: async ({ databaseId }: any) => databases.get(databaseId) },
-  delete_database: { description: "Delete an Appwrite database. Dangerous.", schema: { databaseId: z.string(), confirm: z.literal("DELETE_DATABASE") }, handler: async ({ databaseId }: any) => databases.delete(databaseId) },
-  list_collections: { description: "List collections in an Appwrite database.", schema: { databaseId: z.string() }, handler: async ({ databaseId }: any) => databases.listCollections(databaseId) },
-  create_collection: { description: "Create an Appwrite collection.", schema: { databaseId: z.string(), collectionId: z.string().default(ID.unique()), name: z.string().min(1), documentSecurity: z.boolean().default(true), enabled: z.boolean().default(true), permissions: z.array(z.string()).default([]) }, handler: async (a: any) => databases.createCollection(a.databaseId, a.collectionId, a.name, a.permissions, a.documentSecurity, a.enabled) },
-  get_collection: { description: "Get an Appwrite collection.", schema: { databaseId: z.string(), collectionId: z.string() }, handler: async ({ databaseId, collectionId }: any) => databases.getCollection(databaseId, collectionId) },
-  update_collection: { description: "Update collection metadata and permissions.", schema: { databaseId: z.string(), collectionId: z.string(), name: z.string(), permissions: z.array(z.string()).default([]), documentSecurity: z.boolean().default(true), enabled: z.boolean().default(true) }, handler: async (a: any) => databases.updateCollection(a.databaseId, a.collectionId, a.name, a.permissions, a.documentSecurity, a.enabled) },
-  delete_collection: { description: "Delete an Appwrite collection. Dangerous.", annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false }, schema: { databaseId: z.string(), collectionId: z.string(), confirm: z.literal("DELETE_COLLECTION") }, handler: async ({ databaseId, collectionId }: any) => databases.deleteCollection(databaseId, collectionId) },
-  delete_collection: { description: "Delete an Appwrite collection. Dangerous.", schema: { databaseId: z.string(), collectionId: z.string(), confirm: z.literal("DELETE_COLLECTION") }, handler: async ({ databaseId, collectionId }: any) => databases.deleteCollection(databaseId, collectionId) },
-  list_documents: { description: "List documents from any collection.", schema: { databaseId: z.string(), collectionId: z.string(), queries: z.array(z.string()).default([]), limit: z.number().int().min(1).max(100).default(25) }, handler: async (a: any) => databases.listDocuments(a.databaseId, a.collectionId, [...a.queries, Query.limit(a.limit)]) },
-  get_document: { description: "Get a document by ID.", schema: { databaseId: z.string(), collectionId: z.string(), documentId: z.string() }, handler: async (a: any) => databases.getDocument(a.databaseId, a.collectionId, a.documentId) },
-  create_document: { description: "Create a document in any collection.", schema: { databaseId: z.string(), collectionId: z.string(), documentId: z.string().default(ID.unique()), data: z.record(z.unknown()), permissions: z.array(z.string()).default([]) }, handler: async (a: any) => databases.createDocument(a.databaseId, a.collectionId, a.documentId, a.data, a.permissions) },
-  update_document: { description: "Update a document in any collection.", schema: { databaseId: z.string(), collectionId: z.string(), documentId: z.string(), data: z.record(z.unknown()), permissions: z.array(z.string()).optional() }, handler: async (a: any) => databases.updateDocument(a.databaseId, a.collectionId, a.documentId, a.data, a.permissions) },
-  delete_document: { description: "Delete a document. Dangerous.", annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false }, schema: { databaseId: z.string(), collectionId: z.string(), documentId: z.string(), confirm: z.literal("DELETE_DOCUMENT") }, handler: async (a: any) => databases.deleteDocument(a.databaseId, a.collectionId, a.documentId) }
-  delete_document: { description: "Delete a document. Dangerous.", schema: { databaseId: z.string(), collectionId: z.string(), documentId: z.string(), confirm: z.literal("DELETE_DOCUMENT") }, handler: async (a: any) => databases.deleteDocument(a.databaseId, a.collectionId, a.documentId) }
+  list_databases: defineTool({
+    description: "List Appwrite databases.",
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    handler: async () => databases.list()
+  }),
+  create_database: defineTool({
+    description: "Create an Appwrite database.",
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
+    fields: { databaseId: v.uniqueId(), name: v.string({ minLength: 1 }) },
+    handler: async ({ databaseId, name }) => databases.create(databaseId as string, name as string)
+  }),
+  get_database: defineTool({
+    description: "Get an Appwrite database by ID.",
+    fields: { databaseId: v.string() },
+    handler: async ({ databaseId }) => databases.get(databaseId as string)
+  }),
+  delete_database: defineTool({
+    description: "Delete an Appwrite database. Dangerous.",
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    fields: { databaseId: v.string(), confirm: v.literal("DELETE_DATABASE") },
+    handler: async ({ databaseId }) => databases.delete(databaseId as string)
+  }),
+  list_collections: defineTool({
+    description: "List collections in an Appwrite database.",
+    fields: { databaseId: v.string() },
+    handler: async ({ databaseId }) => databases.listCollections(databaseId as string)
+  }),
+  create_collection: defineTool({
+    description: "Create an Appwrite collection.",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.uniqueId(),
+      name: v.string({ minLength: 1 }),
+      documentSecurity: v.boolean({ defaultValue: true }),
+      enabled: v.boolean({ defaultValue: true }),
+      permissions: v.array(v.string(), { defaultValue: [] })
+    },
+    handler: async (args) =>
+      databases.createCollection(
+        args.databaseId as string,
+        args.collectionId as string,
+        args.name as string,
+        args.permissions as string[],
+        args.documentSecurity as boolean,
+        args.enabled as boolean
+      )
+  }),
+  get_collection: defineTool({
+    description: "Get an Appwrite collection.",
+    fields: { databaseId: v.string(), collectionId: v.string() },
+    handler: async ({ databaseId, collectionId }) =>
+      databases.getCollection(databaseId as string, collectionId as string)
+  }),
+  update_collection: defineTool({
+    description: "Update collection metadata and permissions.",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      name: v.string(),
+      permissions: v.array(v.string(), { defaultValue: [] }),
+      documentSecurity: v.boolean({ defaultValue: true }),
+      enabled: v.boolean({ defaultValue: true })
+    },
+    handler: async (args) =>
+      databases.updateCollection(
+        args.databaseId as string,
+        args.collectionId as string,
+        args.name as string,
+        args.permissions as string[],
+        args.documentSecurity as boolean,
+        args.enabled as boolean
+      )
+  }),
+  delete_collection: defineTool({
+    description: "Delete an Appwrite collection. Dangerous.",
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      confirm: v.literal("DELETE_COLLECTION")
+    },
+    handler: async ({ databaseId, collectionId }) =>
+      databases.deleteCollection(databaseId as string, collectionId as string)
+  }),
+  list_documents: defineTool({
+    description: "List documents from any collection.",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      queries: v.array(v.string(), { defaultValue: [] }),
+      limit: v.number({ integer: true, min: 1, max: 100, defaultValue: 25 })
+    },
+    handler: async ({ databaseId, collectionId, queries, limit }) =>
+      databases.listDocuments(databaseId as string, collectionId as string, [
+        ...(queries as string[]),
+        `limit(${String(limit)})`
+      ])
+  }),
+  get_document: defineTool({
+    description: "Get a document by ID.",
+    fields: { databaseId: v.string(), collectionId: v.string(), documentId: v.string() },
+    handler: async ({ databaseId, collectionId, documentId }) =>
+      databases.getDocument(databaseId as string, collectionId as string, documentId as string)
+  }),
+  create_document: defineTool({
+    description: "Create a document in any collection.",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      documentId: v.uniqueId(),
+      data: v.record(),
+      permissions: v.array(v.string(), { defaultValue: [] })
+    },
+    handler: async ({ databaseId, collectionId, documentId, data, permissions }) =>
+      databases.createDocument(
+        databaseId as string,
+        collectionId as string,
+        documentId as string,
+        data as Record<string, unknown>,
+        permissions as string[]
+      )
+  }),
+  update_document: defineTool({
+    description: "Update a document in any collection.",
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      documentId: v.string(),
+      data: v.record(),
+      permissions: v.array(v.string(), { optional: true })
+    },
+    handler: async ({ databaseId, collectionId, documentId, data, permissions }) =>
+      databases.updateDocument(
+        databaseId as string,
+        collectionId as string,
+        documentId as string,
+        data as Record<string, unknown>,
+        permissions as string[] | undefined
+      )
+  }),
+  delete_document: defineTool({
+    description: "Delete a document. Dangerous.",
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    fields: {
+      databaseId: v.string(),
+      collectionId: v.string(),
+      documentId: v.string(),
+      confirm: v.literal("DELETE_DOCUMENT")
+    },
+    handler: async ({ databaseId, collectionId, documentId }) =>
+      databases.deleteDocument(databaseId as string, collectionId as string, documentId as string)
+  })
 };
