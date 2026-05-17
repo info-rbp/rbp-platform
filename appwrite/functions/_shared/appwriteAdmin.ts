@@ -62,14 +62,12 @@ function requireValue(value: string | undefined, label: string) {
 }
 
 export function getHeader(context: FunctionContext, key: string) {
-function getHeader(context: FunctionContext, key: string) {
   const headers = context.req?.headers || {};
   const matched = Object.entries(headers).find(([name]) => name.toLowerCase() === key.toLowerCase());
   return matched?.[1] || undefined;
 }
 
 function createRealAdminContext() {
-export function createAdminContext() {
   const env = getRequiredAdminEnv();
   const client = new Client()
     .setEndpoint(requireValue(env.endpoint, "APPWRITE_ENDPOINT"))
@@ -170,7 +168,7 @@ export async function resolveCurrentUser(context: FunctionContext): Promise<Curr
   };
 }
 
-export async function requireAdmin(context: FunctionContext) {
+export async function requireAdmin(context: FunctionContext): Promise<CurrentUserContext> {
   if (isTrustedInternalInvocation(context)) {
     try {
       return await resolveCurrentUser(context);
@@ -180,7 +178,7 @@ export async function requireAdmin(context: FunctionContext) {
         tenantId: "",
         role: "admin",
         userProfile: {},
-      } satisfies CurrentUserContext;
+      };
     }
   }
 
@@ -199,55 +197,12 @@ export async function requireAdmin(context: FunctionContext) {
           tenantId: "",
           role: "admin",
           userProfile: {},
-        } satisfies CurrentUserContext;
+        };
       }
     }
   }
 
-  const currentUser = await resolveCurrentUser(context);
-  };
-}
-
-export async function resolveCurrentUser(context: FunctionContext) {
-  const admin = createAdminContext();
-  const userId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
-  if (!userId) {
-    throw new Error("Missing Appwrite user context.");
-  }
-
-  const userProfile = await admin.findOne<Record<string, unknown> & { $id: string }>(
-    collectionIds.userProfiles,
-    [Query.equal("appwrite_user_id", [userId])],
-  );
-
-  if (!userProfile) {
-    throw new Error(`No user profile found for Appwrite user ${userId}.`);
-  }
-
-  return {
-    userId,
-    tenantId: String(userProfile.tenant_id || ""),
-    role: String(userProfile.role || "member"),
-    userProfile,
-  };
-}
-
-export async function requireAdmin(context: FunctionContext) {
-  const currentUser = await resolveCurrentUser(context);
-  if (currentUser.role === "admin") {
-    return currentUser;
-  }
-
-  const adminTeamId = process.env.APPWRITE_ADMIN_TEAM_ID;
-  if (adminTeamId) {
-    const admin = createAdminContext();
-    const memberships = await admin.teams.listMemberships(adminTeamId);
-    const matched = memberships.memberships.find((membership) => membership.userId === currentUser.userId);
-    if (matched) {
-      return currentUser;
-    }
-  }
-
+  await resolveCurrentUser(context);
   throw new Error("Administrator access is required.");
 }
 
