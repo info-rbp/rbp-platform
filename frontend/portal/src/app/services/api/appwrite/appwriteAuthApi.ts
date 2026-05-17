@@ -32,6 +32,18 @@ export const appwriteAuthApi = {
 
   async signIn(payload: { email: string; password: string }) {
     try {
+      try {
+        const currentAccount = await getCurrentAccount();
+
+        if (currentAccount.email.toLowerCase() === payload.email.toLowerCase()) {
+          return apiSuccess("appwrite/account", normaliseUser(currentAccount));
+        }
+
+        await deleteCurrentSession();
+      } catch {
+        // No active Appwrite session exists, so continue with normal sign-in.
+      }
+
       await createEmailPasswordSession(payload);
       return this.getCurrentUser();
     } catch (error) {
