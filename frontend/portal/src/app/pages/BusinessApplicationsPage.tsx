@@ -36,6 +36,24 @@ const applicationOrder = new Map(
   applicationRolloutCatalog.map((application, index) => [application.key, index])
 );
 
+export function buildApplicationInterestSuccessMessage(
+  applicationName: string,
+  alreadyRegistered = false,
+) {
+  if (alreadyRegistered) {
+    return `${applicationName} is already on your interest list. We will use this to prioritise rollout planning.`;
+  }
+
+  return `${applicationName} interest registered. We will use this to prioritise rollout planning.`;
+}
+
+export function buildApplicationInterestErrorMessage(
+  message: string,
+  requestId?: string,
+) {
+  return requestId ? `${message} Reference: ${requestId}.` : message;
+}
+
 function normaliseStatus(application: Partial<RbpApplication>) {
   if (application.interest_enabled === false) {
     return "Coming soon" as const;
@@ -93,6 +111,7 @@ export function BusinessApplicationsPage() {
   const [loading, setLoading] = useState(true);
   const [submitState, setSubmitState] = useState<"idle" | "submitting" | "submitted" | "error">("idle");
   const [submitMessage, setSubmitMessage] = useState("");
+  const [registeredKeys, setRegisteredKeys] = useState<string[]>([]);
   const [form, setForm] = useState({
     email: "",
     phone: "",
@@ -131,18 +150,20 @@ export function BusinessApplicationsPage() {
     () => applications.find((application) => application.key === selectedKey) ?? applications[0],
     [applications, selectedKey]
   );
+  const alreadyRegistered =
+    Boolean(selectedApplication?.key) && registeredKeys.includes(selectedApplication.key);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!selectedApplication || !interestEnabled) {
+    if (!selectedApplication || !interestEnabled || alreadyRegistered) {
       return;
     }
 
     setSubmitState("submitting");
     setSubmitMessage("");
 
-    const response = await applicationsApi.registerApplicationInterest({
+    const response = await applicationsApi.registerInterest({
       application_key: selectedApplication.key,
       email: form.email,
       phone: form.phone || undefined,
@@ -151,9 +172,15 @@ export function BusinessApplicationsPage() {
     });
 
     if (response.ok) {
+      const duplicate = response.data?.already_registered === true;
       setSubmitState("submitted");
       setSubmitMessage(
-        `Interest registered for ${selectedApplication.name}. We will use this to plan rollout priorities.`
+        buildApplicationInterestSuccessMessage(selectedApplication.name, duplicate)
+      );
+      setRegisteredKeys((current) =>
+        current.includes(selectedApplication.key)
+          ? current
+          : [...current, selectedApplication.key]
       );
       setForm((current) => ({
         ...current,
@@ -164,7 +191,12 @@ export function BusinessApplicationsPage() {
     }
 
     setSubmitState("error");
-    setSubmitMessage(response.message || "We could not register interest right now.");
+    setSubmitMessage(
+      buildApplicationInterestErrorMessage(
+        response.message || "We could not register interest right now.",
+        response.meta?.requestId,
+      )
+    );
   }
 
   return (
@@ -265,12 +297,21 @@ export function BusinessApplicationsPage() {
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {applications.map((application) => {
                   const isSelected = selectedApplication?.key === application.key;
+                  const isRegistered = registeredKeys.includes(application.key);
 
                   return (
                     <button
                       key={application.key}
                       type="button"
-                      onClick={() => setSelectedKey(application.key)}
+                      onClick={() => {
+                        setSelectedKey(application.key);
+                        setSubmitState(isRegistered ? "submitted" : "idle");
+                        setSubmitMessage(
+                          isRegistered
+                            ? buildApplicationInterestSuccessMessage(application.name, true)
+                            : ""
+                        );
+                      }}
                       className={[
                         "rounded-3xl border bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
                         isSelected
@@ -310,6 +351,11 @@ export function BusinessApplicationsPage() {
                             {highlight}
                           </span>
                         ))}
+                        {isRegistered ? (
+                          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                            Interest registered
+                          </span>
+                        ) : null}
                       </div>
                     </button>
                   );
@@ -391,12 +437,16 @@ export function BusinessApplicationsPage() {
 
                     <button
                       type="submit"
-                      disabled={!interestEnabled || submitState === "submitting"}
+                      disabled={!interestEnabled || submitState === "submitting" || alreadyRegistered}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {submitState === "submitting" ? (
                         <>
                           <LoaderCircle className="h-4 w-4 animate-spin" /> Register interest
+                        </>
+                      ) : alreadyRegistered ? (
+                        <>
+                          <CheckCircle2 className="h-4 w-4" /> Interest registered
                         </>
                       ) : (
                         <>

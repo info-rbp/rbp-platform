@@ -17,8 +17,8 @@ import {
   type MegaConfig,
 } from "../data/publicNavigation";
 import { useRuntimeConfig } from "../hooks/useRuntimeConfig";
-
-// -- Mega menu panel (desktop) -------------------------------------------------
+import { authApi } from "../services/api/authApi";
+import type { PortalCustomerAuthUser } from "../types/portal";
 
 function normalisePath(href: string) {
   return href.split("?")[0].split("#")[0];
@@ -26,6 +26,41 @@ function normalisePath(href: string) {
 
 function menuLinks(config: MegaConfig) {
   return config.groups?.flatMap((group) => group.links) ?? config.links;
+}
+
+export type NavbarAccountCtaState = {
+  loading: boolean;
+  user: PortalCustomerAuthUser | null;
+};
+
+export function resolveNavbarAccountCtas(state: NavbarAccountCtaState) {
+  if (state.loading) {
+    return {
+      kind: "loading" as const,
+      primaryLabel: "Checking account...",
+      primaryHref: undefined,
+      secondaryLabel: undefined,
+      secondaryHref: undefined,
+    };
+  }
+
+  if (state.user) {
+    return {
+      kind: "authenticated" as const,
+      primaryLabel: "Go to Account",
+      primaryHref: "/portal/dashboard",
+      secondaryLabel: "Portal Dashboard",
+      secondaryHref: "/portal/dashboard",
+    };
+  }
+
+  return {
+    kind: "guest" as const,
+    primaryLabel: "Sign In",
+    primaryHref: "/sign-in",
+    secondaryLabel: "Join Now",
+    secondaryHref: "/membership/sign-up-now",
+  };
 }
 
 function MegaMenuPanel({ config, onClose }: { config: MegaConfig; onClose: () => void }) {
@@ -106,8 +141,6 @@ function MegaMenuPanel({ config, onClose }: { config: MegaConfig; onClose: () =>
   );
 }
 
-// -- Mobile section accordion --------------------------------------------------
-
 function MobileSection({
   config,
   isOpen,
@@ -174,8 +207,6 @@ function MobileSection({
   );
 }
 
-// -- Main Navbar ---------------------------------------------------------------
-
 export function Navbar() {
   const { config } = useRuntimeConfig();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -183,6 +214,8 @@ export function Navbar() {
   const [openMobileAccordion, setOpenMobileAccordion] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<PortalCustomerAuthUser | null>(null);
+  const [accountLoading, setAccountLoading] = useState(true);
   const location = useLocation();
   const headerRef = useRef<HTMLElement>(null);
 
@@ -207,8 +240,35 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadCurrentUser() {
+      setAccountLoading(true);
+      const response = await authApi.getCurrentUser();
+      if (!active) {
+        return;
+      }
+
+      setCurrentUser(response.ok && response.data ? response.data : null);
+      setAccountLoading(false);
+    }
+
+    loadCurrentUser();
+    window.addEventListener("rbp-auth-changed", loadCurrentUser);
+
+    return () => {
+      active = false;
+      window.removeEventListener("rbp-auth-changed", loadCurrentUser);
+    };
+  }, []);
+
   const menus = filterPublicNavigationForRuntime(publicNavigation, config.features);
   const activeMenu = menus.find((menu) => menu.key === openDropdown) ?? null;
+  const accountCtas = resolveNavbarAccountCtas({
+    loading: accountLoading,
+    user: currentUser,
+  });
 
   function toggleDropdown(key: string) {
     setOpenDropdown((prev) => (prev === key ? null : key));
@@ -226,7 +286,6 @@ export function Navbar() {
         scrolled ? "bg-white/95 backdrop-blur-lg shadow-lg" : "bg-white"
       }`}
     >
-      {/* Tier 1: Utility bar */}
       <div className="border-b border-slate-100 bg-slate-50/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-10">
@@ -249,18 +308,35 @@ export function Navbar() {
               >
                 <Search className="w-3.5 h-3.5" />
               </button>
-              <Link
-                to="/sign-in"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-white transition-all ml-1"
-              >
-                <LogIn className="w-3 h-3" /> Sign In
-              </Link>
-              <Link
-                to="/membership/sign-up-now"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg transition-all ml-1"
-              >
-                <UserPlus className="w-3 h-3" /> Join Now
-              </Link>
+              {accountCtas.kind === "loading" ? (
+                <span className="hidden sm:inline-flex items-center text-xs font-semibold text-slate-500 px-3 py-1.5">
+                  {accountCtas.primaryLabel}
+                </span>
+              ) : null}
+              {accountCtas.kind === "authenticated" ? (
+                <Link
+                  to={accountCtas.primaryHref || "/portal/dashboard"}
+                  className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg transition-all ml-1"
+                >
+                  {accountCtas.primaryLabel}
+                </Link>
+              ) : null}
+              {accountCtas.kind === "guest" ? (
+                <>
+                  <Link
+                    to={accountCtas.primaryHref || "/sign-in"}
+                    className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-white transition-all ml-1"
+                  >
+                    <LogIn className="w-3 h-3" /> {accountCtas.primaryLabel}
+                  </Link>
+                  <Link
+                    to={accountCtas.secondaryHref || "/membership/sign-up-now"}
+                    className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg transition-all ml-1"
+                  >
+                    <UserPlus className="w-3 h-3" /> {accountCtas.secondaryLabel}
+                  </Link>
+                </>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -274,7 +350,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Search bar */}
       {searchOpen && (
         <div className="border-b border-slate-100 bg-white px-4 sm:px-6 lg:px-8 py-2">
           <div className="max-w-2xl mx-auto flex items-center gap-3">
@@ -292,7 +367,6 @@ export function Navbar() {
         </div>
       )}
 
-      {/* Tier 2: Main nav (desktop) */}
       <div className="hidden lg:block bg-white border-b border-slate-100 relative">
         <div className="w-full px-3 sm:px-4 lg:px-6 2xl:px-8">
           <nav className="h-12 overflow-x-auto" aria-label="Primary navigation">
@@ -334,7 +408,6 @@ export function Navbar() {
         )}
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-slate-100 shadow-xl max-h-[85vh] overflow-y-auto">
           <Link
@@ -358,20 +431,38 @@ export function Navbar() {
           ))}
 
           <div className="border-t border-slate-100 px-4 py-4 space-y-2">
-            <Link
-              to="/sign-in"
-              onClick={closeMobile}
-              className="flex items-center justify-center gap-2 py-3 text-sm font-semibold border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-colors"
-            >
-              <LogIn className="w-4 h-4" /> Sign In
-            </Link>
-            <Link
-              to="/membership/sign-up-now"
-              onClick={closeMobile}
-              className="flex items-center justify-center gap-2 py-3 text-sm font-bold bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition-colors"
-            >
-              <UserPlus className="w-4 h-4" /> Join Now
-            </Link>
+            {accountCtas.kind === "loading" ? (
+              <div className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-500">
+                {accountCtas.primaryLabel}
+              </div>
+            ) : null}
+            {accountCtas.kind === "authenticated" ? (
+              <Link
+                to={accountCtas.primaryHref || "/portal/dashboard"}
+                onClick={closeMobile}
+                className="flex items-center justify-center gap-2 py-3 text-sm font-bold bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition-colors"
+              >
+                {accountCtas.secondaryLabel}
+              </Link>
+            ) : null}
+            {accountCtas.kind === "guest" ? (
+              <>
+                <Link
+                  to={accountCtas.primaryHref || "/sign-in"}
+                  onClick={closeMobile}
+                  className="flex items-center justify-center gap-2 py-3 text-sm font-semibold border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <LogIn className="w-4 h-4" /> {accountCtas.primaryLabel}
+                </Link>
+                <Link
+                  to={accountCtas.secondaryHref || "/membership/sign-up-now"}
+                  onClick={closeMobile}
+                  className="flex items-center justify-center gap-2 py-3 text-sm font-bold bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition-colors"
+                >
+                  <UserPlus className="w-4 h-4" /> {accountCtas.secondaryLabel}
+                </Link>
+              </>
+            ) : null}
           </div>
         </div>
       )}

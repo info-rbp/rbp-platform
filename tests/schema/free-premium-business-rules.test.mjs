@@ -37,7 +37,7 @@ test("QA Premium plan is AUD 25 weekly with the approved test Stripe price", () 
   assert.equal(premium.amount, 25);
   assert.equal(premium.currency, "AUD");
   assert.equal(premium.billing_cycle, "weekly");
-  assert.equal(premium.stripe_price_id, "price_1TXKGnS9Az4EAUomNJeSfDA1");
+  assert.equal(premium.stripe_price_id, "price_1TXx7C0mYebE7B3JyCL64COg");
 });
 
 test("QA seed keeps Free active and does not hardcode live subscription checkout", () => {
