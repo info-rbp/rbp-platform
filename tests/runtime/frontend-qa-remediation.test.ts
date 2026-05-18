@@ -1,17 +1,20 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { resolveNavbarAccountCtas } from "../../frontend/portal/src/app/components/Navbar";
-import {
+process.env.VITE_APPWRITE_ENDPOINT = "https://syd.cloud.appwrite.io/v1";
+process.env.VITE_APPWRITE_PROJECT_ID = "qa-project";
+
+const { resolveNavbarAccountCtas } = await import("../../frontend/portal/src/app/components/Navbar");
+const {
   buildApplicationInterestErrorMessage,
   buildApplicationInterestSuccessMessage,
-} from "../../frontend/portal/src/app/pages/BusinessApplicationsPage";
-import {
+} = await import("../../frontend/portal/src/app/pages/BusinessApplicationsPage");
+const {
   buildPortalIdentity,
   getUnreadNotificationCount,
   normalisePortalNotifications,
-} from "../../frontend/portal/src/app/pages/portal/PortalLayout";
-import { publicNavigation } from "../../frontend/portal/src/app/data/publicNavigation";
+} = await import("../../frontend/portal/src/app/pages/portal/PortalLayout");
+const { publicNavigation } = await import("../../frontend/portal/src/app/data/publicNavigation");
 
 test("navbar resolves guest CTAs", () => {
   const result = resolveNavbarAccountCtas({ loading: false, user: null });

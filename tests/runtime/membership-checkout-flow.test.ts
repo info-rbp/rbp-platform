@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import {
+process.env.VITE_APPWRITE_ENDPOINT = "https://syd.cloud.appwrite.io/v1";
+process.env.VITE_APPWRITE_PROJECT_ID = "qa-project";
+
+const {
   buildMembershipCheckoutPayload,
   getMembershipPaymentValidationErrors,
   redirectToCheckout,
   resolveMembershipCheckoutOutcome,
-} from "../../frontend/portal/src/app/features/membership/MembershipPurchaseOnboardingFlow";
+} = await import("../../frontend/portal/src/app/features/membership/MembershipPurchaseOnboardingFlow");
 
 type MembershipForm = Parameters<typeof buildMembershipCheckoutPayload>[0];
 
