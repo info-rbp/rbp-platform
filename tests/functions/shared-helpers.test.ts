@@ -49,8 +49,6 @@ test("stripe helpers expose deterministic idempotency and event mapping", () => 
   assert.equal(buildIdempotencyKey("evt_123"), "stripe:evt_123");
   assert.equal(mapStripeEventToStatus("checkout.session.completed"), "active");
   assert.equal(mapStripeEventToStatus("invoice.payment_failed"), "suspended");
-  assert.equal(mapStripeEventToStatus("checkout.session.expired"), "revoked");
-  assert.equal(mapStripeEventToStatus("unknown.event"), "pending");
   assert.equal(mapStripeEventToStatus("checkout.session.expired"), "expired");
   assert.equal(mapStripeEventToStatus("unknown.event"), "pending");
   assert.equal(isCheckoutAbandonmentEvent("checkout.session.expired"), true);

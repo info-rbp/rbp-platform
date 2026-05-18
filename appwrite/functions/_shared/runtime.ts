@@ -1,13 +1,36 @@
 import { Query } from "node-appwrite";
 import { createAuditEvent, persistAuditEvent } from "./audit";
-import { collectionIds, createAdminContext, getHeader, isTrustedInternalInvocation, requireAdmin, resolveCurrentUser, type CurrentUserContext } from "./appwriteAdmin";
-import { grantTenantEntitlements, listTenantEntitlements, revokeTenantEntitlements } from "./entitlements";
-import { fail, forbidden, notFound, ok, parseJsonBody, unauthorized, validationError } from "./response";
-import { buildIdempotencyKey, createCheckoutSession, getStripeClient, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
-import { collectionIds, createAdminContext, requireAdmin, resolveCurrentUser } from "./appwriteAdmin";
-import { grantTenantEntitlements, listTenantEntitlements, revokeTenantEntitlements } from "./entitlements";
-import { fail, forbidden, notFound, ok, parseJsonBody, unauthorized, validationError } from "./response";
-import { buildIdempotencyKey, createCheckoutSession, getStripeClient, isCheckoutAbandonmentEvent, mapStripeEventToStatus, verifyWebhookSignature } from "./stripe";
+import {
+  collectionIds,
+  createAdminContext,
+  getHeader,
+  isTrustedInternalInvocation,
+  requireAdmin,
+  resolveCurrentUser,
+  type CurrentUserContext
+} from "./appwriteAdmin";
+import {
+  grantTenantEntitlements,
+  listTenantEntitlements,
+  revokeTenantEntitlements
+} from "./entitlements";
+import {
+  fail,
+  forbidden,
+  notFound,
+  ok,
+  parseJsonBody,
+  unauthorized,
+  validationError
+} from "./response";
+import {
+  buildIdempotencyKey,
+  createCheckoutSession,
+  getStripeClient,
+  isCheckoutAbandonmentEvent,
+  mapStripeEventToStatus,
+  verifyWebhookSignature
+} from "./stripe";
 
 type FunctionContext = {
   req?: {
@@ -33,11 +56,6 @@ const CUSTOMER_NOTIFICATION_ACTIONS = new Set([
   "get_portal_dashboard",
   "register_application_interest",
 ]);
-function readHeader(context: FunctionContext, name: string) {
-  const headers = context.req?.headers || {};
-  const matched = Object.entries(headers).find(([key]) => key.toLowerCase() === name.toLowerCase());
-  return matched?.[1] || undefined;
-}
 
 function requireFields(payload: Record<string, unknown>, fields: string[]) {
   const errors = fields
@@ -61,20 +79,18 @@ function stripSystemFields(record: Record<string, unknown>) {
   );
 }
 
-function resolveBootstrapAccountId(context: FunctionContext, payload: Record<string, unknown>) {
-  const headerUserId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
 function isTrustedInvocation(context: FunctionContext) {
   const configuredToken = process.env.APPWRITE_TRUSTED_FUNCTION_TOKEN || process.env.RBP_INTERNAL_FUNCTION_TOKEN;
   if (!configuredToken) {
     return false;
   }
 
-  const presentedToken = readHeader(context, "x-rbp-trusted-invocation") || readHeader(context, "x-rbp-internal-token");
+  const presentedToken = getHeader(context, "x-rbp-trusted-invocation") || getHeader(context, "x-rbp-internal-token");
   return Boolean(presentedToken && presentedToken === configuredToken);
 }
 
 function resolveBootstrapAccountId(context: FunctionContext, payload: Record<string, unknown>) {
-  const headerUserId = readHeader(context, "x-appwrite-user-id") || readHeader(context, "x-user-id");
+  const headerUserId = getHeader(context, "x-appwrite-user-id") || getHeader(context, "x-user-id");
   const payloadAccountId = payload.accountId ? String(payload.accountId) : "";
 
   if (headerUserId && payloadAccountId && headerUserId !== payloadAccountId) {
@@ -85,8 +101,7 @@ function resolveBootstrapAccountId(context: FunctionContext, payload: Record<str
     return headerUserId;
   }
 
-  if (payloadAccountId && isTrustedInternalInvocation(context)) {
-  if (payloadAccountId && isTrustedInvocation(context)) {
+  if (payloadAccountId && (isTrustedInternalInvocation(context) || isTrustedInvocation(context))) {
     return payloadAccountId;
   }
 
@@ -148,7 +163,8 @@ async function bootstrapTenant(context: FunctionContext) {
   const email = String(payload.email).toLowerCase();
   const name = String(payload.name);
   const businessName = String(payload.businessName || `${name} Business`);
-  const planCode = String(payload.planCode || "free");
+  const requestedPlanCode = String(payload.planCode || "free");
+  const planCode = "free";
   const role = "owner";
 
   const existingProfile = await admin.findOne<Record<string, unknown> & { $id: string }>(
@@ -168,16 +184,6 @@ async function bootstrapTenant(context: FunctionContext) {
     }) as { $id: string };
     tenantId = String(tenant.$id);
   }
-  const requestedPlanCode = String(payload.planCode || "free");
-  const planCode = "free";
-  const role = String(payload.role || "member");
-
-  const tenantResult = await admin.upsertByQuery(
-    collectionIds.tenants,
-    [Query.equal("tenant_name", [businessName])],
-    { tenant_name: businessName, status: "active", plan_code: planCode },
-  );
-  const tenantId = String((tenantResult.document as { $id: string }).$id);
 
   const businessProfileResult = await admin.upsertByQuery(
     collectionIds.businessProfiles,
@@ -191,7 +197,7 @@ async function bootstrapTenant(context: FunctionContext) {
       tenant_id: tenantId,
       appwrite_user_id: accountId,
       email,
-      role: existingProfile.role === "admin" ? "member" : String(existingProfile.role || role),
+      role: existingProfile.role === "admin" ? "admin" : "member",
     });
   } else {
     const userProfile = await admin.createDocument(collectionIds.userProfiles, {
@@ -202,17 +208,10 @@ async function bootstrapTenant(context: FunctionContext) {
     }) as { $id: string };
     userProfileId = String(userProfile.$id);
   }
-  const userProfileResult = await admin.upsertByQuery(
-    collectionIds.userProfiles,
-    [Query.equal("appwrite_user_id", [accountId])],
-    { tenant_id: tenantId, appwrite_user_id: accountId, email, role },
-  );
-  const userProfileId = String((userProfileResult.document as { $id: string }).$id);
 
   await admin.upsertByQuery(
     collectionIds.teamMemberships,
     [Query.equal("user_profile_id", [userProfileId])],
-    { tenant_id: tenantId, user_profile_id: userProfileId, team_role: "owner" },
     { tenant_id: tenantId, user_profile_id: userProfileId, team_role: role === "admin" ? "admin" : "owner" },
   );
 
@@ -230,11 +229,11 @@ async function bootstrapTenant(context: FunctionContext) {
     message: "Your tenant has been provisioned in Appwrite.",
     status: "sent",
   });
+
   await persistAuditEvent({
     eventName: "bootstrap_tenant",
     actorId: accountId,
     tenantId,
-    payload: { accountId, email, businessName, planCode, role, requestedRoleIgnored: payload.role !== undefined },
     payload: { accountId, email, businessName, planCode, requestedPlanCode, role },
   });
 
@@ -362,7 +361,6 @@ async function createMembershipCheckout(context: FunctionContext) {
 async function handleStripeWebhook(context: FunctionContext) {
   const admin = createAdminContext();
   const signature = getHeader(context, "stripe-signature");
-  const signature = readHeader(context, "stripe-signature");
   const rawBody = typeof context.req?.body === "string" ? context.req.body : JSON.stringify(context.req?.body || {});
   if (!signature) {
     return unauthorized("Missing Stripe signature.");
@@ -757,8 +755,8 @@ async function listNotificationsForUser(currentUser: CurrentUserContext) {
       const notificationTenantId = String(notification.tenant_id || "");
       const canRead = notificationUserId === currentUser.userId
         || (!notificationUserId && notificationTenantId === currentUser.tenantId);
-      const id = String(notification.$id || `${notificationTenantId}:${notificationUserId}:${notification.title || ""}`);
-      if (canRead && !seen.has(id)) {
+      const id = String(notification.$id || "");
+      if (canRead && id && !seen.has(id)) {
         seen.add(id);
         items.push(notification);
       }
@@ -785,57 +783,6 @@ async function handleCustomerAdminOperation(context: FunctionContext, action: st
     }
     case "mark_notification_read": {
       const currentUser = await resolveCurrentUser(context);
-async function adminOperations(context: FunctionContext) {
-  await requireAdmin(context);
-  const admin = createAdminContext();
-  const payload = parseJsonBody(context);
-  const action = String(payload.action || "");
-  const actionPayload = (payload.payload && typeof payload.payload === "object" ? payload.payload : payload) as Record<string, unknown>;
-
-  switch (action) {
-    case "list_tenants":
-      return ok({ items: (await admin.listDocuments(collectionIds.tenants)).documents });
-    case "list_user_profiles":
-      return ok({ items: (await admin.listDocuments(collectionIds.userProfiles)).documents });
-    case "list_subscriptions":
-      return ok({ items: (await admin.listDocuments(collectionIds.subscriptions)).documents });
-    case "list_payment_events":
-      return ok({ items: (await admin.listDocuments(collectionIds.paymentEvents)).documents });
-    case "list_applications":
-      return ok({ items: (await admin.listDocuments(collectionIds.applications)).documents });
-    case "update_application": {
-      requireFields(actionPayload, ["applicationId"]);
-      const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.applications, String(actionPayload.applicationId));
-      await admin.updateDocument(collectionIds.applications, String(actionPayload.applicationId), {
-        ...stripSystemFields(existing),
-        ...stripSystemFields(actionPayload),
-      });
-      return ok({ updated: true });
-    }
-    case "list_application_interest":
-      return ok({ items: (await admin.listDocuments(collectionIds.applicationInterest)).documents });
-    case "update_application_interest_status": {
-      requireFields(actionPayload, ["interestId", "status"]);
-      const existing = await admin.getDocument<Record<string, unknown>>(collectionIds.applicationInterest, String(actionPayload.interestId));
-      await admin.updateDocument(collectionIds.applicationInterest, String(actionPayload.interestId), {
-        ...stripSystemFields(existing),
-        status: String(actionPayload.status),
-      });
-      return ok({ updated: true });
-    }
-    case "list_service_requests":
-      return ok({ items: (await admin.listDocuments(collectionIds.serviceRequests)).documents });
-    case "update_service_request_status":
-      return adminUpdateServiceStatus({ req: { body: JSON.stringify({ serviceRequestId: actionPayload.serviceRequestId, status: actionPayload.status }), headers: context.req?.headers } });
-    case "list_notifications":
-      return ok({ items: (await admin.listDocuments(collectionIds.notifications)).documents });
-    case "list_audit_events":
-      return ok({ items: (await admin.listDocuments(collectionIds.auditEvents)).documents });
-    case "list_my_notifications": {
-      const currentUser = await resolveCurrentUser(context);
-      return ok({ items: (await admin.listDocuments(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId])])).documents });
-    }
-    case "mark_notification_read": {
       const notificationId = String(actionPayload.notificationId || actionPayload.name || "");
       if (!notificationId) {
         return validationError([{ field: "notificationId", code: "required", message: "notificationId is required." }]);
@@ -849,37 +796,27 @@ async function adminOperations(context: FunctionContext) {
       await admin.updateDocument(collectionIds.notifications, notificationId, {
         ...stripSystemFields(existing),
         status: "read",
-      await admin.updateDocument(collectionIds.notifications, notificationId, {
-        ...stripSystemFields(existing),
-        status: "sent",
       });
       return ok({ updated: true });
     }
     case "mark_all_notifications_read": {
       const currentUser = await resolveCurrentUser(context);
       const notifications = await listNotificationsForUser(currentUser) as Array<Record<string, unknown> & { $id?: string }>;
+      let updated = 0;
       for (const notification of notifications) {
-        if (!notification.$id) continue;
+        if (!notification.$id || notification.status === "read") continue;
         await admin.updateDocument(collectionIds.notifications, String(notification.$id), {
           ...stripSystemFields(notification),
           status: "read",
         });
+        updated++;
       }
-      return ok({ updated: notifications.length });
-      const notifications = await admin.listDocuments<Record<string, unknown> & { $id: string }>(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId])]);
-      for (const notification of notifications.documents) {
-        await admin.updateDocument(collectionIds.notifications, String(notification.$id), {
-          ...stripSystemFields(notification),
-          status: "sent",
-        });
-      }
-      return ok({ updated: notifications.documents.length });
+      return ok({ updated });
     }
     case "get_portal_dashboard": {
       const currentUser = await resolveCurrentUser(context);
       const subscription = await admin.findOne<Record<string, unknown>>(collectionIds.subscriptions, [Query.equal("tenant_id", [currentUser.tenantId])]);
       const notifications = await listNotificationsForUser(currentUser);
-      const notifications = await admin.listDocuments<Record<string, unknown>>(collectionIds.notifications, [Query.equal("user_id", [currentUser.userId]), Query.limit(10)]);
       const activities = await admin.listDocuments<Record<string, unknown>>(collectionIds.serviceRequests, [Query.equal("tenant_id", [currentUser.tenantId]), Query.limit(10)]);
       return ok({
         membershipStatus: String(subscription?.status || "pending"),
@@ -892,7 +829,6 @@ async function adminOperations(context: FunctionContext) {
         },
         activities: activities.documents,
         notifications,
-        notifications: notifications.documents,
       });
     }
     case "register_application_interest": {
