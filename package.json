@@ -32,6 +32,6 @@
   },
   "dependencies": {
     "node-appwrite": "^15.0.1",
-    "stripe": "^18.3.0"
+    "stripe": "^18.5.0"
   }
 }

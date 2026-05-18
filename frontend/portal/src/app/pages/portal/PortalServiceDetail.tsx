@@ -3,7 +3,7 @@ import {
   ChevronRight, CheckCircle, Clock, FileText, CalendarCheck,
   Users, AlertCircle, ArrowRight, MessageSquare, Download,
 } from "lucide-react";
-import { SERVICES, type ServiceStatus } from "./portalServicesModel";
+import { SERVICES, type ServiceStatus } from "./PortalServices";
 
 // ── Timeline step types ──────────────────────────────────────────────────────
 type StepState = "done" | "active" | "pending";
