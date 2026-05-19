@@ -12,8 +12,10 @@ const completeAppwriteEnv = {
   VITE_APPWRITE_PROJECT_ID: "project-id",
   VITE_APPWRITE_DATABASE_ID: "database-id",
   VITE_APPWRITE_STORAGE_BUCKET_ID: "bucket-id",
+  VITE_ENABLE_STRIPE_CHECKOUT: "true",
   VITE_ENABLE_MOCK_FALLBACK: "false",
   VITE_QA_ENVIRONMENT: "true",
+  VITE_BUILD_COMMIT: "abc123def456",
 };
 
 test("Appwrite frontend diagnostics pass with all required Vite variables", () => {
@@ -25,6 +27,9 @@ test("Appwrite frontend diagnostics pass with all required Vite variables", () =
   assert.equal(diagnostics.projectIdLoaded, true);
   assert.equal(diagnostics.databaseIdLoaded, true);
   assert.equal(diagnostics.storageBucketIdLoaded, true);
+  assert.equal(diagnostics.stripeCheckoutEnabled, true);
+  assert.equal(diagnostics.stripeCheckoutRawValue, "true");
+  assert.equal(diagnostics.buildCommit, "abc123def456");
 });
 
 test("Appwrite frontend diagnostics fail clearly when endpoint is missing", () => {

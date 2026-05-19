@@ -2,7 +2,10 @@ export type FrontendEnvSource = Record<string, unknown>;
 
 export type FrontendDiagnostics = {
   backendProvider: string;
+  buildCommit: string;
   appwriteEndpointHost: string;
+  stripeCheckoutEnabled: boolean;
+  stripeCheckoutRawValue: string;
   projectIdLoaded: boolean;
   databaseIdLoaded: boolean;
   storageBucketIdLoaded: boolean;
@@ -55,7 +58,10 @@ export function buildFrontendDiagnostics(env: FrontendEnvSource): FrontendDiagno
 
   return {
     backendProvider: readString(env, "VITE_BACKEND_PROVIDER", "appwrite"),
+    buildCommit: readString(env, "VITE_BUILD_COMMIT"),
     appwriteEndpointHost: endpointHost(appwriteEndpoint),
+    stripeCheckoutEnabled: readBoolean(env, "VITE_ENABLE_STRIPE_CHECKOUT", true),
+    stripeCheckoutRawValue: readString(env, "VITE_ENABLE_STRIPE_CHECKOUT", "missing"),
     projectIdLoaded: Boolean(readString(env, "VITE_APPWRITE_PROJECT_ID")),
     databaseIdLoaded: Boolean(readString(env, "VITE_APPWRITE_DATABASE_ID")),
     storageBucketIdLoaded: Boolean(readString(env, "VITE_APPWRITE_STORAGE_BUCKET_ID")),

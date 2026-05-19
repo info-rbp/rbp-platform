@@ -31,9 +31,11 @@ Protected routes that must remain noindex:
 - `VITE_CLOUDFLARE_ENVIRONMENT=qa`
 - `VITE_ENABLE_MOCK_AUTH=false`
 - `VITE_ENABLE_MOCK_FALLBACK=false`
+- `VITE_ENABLE_STRIPE_CHECKOUT=true`
 
 ## Separation Rules
 
 - QA and production must use separate environment variable sets.
 - QA must not enable mock auth or mock fallback.
+- QA must enable Stripe checkout.
 - QA must not use a non-Appwrite backend provider.
