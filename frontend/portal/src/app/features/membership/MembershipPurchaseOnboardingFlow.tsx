@@ -32,10 +32,12 @@ import {
   premiumMembershipRoutes,
 } from "../../data/premiumMembership";
 import {
+  freeMembershipTimeline,
   mockMembershipExtras,
   mockMembershipGoalOptions,
   mockMembershipManagedServiceOptions,
   mockPaymentMethods,
+  premiumMembershipTimeline,
   type MockMembershipPlan,
 } from "../../mock";
 import {
@@ -46,6 +48,7 @@ import {
   type MockMembershipSignupResult,
 } from "../../services/mock/membership.mockService";
 import { billingApi, membershipApi } from "../../services/api";
+import type { MembershipCheckoutSession } from "../../services/api/appwrite/appwriteBillingApi";
 
 type PaymentState = "idle" | "pending" | "simulated-success" | "simulated-failed";
 type SubmissionState = "idle" | "loading" | "success" | "error";
@@ -74,6 +77,14 @@ interface MembershipFlowForm {
   managedServiceInterests: string[];
 }
 
+export type MembershipCheckoutResponse = {
+  ok: boolean;
+  data: MembershipCheckoutSession | null;
+  message?: string;
+  errors?: Array<{ field?: string; code?: string; message?: string }>;
+  meta?: { requestId?: string };
+};
+
 export const membershipFlowStorageKey = "rbp.mockMembershipPurchaseOnboarding";
 
 const flowSteps: StepperStep[] = [
@@ -81,9 +92,9 @@ const flowSteps: StepperStep[] = [
   { id: "account", label: "Account", description: "Member details" },
   { id: "inclusions", label: "Inclusions", description: "Review access" },
   { id: "extras", label: "Extras", description: "Optional extras" },
-  { id: "payment", label: "Payment", description: "Payment preview" },
+  { id: "payment", label: "Payment", description: "Checkout" },
   { id: "review", label: "Review", description: "Review details" },
-  { id: "success", label: "Success", description: "Preview confirmed" },
+  { id: "success", label: "Success", description: "Confirmation" },
   { id: "business-details", label: "Business", description: "Business details" },
   { id: "profile", label: "Profile", description: "Business profile" },
   { id: "goals", label: "Goals", description: "Priorities" },
@@ -152,7 +163,15 @@ function listValue(items: string[], fallback = "None selected") {
   return items.length > 0 ? items.join(", ") : fallback;
 }
 
-function paymentStateLabel(state: PaymentState) {
+function inferMembershipTier(selectedPlanId: string) {
+  return selectedPlanId.includes("free") ? "free" : "premium";
+}
+
+export function paymentStateLabel(state: PaymentState, stripeEnabled: boolean) {
+  if (stripeEnabled) {
+    return "Secure Stripe checkout";
+  }
+
   if (state === "simulated-success") {
     return "Payment preview complete";
   }
@@ -168,7 +187,108 @@ function paymentStateLabel(state: PaymentState) {
   return "Not started";
 }
 
+export function getMembershipPaymentValidationErrors(input: {
+  enableStripeCheckout: boolean;
+  paymentMethodMock: string;
+  paymentState: PaymentState;
+}) {
+  if (input.enableStripeCheckout) {
+    return {} as Record<string, string>;
+  }
+
+  const nextErrors: Record<string, string> = {};
+
+  if (!input.paymentMethodMock) {
+    nextErrors.paymentMethodMock = "Select a payment preview method.";
+  }
+
+  if (input.paymentState !== "simulated-success") {
+    nextErrors.paymentState = "Preview a successful payment to continue.";
+  }
+
+  return nextErrors;
+}
+
+export function buildMembershipCheckoutPayload(form: MembershipFlowForm) {
+  return {
+    planCode: form.selectedPlanId,
+    plan_code: form.selectedPlanId,
+    selected_plan_id: form.selectedPlanId,
+    primary_contact_name: form.primaryContactName,
+    email: form.email,
+    phone: form.phone,
+    business_name: form.businessName,
+    abn_or_identifier: form.abnOrIdentifier,
+    billing_address: form.billingAddress,
+    accepted_terms: form.acceptedTerms,
+    marketing_consent: form.marketingConsent,
+    selected_extras: form.selectedExtras,
+  };
+}
+
+export function buildMembershipCheckoutErrorMessage(response: MembershipCheckoutResponse) {
+  const baseMessage =
+    response.errors?.[0]?.message ??
+    response.data?.message ??
+    response.message ??
+    "Stripe checkout could not be started. Please try again or contact support.";
+
+  return response.meta?.requestId
+    ? `${baseMessage} Reference: ${response.meta.requestId}.`
+    : baseMessage;
+}
+
+export function redirectToCheckout(
+  checkoutUrl: string,
+  locationLike?: { assign: (url: string) => void },
+) {
+  const target = locationLike ?? window.location;
+  target.assign(checkoutUrl);
+}
+
+function createBackendSignupResult(form: MembershipFlowForm): MockMembershipSignupResult {
+  const membershipTier = inferMembershipTier(form.selectedPlanId);
+
+  return {
+    reference: `MEM-${Date.now()}`,
+    membershipStatus: "active",
+    membershipTier,
+    paymentStatus: membershipTier === "free" ? "not-required" : "simulated-success",
+    portalHref: "/portal/dashboard",
+    timeline: membershipTier === "free" ? freeMembershipTimeline : premiumMembershipTimeline,
+  };
+}
+
+export function resolveMembershipCheckoutOutcome(input: {
+  response: MembershipCheckoutResponse;
+  form: MembershipFlowForm;
+}) {
+  const checkoutUrl = input.response.data?.checkout_url ?? input.response.data?.url;
+
+  if (input.response.ok && checkoutUrl) {
+    return {
+      kind: "redirect" as const,
+      checkoutUrl,
+      sessionId:
+        input.response.data?.checkout_session_id ?? input.response.data?.session_id ?? null,
+    };
+  }
+
+  if (input.response.ok && input.response.data?.requires_checkout === false) {
+    return {
+      kind: "activate" as const,
+      result: createBackendSignupResult(input.form),
+    };
+  }
+
+  return {
+    kind: "error" as const,
+    message: buildMembershipCheckoutErrorMessage(input.response),
+  };
+}
+
 export function MembershipPurchaseOnboardingFlow() {
+  const stripeEnabled = environment.enableStripeCheckout;
   const [plans, setPlans] = useState<MockMembershipPlan[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [form, setForm] = useState<MembershipFlowForm>(initialForm);
@@ -221,19 +341,21 @@ export function MembershipPurchaseOnboardingFlow() {
         label: "Extras",
         value: selectedExtras.length ? `${selectedExtras.length} selected` : "No extras selected",
       },
-      { label: "Payment", value: paymentStateLabel(paymentState) },
+      { label: stripeEnabled ? "Checkout" : "Payment", value: paymentStateLabel(paymentState, stripeEnabled) },
       {
         label: "Status",
         value: onboardingResult
           ? "Onboarding complete"
           : signupResult
-            ? "Preview confirmed"
+            ? stripeEnabled
+              ? "Checkout started"
+              : "Preview confirmed"
             : accountCreated
               ? "Details captured"
               : "Draft",
       },
     ],
-    [accountCreated, onboardingResult, paymentState, selectedExtras.length, selectedPlan, signupResult]
+    [accountCreated, onboardingResult, paymentState, selectedExtras.length, selectedPlan, signupResult, stripeEnabled]
   );
 
   function updateField<K extends keyof MembershipFlowForm>(
@@ -307,13 +429,11 @@ export function MembershipPurchaseOnboardingFlow() {
     }
 
     if (currentStep.id === "payment") {
-      const nextErrors: Record<string, string> = {};
-      if (!form.paymentMethodMock) {
-        nextErrors.paymentMethodMock = "Select a payment preview method.";
-      }
-      if (paymentState !== "simulated-success") {
-        nextErrors.paymentState = "Preview a successful payment to continue.";
-      }
+      const nextErrors = getMembershipPaymentValidationErrors({
+        enableStripeCheckout: stripeEnabled,
+        paymentMethodMock: form.paymentMethodMock,
+        paymentState,
+      });
       setErrors(nextErrors);
       return Object.keys(nextErrors).length === 0;
     }
@@ -363,49 +483,57 @@ export function MembershipPurchaseOnboardingFlow() {
     setSubmissionState("loading");
     setErrors({});
 
-    const checkoutResponse = await billingApi.createMembershipCheckoutSession({
-      plan_code: form.selectedPlanId,
-      selected_plan_id: form.selectedPlanId,
-      primary_contact_name: form.primaryContactName,
-      email: form.email,
-      phone: form.phone,
-      business_name: form.businessName,
-      abn_or_identifier: form.abnOrIdentifier,
-      billing_address: form.billingAddress,
-      accepted_terms: form.acceptedTerms,
-      marketing_consent: form.marketingConsent,
-      selected_extras: form.selectedExtras,
+    const checkoutResponse = await billingApi.createMembershipCheckoutSession(
+      buildMembershipCheckoutPayload(form)
+    );
+
+    const outcome = resolveMembershipCheckoutOutcome({
+      response: checkoutResponse as MembershipCheckoutResponse,
+      form,
     });
 
-    const checkoutUrl = checkoutResponse.data?.checkout_url ?? checkoutResponse.data?.url;
-
-    if (checkoutResponse.ok && checkoutUrl) {
+    if (outcome.kind === "redirect") {
       writeMembershipSession({
-        checkoutSessionId: checkoutResponse.data?.checkout_session_id ?? checkoutResponse.data?.session_id,
+        checkoutSessionId: outcome.sessionId,
         membershipStatus: "pending",
+        membershipTier: inferMembershipTier(form.selectedPlanId),
         paymentStatus: "stripe-checkout-started",
         onboardingStatus: "pending-payment",
         businessName: form.businessName,
         primaryContactName: form.primaryContactName,
         selectedPlan: selectedPlan?.name,
       });
-      window.location.assign(checkoutUrl);
+      redirectToCheckout(outcome.checkoutUrl);
       return;
     }
 
-    if (environment.enableStripeCheckout) {
-      setSubmissionState("error");
-      setErrors({
-        paymentState:
-          checkoutResponse.errors?.[0]?.message ??
-          checkoutResponse.data?.message ??
-          "Stripe Checkout could not be started. Please try again or contact support.",
+    if (outcome.kind === "activate") {
+      setSignupResult(outcome.result);
+      setSubmissionState("success");
+      writeMembershipSession({
+        signupReference: outcome.result.reference,
+        membershipTier: outcome.result.membershipTier,
+        membershipStatus: outcome.result.membershipStatus,
+        paymentStatus: outcome.result.paymentStatus,
+        onboardingStatus: "in-progress",
+        portalHref: outcome.result.portalHref,
+        businessName: form.businessName,
+        primaryContactName: form.primaryContactName,
+        selectedPlan: selectedPlan?.name,
       });
+      setCurrentStepIndex(flowSteps.findIndex((step) => step.id === "success"));
+      return;
+    }
+
+    if (stripeEnabled) {
+      setSubmissionState("error");
+      setErrors({ checkout: outcome.message, paymentState: outcome.message });
       return;
     }
 
     const response = await submitMockMembershipSignup({
       selectedPlanId: form.selectedPlanId,
+      membershipTier: inferMembershipTier(form.selectedPlanId),
       businessName: form.businessName,
       primaryContactName: form.primaryContactName,
       email: form.email,
@@ -427,6 +555,7 @@ export function MembershipPurchaseOnboardingFlow() {
     setSubmissionState("success");
     writeMembershipSession({
       signupReference: response.data.reference,
+      membershipTier: response.data.membershipTier,
       membershipStatus: response.data.membershipStatus,
       paymentStatus: response.data.paymentStatus,
       onboardingStatus: "in-progress",
@@ -464,8 +593,9 @@ export function MembershipPurchaseOnboardingFlow() {
     writeMembershipSession({
       signupReference: signupResult?.reference,
       onboardingReference: response.data.reference,
+      membershipTier: signupResult?.membershipTier,
       membershipStatus: response.data.membershipStatus,
-      paymentStatus: "simulated-success",
+      paymentStatus: stripeEnabled ? "stripe-checkout-started" : "simulated-success",
       onboardingStatus: response.data.onboardingStatus,
       portalHref: response.data.portalHref,
       businessName: form.businessName,
@@ -497,10 +627,18 @@ export function MembershipPurchaseOnboardingFlow() {
               <StatusBadge status={form.selectedPlanId ? "active" : "draft"} label="Plan selected" />
               <StatusBadge status={accountCreated ? "active" : "draft"} label="Member details" />
               <StatusBadge
-                status={paymentState === "simulated-success" ? "active" : "pending"}
-                label="Payment preview"
+                status={
+                  stripeEnabled
+                    ? accountCreated && form.acceptedTerms
+                      ? "active"
+                      : "pending"
+                    : paymentState === "simulated-success"
+                      ? "active"
+                      : "pending"
+                }
+                label={stripeEnabled ? "Stripe checkout ready" : "Payment preview"}
               />
-              <StatusBadge status={signupResult ? "active" : "draft"} label="Preview confirmed" />
+              <StatusBadge status={signupResult ? "active" : "draft"} label={stripeEnabled ? "Checkout response" : "Preview confirmed"} />
               <StatusBadge
                 status={onboardingResult ? "active" : signupResult ? "in-progress" : "draft"}
                 label="Onboarding"
@@ -551,7 +689,7 @@ export function MembershipPurchaseOnboardingFlow() {
         {currentStep.id === "account" ? (
           <FormSection
             title="Create your member profile"
-            description="Capture the core contact and business details used for your membership sign-up preview."
+            description="Capture the core contact and business details used for your membership checkout."
           >
             <div className="grid gap-4 md:grid-cols-2">
               <TextField
@@ -621,7 +759,7 @@ export function MembershipPurchaseOnboardingFlow() {
               checked={form.inclusionConfirmed}
               onChange={(event) => updateField("inclusionConfirmed", event.currentTarget.checked)}
               label="I understand the RBP Premium Membership inclusions and terms."
-              description="Required before continuing with your membership sign-up preview."
+              description="Required before continuing with membership checkout."
             />
             {errors.inclusionConfirmed ? (
               <p className="text-sm font-medium text-red-600">{errors.inclusionConfirmed}</p>
@@ -678,59 +816,81 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "payment" ? (
           <FormSection
-            title="Payment Preview"
-            description="Review the early bird membership price. The final review step will request a Stripe checkout session from the backend when available."
+            title={stripeEnabled ? "Stripe checkout" : "Payment preview"}
+            description={
+              stripeEnabled
+                ? "Review the membership amount, then continue to secure Stripe checkout. No card details are stored by RBP."
+                : "Review the early bird membership price and complete the payment preview before continuing."
+            }
           >
             <PaymentSimulationPanel
-              title="Payment Preview"
-              amountLabel={`RBP Premium Membership: ${currencyLine(selectedPlan)}. No real payment will be processed.`}
-            />
-            <RadioCardGroup
-              name="payment-method"
-              label="Payment preview method"
-              value={form.paymentMethodMock}
-              onChange={(value) => updateField("paymentMethodMock", value)}
-              options={mockPaymentMethods.map((method) => ({
-                label: method.label,
-                value: method.id,
-                description: method.description,
-              }))}
-            />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => simulatePayment("simulated-success")}
-                disabled={paymentState === "pending"}
-                className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
-              >
-                {paymentState === "pending" ? "Previewing..." : "Preview Payment Success"}
-              </button>
-              <button
-                type="button"
-                onClick={() => simulatePayment("simulated-failed")}
-                disabled={paymentState === "pending"}
-                className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 disabled:opacity-50"
-              >
-                Preview Payment Failure
-              </button>
-            </div>
-            <MockSubmissionState
-              state={
-                paymentState === "pending"
-                  ? "loading"
-                  : paymentState === "simulated-success"
-                    ? "success"
-                    : paymentState === "simulated-failed"
-                      ? "error"
-                      : "idle"
+              title={stripeEnabled ? "Stripe checkout" : "Payment Preview"}
+              amountLabel={
+                stripeEnabled
+                  ? `RBP Premium Membership: ${currencyLine(selectedPlan)}. You will be redirected to Stripe test checkout in QA.`
+                  : `RBP Premium Membership: ${currencyLine(selectedPlan)}. No real payment will be processed.`
               }
-              idleMessage="Payment preview is ready."
-              loadingMessage="Payment preview pending..."
-              successMessage="Payment preview completed. No funds were charged."
-              errorMessage="Payment preview failed. Preview a successful payment to continue."
             />
+            {stripeEnabled ? (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                <p className="font-semibold text-slate-900">Continue to secure Stripe checkout</p>
+                <p className="mt-2 leading-6">
+                  No card details are stored by RBP. After the review step you will be redirected to Stripe test checkout in QA.
+                </p>
+              </div>
+            ) : (
+              <>
+                <RadioCardGroup
+                  name="payment-method"
+                  label="Payment preview method"
+                  value={form.paymentMethodMock}
+                  onChange={(value) => updateField("paymentMethodMock", value)}
+                  options={mockPaymentMethods.map((method) => ({
+                    label: method.label,
+                    value: method.id,
+                    description: method.description,
+                  }))}
+                />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => simulatePayment("simulated-success")}
+                    disabled={paymentState === "pending"}
+                    className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                  >
+                    {paymentState === "pending" ? "Previewing..." : "Preview Payment Success"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => simulatePayment("simulated-failed")}
+                    disabled={paymentState === "pending"}
+                    className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 disabled:opacity-50"
+                  >
+                    Preview Payment Failure
+                  </button>
+                </div>
+                <MockSubmissionState
+                  state={
+                    paymentState === "pending"
+                      ? "loading"
+                      : paymentState === "simulated-success"
+                        ? "success"
+                        : paymentState === "simulated-failed"
+                          ? "error"
+                          : "idle"
+                  }
+                  idleMessage="Payment preview is ready."
+                  loadingMessage="Payment preview pending..."
+                  successMessage="Payment preview completed. No funds were charged."
+                  errorMessage="Payment preview failed. Preview a successful payment to continue."
+                />
+              </>
+            )}
             {errors.paymentState ? (
               <p className="text-sm font-medium text-red-600">{errors.paymentState}</p>
+            ) : null}
+            {errors.checkout ? (
+              <p className="text-sm font-medium text-red-600">{errors.checkout}</p>
             ) : null}
           </FormSection>
         ) : null}
@@ -739,15 +899,40 @@ export function MembershipPurchaseOnboardingFlow() {
           <div className="space-y-4">
             <MockSubmissionState
               state={submissionState}
-              idleMessage="Ready to confirm the membership preview."
-              loadingMessage="Confirming membership preview..."
-              successMessage="Membership preview confirmed."
-              errorMessage="Membership preview could not be confirmed. Review the highlighted fields."
+              idleMessage={
+                stripeEnabled
+                  ? "Ready to continue to secure Stripe checkout."
+                  : "Ready to confirm the membership preview."
+              }
+              loadingMessage={
+                stripeEnabled
+                  ? "Starting Stripe checkout..."
+                  : "Confirming membership preview..."
+              }
+              successMessage={
+                stripeEnabled
+                  ? "Membership checkout response received."
+                  : "Membership preview confirmed."
+              }
+              errorMessage={
+                stripeEnabled
+                  ? "Stripe checkout could not be started. Review the message below."
+                  : "Membership preview could not be confirmed. Review the highlighted fields."
+              }
             />
+            {errors.checkout ? (
+              <p className="text-sm font-medium text-red-600">{errors.checkout}</p>
+            ) : null}
             <ReviewSubmit
               title="Review Your Premium Membership Details"
-              description="Confirm your membership details before completing the preview."
-              submitLabel="Confirm Membership Preview"
+              description={
+                stripeEnabled
+                  ? "Confirm your membership details before continuing to secure Stripe checkout."
+                  : "Confirm your membership details before completing the preview."
+              }
+              submitLabel={
+                stripeEnabled ? "Continue to secure Stripe checkout" : "Confirm Membership Preview"
+              }
               isSubmitting={submissionState === "loading"}
               onSubmit={submitSignup}
               sections={[
@@ -766,7 +951,10 @@ export function MembershipPurchaseOnboardingFlow() {
                     { label: "Plan", value: selectedPlan?.name ?? premiumMembershipPlan.name },
                     { label: "Price", value: currencyLine(selectedPlan) },
                     { label: "Extras", value: listValue(selectedExtras.map((extra) => extra.title)) },
-                    { label: "Payment", value: paymentStateLabel(paymentState) },
+                    {
+                      label: stripeEnabled ? "Checkout" : "Payment",
+                      value: paymentStateLabel(paymentState, stripeEnabled),
+                    },
                   ],
                 },
               ]}
@@ -777,9 +965,27 @@ export function MembershipPurchaseOnboardingFlow() {
 
         {currentStep.id === "success" && signupResult ? (
           <ConfirmationPanel
-            title="RBP Premium Membership Preview Confirmed"
-            statusLabel="Payment preview complete"
-            message="Your premium membership preview has been completed. Continue to onboarding or review your confirmation details."
+            title={
+              stripeEnabled
+                ? signupResult.membershipTier === "free"
+                  ? "RBP Membership Activated"
+                  : "Stripe checkout ready"
+                : "RBP Premium Membership Preview Confirmed"
+            }
+            statusLabel={
+              stripeEnabled
+                ? signupResult.membershipTier === "free"
+                  ? "Membership active"
+                  : "Stripe checkout started"
+                : "Payment preview complete"
+            }
+            message={
+              stripeEnabled
+                ? signupResult.membershipTier === "free"
+                  ? "Your membership has been activated without Stripe checkout. Continue to onboarding or review your confirmation details."
+                  : "Your membership checkout session has been prepared."
+                : "Your premium membership preview has been completed. Continue to onboarding or review your confirmation details."
+            }
             reference={signupResult.reference}
             primaryAction={
               <button
@@ -991,7 +1197,7 @@ export function MembershipPurchaseOnboardingFlow() {
           <ConfirmationPanel
             title="Membership onboarding preview complete"
             statusLabel="Portal handoff ready"
-            message="Your RBP Premium Membership preview and onboarding details have been completed. Continue to the member portal dashboard."
+            message="Your RBP membership onboarding details have been completed. Continue to the member portal dashboard."
             reference={onboardingResult.reference}
             primaryAction={
               <Link
@@ -1017,7 +1223,13 @@ export function MembershipPurchaseOnboardingFlow() {
             canGoBack={currentStepIndex > 0}
             onBack={goBack}
             onContinue={goNext}
-            continueLabel={currentStep.id === "payment" ? "Continue to review" : "Continue"}
+            continueLabel={
+              currentStep.id === "payment"
+                ? stripeEnabled
+                  ? "Continue to checkout review"
+                  : "Continue to review"
+                : "Continue"
+            }
           />
         ) : null}
       </div>

@@ -101,7 +101,7 @@ export const publicNavigation: MegaConfig[] = [
           { label: "Our NBN Plans", href: "/operations/connectivity/nbn-phone/our-nbn-plans" },
           { label: "Getting Connected", href: "/operations/connectivity/nbn-phone/getting-connected" },
           { label: "WiFi Modems", href: "/operations/connectivity/nbn-phone/wifi-modems" },
-          { label: "Order through account", href: "/portal/services/nbn/start" },
+          { label: "Order through account", href: "/operations/connectivity/nbn-phone/connect-now" },
           { label: "FAQs", href: "/operations/connectivity/nbn-phone/faqs" },
         ],
       },

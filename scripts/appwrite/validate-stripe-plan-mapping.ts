@@ -36,36 +36,6 @@ function validateRequiredPlans(plans: MembershipPlan[], source: string) {
     throw new Error(`${source} must keep the free membership plan at zero cost.`);
   }
 
-  if (!String(free.stripe_price_id ?? "").startsWith("price_test_")) {
-    throw new Error(`${source} must keep the free plan on a Stripe test price id.`);
-  }
-
-  if (!String(premium.stripe_price_id ?? "").startsWith("price_test_")) {
-    throw new Error(`${source} must keep the premium plan on a Stripe test price id.`);
-  }
-
-  if (premium.active !== true) {
-    throw new Error(`${source} must keep the premium plan active for QA validation.`);
-  }
-
-  return { free, premium };
-}
-
-}
-
-function validateRequiredPlans(plans: MembershipPlan[], source: string) {
-  const planMap = normalizePlanMap(plans);
-  const free = planMap.get("free");
-  const premium = planMap.get("premium");
-
-  if (!free || !premium) {
-    throw new Error(`${source} is missing the free or premium membership plan.`);
-  }
-
-  if (Number(free.amount ?? 0) !== 0) {
-    throw new Error(`${source} must keep the free membership plan at zero cost.`);
-  }
-
   if (free.stripe_price_id) {
     throw new Error(`${source} must not require a Stripe subscription price id for the free plan.`);
   }
@@ -78,7 +48,7 @@ function validateRequiredPlans(plans: MembershipPlan[], source: string) {
     throw new Error(`${source} must keep the premium plan at AUD 25 plus GST.`);
   }
 
-  if (premium.stripe_price_id !== "price_1TXKGnS9Az4EAUomNJeSfDA1") {
+  if (premium.stripe_price_id !== "price_1TXx7C0mYebE7B3JyCL64COg") {
     throw new Error(`${source} must keep the premium plan on the approved QA Stripe test price id.`);
   }
 
@@ -116,7 +86,6 @@ async function validateLiveStripe(plan: MembershipPlan) {
 
 try {
   const seedPlans = readSeedPlans();
-  const { free: freeSeedPlan, premium: premiumSeedPlan } = validateRequiredPlans(seedPlans, "QA seed data");
   const { premium: premiumSeedPlan } = validateRequiredPlans(seedPlans, "QA seed data");
 
   const report: Record<string, unknown> = {
@@ -155,7 +124,6 @@ try {
   if (process.env.STRIPE_SECRET_KEY) {
     report.liveStripe = {
       status: "validated",
-      free: await validateLiveStripe(freeSeedPlan),
       free: {
         status: "skipped",
         message: "Free membership has no subscription checkout price; Stripe is used only for pay-per-use purchases.",

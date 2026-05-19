@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { PortalAdminReference } from "./PortalAdminReference";
 import { useState } from "react";
-import { ArrowRight, Clock, ChevronRight, TrendingUp, FileText, Video, Mic, Search } from "lucide-react";
+import { ArrowRight, Clock, ChevronRight, TrendingUp, FileText, Video, Mic, Search, LifeBuoy } from "lucide-react";
 import { mockPortalFeaturedResource, mockPortalResources } from "../../mock";
 
 const featured = mockPortalFeaturedResource;
@@ -34,6 +34,30 @@ export function PortalResources() {
         portalRoute="/portal/resources"
         controlledBy={["Admin Resources", "Admin Help Center > Resources"]}
       />
+
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 flex items-start gap-3">
+        <LifeBuoy className="w-5 h-5 text-blue-700 flex-shrink-0 mt-0.5" />
+        <div>
+          <div className="text-xs font-extrabold text-blue-900">Support and resources now sit side by side</div>
+          <p className="text-[11px] text-blue-700 leading-relaxed mt-1">
+            If a service lane is still placeholder-only in this MVP, members should use the resource library or the help centre instead of landing on a dead route.
+          </p>
+          <div className="flex flex-wrap gap-3 mt-3">
+            <Link
+              to="/help?section=support"
+              className="inline-flex items-center gap-1.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs px-4 py-2 rounded-xl transition-colors"
+            >
+              Open Help Centre <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              to="/contact?reason=support"
+              className="inline-flex items-center gap-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs px-4 py-2 rounded-xl transition-colors"
+            >
+              Contact RBP
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
