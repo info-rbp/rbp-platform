@@ -6,6 +6,7 @@ const required = [
   "VITE_APPWRITE_STORAGE_BUCKET_ID",
   "VITE_QA_ENVIRONMENT",
   "VITE_CLOUDFLARE_ENVIRONMENT",
+  "VITE_ENABLE_STRIPE_CHECKOUT",
 ];
 
 const missing = required.filter((key) => !process.env[key]);
@@ -26,6 +27,11 @@ if (String(process.env.VITE_ENABLE_MOCK_AUTH || "false").toLowerCase() === "true
 
 if (String(process.env.VITE_ENABLE_MOCK_FALLBACK || "false").toLowerCase() === "true") {
   console.error("Cloudflare QA builds must not enable mock fallback.");
+  process.exit(1);
+}
+
+if (String(process.env.VITE_ENABLE_STRIPE_CHECKOUT).toLowerCase() !== "true") {
+  console.error("Cloudflare QA builds must set VITE_ENABLE_STRIPE_CHECKOUT=true.");
   process.exit(1);
 }
 

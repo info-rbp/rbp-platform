@@ -6,9 +6,23 @@ type LiveFunction = {
   name?: string;
   enabled?: boolean;
   status?: string;
-  latestDeploymentId?: string;
-  latestDeploymentCreatedAt?: string;
   execute?: string[];
+};
+
+type LiveDeployment = {
+  $id: string;
+  $createdAt?: string;
+  status?: string;
+  activate?: boolean;
+};
+
+type FunctionVerificationEntry = {
+  id: string;
+  name: string;
+  enabled: boolean;
+  status: string;
+  latestDeploymentId: string | null;
+  latestDeploymentCreatedAt: string | null;
 };
 
 const safeDryCallFunctions = new Set([
@@ -23,6 +37,13 @@ function listFunctions(functions: ReturnType<typeof createAdminServices>["functi
   );
 }
 
+async function getLatestDeployment(functions: ReturnType<typeof createAdminServices>["functions"], functionId: string) {
+  const deployments = await functions.listDeployments(functionId, [Query.limit(1), Query.orderDesc("$createdAt")]) as unknown as {
+    deployments?: LiveDeployment[];
+  };
+  return deployments.deployments?.[0] || null;
+}
+
 function hasCallableState(fn: LiveFunction) {
   if (fn.enabled === false) {
     return false;
@@ -34,8 +55,6 @@ function hasCallableState(fn: LiveFunction) {
 
   return true;
 }
-import { Functions, Query } from "node-appwrite";
-import { createAdminClient, printSummary, readConfig, requireEnv } from "./_lib";
 
 try {
   requireEnv(["APPWRITE_ENDPOINT", "APPWRITE_PROJECT_ID", "APPWRITE_API_KEY"]);
@@ -44,12 +63,14 @@ try {
   const expectedFunctions = config.functions || [];
   const { functions } = createAdminServices();
   const liveFunctions = await listFunctions(functions);
+  const liveIds = liveFunctions.map((fn) => fn.$id).sort((left, right) => left.localeCompare(right));
   const byId = new Map(liveFunctions.map((fn) => [fn.$id, fn]));
   const report = {
-    expected: expectedFunctions.length,
-    live: liveFunctions.length,
-    found: [] as Array<Record<string, unknown>>,
+    expected: expectedFunctions,
+    live: liveIds,
+    found: [] as FunctionVerificationEntry[],
     missing: [] as string[],
+    unexpected: liveIds.filter((functionId) => !expectedFunctions.includes(functionId)),
     failed: [] as string[],
     manualVerificationRequired: [] as string[],
   };
@@ -61,23 +82,28 @@ try {
       continue;
     }
 
-    const entry = {
+    const latestDeployment = await getLatestDeployment(functions, functionId);
+    report.found.push({
       id: live.$id,
       name: live.name || live.$id,
       enabled: live.enabled !== false,
       status: live.status || "unknown",
-      latestDeploymentId: live.latestDeploymentId || null,
-      latestDeploymentCreatedAt: live.latestDeploymentCreatedAt || null,
-    };
-    report.found.push(entry);
+      latestDeploymentId: latestDeployment?.$id || null,
+      latestDeploymentCreatedAt: latestDeployment?.$createdAt || null,
+    });
 
     if (!hasCallableState(live)) {
       report.failed.push(`${functionId}: function is disabled or failed`);
       continue;
     }
 
-    if (!live.latestDeploymentId && !live.latestDeploymentCreatedAt) {
-      report.manualVerificationRequired.push(`${functionId}: no deployment metadata exposed; confirm Git integration deployment in Appwrite.`);
+    if (!latestDeployment) {
+      report.failed.push(`${functionId}: no deployment found`);
+      continue;
+    }
+
+    if (latestDeployment.status !== "ready") {
+      report.failed.push(`${functionId}: latest deployment status is ${latestDeployment.status || "unknown"}`);
       continue;
     }
 
@@ -93,34 +119,6 @@ try {
   if (report.missing.length || report.failed.length) {
     process.exit(1);
   }
-  const expected = config.functions || [];
-  const functions = new Functions(createAdminClient());
-  const liveFunctions = await functions.list([Query.limit(100)]);
-  const live = liveFunctions.functions.map((fn) => fn.$id).sort((left, right) => left.localeCompare(right));
-  const liveSet = new Set(live);
-  const missing = expected.filter((functionId) => !liveSet.has(functionId));
-  const unexpected = live.filter((functionId) => !expected.includes(functionId));
-
-  console.log(JSON.stringify({
-    expected,
-    live,
-    missing,
-    unexpected,
-  }, null, 2));
-
-  if (missing.length) {
-    process.exit(1);
-  }
-
-  const summary = {
-    created: [],
-    updated: [],
-    skipped: expected.map((functionId) => `function:${functionId}`),
-    drift: unexpected.map((functionId) => `function:${functionId}`),
-    failed: [],
-    manualActionRequired: [],
-  };
-  printSummary(summary);
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exit(1);

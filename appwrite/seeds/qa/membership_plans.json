@@ -5,8 +5,6 @@
     "billing_cycle": "none",
     "currency": "AUD",
     "amount": 0,
-    "stripe_product_id": "prod_test_free",
-    "stripe_price_id": "price_test_free",
     "active": true
   },
   {
@@ -15,9 +13,8 @@
     "billing_cycle": "weekly",
     "currency": "AUD",
     "amount": 25,
-    "stripe_product_id": "prod_test_premium",
-    "stripe_price_id": "price_test_premium",
-    "stripe_price_id": "price_1TXKGnS9Az4EAUomNJeSfDA1",
+    "stripe_product_id": "prod_UUkCHEv53d9xLJ",
+    "stripe_price_id": "price_1TVlMC0xk2ucRLEh9h6bjNuc",
     "active": true
   }
 ]

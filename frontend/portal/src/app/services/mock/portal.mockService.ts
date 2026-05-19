@@ -19,6 +19,7 @@ import type {
 import { mockAuthService } from "./auth.mockService";
 import { mockGet, mockSuccess } from "./mockClient";
 import { portalApi, servicesApi } from "../api";
+import { normalisePortalDashboardState } from "../api/portalDashboardState";
 
 const PORTAL_STATE_KEY = "rbp.mockPortalState";
 
@@ -70,7 +71,7 @@ function productKeyFromSource(source: string): PortalProductKey {
   return "membership";
 }
 
-function createDefaultPortalState(): PortalDashboardState {
+export function createDefaultPortalState(): PortalDashboardState {
   const customer = mockAuthService.getCurrentUser() ?? {
     id: mockCurrentUser.id,
     name: mockCurrentUser.contact.name,
@@ -93,20 +94,21 @@ function createDefaultPortalState(): PortalDashboardState {
   };
 }
 
-function readPortalState(): PortalDashboardState {
+export function readPortalState(): PortalDashboardState {
   const rawValue = window.sessionStorage.getItem(PORTAL_STATE_KEY);
+  const fallbackState = createDefaultPortalState();
 
   if (!rawValue) {
-    return createDefaultPortalState();
+    return fallbackState;
   }
 
   try {
-    return {
-      ...createDefaultPortalState(),
-      ...JSON.parse(rawValue),
-    } as PortalDashboardState;
+    const state = normalisePortalDashboardState(JSON.parse(rawValue), fallbackState);
+    writePortalState(state);
+    return state;
   } catch {
-    return createDefaultPortalState();
+    writePortalState(fallbackState);
+    return fallbackState;
   }
 }
 
@@ -200,16 +202,24 @@ export function getMockPortalDashboard() {
 
 export const mockPortalService: PortalService = {
   async getDashboard() {
+    const fallbackState = createDefaultPortalState();
     const response = await portalApi.getDashboardState();
 
     if (response.ok && response.data) {
-      writePortalState(response.data);
-      return response;
+      const normalised = normalisePortalDashboardState(response.data, fallbackState);
+      writePortalState(normalised);
+      return {
+        ...response,
+        data: normalised,
+      };
     }
+
+    const stored = normalisePortalDashboardState(readPortalState(), fallbackState);
+    writePortalState(stored);
 
     return mockGet(
       "/mock/portal/state",
-      readPortalState(),
+      stored,
       "Mock shared portal state returned after backend fallback."
     );
   },

@@ -7,6 +7,7 @@ import {
   getCurrentAccount,
 } from "../../../lib/appwrite/account";
 import { invokeAppwriteFunction } from "../../../lib/appwrite/functions";
+import { describeAppwriteError } from "./errorDiagnostics";
 
 function normaliseUser(payload: { $id: string; email: string; name?: string }): PortalCustomerAuthUser {
   return {
@@ -22,7 +23,7 @@ export const appwriteAuthApi = {
       const account = await getCurrentAccount();
       return apiSuccess("appwrite/account", normaliseUser(account));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to load the current Appwrite account.";
+      const message = describeAppwriteError(error, "Loading the current account");
       return apiFailure<PortalCustomerAuthUser>("appwrite/account", message, [
         { field: "account", code: "invalid", message },
       ]);
@@ -31,10 +32,22 @@ export const appwriteAuthApi = {
 
   async signIn(payload: { email: string; password: string }) {
     try {
+      try {
+        const currentAccount = await getCurrentAccount();
+
+        if (currentAccount.email.toLowerCase() === payload.email.toLowerCase()) {
+          return apiSuccess("appwrite/account", normaliseUser(currentAccount));
+        }
+
+        await deleteCurrentSession();
+      } catch {
+        // No active Appwrite session exists, so continue with normal sign-in.
+      }
+
       await createEmailPasswordSession(payload);
       return this.getCurrentUser();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to sign in with Appwrite.";
+      const message = describeAppwriteError(error, "Sign-in");
       return apiFailure<PortalCustomerAuthUser>("appwrite/account/sessions/email", message, [
         { field: "account", code: "invalid", message },
       ]);
@@ -67,7 +80,7 @@ export const appwriteAuthApi = {
         businessName: payload.businessName,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to create an Appwrite account.";
+      const message = describeAppwriteError(error, "Signup");
       return apiFailure<PortalCustomerAuthUser>("appwrite/account", message, [
         { field: "account", code: "invalid", message },
       ]);
@@ -79,7 +92,7 @@ export const appwriteAuthApi = {
       await deleteCurrentSession();
       return apiSuccess("appwrite/account/sessions/current", { signedOut: true });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to sign out of Appwrite.";
+      const message = describeAppwriteError(error, "Sign-out");
       return apiFailure<{ signedOut: true }>("appwrite/account/sessions/current", message, [
         { field: "account", code: "invalid", message },
       ]);
