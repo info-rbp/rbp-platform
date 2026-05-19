@@ -13,6 +13,9 @@ type MembershipPlan = Record<string, unknown> & {
   active?: boolean;
 };
 
+const qaPremiumStripeProductId = "prod_UUkCHEv53d9xLJ";
+const qaPremiumStripePriceId = "price_1TVlMC0xk2ucRLEh9h6bjNuc";
+
 function readSeedPlans() {
   return readJson<MembershipPlan[]>(
     path.join(process.cwd(), "appwrite", "seeds", "qa", "membership_plans.json"),
@@ -48,8 +51,12 @@ function validateRequiredPlans(plans: MembershipPlan[], source: string) {
     throw new Error(`${source} must keep the premium plan at AUD 25 plus GST.`);
   }
 
-  if (premium.stripe_price_id !== "price_1TXx7C0mYebE7B3JyCL64COg") {
-    throw new Error(`${source} must keep the premium plan on the approved QA Stripe test price id.`);
+  if (premium.stripe_product_id !== qaPremiumStripeProductId) {
+    throw new Error(`${source} must keep the premium plan on the approved Stripe sandbox product id.`);
+  }
+
+  if (premium.stripe_price_id !== qaPremiumStripePriceId) {
+    throw new Error(`${source} must keep the premium plan on the approved Stripe sandbox price id.`);
   }
 
   if (premium.active !== true) {

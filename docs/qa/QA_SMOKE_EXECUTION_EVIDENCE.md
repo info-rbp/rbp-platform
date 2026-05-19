@@ -85,8 +85,8 @@ Evidence:
 - Live AppWrite Free/Premium membership mapping validates.
 - Free plan does not require Stripe subscription checkout.
 - Premium plan remains AUD 25 + GST weekly.
-- Premium plan uses the QA Stripe test price `price_1TXx7C0mYebE7B3JyCL64COg`.
-- Premium plan maps to Stripe product `prod_UX19mM8SidwDPS`.
+- Premium plan uses the connected Stripe sandbox price `price_1TVlMC0xk2ucRLEh9h6bjNuc`.
+- Premium plan maps to Stripe product `prod_UUkCHEv53d9xLJ`.
 
 `npm run smoke:qa:billing -- --execute`: PASS.
 

@@ -6,7 +6,7 @@ Free is an active AUD 0 membership plan. It is not a trial, and Free signup must
 
 Premium is AUD 25 + GST per week. Premium upgrade uses Stripe subscription checkout after the user account and Free tenant already exist. The tenant remains Free until a successful Stripe checkout/webhook updates the subscription and entitlements. Abandoned checkout leaves the tenant on Free.
 
-QA seed data uses Stripe test price `price_1TXx7C0mYebE7B3JyCL64COg` for Premium. Live Stripe product and price IDs must be supplied through production environment/config or production Appwrite records during release setup. Do not hardcode live Stripe IDs into QA seed data.
+QA seed data uses connected Stripe sandbox price `price_1TVlMC0xk2ucRLEh9h6bjNuc` for Premium, mapped to product `prod_UUkCHEv53d9xLJ`. This price is AUD 25.00. Production Stripe product and price IDs must be supplied through production environment/config or production Appwrite records during release setup. Do not hardcode production Stripe IDs into QA seed data.
 
 All prices in the membership business-rule seeds are GST exclusive unless explicitly marked otherwise.
 

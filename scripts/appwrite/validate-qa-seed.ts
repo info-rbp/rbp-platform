@@ -5,6 +5,9 @@ import { readJson } from "./_lib";
 type SeedRecord = Record<string, unknown>;
 type PlanEntitlement = { plan_code?: string; entitlement_key?: string; enabled?: boolean };
 
+const qaPremiumStripeProductId = "prod_UUkCHEv53d9xLJ";
+const qaPremiumStripePriceId = "price_1TVlMC0xk2ucRLEh9h6bjNuc";
+
 const root = path.join(process.cwd(), "appwrite", "seeds", "qa");
 const users = readSeedFile<SeedRecord[]>("users");
 const tenants = readSeedFile<SeedRecord[]>("tenants");
@@ -156,8 +159,12 @@ requireCondition(String(premiumPlan?.billing_cycle) === "weekly", "Premium membe
 requireCondition(String(premiumPlan?.currency) === "AUD", "Premium membership plan must use AUD.");
 requireCondition(Number(premiumPlan?.amount) === 25, "Premium membership plan must be AUD 25 plus GST.");
 requireCondition(
-  premiumPlan?.stripe_price_id === "price_1TXx7C0mYebE7B3JyCL64COg",
-  "QA Premium membership plan must use the approved Stripe test price id.",
+  premiumPlan?.stripe_product_id === qaPremiumStripeProductId,
+  "QA Premium membership plan must use the approved Stripe sandbox product id.",
+);
+requireCondition(
+  premiumPlan?.stripe_price_id === qaPremiumStripePriceId,
+  "QA Premium membership plan must use the approved Stripe sandbox price id.",
 );
 
 const qaSeedText = fs.readdirSync(root)

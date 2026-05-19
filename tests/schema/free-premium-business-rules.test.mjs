@@ -31,13 +31,14 @@ const enabledEntitlements = (planCode) =>
       .map((row) => row.entitlement_key),
   );
 
-test("QA Premium plan is AUD 25 weekly with the approved test Stripe price", () => {
+test("QA Premium plan is AUD 25 weekly with the approved Stripe sandbox price", () => {
   const premium = planByCode("premium");
 
   assert.equal(premium.amount, 25);
   assert.equal(premium.currency, "AUD");
   assert.equal(premium.billing_cycle, "weekly");
-  assert.equal(premium.stripe_price_id, "price_1TXx7C0mYebE7B3JyCL64COg");
+  assert.equal(premium.stripe_product_id, "prod_UUkCHEv53d9xLJ");
+  assert.equal(premium.stripe_price_id, "price_1TVlMC0xk2ucRLEh9h6bjNuc");
 });
 
 test("QA seed keeps Free active and does not hardcode live subscription checkout", () => {

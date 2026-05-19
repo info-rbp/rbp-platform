@@ -14,8 +14,8 @@ Status: PASS.
 
 ## Stripe QA Mapping
 
-- QA Stripe price ID: `price_1TXx7C0mYebE7B3JyCL64COg`.
-- QA Stripe product ID: `prod_UX19mM8SidwDPS`.
+- QA Stripe price ID: `price_1TVlMC0xk2ucRLEh9h6bjNuc`.
+- QA Stripe product ID: `prod_UUkCHEv53d9xLJ`.
 - Plan code: `premium`.
 - Currency: `AUD`.
 - Amount: `25`.
